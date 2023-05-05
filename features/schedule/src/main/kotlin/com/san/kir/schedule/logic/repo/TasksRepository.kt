@@ -6,9 +6,8 @@ import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.db.dao.PlannedDao
 import com.san.kir.data.models.base.PlannedTask
 import com.san.kir.data.parsing.SiteCatalogsManager
-import javax.inject.Inject
 
-class TasksRepository @Inject constructor(
+internal class TasksRepository(
     private val plannedDao: PlannedDao,
     categoryDao: CategoryDao,
     mangaDao: MangaDao,

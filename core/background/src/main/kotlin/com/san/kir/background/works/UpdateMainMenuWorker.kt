@@ -1,7 +1,6 @@
 package com.san.kir.background.works
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
@@ -9,17 +8,17 @@ import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.san.kir.core.support.MainMenuType
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.db.dao.MainMenuDao
+import com.san.kir.data.mainMenuDao
 import com.san.kir.data.models.base.MainMenuItem
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class UpdateMainMenuWorker @AssistedInject constructor(
-    @Assisted private val ctx: Context,
-    @Assisted params: WorkerParameters,
-    private val mainMenuDao: MainMenuDao,
+class UpdateMainMenuWorker(
+    private val ctx: Context,
+    params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
+
+    private val mainMenuDao: MainMenuDao = ManualDI.mainMenuDao
 
     override suspend fun doWork(): Result {
         kotlin.runCatching {

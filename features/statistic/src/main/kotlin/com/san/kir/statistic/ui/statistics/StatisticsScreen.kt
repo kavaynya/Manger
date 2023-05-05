@@ -16,7 +16,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.CircleLogo
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
@@ -24,15 +23,16 @@ import com.san.kir.core.compose.RemoveItemMenuOnHold
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.TimeFormat
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.SimplifiedStatistic
 import com.san.kir.statistic.R
 
 @Composable
-fun StatisticsScreen(
-    navigateUp: () -> Boolean,
+internal fun StatisticsScreen(
+    navigateUp: () -> Unit,
     navigateToItem: (Long) -> Unit,
 ) {
-    val viewModel: StatisticsViewModel = hiltViewModel()
+    val viewModel: StatisticsStateHolder = stateHolder { StatisticsViewModel() }
     val state by viewModel.state.collectAsState()
     val ctx = LocalContext.current
 

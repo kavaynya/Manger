@@ -22,13 +22,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.coroutines.mainLaunch
 import com.san.kir.core.utils.toast
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.library.R
 import com.san.kir.library.ui.drawer.DrawerScreen
 import com.san.kir.library.utils.BottomDialog
@@ -39,13 +40,11 @@ import com.san.kir.library.utils.libraryActions
 private var backPressedTime = 0L
 
 @Composable
-fun LibraryScreen(
-    navigation: LibraryNavigation,
-) {
-    val viewModel: LibraryViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+internal fun LibraryScreen(navigation: LibraryNavigation) {
+    val holder: LibraryStateHolder = stateHolder { LibraryViewModel() }
+    val state by holder.state.collectAsState()
 
-    val unSelect = remember { { viewModel.sendEvent(LibraryEvent.NonSelect) } }
+    val unSelect = remember { { holder.sendEvent(LibraryEvent.NonSelect) } }
 
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
 
@@ -60,14 +59,14 @@ fun LibraryScreen(
                 navigateToStats = navigation.navigateToStats,
                 itemsState = state.items,
                 selectedManga = it,
-                sendEvent = viewModel::sendEvent
+                sendEvent = holder::sendEvent
             )
         }
     ) {
         ScreenContent(
             topBar = topBar(
                 title = stringResource(R.string.library_title),
-                actions = libraryActions(navigation.navigateToOnline, viewModel::sendEvent),
+                actions = libraryActions(navigation.navigateToOnline, holder::sendEvent),
                 navigationButton = NavigationButton.Scaffold(scaffoldState),
                 hasAction = state.background is BackgroundState.Work
             ),
@@ -78,7 +77,9 @@ fun LibraryScreen(
         ) {
             when (val currentState = state.items) {
                 ItemsState.Empty ->
-                    Empty(navigation.navigateToCategories)
+                    Empty {
+                        navigation.navigateToScreen(MainMenuType.Category)
+                    }
 
                 ItemsState.Load ->
                     Loading()
@@ -88,7 +89,7 @@ fun LibraryScreen(
                         navigation = navigation,
                         state = state,
                         itemsState = currentState,
-                        sendEvent = viewModel::sendEvent
+                        sendEvent = holder::sendEvent
                     )
                 }
             }

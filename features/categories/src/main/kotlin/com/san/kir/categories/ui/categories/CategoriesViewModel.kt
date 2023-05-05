@@ -1,23 +1,23 @@
 package com.san.kir.categories.ui.categories
 
+import com.san.kir.categories.logic.di.categoryRepository
 import com.san.kir.categories.logic.repo.CategoryRepository
-import com.san.kir.core.utils.viewModel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-@HiltViewModel
-internal class CategoriesViewModel @Inject constructor(
-    private val categoryRepository: CategoryRepository,
-) : BaseViewModel<CategoriesEvent, CategoriesState>() {
+internal class CategoriesViewModel(
+    private val categoryRepository: CategoryRepository = ManualDI.categoryRepository,
+) : ViewModel<CategoriesState>(), CategoriesStateHolder {
 
     override val tempState = categoryRepository.items.map { CategoriesState(it.toPersistentList()) }
 
     override val defaultState = CategoriesState(persistentListOf())
 
-    override suspend fun onEvent(event: CategoriesEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is CategoriesEvent.Reorder -> categoryRepository.swap(event.from, event.to)
             is CategoriesEvent.ChangeVisibility -> {

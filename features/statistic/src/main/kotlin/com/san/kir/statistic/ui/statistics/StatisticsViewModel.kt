@@ -1,16 +1,16 @@
 package com.san.kir.statistic.ui.statistics
 
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
+import com.san.kir.statistic.logic.di.statisticRepository
 import com.san.kir.statistic.logic.repo.StatisticRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.combine
-import javax.inject.Inject
 
-@HiltViewModel
-internal class StatisticsViewModel @Inject constructor(
-    private val statisticRepository: StatisticRepository
-) : BaseViewModel<StatisticsEvent, StatisticsState>() {
+internal class StatisticsViewModel(
+    private val statisticRepository: StatisticRepository = ManualDI.statisticRepository,
+) : ViewModel<StatisticsState>(), StatisticsStateHolder {
 
     override val tempState =
         combine(statisticRepository.items, statisticRepository.allTime) { items, time ->
@@ -19,7 +19,7 @@ internal class StatisticsViewModel @Inject constructor(
 
     override val defaultState = StatisticsState()
 
-    override suspend fun onEvent(event: StatisticsEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is StatisticsEvent.Delete -> statisticRepository.delete(event.itemId)
         }

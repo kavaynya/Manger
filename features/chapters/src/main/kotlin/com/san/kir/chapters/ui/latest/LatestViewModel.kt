@@ -1,17 +1,19 @@
 package com.san.kir.chapters.ui.latest
 
-import android.app.Application
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
-import androidx.work.WorkManager
+import android.content.Context
 import com.san.kir.background.logic.DownloadChaptersManager
+import com.san.kir.background.logic.di.downloadChaptersManager
+import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.LatestClearWorkers
+import com.san.kir.chapters.logic.di.latestRepository
 import com.san.kir.chapters.logic.repo.LatestRepository
 import com.san.kir.core.support.ChapterStatus
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultDispatcher
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.coroutines.defaultLaunch
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.action
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -26,15 +28,13 @@ import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-internal class LatestViewModel @Inject constructor(
-    private val context: Application,
-    private val latestRepository: LatestRepository,
-    private val downloadManager: DownloadChaptersManager,
-) : BaseViewModel<LatestEvent, LatestState>() {
+internal class LatestViewModel(
+    private val context: Context = ManualDI.context,
+    private val latestRepository: LatestRepository = ManualDI.latestRepository,
+    private val downloadManager: DownloadChaptersManager = ManualDI.downloadChaptersManager,
+) : ViewModel<LatestState>(), LatestStateHolder {
 
     private var job: Job? = null
     private val hasBackground = MutableStateFlow(true)
@@ -79,22 +79,22 @@ internal class LatestViewModel @Inject constructor(
 
     override val defaultState = LatestState()
 
-    override suspend fun onEvent(event: LatestEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            LatestEvent.CleanAll         -> LatestClearWorkers.clearAll(context)
-            LatestEvent.CleanDownloaded  -> LatestClearWorkers.clearDownloaded(context)
-            LatestEvent.CleanRead        -> LatestClearWorkers.clearReaded(context)
-            LatestEvent.DownloadNew      -> downloadNewChapters()
-            LatestEvent.RemoveSelected   -> removeSelected()
+            LatestEvent.CleanAll -> LatestClearWorkers.clearAll(context)
+            LatestEvent.CleanDownloaded -> LatestClearWorkers.clearDownloaded(context)
+            LatestEvent.CleanRead -> LatestClearWorkers.clearReaded(context)
+            LatestEvent.DownloadNew -> downloadNewChapters()
+            LatestEvent.RemoveSelected -> removeSelected()
             LatestEvent.DownloadSelected -> downloadSelected()
-            LatestEvent.UnselectAll      -> unselect()
-            is LatestEvent.ChangeSelect  -> changeSelect(event.index)
+            LatestEvent.UnselectAll -> unselect()
+            is LatestEvent.ChangeSelect -> changeSelect(event.index)
             is LatestEvent.StartDownload -> downloadManager.addTask(event.id)
-            is LatestEvent.StopDownload  -> downloadManager.removeTask(event.id)
+            is LatestEvent.StopDownload -> downloadManager.removeTask(event.id)
         }
     }
 
-    private suspend fun downloadNewChapters()  {
+    private suspend fun downloadNewChapters() {
         downloadManager.addTasks(newItems.first().map { it.id })
     }
 
@@ -102,7 +102,7 @@ internal class LatestViewModel @Inject constructor(
         latestRepository.update(items.value.filter { it.selected }.map { it.chapter.id }, false)
     }
 
-    private suspend fun downloadSelected()  {
+    private suspend fun downloadSelected() {
         downloadManager.addTasks(items.value.filter { it.selected }.map { it.chapter.id })
     }
 
@@ -120,13 +120,10 @@ internal class LatestViewModel @Inject constructor(
     private fun runWorkersObserver() {
         if (job?.isActive == true) return
         hasBackground.value = false
-        job = WorkManager
-            .getInstance(context)
-            .getWorkInfosByTagLiveData(LatestClearWorkers.tag)
-            .asFlow()
-            .onEach { works ->
+        job = viewModelScope.defaultLaunch {
+            collectWorkInfoByTag(LatestClearWorkers.tag) { works ->
                 hasBackground.value = works.any { it.state.isFinished.not() }
             }
-            .launchIn(viewModelScope)
+        }
     }
 }

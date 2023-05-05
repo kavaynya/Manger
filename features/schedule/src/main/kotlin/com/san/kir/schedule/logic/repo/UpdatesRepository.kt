@@ -2,9 +2,8 @@ package com.san.kir.schedule.logic.repo
 
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.db.dao.MangaDao
-import javax.inject.Inject
 
-class UpdatesRepository @Inject constructor(
+class UpdatesRepository(
     private val mangaDao: MangaDao,
 ) {
     val items = mangaDao.loadMiniItems()

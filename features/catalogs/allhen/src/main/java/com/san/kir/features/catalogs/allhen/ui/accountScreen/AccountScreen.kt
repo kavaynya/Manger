@@ -5,21 +5,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.web.WebView
 import com.google.accompanist.web.rememberWebViewState
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.parsing.sites.Allhentai
 
 @Composable
 fun AccountScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     url: String?,
 ) {
-    val viewModel: AccountScreenViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: AccountScreenStateHolder = stateHolder { AccountScreenViewModel() }
+    val state by holder.state.collectAsState()
 
     ScreenContent(
         topBar = topBar(

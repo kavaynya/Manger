@@ -1,34 +1,35 @@
 package com.san.kir.background.works
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.san.kir.core.support.DIR
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.shortPath
+import com.san.kir.data.chapterDao
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.db.dao.StorageDao
 import com.san.kir.data.db.dao.itemByPath
+import com.san.kir.data.mangaDao
 import com.san.kir.data.models.base.Storage
 import com.san.kir.data.models.base.getSizeAndIsNew
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.data.storageDao
 
 /*
     Worker для обновления данных о занимаемом месте
 */
-@HiltWorker
-class StoragesUpdateWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParameters: WorkerParameters,
-    private val storageDao: StorageDao,
-    private val chapterDao: ChapterDao,
-    private val mangaDao: MangaDao,
+class StoragesUpdateWorker(
+    appContext: Context,
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParameters) {
+
+    private val storageDao: StorageDao = ManualDI.storageDao
+    private val chapterDao: ChapterDao = ManualDI.chapterDao
+    private val mangaDao: MangaDao = ManualDI.mangaDao
 
     override suspend fun doWork(): Result {
         kotlin.runCatching {

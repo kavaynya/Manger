@@ -32,20 +32,20 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.systemBarBottomPadding
 import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.TestTags
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.library.R
 
 // Боковое меню с выбором пунктов для навигации по приложению
 @Composable
 internal fun DrawerScreen(navigateToScreen: (MainMenuType) -> Unit) {
 
-    val viewModel: DrawerViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: DrawerStateHolder = stateHolder { DrawerViewModel() }
+    val state by holder.state.collectAsState()
 
     val context = LocalContext.current
     val version = remember {
@@ -87,7 +87,7 @@ internal fun DrawerScreen(navigateToScreen: (MainMenuType) -> Unit) {
                             max = current.items.size,
                             item = item,
                             editMode = state.hasEditMenu,
-                            sendEvent = viewModel::sendEvent
+                            sendEvent = holder::sendEvent
                         ) {
                             navigateToScreen(item.item.type)
                         }

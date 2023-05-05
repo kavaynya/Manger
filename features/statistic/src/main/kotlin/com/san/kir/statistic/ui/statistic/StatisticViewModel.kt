@@ -1,25 +1,25 @@
 package com.san.kir.statistic.ui.statistic
 
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Statistic
+import com.san.kir.statistic.logic.di.statisticRepository
 import com.san.kir.statistic.logic.repo.StatisticRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-internal class StatisticViewModel @Inject constructor(
-    private val statisticRepository: StatisticRepository
-) : BaseViewModel<StatisticEvent, StatisticState>() {
+internal class StatisticViewModel(
+    private val statisticRepository: StatisticRepository = ManualDI.statisticRepository,
+) : ViewModel<StatisticState>(), StatisticStateHolder {
     private val statistic = MutableStateFlow(Statistic())
     private val mangaName = MutableStateFlow("")
 
     override val tempState = combine(statistic, mangaName, ::StatisticState)
     override val defaultState = StatisticState()
 
-    override suspend fun onEvent(event: StatisticEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is StatisticEvent.Set -> set(event.itemId)
         }

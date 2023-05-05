@@ -61,7 +61,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.catalog.R
 import com.san.kir.catalog.utils.ListItem
 import com.san.kir.core.compose.Dimensions
@@ -75,6 +74,7 @@ import com.san.kir.core.compose.systemBarBottomPadding
 import com.san.kir.core.compose.systemBarStartPadding
 import com.san.kir.core.compose.systemBarTopPadding
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.MiniCatalogItem
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.coroutines.launch
@@ -82,16 +82,16 @@ import java.net.URLDecoder
 
 @Composable
 fun CatalogScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToInfo: (String) -> Unit,
     navigateToAdd: (String) -> Unit,
     catalogName: String,
 ) {
-    val viewModel: CatalogViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
-    val filters by viewModel.filters.collectAsState()
+    val holder: CatalogStateHolder = stateHolder { CatalogViewModel() }
+    val state by holder.state.collectAsState()
+    val filters by holder.filters.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(CatalogEvent.Set(catalogName)) }
+    LaunchedEffect(Unit) { holder.sendEvent(CatalogEvent.Set(catalogName)) }
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -100,11 +100,11 @@ fun CatalogScreen(
     val query: ((String) -> Unit)? =
         remember(enableSearch) {
             if (enableSearch) {
-                { viewModel.sendEvent(CatalogEvent.Search(it)) }
+                { holder.sendEvent(CatalogEvent.Search(it)) }
             } else null
         }
     val update =
-        remember { { arg: MiniCatalogItem -> viewModel.sendEvent(CatalogEvent.UpdateManga(arg)) } }
+        remember { { arg: MiniCatalogItem -> holder.sendEvent(CatalogEvent.UpdateManga(arg)) } }
 
     ScreenList(
         scaffoldState = scaffoldState,
@@ -118,12 +118,12 @@ fun CatalogScreen(
             hasAction = state.background.currentState,
             progressAction = state.background.progress,
         ),
-        drawerContent = drawerToogle(filters, viewModel::sendEvent),
+        drawerContent = drawerToogle(filters, holder::sendEvent),
         bottomBar = { height ->
             BottomBar(
                 sort = state.sort,
                 background = state.background,
-                sendEvent = viewModel::sendEvent,
+                sendEvent = holder::sendEvent,
                 height = height
             )
         },
@@ -286,7 +286,7 @@ private fun CancelDialog(
 private fun navigationButtonToggle(
     state: Boolean,
     scaffoldState: ScaffoldState,
-    navigateUp: () -> Boolean
+    navigateUp: () -> Unit
 ) =
     if (state) NavigationButton.Scaffold(scaffoldState)
     else NavigationButton.Back(navigateUp)

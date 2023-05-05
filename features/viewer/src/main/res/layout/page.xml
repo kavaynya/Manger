@@ -36,7 +36,7 @@
         tools:visibility="gone" />
 
     <TextView
-        android:id="@+id/progress_text"
+        android:id="@+id/progressText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
@@ -48,7 +48,7 @@
         tools:visibility="gone" />
 
     <TextView
-        android:id="@+id/error_text"
+        android:id="@+id/errorText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"

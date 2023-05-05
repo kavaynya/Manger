@@ -1,6 +1,5 @@
 package com.san.kir.data.db
 
-import android.app.Application
 import android.content.Context
 import androidx.room.AutoMigration
 import androidx.room.Database
@@ -16,7 +15,6 @@ import com.san.kir.data.db.dao.SiteCatalogDao
 import com.san.kir.data.db.typeConverters.ListStringConverter
 import com.san.kir.data.models.base.SiteCatalogElement
 import java.io.File
-import javax.inject.Inject
 
 @Database(
     entities = [(SiteCatalogElement::class)],
@@ -50,12 +48,6 @@ abstract class CatalogDb : RoomDatabase() {
 
     object Migrate {
         val migrations: Array<Migration> = arrayOf()
-    }
-
-    class Factory @Inject constructor(private val context: Application) {
-        fun create(catalogName: String): CatalogDb {
-            return getDatabase(context, catalogName)
-        }
     }
 }
 

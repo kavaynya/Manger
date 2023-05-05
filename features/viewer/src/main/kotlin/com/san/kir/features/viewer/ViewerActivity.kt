@@ -24,13 +24,14 @@ import androidx.core.view.isVisible
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.viewpager.widget.ViewPager
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.data.models.base.Settings
 import com.san.kir.features.viewer.databinding.MainBinding
 import com.san.kir.features.viewer.utils.Page
 import com.san.kir.features.viewer.utils.VIEW_OFFSET
-import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -47,7 +48,6 @@ object MangaViewer {
     }
 }
 
-@AndroidEntryPoint
 internal class ViewerActivity : AppCompatActivity() {
 
     companion object {
@@ -64,7 +64,9 @@ internal class ViewerActivity : AppCompatActivity() {
     }
 
     private val binding by lazy { MainBinding.inflate(layoutInflater) }
-    private val viewModel: ViewerViewModel by viewModels()
+    private val viewModel: ViewerViewModel by viewModels(factoryProducer = {
+        viewModelFactory { initializer { ViewerViewModel() } }
+    })
     private val adapter by lazy { Adapter(this) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -111,14 +113,14 @@ internal class ViewerActivity : AppCompatActivity() {
         lifecycleScope.launchWhenResumed {
             viewModel.settingsRepository.viewer().collect { data: Settings.Viewer ->
                 requestedOrientation = when (data.orientation) {
-                    Settings.Viewer.Orientation.PORT      -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    Settings.Viewer.Orientation.LAND      -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    Settings.Viewer.Orientation.AUTO      -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                    Settings.Viewer.Orientation.PORT_REV  -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-                    Settings.Viewer.Orientation.LAND_REV  -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                    Settings.Viewer.Orientation.PORT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    Settings.Viewer.Orientation.LAND -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    Settings.Viewer.Orientation.AUTO -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                    Settings.Viewer.Orientation.PORT_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+                    Settings.Viewer.Orientation.LAND_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
                     Settings.Viewer.Orientation.AUTO_PORT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
                     Settings.Viewer.Orientation.AUTO_LAND -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                    else                                  -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                 }
 
                 if (Build.VERSION.SDK_INT >= 28) {
@@ -163,7 +165,7 @@ internal class ViewerActivity : AppCompatActivity() {
             lifecycleScope.launch {
                 when (keyCode) {
                     KeyEvent.KEYCODE_VOLUME_DOWN -> viewModel.chaptersManager.nextPage()
-                    KeyEvent.KEYCODE_VOLUME_UP   -> viewModel.chaptersManager.prevPage()
+                    KeyEvent.KEYCODE_VOLUME_UP -> viewModel.chaptersManager.prevPage()
                 }
             }
         }

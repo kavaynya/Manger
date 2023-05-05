@@ -23,14 +23,14 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
-import com.san.kir.core.internet.LocalConnectManager
+import com.san.kir.core.internet.connectManager
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withDefaultContext
 import timber.log.Timber
 import java.io.File
 
 @Composable
 fun ImageWithStatus(url: String?) {
-    val manager = LocalConnectManager.current
     var statusLogo by remember { mutableStateOf(StatusLogo.Init) }
     var logo by remember { mutableStateOf(ImageBitmap(60, 60)) }
 
@@ -53,7 +53,7 @@ fun ImageWithStatus(url: String?) {
     LaunchedEffect(url) {
         if (!url.isNullOrEmpty()) {
             statusLogo = StatusLogo.Init
-            manager.downloadBitmap(url)
+            ManualDI.connectManager.downloadBitmap(url)
                 .onSuccess { (bitmap, _, _) ->
                     logo = bitmap.asImageBitmap()
                     statusLogo = StatusLogo.Complete
@@ -68,13 +68,12 @@ fun ImageWithStatus(url: String?) {
 @Composable
 fun rememberImage(url: String?): BitmapPainter {
     val context = LocalContext.current
-    val manager = LocalConnectManager.current
     var logo by remember { mutableStateOf(BitmapPainter(ImageBitmap(2, 2))) }
 
     LaunchedEffect(url) {
         withDefaultContext {
             if (url != null && url.isNotEmpty()) {
-                val name = manager.nameFromUrl2(url)
+                val name = ManualDI.connectManager.nameFromUrl2(url)
                 val imageCacheDirectory = File(context.cacheDir, "image_cache")
                 val icon = File(imageCacheDirectory, name)
 
@@ -86,7 +85,7 @@ fun rememberImage(url: String?): BitmapPainter {
                     return@withDefaultContext
                 }
 
-                manager.downloadFile(icon, url)
+                ManualDI.connectManager.downloadFile(icon, url)
                     .mapCatching {
                         logo = BitmapPainter(BitmapFactory.decodeFile(icon.path).asImageBitmap())
                     }

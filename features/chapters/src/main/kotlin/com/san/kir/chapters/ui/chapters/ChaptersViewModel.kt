@@ -1,24 +1,28 @@
 package com.san.kir.chapters.ui.chapters
 
-import android.app.Application
-import androidx.lifecycle.viewModelScope
+import android.content.Context
 import com.san.kir.background.logic.DownloadChaptersManager
 import com.san.kir.background.logic.UpdateMangaManager
+import com.san.kir.background.logic.di.downloadChaptersManager
+import com.san.kir.background.logic.di.updateMangaManager
 import com.san.kir.chapters.R
+import com.san.kir.chapters.logic.di.chaptersRepository
+import com.san.kir.chapters.logic.di.settingsRepository
 import com.san.kir.chapters.logic.repo.ChaptersRepository
 import com.san.kir.chapters.logic.repo.SettingsRepository
 import com.san.kir.chapters.logic.utils.SelectionHelper
 import com.san.kir.core.support.ChapterFilter
 import com.san.kir.core.support.DownloadState
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.delChapters
 import com.san.kir.core.utils.longToast
 import com.san.kir.core.utils.toast
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Manga
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.FlowPreview
@@ -32,16 +36,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class ChaptersViewModel @Inject constructor(
-    private val context: Application,
-    private val chaptersRepository: ChaptersRepository,
-    private val settingsRepository: SettingsRepository,
-    private val updateManager: UpdateMangaManager,
-    private val downloadManager: DownloadChaptersManager,
-) : BaseViewModel<ChaptersEvent, ChaptersState>() {
+internal class ChaptersViewModel(
+    private val context: Context = ManualDI.context,
+    private val chaptersRepository: ChaptersRepository = ManualDI.chaptersRepository,
+    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager,
+    private val downloadManager: DownloadChaptersManager = ManualDI.downloadChaptersManager,
+) : ViewModel<ChaptersState>(), ChaptersStateHolder {
     private var job: Job? = null
     private val selectableItemComparator by lazy { SelectableItemComparator() }
     private var oneTimeFlag = true
@@ -75,19 +77,19 @@ internal class ChaptersViewModel @Inject constructor(
 
     override val defaultState = ChaptersState()
 
-    override suspend fun onEvent(event: ChaptersEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            is ChaptersEvent.Set           -> set(event.mangaId)
-            is ChaptersEvent.WithSelected  -> withSelected(event.mode)
-            is ChaptersEvent.ChangeFilter  -> changeFilter(event.mode)
+            is ChaptersEvent.Set -> set(event.mangaId)
+            is ChaptersEvent.WithSelected -> withSelected(event.mode)
+            is ChaptersEvent.ChangeFilter -> changeFilter(event.mode)
             is ChaptersEvent.StartDownload -> downloadManager.addTask(event.id)
-            is ChaptersEvent.StopDownload  -> downloadManager.removeTask(event.id)
-            ChaptersEvent.ChangeIsUpdate   -> changeIsUpdate()
-            ChaptersEvent.ChangeMangaSort  -> changeMangaSort()
-            ChaptersEvent.DownloadAll      -> downloadAll()
-            ChaptersEvent.DownloadNext     -> downloadNext()
-            ChaptersEvent.DownloadNotRead  -> downloadNotReads()
-            ChaptersEvent.UpdateManga      -> updateManager.addTask(manga.value.id)
+            is ChaptersEvent.StopDownload -> downloadManager.removeTask(event.id)
+            ChaptersEvent.ChangeIsUpdate -> changeIsUpdate()
+            ChaptersEvent.ChangeMangaSort -> changeMangaSort()
+            ChaptersEvent.DownloadAll -> downloadAll()
+            ChaptersEvent.DownloadNext -> downloadNext()
+            ChaptersEvent.DownloadNotRead -> downloadNotReads()
+            ChaptersEvent.UpdateManga -> updateManager.addTask(manga.value.id)
         }
     }
 
@@ -125,7 +127,7 @@ internal class ChaptersViewModel @Inject constructor(
             backgroundAction.update { it.copy(updateManga = task != null) }
 
             when (task?.state) {
-                DownloadState.UNKNOWN   -> withMainContext {
+                DownloadState.UNKNOWN -> withMainContext {
                     context.longToast(R.string.list_chapters_message_error)
                 }
                 DownloadState.COMPLETED -> withMainContext {
@@ -133,7 +135,7 @@ internal class ChaptersViewModel @Inject constructor(
                     else context.longToast(R.string.have_new_chapters_count, task.newChapters)
                 }
 
-                else                    -> {}
+                else -> {}
             }
         }.launchIn(this)
     }
@@ -176,13 +178,13 @@ internal class ChaptersViewModel @Inject constructor(
 
         val selectedItems = state.value.items.filter { it.selected }
         when (mode) {
-            Selection.Above        -> items.update { SelectionHelper.above(it) }
-            Selection.Below        -> items.update { SelectionHelper.below(it) }
-            Selection.All          -> items.update { SelectionHelper.all(it) }
-            Selection.Clear        -> items.update { SelectionHelper.clear(it) }
-            is Selection.Change    -> items.update { SelectionHelper.change(it, mode.index) }
+            Selection.Above -> items.update { SelectionHelper.above(it) }
+            Selection.Below -> items.update { SelectionHelper.below(it) }
+            Selection.All -> items.update { SelectionHelper.all(it) }
+            Selection.Clear -> items.update { SelectionHelper.clear(it) }
+            is Selection.Change -> items.update { SelectionHelper.change(it, mode.index) }
 
-            Selection.DeleteFiles  -> delChapters(
+            Selection.DeleteFiles -> delChapters(
                 selectedItems.map { chaptersRepository.item(it.chapter.id).path }
             ).apply {
                 withMainContext {
@@ -197,12 +199,12 @@ internal class ChaptersViewModel @Inject constructor(
 
             Selection.DeleteFromDB -> chaptersRepository.delete(selectedItems.map { it.chapter.id })
 
-            Selection.Download     -> {
+            Selection.Download -> {
                 downloadManager.addTasks(selectedItems.map { it.chapter.id })
                 items.update { SelectionHelper.clear(it) }
             }
 
-            is Selection.SetRead   -> {
+            is Selection.SetRead -> {
                 chaptersRepository.update(selectedItems.map { it.chapter.id }, mode.newState)
                 items.update { SelectionHelper.clear(it) }
             }
@@ -212,9 +214,9 @@ internal class ChaptersViewModel @Inject constructor(
     private fun changeFilter(mode: Filter) {
         filter.update {
             when (mode) {
-                Filter.All     -> it.toAll()
+                Filter.All -> it.toAll()
                 Filter.NotRead -> it.toNot()
-                Filter.Read    -> it.toRead()
+                Filter.Read -> it.toRead()
                 Filter.Reverse -> it.inverse()
             }
         }

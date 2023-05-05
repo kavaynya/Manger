@@ -13,10 +13,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
-import javax.inject.Inject
 
 // класс для управления страницами и главами
-internal class ChaptersManager @Inject constructor(
+internal class ChaptersManager(
     private val chapterDao: ChapterDao,
     private val statisticDao: StatisticDao,
     private val siteCatalogManager: SiteCatalogsManager,

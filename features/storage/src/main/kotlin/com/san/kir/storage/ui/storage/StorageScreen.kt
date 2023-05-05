@@ -32,7 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
@@ -40,21 +39,22 @@ import com.san.kir.core.compose.animation.VectorConverter
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.format
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.base.Storage
 import com.san.kir.storage.R
 import com.san.kir.storage.utils.StorageProgressBar
 import kotlinx.coroutines.launch
 
 @Composable
-fun StorageScreen(
-    navigateUp: () -> Boolean,
+internal fun StorageScreen(
+    navigateUp: () -> Unit,
     mangaId: Long,
     hasUpdate: Boolean,
 ) {
-    val viewModel: StorageViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: StorageStateHolder = stateHolder { StorageViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(StorageEvent.Set(mangaId, hasUpdate)) }
+    LaunchedEffect(Unit) { holder.sendEvent(StorageEvent.Set(mangaId, hasUpdate)) }
 
     ScreenContent(
         topBar = topBar(
@@ -67,7 +67,7 @@ fun StorageScreen(
             background = state.background,
             storage = state.item,
             size = state.size,
-            sendEvent = viewModel::sendEvent
+            sendEvent = holder::sendEvent
         )
     }
 }

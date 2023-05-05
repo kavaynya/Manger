@@ -6,9 +6,8 @@ import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.StatisticDao
 import com.san.kir.data.models.base.Chapter
 import com.san.kir.data.parsing.SiteCatalogsManager
-import javax.inject.Inject
 
-class ChapterRepository @Inject constructor(
+class ChapterRepository(
     private val manager: SiteCatalogsManager,
     private val chapterDao: ChapterDao,
     private val statisticDao: StatisticDao,

@@ -132,9 +132,7 @@ Manger (MANGa readER)
     * [Navigation](https://developer.android.com/jetpack/compose/navigation)
     * [Hilt and Navigation](https://developer.android.com/jetpack/compose/libraries#hilt-navigation)
 * DI
-    * [Hilt Android](https://developer.android.com/training/dependency-injection/hilt-android)
-    * [Hilt Compiler](https://developer.android.com/training/dependency-injection/hilt-android)
-    * [Hilt WorkManager](https://developer.android.com/training/dependency-injection/hilt-jetpack#workmanager)
+    * Use manual DI
 * Internet & Parsing
     * [Jsoup](https://jsoup.org)
     * [OKHttp](https://square.github.io/okhttp/)
@@ -153,9 +151,9 @@ Manger (MANGa readER)
     * [KSP](https://github.com/google/ksp)
     * [Immutable Collections](https://github.com/Kotlin/kotlinx.collections.immutable)
 * Lifecycle
+    * [Decompose](https://arkivanov.github.io/Decompose/) 
     * [Common](https://developer.android.com/topic/libraries/architecture/lifecycle)
     * [Runtime KTX Extensions](https://developer.android.com/topic/libraries/architecture/lifecycle)
-    * [LiveData KTX Extensions](https://developer.android.com/topic/libraries/architecture/livedata)
     * [ViewModel KTX Extensions](https://developer.android.com/topic/libraries/architecture/viewmodel)
 * Work Manager
     * [Runtime Kotlin + Coroutines](https://developer.android.com/topic/libraries/architecture/workmanager)

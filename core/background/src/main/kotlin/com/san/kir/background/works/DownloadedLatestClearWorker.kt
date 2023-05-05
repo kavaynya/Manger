@@ -1,21 +1,20 @@
 package com.san.kir.background.works
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.san.kir.core.support.ChapterStatus
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.data.chapterDao
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.models.base.action
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
-@HiltWorker
-class DownloadedLatestClearWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val chapterDao: ChapterDao,
+class DownloadedLatestClearWorker(
+    appContext: Context,
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
+
+    private val chapterDao: ChapterDao = ManualDI.chapterDao
 
     override suspend fun doWork(): Result {
         kotlin.runCatching {

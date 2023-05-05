@@ -17,7 +17,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.catalog.R
 import com.san.kir.core.compose.DialogText
 import com.san.kir.core.compose.Dimensions
@@ -31,18 +30,19 @@ import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.browse
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.base.SiteCatalogElement
 
 @Composable
 fun CatalogItemScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToAdd: (String) -> Unit,
     url: String,
 ) {
-    val viewModel: CatalogItemViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: CatalogItemViewModel = stateHolder { CatalogItemViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(CatalogItemEvent.Set(url)) }
+    LaunchedEffect(Unit) { holder.sendEvent(CatalogItemEvent.Set(url)) }
 
     ScreenContent(
         topBar = topBar(

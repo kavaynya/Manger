@@ -1,17 +1,19 @@
 package com.san.kir.catalog.ui.catalog
 
-import android.app.Application
-import androidx.lifecycle.viewModelScope
+import android.content.Context
 import com.san.kir.background.logic.UpdateCatalogManager
+import com.san.kir.background.logic.di.updateCatalogManager
+import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
 import com.san.kir.core.support.DownloadState
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
 import com.san.kir.core.utils.mapP
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.MiniCatalogItem
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.PersistentMap
 import kotlinx.collections.immutable.persistentListOf
@@ -25,14 +27,12 @@ import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class CatalogViewModel @Inject constructor(
-    private val context: Application,
-    private val catalogRepository: CatalogRepository,
-    private val manager: UpdateCatalogManager,
-) : BaseViewModel<CatalogEvent, CatalogState>() {
+internal class CatalogViewModel(
+    private val context: Context = ManualDI.context,
+    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
+    private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager,
+) : ViewModel<CatalogState>(), CatalogStateHolder {
     private var job: Job? = null
     private val items = MutableStateFlow(persistentListOf<MiniCatalogItem>())
     private val title = MutableStateFlow("")
@@ -43,7 +43,7 @@ internal class CatalogViewModel @Inject constructor(
     private val filter = MutableStateFlow(FilterState())
 
     private val _filters = MutableStateFlow(persistentListOf<Filter>())
-    val filters = _filters.asStateFlow()
+    override val filters = _filters.asStateFlow()
 
     override val tempState = combine(
         items, title, filter, background, sort
@@ -59,16 +59,16 @@ internal class CatalogViewModel @Inject constructor(
 
     override val defaultState = CatalogState()
 
-    override suspend fun onEvent(event: CatalogEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            is CatalogEvent.Set              -> set(event.catalogName)
-            is CatalogEvent.UpdateManga      -> updateManga(event.item)
-            is CatalogEvent.ChangeFilter     -> changeFilter(event.type, event.index)
-            is CatalogEvent.Search           -> filter.update { it.copy(search = event.query) }
-            is CatalogEvent.ChangeSort       -> sort.update { it.copy(type = event.sort) }
-            CatalogEvent.Reverse             -> sort.update { it.copy(reverse = it.reverse.not()) }
-            CatalogEvent.ClearFilters        -> clearFilters()
-            CatalogEvent.UpdateContent       -> manager.addTask(state.value.title)
+            is CatalogEvent.Set -> set(event.catalogName)
+            is CatalogEvent.UpdateManga -> updateManga(event.item)
+            is CatalogEvent.ChangeFilter -> changeFilter(event.type, event.index)
+            is CatalogEvent.Search -> filter.update { it.copy(search = event.query) }
+            is CatalogEvent.ChangeSort -> sort.update { it.copy(type = event.sort) }
+            CatalogEvent.Reverse -> sort.update { it.copy(reverse = it.reverse.not()) }
+            CatalogEvent.ClearFilters -> clearFilters()
+            CatalogEvent.UpdateContent -> manager.addTask(state.value.title)
             CatalogEvent.CancelUpdateContent -> manager.removeTask(state.value.title)
         }
     }
@@ -90,9 +90,9 @@ internal class CatalogViewModel @Inject constructor(
 
                         DownloadState.QUEUED,
                         DownloadState.PAUSED,
-                                              -> old.copy(updateCatalogs = true, progress = null)
+                        -> old.copy(updateCatalogs = true, progress = null)
 
-                        else                  -> old
+                        else -> old
                     }
                 }
                 background.update { old }
@@ -125,10 +125,10 @@ internal class CatalogViewModel @Inject constructor(
 
         filter.selectedFilters.forEach { entry ->
             prepare = when (entry.key) {
-                FilterType.Authors  -> prepare.filter { it.authors.containsAll(entry.value) }
-                FilterType.Genres   -> prepare.filter { it.genres.containsAll(entry.value) }
+                FilterType.Authors -> prepare.filter { it.authors.containsAll(entry.value) }
+                FilterType.Genres -> prepare.filter { it.genres.containsAll(entry.value) }
                 FilterType.Statuses -> prepare.filter { entry.value.contains(it.statusEdition) }
-                FilterType.Types    -> prepare.filter { entry.value.contains(it.type) }
+                FilterType.Types -> prepare.filter { entry.value.contains(it.type) }
             }
         }
 
@@ -139,7 +139,7 @@ internal class CatalogViewModel @Inject constructor(
         val sorted = when (sort.type) {
             SortType.Date -> sortedBy { it.dateId }
             SortType.Name -> sortedBy { it.name }
-            SortType.Pop  -> sortedBy { it.populate }
+            SortType.Pop -> sortedBy { it.populate }
         }.sortedByDescending { it.state is MiniCatalogItem.State.Update }
 
         return (if (sort.reverse) sorted.reversed() else sorted).toPersistentList()

@@ -32,9 +32,6 @@
 
     <string name="settings_viewer_control_summary">Выбор способа перелистывания страниц</string>
     <string name="settings_viewer_control_title">Управление</string>
-    <string name="settings_viewer_control_taps">taps</string>
-    <string name="settings_viewer_control_swipes">swipes</string>
-    <string name="settings_viewer_control_keys">keys</string>
 
     <string name="settings_viewer_cutout_summary">Будет ли использоваться зона выреза или она будет закрашена черной полосой</string>
     <string name="settings_viewer_cutout_title">Использовать зону выреза</string>

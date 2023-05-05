@@ -25,7 +25,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -38,7 +38,6 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.PermissionStatus
 import com.google.accompanist.permissions.rememberPermissionState
@@ -46,13 +45,15 @@ import com.san.kir.core.compose.DefaultSpacer
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.FromTopToTopAnimContent
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.manger.R
 import timber.log.Timber
 
 @Composable
 fun InitScreen(navigateToItem: () -> Unit) {
-    val viewModel: InitViewModel = hiltViewModel()
-    var state by remember { mutableStateOf<InitState>(InitState.Memory) }
+    val holder: InitStateHolder = stateHolder { InitViewModel() }
+    val state by holder.state.collectAsState()
+    val next = holder.next { navigateToItem.invoke() }
 
     MaterialTheme {
         Scaffold { padding ->
@@ -86,27 +87,14 @@ fun InitScreen(navigateToItem: () -> Unit) {
                 ) {
                     Column(horizontalAlignment = Alignment.CenterHorizontally) {
                         when (it) {
-                            InitState.Init -> {
-                                LaunchedEffect(Unit) {
-                                    viewModel.startApp()
-                                    navigateToItem.invoke()
-                                }
-                            }
+                            InitState.Init -> Unit
 
                             InitState.Memory ->
-                                MemoryPermission {
-                                    state =
-                                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                                            InitState.Notification
-                                        else
-                                            InitState.Init
-                                }
+                                MemoryPermission(next::invoke)
 
                             InitState.Notification ->
                                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                                    NotificationPermission {
-                                        state = InitState.Init
-                                    }
+                                    NotificationPermission(next::invoke)
                         }
                     }
                 }

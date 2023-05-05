@@ -1,21 +1,19 @@
 package com.san.kir.features.catalogs.allhen.ui.accountScreen
 
-import com.san.kir.core.utils.viewModel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import kotlinx.coroutines.flow.flowOf
-import javax.inject.Inject
 
-@HiltViewModel
-internal class AccountScreenViewModel @Inject constructor(
+internal class AccountScreenViewModel(
 
-) : BaseViewModel<AccountScreenEvent, AccountScreenState>() {
+) : ViewModel<AccountScreenState>(), AccountScreenStateHolder {
     override val tempState = flowOf(AccountScreenState())
 
     override val defaultState = AccountScreenState()
 
-    override suspend fun onEvent(event: AccountScreenEvent) {
-//        when(event) {
-//
-//        }
+    override suspend fun onEvent(event: ScreenEvent) {
+        //        when(event) {
+        //
+        //        }
     }
 }

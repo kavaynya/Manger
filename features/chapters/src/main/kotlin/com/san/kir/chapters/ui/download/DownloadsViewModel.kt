@@ -1,26 +1,30 @@
 package com.san.kir.chapters.ui.download
 
 import com.san.kir.background.logic.DownloadChaptersManager
+import com.san.kir.background.logic.di.downloadChaptersManager
+import com.san.kir.chapters.logic.di.chaptersRepository
+import com.san.kir.chapters.logic.di.settingsRepository
 import com.san.kir.chapters.logic.repo.ChaptersRepository
 import com.san.kir.chapters.logic.repo.SettingsRepository
 import com.san.kir.core.internet.CellularNetwork
 import com.san.kir.core.internet.NetworkState
 import com.san.kir.core.internet.WifiNetwork
+import com.san.kir.core.internet.cellularNetwork
+import com.san.kir.core.internet.wifiNetwork
 import com.san.kir.core.support.DownloadState
-import com.san.kir.core.utils.viewModel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.combine
-import javax.inject.Inject
 
-@HiltViewModel
-internal class DownloadsViewModel @Inject constructor(
-    private val chaptersRepository: ChaptersRepository,
-    private val cellularNetwork: CellularNetwork,
-    private val wifiNetwork: WifiNetwork,
-    private val manager: DownloadChaptersManager,
-    settingsRepository: SettingsRepository,
-) : BaseViewModel<DownloadsEvent, DownloadsState>() {
+internal class DownloadsViewModel(
+    private val chaptersRepository: ChaptersRepository = ManualDI.chaptersRepository,
+    private val cellularNetwork: CellularNetwork = ManualDI.cellularNetwork,
+    private val wifiNetwork: WifiNetwork = ManualDI.wifiNetwork,
+    private val manager: DownloadChaptersManager = ManualDI.downloadChaptersManager,
+    settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+) : ViewModel<DownloadsState>(), DownloadsStateHolder {
 
     override val tempState = combine(
         chaptersRepository.items,
@@ -41,16 +45,16 @@ internal class DownloadsViewModel @Inject constructor(
 
     override val defaultState = DownloadsState()
 
-    override suspend fun onEvent(event: DownloadsEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            DownloadsEvent.ClearAll         -> clearAll()
-            DownloadsEvent.CompletedClear   -> clearCompleted()
-            DownloadsEvent.ErrorClear       -> clearError()
-            DownloadsEvent.PausedClear      -> clearPaused()
-            DownloadsEvent.StartAll         -> manager.addPausedTasks()
-            DownloadsEvent.StopAll          -> manager.removeAllTasks()
+            DownloadsEvent.ClearAll -> clearAll()
+            DownloadsEvent.CompletedClear -> clearCompleted()
+            DownloadsEvent.ErrorClear -> clearError()
+            DownloadsEvent.PausedClear -> clearPaused()
+            DownloadsEvent.StartAll -> manager.addPausedTasks()
+            DownloadsEvent.StopAll -> manager.removeAllTasks()
             is DownloadsEvent.StartDownload -> manager.addTask(event.itemId)
-            is DownloadsEvent.StopDownload  -> manager.removeTask(event.itemId)
+            is DownloadsEvent.StopDownload -> manager.removeTask(event.itemId)
         }
     }
 
@@ -90,7 +94,8 @@ internal class DownloadsViewModel @Inject constructor(
         )
     }
 
-    override fun onCleared() {
+    override fun onDestroy() {
+        super.onDestroy()
         cellularNetwork.stop()
         wifiNetwork.stop()
     }

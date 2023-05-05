@@ -5,35 +5,36 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.hilt.work.HiltWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
 import com.san.kir.background.logic.WorkComplete
+import com.san.kir.background.logic.di.mangaRepository
+import com.san.kir.background.logic.di.mangaWorkerRepository
 import com.san.kir.background.logic.repo.MangaRepository
 import com.san.kir.background.logic.repo.MangaWorkerRepository
 import com.san.kir.background.util.cancelAction
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ID
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.fuzzy
 import com.san.kir.data.models.base.Chapter
 import com.san.kir.data.models.base.MangaTask
 import com.san.kir.data.parsing.SiteCatalogsManager
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 import java.util.regex.Pattern
 
-@HiltWorker
-class UpdateMangaWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
-    private val workerRepository: MangaWorkerRepository,
-    private val mangaRepository: MangaRepository,
-    private val manager: SiteCatalogsManager,
-) : BaseUpdateWorker<MangaTask>(context, params, workerRepository) {
+class UpdateMangaWorker(
+    context: Context,
+    params: WorkerParameters,
+) : BaseUpdateWorker<MangaTask>(context, params) {
 
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager
+
+    override val workerRepository: MangaWorkerRepository = ManualDI.mangaWorkerRepository
     override val TAG = "Chapter Finder"
 
     private val reg = Pattern.compile("\\d+")
@@ -122,7 +123,7 @@ class UpdateMangaWorker @AssistedInject constructor(
                         )
                     )
 
-                    else                 -> setContentText(
+                    else -> setContentText(
                         applicationContext.getString(
                             R.string.finding_for_format, task.mangaName
                         )

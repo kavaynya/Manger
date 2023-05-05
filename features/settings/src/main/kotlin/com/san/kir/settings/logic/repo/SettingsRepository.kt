@@ -4,9 +4,8 @@ import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.db.dao.SettingsDao
 import com.san.kir.data.db.repositories.AbstractSettingsRepository
 import com.san.kir.data.models.base.Settings
-import javax.inject.Inject
 
-class SettingsRepository @Inject constructor(
+internal class SettingsRepository(
     settingsDao: SettingsDao
 ) : AbstractSettingsRepository(settingsDao) {
 

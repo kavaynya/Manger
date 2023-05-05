@@ -1,23 +1,23 @@
 package com.san.kir.categories.ui.category
 
-import android.app.Application
+import android.content.Context
 import com.san.kir.background.works.RemoveCategoryWorker
+import com.san.kir.categories.logic.di.categoryRepository
 import com.san.kir.categories.logic.repo.CategoryRepository
 import com.san.kir.core.support.CATEGORY_ALL
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Category
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class CategoryViewModel @Inject constructor(
-    private val context: Application,
-    private val categoryRepository: CategoryRepository,
-) : BaseViewModel<CategoryEvent, CategoryState>() {
+internal class CategoryViewModel(
+    private val context: Context = ManualDI.context,
+    private val categoryRepository: CategoryRepository = ManualDI.categoryRepository,
+) : ViewModel<CategoryState>(), CategoryStateHolder {
 
     private val hasCreatedNew = MutableStateFlow(false)
     private val currentCategory = MutableStateFlow(Category())
@@ -43,11 +43,11 @@ internal class CategoryViewModel @Inject constructor(
 
     override val defaultState = CategoryState()
 
-    override suspend fun onEvent(event: CategoryEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            CategoryEvent.Save      -> save()
-            is CategoryEvent.Set    -> setCategory(event.categoryName)
-            CategoryEvent.Delete    -> RemoveCategoryWorker.addTask(context, currentCategory.value)
+            CategoryEvent.Save -> save()
+            is CategoryEvent.Set -> setCategory(event.categoryName)
+            CategoryEvent.Delete -> RemoveCategoryWorker.addTask(context, currentCategory.value)
             is CategoryEvent.Update -> change(event)
         }
     }

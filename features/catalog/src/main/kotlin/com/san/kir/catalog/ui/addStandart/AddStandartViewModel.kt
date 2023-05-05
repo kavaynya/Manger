@@ -1,15 +1,19 @@
 package com.san.kir.catalog.ui.addStandart
 
 import com.san.kir.background.logic.UpdateMangaManager
+import com.san.kir.background.logic.di.updateMangaManager
+import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
 import com.san.kir.core.support.DIR
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Category
 import com.san.kir.data.models.base.Statistic
 import com.san.kir.data.models.base.toManga
 import com.san.kir.data.parsing.SiteCatalogAlternative
 import com.san.kir.data.parsing.SiteCatalogsManager
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,15 +21,14 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import java.util.regex.Pattern
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-@HiltViewModel
-internal class AddStandartViewModel @Inject constructor(
-    private val catalogRepository: CatalogRepository,
-    private val manager: SiteCatalogsManager,
-    private val updateManager: UpdateMangaManager,
-) : BaseViewModel<AddStandartEvent, AddStandartState>() {
+
+internal class AddStandartViewModel(
+    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager,
+    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager,
+) : ViewModel<AddStandartState>(), AddStandartStateHolder {
     private var url = ""
     private val categoryName = MutableStateFlow("")
     private val processState = MutableStateFlow<ProcessState>(ProcessState.None)
@@ -49,7 +52,7 @@ internal class AddStandartViewModel @Inject constructor(
 
     override val defaultState = AddStandartState()
 
-    override suspend fun onEvent(event: AddStandartEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is AddStandartEvent.Set -> url = event.url
             is AddStandartEvent.UpdateText -> categoryName.update { event.text }
@@ -57,7 +60,7 @@ internal class AddStandartViewModel @Inject constructor(
         }
     }
 
-    private suspend fun startProcess()  {
+    private suspend fun startProcess() {
         kotlin.runCatching {
             processState.update { ProcessState.Load }
 

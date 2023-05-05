@@ -6,9 +6,8 @@ import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.models.base.Chapter
 import com.san.kir.data.models.base.Manga
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-class ChaptersRepository @Inject constructor(
+class ChaptersRepository(
     private val mangaDao: MangaDao,
     private val chapterDao: ChapterDao,
 ) {

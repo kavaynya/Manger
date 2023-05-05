@@ -12,11 +12,9 @@
     <!-- Main Activity -->
     <string name="app_name" translatable="false">Manger</string>
     <string name="app_name_version" translatable="false">Manger: %s</string>
-    <string name="main_permission_error">Данное приложение превратилось в тыкву</string>
     <string name="storage_permission_nonpermission">Вы запретили приложению доступ к памяти смартфона и оно превратилось в тыкву. Для исправления перейдите в настройки</string>
     <string name="main_permission_request">Показать запрос</string>
     <string name="main_permission_go_to_setting">Перейти в настройки</string>
-    <string name="main_permission_no_rationale">Больше не просить</string>
     <string name="storage_permission_reason">Данное приложение использует доступ к памяти смартфона
     для хранения профиля, настроек и манги для возможности читать ее в любой момент.
     Без получения соответстующего разрешения, приложение не сможет работать.</string>
@@ -35,12 +33,10 @@
     <string name="schedule">Расписание</string>
     <string name="categories">Категории</string>
     <string name="catalogs">Каталоги</string>
-    <string name="main_menu_library_count">Библиотека: %d</string>
     <string name="main_menu_storage_size_mb">%s Мб</string>
     <string name="main_menu_downloader_count">Загрузчик: %d</string>
     <string name="main_menu_latest_count">Обновления: %d</string>
     <string name="main_menu_search">Поиск</string>
-    <string name="main_menu_item_catalogs">%1$d - %2$d</string>
 
 
     <!-- Library -->
@@ -53,7 +49,6 @@
     <string name="library_popupmenu_storage">Используемая память</string>
     <string name="library_popupmenu_statistic">Статистика чтения</string>
     <string name="library_popupmenu_delete_message">Вы действительно хотите удалить эту мангу</string>
-    <string name="library_popupmenu_delete_title">Внимание!!!</string>
     <string name="library_popupmenu_delete_ok">Конечно</string>
     <string name="library_popupmenu_delete_ok_with_files">Конечно, c файлами</string>
     <string name="library_popupmenu_delete_no">Никогда</string>
@@ -62,9 +57,7 @@
     <string name="library_popupmenu_delete_read_chapters">Удалить прочитанное</string>
     <string name="library_popupmenu_delete_all">Очистить папку</string>
     <string name="library_popupmenu_delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
-    <string name="library_popupmenu_delete_all_chapters_message">Своими действиями вы хотите лишить себя всей манги?</string>
     <string name="library_popupmenu_delete_read_chapters_ok">Да</string>
-    <string name="library_popupmenu_delete_read_chapters_delete_nothing">Удалять нечего</string>
     <string name="library_popupmenu_delete_read_chapters_delete">Удаляю…</string>
     <string name="library_popupmenu_delete_read_chapters_no">Не, не</string>
     <string name="library_no_categories">У вас скрыты все категории, вернитесь в пункт "Категории" и измените видимость у нужных</string>
@@ -74,21 +67,12 @@
     <string name="library_help_go">В КАТАЛОГИ</string>
     <string name="library_sort_dialog_reverse">Изменить порядок?</string>
     <string name="library_sort_dialog_visible">Скрыть ?</string>
-    <string name="library_page_item_read_status">%1$d</string>
     <string name="library_menu_reload">Обновить текущую категорию</string>
     <string name="library_menu_reload_all">Обновить все</string>
     <string name="library_menu_update">Поиск обновлений приложения</string>
-    <string name="library_menu_add_manga">Добавить мангу</string>
     <string name="library_page_item_size">%s Мб</string>
-    <string name="library_error_hide_categories">Все категории скрыты?</string>
 
     <!-- ListChapters -->
-
-    <string name="list_chapters_option_update">Обновить</string>
-
-
-    <string name="action_select_all">Выбрать все</string>
-    <string name="action_set_download">Скачать</string>
 
 
     <!--LatestChapter-->
@@ -98,14 +82,8 @@
     <string name="latest_chapter_clean_download">Очистить скачанное</string>
 
     <!-- MigrateLatestChapterToChapterService -->
-    <string name="migrate_service_title_update">Обновление базы данных…</string>
-    <string name="migrate_service_title_finish">Обновление завершено</string>
-    <string name="migrate_service_title_error">Обновление прервалось с ошибкой</string>
 
     <!-- OTHER -->
-    <string name="navigation_drawer_open">Open navigation drawer</string>
-    <string name="navigation_drawer_close">Close navigation drawer</string>
-    <string name="nothing_founds">Ничего не найдено</string>
 
     <string name="name">Автор: Kir San</string>
 

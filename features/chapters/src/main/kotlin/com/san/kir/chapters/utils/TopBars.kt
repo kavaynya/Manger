@@ -28,13 +28,12 @@ import com.san.kir.core.compose.topBar
 import com.san.kir.data.models.base.Manga
 
 @Composable
-@OptIn(ExperimentalComposeUiApi::class)
 internal fun topBar(
     selectedCount: Int,
     selectionMode: Boolean,
     backgroundAction: Boolean,
     manga: Manga,
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     sendEvent: (ChaptersEvent) -> Unit,
 ) = topBar(
     titleContent = {

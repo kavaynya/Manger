@@ -2,17 +2,14 @@ package com.san.kir.storage.logic.repo
 
 import com.san.kir.core.utils.coroutines.withDefaultContext
 import com.san.kir.core.utils.getFullPath
-import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.db.dao.StorageDao
 import com.san.kir.data.db.dao.itemByPath
 import com.san.kir.data.models.base.Storage
-import javax.inject.Inject
 
-class StorageRepository @Inject constructor(
+internal class StorageRepository(
     private val storageDao: StorageDao,
     private val mangaDao: MangaDao,
-    private val chapterDao: ChapterDao,
 ) {
     val items = storageDao.loadItems()
     val fullSize = storageDao.loadFullSize()

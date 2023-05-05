@@ -5,27 +5,30 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.hilt.work.HiltWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
 import com.san.kir.background.logic.ChapterDownloader
 import com.san.kir.background.logic.WorkComplete
+import com.san.kir.background.logic.di.chapterRepository
+import com.san.kir.background.logic.di.chapterWorkerRepository
+import com.san.kir.background.logic.di.settingsRepository
 import com.san.kir.background.logic.repo.ChapterRepository
-import com.san.kir.background.logic.repo.ChapterWorkerRepository
 import com.san.kir.background.logic.repo.SettingsRepository
 import com.san.kir.background.util.cancelAction
 import com.san.kir.core.internet.CellularNetwork
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.internet.NetworkState
 import com.san.kir.core.internet.WifiNetwork
+import com.san.kir.core.internet.cellularNetwork
+import com.san.kir.core.internet.connectManager
+import com.san.kir.core.internet.wifiNetwork
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ID
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.bytesToMb
 import com.san.kir.core.utils.formatDouble
 import com.san.kir.data.models.base.ChapterTask
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -33,19 +36,17 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-@HiltWorker
-class DownloadChaptersWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
-    private val workerRepository: ChapterWorkerRepository,
-    private val chapterRepository: ChapterRepository,
-    private val settingsRepository: SettingsRepository,
-    private val connectManager: ConnectManager,
-    private val cellularNetwork: CellularNetwork,
-    private val wifiNetwork: WifiNetwork,
-) : BaseUpdateWorker<ChapterTask>(context, params, workerRepository) {
+class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
+    BaseUpdateWorker<ChapterTask>(context, params) {
 
     override val TAG = "Chapter Downloader"
+
+    override val workerRepository get() = ManualDI.chapterWorkerRepository
+    private val chapterRepository: ChapterRepository = ManualDI.chapterRepository
+    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository
+    private val connectManager: ConnectManager = ManualDI.connectManager
+    private val cellularNetwork: CellularNetwork = ManualDI.cellularNetwork
+    private val wifiNetwork: WifiNetwork = ManualDI.wifiNetwork
 
     private var successfuled = listOf<ChapterTask>()
     private var networkState = NetworkState.OK
@@ -94,9 +95,9 @@ class DownloadChaptersWorker @AssistedInject constructor(
             setContentTitle(applicationContext.getString(R.string.chapters_downloading))
 
             when (networkState) {
-                NetworkState.NOT_WIFI     -> setContentText(applicationContext.getString(R.string.wifi_off))
+                NetworkState.NOT_WIFI -> setContentText(applicationContext.getString(R.string.wifi_off))
                 NetworkState.NOT_CELLURAR -> setContentText(applicationContext.getString(R.string.internet_off))
-                NetworkState.OK           -> task?.let { task ->
+                NetworkState.OK -> task?.let { task ->
                     setContentTitle(
                         applicationContext.getString(R.string.queue_downloading, queue.size)
                     )
@@ -107,7 +108,7 @@ class DownloadChaptersWorker @AssistedInject constructor(
                             setProgress(task.max, task.progress, false)
                         }
 
-                        else                  -> {
+                        else -> {
                             setProgress(0, 0, true)
                         }
                     }
@@ -134,7 +135,7 @@ class DownloadChaptersWorker @AssistedInject constructor(
 
         if (ex is WorkComplete) {
             when {
-                successfuled.isEmpty() && errored.isNotEmpty()    -> {
+                successfuled.isEmpty() && errored.isNotEmpty() -> {
                     builder.setContentTitle(applicationContext.getString(R.string.download_failed))
                     builder.setContentText(applicationContext.getString(R.string.all_chapters_downloaded_with_an_error))
                 }
@@ -163,7 +164,7 @@ class DownloadChaptersWorker @AssistedInject constructor(
                     )
                 }
 
-                successfuled.isNotEmpty()                         -> {
+                successfuled.isNotEmpty() -> {
                     builder.setContentTitle(applicationContext.getString(R.string.download_complete))
                     builder.setContentText(applicationContext.getString(R.string.enjoy_reading))
 

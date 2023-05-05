@@ -210,7 +210,7 @@ sealed interface NavigationButton {
     data class Scaffold(val state: ScaffoldState) : NavigationButton
 
     @Stable
-    data class Back(val onClick: () -> Boolean) : NavigationButton
+    data class Back(val onClick: () -> Unit) : NavigationButton
 
     @Stable
     data class Close(val onClick: () -> Unit) : NavigationButton

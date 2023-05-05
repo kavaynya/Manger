@@ -1,14 +1,15 @@
 package com.san.kir.catalog.ui.search
 
-import android.app.Application
-import androidx.lifecycle.viewModelScope
+import android.content.Context
+import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.MiniCatalogItem
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
@@ -18,14 +19,12 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-@HiltViewModel
-internal class SearchViewModel @Inject constructor(
-    private val context: Application,
-    private val catalogRepository: CatalogRepository,
-) : BaseViewModel<SearchEvent, SearchState>() {
+internal class SearchViewModel(
+    private val context: Context = ManualDI.context,
+    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
+) : ViewModel<SearchState>(), SearchStateHolder {
     private var job: Job? = null
 
     private val background = MutableStateFlow(false)
@@ -42,9 +41,9 @@ internal class SearchViewModel @Inject constructor(
         loadItems()
     }
 
-    override suspend fun onEvent(event: SearchEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            is SearchEvent.Search      -> updateFilter(event.query)
+            is SearchEvent.Search -> updateFilter(event.query)
             is SearchEvent.UpdateManga -> updateManga(event.item)
         }
     }

@@ -1,6 +1,5 @@
 package com.san.kir.library.logic.repo
 
-import android.app.Application
 import android.content.Context
 import com.san.kir.core.support.CATEGORY_ALL
 import com.san.kir.core.support.SortLibraryUtil
@@ -16,10 +15,9 @@ import com.san.kir.library.ui.library.ItemsState
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import javax.inject.Inject
 
-internal class MangaRepository @Inject constructor(
-    private val context: Application,
+internal class MangaRepository(
+    private val context: Context,
     private val mangaDao: MangaDao,
     private val categoryDao: CategoryDao,
 ) {

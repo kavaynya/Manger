@@ -11,11 +11,10 @@ import com.san.kir.data.models.base.SiteCatalogElement
 import com.san.kir.data.models.base.Statistic
 import com.san.kir.data.models.extend.MiniCatalogItem
 import com.san.kir.data.parsing.SiteCatalogsManager
-import javax.inject.Inject
 
-internal class CatalogRepository @Inject constructor(
+internal class CatalogRepository(
     private val manager: SiteCatalogsManager,
-    private val catalogFactory: CatalogDb.Factory,
+    private val catalogFactory: (String) -> CatalogDb,
     private val mangaDao: MangaDao,
     private val categoryDao: CategoryDao,
     private val statisticDao: StatisticDao,
@@ -24,14 +23,14 @@ internal class CatalogRepository @Inject constructor(
     val items = manager.catalog
 
     suspend fun volume(catalogName: String) = kotlin.runCatching {
-        val db = catalogFactory.create(manager.catalogName(catalogName))
+        val db = catalogFactory(manager.catalogName(catalogName))
         db.dao.itemsCount().apply {
             db.close()
         }
     }.onFailure { it.printStackTrace() }
 
     suspend fun items(name: String): List<MiniCatalogItem> = withIoContext {
-        val db = catalogFactory.create(manager.catalogName(name))
+        val db = catalogFactory(manager.catalogName(name))
         db.dao.miniItems()
             .onEach {
                 it.state =
@@ -42,7 +41,7 @@ internal class CatalogRepository @Inject constructor(
     }
 
     suspend fun item(name: String, id: Long): SiteCatalogElement = withIoContext {
-        val db = catalogFactory.create(manager.catalogName(name))
+        val db = catalogFactory(manager.catalogName(name))
         db.dao.itemById(id).apply { db.close() }
     }
 

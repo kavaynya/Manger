@@ -4,11 +4,10 @@ import com.san.kir.data.db.dao.SettingsDao
 import com.san.kir.data.db.repositories.AbstractSettingsRepository
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.mapLatest
-import javax.inject.Inject
 
 @OptIn(ExperimentalCoroutinesApi::class)
-internal class SettingsRepository @Inject constructor(
-    settingsDao: SettingsDao
+internal class SettingsRepository(
+    settingsDao: SettingsDao,
 ) : AbstractSettingsRepository(settingsDao) {
 
     fun main() = settings().mapLatest { it.main }

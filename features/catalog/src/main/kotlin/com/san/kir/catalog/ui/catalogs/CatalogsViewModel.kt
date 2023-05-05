@@ -1,24 +1,24 @@
 package com.san.kir.catalog.ui.catalogs
 
-import androidx.lifecycle.viewModelScope
 import com.san.kir.background.logic.UpdateCatalogManager
+import com.san.kir.background.logic.di.updateCatalogManager
+import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class CatalogsViewModel @Inject constructor(
-    private val catalogRepository: CatalogRepository,
-    private val manager: UpdateCatalogManager,
-) : BaseViewModel<CatalogsEvent, CatalogsState>() {
+internal class CatalogsViewModel(
+    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
+    private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager,
+) : ViewModel<CatalogsState>(), CatalogsStateHolder {
     private var job: Job? = null
     private val items = MutableStateFlow(persistentListOf<CheckableSite>())
     private val background = MutableStateFlow(false)
@@ -34,7 +34,7 @@ internal class CatalogsViewModel @Inject constructor(
         updateItemData()
     }
 
-    override suspend fun onEvent(event: CatalogsEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             CatalogsEvent.UpdateData -> updateItemData()
             CatalogsEvent.UpdateContent -> {

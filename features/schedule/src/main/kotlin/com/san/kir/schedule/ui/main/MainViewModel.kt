@@ -1,17 +1,13 @@
 package com.san.kir.schedule.ui.main
 
-import com.san.kir.core.utils.viewModel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import kotlinx.coroutines.flow.flowOf
-import javax.inject.Inject
 
-@HiltViewModel
-internal class MainViewModel @Inject constructor(
-
-) : BaseViewModel<MainEvent, MainState>() {
+internal class MainViewModel : ViewModel<MainState>(), MainStateHolder {
     override val tempState = flowOf(MainState())
 
     override val defaultState = MainState()
 
-    override suspend fun onEvent(event: MainEvent) {}
+    override suspend fun onEvent(event: ScreenEvent) {}
 }

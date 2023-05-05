@@ -21,11 +21,8 @@
     <string name="list_chapters_is_update">Разрешить обновления</string>
     <string name="list_chapters_page_about">Описание</string>
     <string name="list_chapters_page_list">Содержимое</string>
-    <string name="list_chapters_about_start">Читать с начала</string>
-    <string name="list_chapters_about_delete">Удалить прочитанное</string>
     <string name="list_chapters_about_continue">"Продолжить чтение\n%s"</string>
     <string name="list_chapters_about_not_continue">"Нет глав для чтения"</string>
-    <string name="list_chapters_about_search_continue">"Поиск главы для чтения"</string>
     <string name="list_chapters_about_read">"Вы прочитали %1$d %2$s из %3$d"</string>
     <string name="list_chapters_remove_text">Вы действительно хотите удалить</string>
     <string name="list_chapters_remove_yes">Да</string>
@@ -41,7 +38,6 @@
     <string name="action_delete">Удалить</string>
     <string name="action_set_read">Пометить прочитаными</string>
     <string name="action_set_not_read">Пометить не прочитаными</string>
-    <string name="action_update_pages">Обновить страницы</string>
     <string name="action_select_above">Выбрать все выше</string>
     <string name="action_select_below">Выбрать все ниже</string>
     <string name="action_full_delete">Удалить из базы данных</string>
@@ -70,7 +66,6 @@
     <string name="download_item_progress_text">Загруженно %1$d из %2$d</string>
     <string name="download_item_progress_size">%s Мб</string>
     <string name="download_item_final_size_with_time">%1$s Мб за %2$s</string>
-    <string name="download_item_name">%1$s %2$s</string>
     <string name="download_item_progress">%1$s  %2$s</string>
     <string name="download_activity_subtitle">Останов.: %1$d  Заверш.: %2$d</string>
     <string name="download_activity_option_submenu_clean_all">Очистить все</string>

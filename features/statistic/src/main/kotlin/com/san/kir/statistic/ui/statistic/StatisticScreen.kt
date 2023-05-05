@@ -9,7 +9,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.DefaultSpacer
 import com.san.kir.core.compose.DialogText
 import com.san.kir.core.compose.Dimensions
@@ -21,15 +20,16 @@ import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.TimeFormat
 import com.san.kir.core.utils.bytesToMb
 import com.san.kir.core.utils.formatDouble
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.base.Statistic
 import com.san.kir.statistic.R
 
 @Composable
-fun StatisticScreen(navigateUp: () -> Boolean, itemId: Long) {
-    val viewModel: StatisticViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+internal fun StatisticScreen(navigateUp: () -> Unit, itemId: Long) {
+    val holder: StatisticStateHolder = stateHolder { StatisticViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(StatisticEvent.Set(itemId)) }
+    LaunchedEffect(Unit) { holder.sendEvent(StatisticEvent.Set(itemId)) }
 
     ScreenContent(
         topBar = topBar(

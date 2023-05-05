@@ -1,31 +1,31 @@
 package com.san.kir.background.works
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withDefaultContext
+import com.san.kir.data.categoryDao
 import com.san.kir.data.db.dao.CategoryDao
 import com.san.kir.data.db.dao.MangaDao
+import com.san.kir.data.mangaDao
 import com.san.kir.data.models.base.Category
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
 
 /*
     Worker для удаления категории,
     У всей манги, которая была свазанна с удаляемой категорией,
     применяется категория по умолчанию
 */
-@HiltWorker
-class RemoveCategoryWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParameters: WorkerParameters,
-    private val categoryDao: CategoryDao,
-    private val mangaDao: MangaDao,
+class RemoveCategoryWorker(
+    appContext: Context,
+    workerParameters: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParameters) {
+
+    private val categoryDao: CategoryDao = ManualDI.categoryDao
+    private val mangaDao: MangaDao = ManualDI.mangaDao
 
     override suspend fun doWork(): Result {
         val categoryId = inputData.getLong(cat, -1L)

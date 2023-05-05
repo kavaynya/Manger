@@ -1,20 +1,20 @@
 package com.san.kir.library.ui.mangaAbout
 
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.lengthMb
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Manga
+import com.san.kir.library.logic.di.mangaRepository
 import com.san.kir.library.logic.repo.MangaRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class MangaAboutViewModel @Inject constructor(
-    private val mangaRepository: MangaRepository,
-) : BaseViewModel<MangaAboutEvent, MangaAboutState>() {
+internal class MangaAboutViewModel(
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository,
+) : ViewModel<MangaAboutState>(), MangaAboutStateHolder {
 
     private val manga = MutableStateFlow(Manga())
     private val categoryName = MutableStateFlow("")
@@ -24,11 +24,11 @@ internal class MangaAboutViewModel @Inject constructor(
 
     override val defaultState = MangaAboutState()
 
-    override suspend fun onEvent(event: MangaAboutEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            is MangaAboutEvent.Set          -> set(event.id)
+            is MangaAboutEvent.Set -> set(event.id)
             is MangaAboutEvent.ChangeUpdate -> change(event.newState)
-            is MangaAboutEvent.ChangeColor  -> change(event.newState)
+            is MangaAboutEvent.ChangeColor -> change(event.newState)
         }
     }
 

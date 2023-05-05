@@ -1,23 +1,22 @@
 package com.san.kir.catalog.ui.addOnline
 
-import androidx.lifecycle.viewModelScope
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.parsing.SiteCatalogsManager
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 import kotlin.time.Duration.Companion.seconds
 
-@HiltViewModel
-internal class AddOnlineViewModel @Inject constructor(
-    private val manager: SiteCatalogsManager,
-) : BaseViewModel<AddOnlineEvent, AddOnlineState>() {
+internal class AddOnlineViewModel(
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager,
+) : ViewModel<AddOnlineState>(), AddOnlineStateHolder {
     private val siteNames: List<String> = manager.catalog.map { it.catalogName }
     private var job: Job? = null
 
@@ -39,7 +38,7 @@ internal class AddOnlineViewModel @Inject constructor(
         validatesCatalogs = siteNames.toPersistentList(),
     )
 
-    override suspend fun onEvent(event: AddOnlineEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is AddOnlineEvent.Update -> {
                 checkUrl(event.text)

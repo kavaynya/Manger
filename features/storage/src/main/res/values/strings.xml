@@ -10,19 +10,13 @@
         <item quantity="other">В %d папках</item>
     </plurals>
 
-    <string name="storage_title_size">Хранилище: %s Мб</string>
     <string name="storage_not_in_bd">Нет в базе</string>
-    <string name="storage_item_all_s">Всего занято: вычисление…</string>
     <string name="storage_item_all_size">Всего занято: %s Мб</string>
     <string name="storage_item_manga_size">Занято этой мангой: %s Мб</string>
     <string name="storage_item_read_size">Прочитанное в этой манге: %s Мб</string>
     <string name="storage_item_menu_full_delete">Очистить</string>
     <string name="storage_item_menu_cancel">Оставить</string>
-    <string name="storage_item_alert_message">Вы действительно хотите удалить?</string>
-    <string name="storage_item_alert_positive">Да, конечно</string>
-    <string name="storage_item_alert_negative">Нет</string>
     <string name="storage_manga_item_size_text">Использовано: %1$s Мб или %2$d %%</string>
-    <string name="storage_dialog_close">Закрыть</string>
 
     <string name="library_popupmenu_delete_read_chapters">Удалить прочитанное</string>
     <string name="library_popupmenu_delete_all">Очистить папку</string>

@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
@@ -35,18 +34,19 @@ import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.viewModel.stateHolder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun AddStandartScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     url: String,
 ) {
-    val viewModel: AddStandartViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: AddStandartViewModel = stateHolder { AddStandartViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(AddStandartEvent.Set(url)) }
+    LaunchedEffect(Unit) { holder.sendEvent(AddStandartEvent.Set(url)) }
 
     ScreenContent(
         topBar = topBar(
@@ -54,7 +54,7 @@ fun AddStandartScreen(
             navigationButton = NavigationButton.Back(navigateUp)
         ),
     ) {
-        Content(state, viewModel::sendEvent, navigateUp)
+        Content(state, holder::sendEvent, navigateUp)
     }
 }
 
@@ -62,7 +62,7 @@ fun AddStandartScreen(
 private fun ColumnScope.Content(
     state: AddStandartState,
     sendEvent: (AddStandartEvent) -> Unit,
-    closeBtnAction: () -> Boolean,
+    closeBtnAction: () -> Unit,
 ) {
     TextWithValidate(state.categoryName) { sendEvent(AddStandartEvent.UpdateText(it)) }
 
@@ -100,11 +100,11 @@ private fun ColumnScope.Content(
 @Composable
 private inline fun TextWithValidate(
     value: String,
-    noinline onValueChange: (String) -> Unit,
+    crossinline onValueChange: (String) -> Unit,
 ) {
     TextField(
         value = value,
-        onValueChange = onValueChange,
+        onValueChange = { onValueChange(it) },
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()

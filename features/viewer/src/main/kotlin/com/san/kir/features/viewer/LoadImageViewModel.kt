@@ -5,14 +5,16 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davemorrissey.labs.subscaleview.ImageSource
 import com.san.kir.core.internet.ConnectManager
+import com.san.kir.core.internet.connectManager
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.convertImagesToPng
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isOkPng
 import com.san.kir.data.models.base.preparedPath
 import com.san.kir.features.viewer.logic.SettingsRepository
+import com.san.kir.features.viewer.logic.di.settingsRepository
 import com.san.kir.features.viewer.utils.LoadState
 import com.san.kir.features.viewer.utils.Page
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -21,12 +23,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-internal class LoadImageViewModel @Inject constructor(
-    private val connectManager: ConnectManager,
-    private val settingsRepository: SettingsRepository,
+internal class LoadImageViewModel(
+    private val connectManager: ConnectManager = ManualDI.connectManager,
+    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository,
 ) : ViewModel() {
     private var imageLoadingJob: Job? = null
 

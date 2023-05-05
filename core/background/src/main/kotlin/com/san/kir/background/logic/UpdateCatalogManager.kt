@@ -1,6 +1,6 @@
 package com.san.kir.background.logic
 
-import android.app.Application
+import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
@@ -10,12 +10,9 @@ import com.san.kir.background.works.UpdateCatalogWorker
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.models.base.CatalogTask
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class UpdateCatalogManager @Inject constructor(
-    private val context: Application,
+class UpdateCatalogManager(
+    context: Context,
     private val workerRepository: CatalogWorkerRepository,
 ) {
     private val manager by lazy { WorkManager.getInstance(context) }

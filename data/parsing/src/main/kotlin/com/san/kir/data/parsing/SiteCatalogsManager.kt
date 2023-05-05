@@ -1,6 +1,6 @@
 package com.san.kir.data.parsing
 
-import android.app.Application
+import android.content.Context
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.support.DIR
 import com.san.kir.core.utils.coroutines.withDefaultContext
@@ -16,12 +16,9 @@ import com.san.kir.data.parsing.sites.Readmanga
 import com.san.kir.data.parsing.sites.Selfmanga
 import com.san.kir.data.parsing.sites.Unicomics
 import com.san.kir.data.parsing.sites.Yaoichan
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class SiteCatalogsManager @Inject constructor(
-    context: Application,
+class SiteCatalogsManager(
+    context: Context,
     connectManager: ConnectManager,
 ) {
 
@@ -40,7 +37,7 @@ class SiteCatalogsManager @Inject constructor(
             Yaoichan(connectManager),
             Unicomics(connectManager),
             Acomics(connectManager),
-//            ComX(connectManager),
+            //            ComX(connectManager),
         )
     }
 

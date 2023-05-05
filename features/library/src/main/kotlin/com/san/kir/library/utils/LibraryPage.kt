@@ -25,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.systemBarBottomPadding
+import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.TestTags
 import com.san.kir.data.models.extend.CategoryWithMangas
 import com.san.kir.library.R
@@ -45,7 +46,9 @@ internal fun LibraryPage(
         contentAlignment = Alignment.Center
     ) {
         if (item.mangas.isEmpty()) {
-            EmptyView(navigation.navigateToCatalogs)
+            EmptyView {
+                navigation.navigateToScreen(MainMenuType.Catalogs)
+            }
         } else {
             PageView(
                 navigateToChapters = navigation.navigateToChapters,

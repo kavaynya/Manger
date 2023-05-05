@@ -1,6 +1,6 @@
 package com.san.kir.library.logic.repo
 
-import android.app.Application
+import android.content.Context
 import com.san.kir.core.support.MainMenuType
 import com.san.kir.data.db.dao.CategoryDao
 import com.san.kir.data.db.dao.ChapterDao
@@ -16,17 +16,16 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
 import java.util.Collections
-import javax.inject.Inject
 
-internal class MainMenuRepository @Inject constructor(
-    private val context: Application,
+internal class MainMenuRepository(
+    private val context: Context,
     private val mainMenuDao: MainMenuDao,
     mangaDao: MangaDao,
     storageDao: StorageDao,
     categoryDao: CategoryDao,
-    manager: SiteCatalogsManager,
     chapterDao: ChapterDao,
     plannedDao: PlannedDao,
+    manager: SiteCatalogsManager,
 ) {
 
     val items =
@@ -53,7 +52,8 @@ internal class MainMenuRepository @Inject constructor(
     private fun transform(siteCount: Int, transition: Transition): (MainMenuItem) -> MenuItem = {
         when (it.type) {
             MainMenuType.Default,
-            MainMenuType.Library -> MenuItem(it, transition.libraryCount)
+            MainMenuType.Library,
+            -> MenuItem(it, transition.libraryCount)
 
             MainMenuType.Category -> MenuItem(it, transition.categoryCount)
             MainMenuType.Catalogs -> MenuItem(it, "$siteCount")
@@ -62,7 +62,8 @@ internal class MainMenuRepository @Inject constructor(
             MainMenuType.Schedule -> MenuItem(it, transition.plannedCount)
             MainMenuType.Settings,
             MainMenuType.Statistic,
-            MainMenuType.Accounts -> MenuItem(it, "")
+            MainMenuType.Accounts,
+            -> MenuItem(it, "")
 
             MainMenuType.Storage -> {
                 MenuItem(

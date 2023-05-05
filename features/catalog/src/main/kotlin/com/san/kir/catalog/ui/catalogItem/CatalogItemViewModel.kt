@@ -1,20 +1,21 @@
 package com.san.kir.catalog.ui.catalogItem
 
+import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.SiteCatalogElement
 import com.san.kir.data.parsing.SiteCatalogsManager
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class CatalogItemViewModel @Inject constructor(
-    private val manager: SiteCatalogsManager,
-    private val catalogRepository: CatalogRepository,
-) : BaseViewModel<CatalogItemEvent, CatalogItemState>() {
+internal class CatalogItemViewModel(
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager,
+    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
+) : ViewModel<CatalogItemState>(), CatalogItemStateHolder {
     private val item = MutableStateFlow(SiteCatalogElement())
     private val containingInLibrary =
         MutableStateFlow<ContainingInLibraryState>(ContainingInLibraryState.Check)
@@ -24,7 +25,7 @@ internal class CatalogItemViewModel @Inject constructor(
 
     override val defaultState = CatalogItemState()
 
-    override suspend fun onEvent(event: CatalogItemEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is CatalogItemEvent.Set -> {
                 val item = manager.elementByUrl(event.url)

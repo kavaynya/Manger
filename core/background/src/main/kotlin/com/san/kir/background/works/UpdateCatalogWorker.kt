@@ -5,33 +5,34 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.hilt.work.HiltWorker
 import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
 import com.san.kir.background.logic.WorkComplete
+import com.san.kir.background.logic.di.catalogRepository
+import com.san.kir.background.logic.di.catalogWorkerRepository
 import com.san.kir.background.logic.repo.CatalogRepository
 import com.san.kir.background.logic.repo.CatalogWorkerRepository
 import com.san.kir.background.util.cancelAction
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ID
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.models.base.CatalogTask
 import com.san.kir.data.models.base.SiteCatalogElement
 import com.san.kir.data.parsing.SiteCatalogsManager
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.flow.collectIndexed
 import timber.log.Timber
 
-@HiltWorker
-class UpdateCatalogWorker @AssistedInject constructor(
-    @Assisted context: Context,
-    @Assisted params: WorkerParameters,
-    private val manager: SiteCatalogsManager,
-    private val workerRepository: CatalogWorkerRepository,
-    private val catalogRepository: CatalogRepository,
-) : BaseUpdateWorker<CatalogTask>(context, params, workerRepository) {
+class UpdateCatalogWorker(
+    context: Context,
+    params: WorkerParameters,
+) : BaseUpdateWorker<CatalogTask>(context, params) {
 
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager
+    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository
+
+    override val workerRepository: CatalogWorkerRepository = ManualDI.catalogWorkerRepository
     override val TAG = "Catalogs Updater"
 
     override suspend fun work(task: CatalogTask) {

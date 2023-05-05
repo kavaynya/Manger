@@ -1,36 +1,29 @@
 package com.san.kir.library.ui.library
 
-import android.app.Application
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
-import androidx.work.WorkManager
 import com.san.kir.background.logic.UpdateMangaManager
+import com.san.kir.background.logic.di.updateMangaManager
+import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.AppUpdateWorker
 import com.san.kir.background.works.MangaDeleteWorker
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.CategoryWithMangas
+import com.san.kir.library.logic.di.mangaRepository
+import com.san.kir.library.logic.di.settingsRepository
 import com.san.kir.library.logic.repo.MangaRepository
 import com.san.kir.library.logic.repo.SettingsRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@OptIn(ExperimentalCoroutinesApi::class)
-@HiltViewModel
-internal class LibraryViewModel @Inject internal constructor(
-    private val context: Application,
-    private val mangaRepository: MangaRepository,
-    private val updateManager: UpdateMangaManager,
-    settingsRepository: SettingsRepository,
-) : BaseViewModel<LibraryEvent, LibraryState>() {
+internal class LibraryViewModel internal constructor(
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository,
+    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager,
+    settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+) : ViewModel<LibraryState>(), LibraryStateHolder {
 
     private val selectedMangaState =
         MutableStateFlow<SelectedMangaState>(SelectedMangaState.NonVisible)
@@ -38,7 +31,7 @@ internal class LibraryViewModel @Inject internal constructor(
     private val backgroundState = MutableStateFlow<BackgroundState>(BackgroundState.None)
 
     init {
-        viewModelScope.defaultLaunch { checkWorks() }
+        checkWorks()
     }
 
     override val tempState = combine(
@@ -52,27 +45,27 @@ internal class LibraryViewModel @Inject internal constructor(
 
     override val defaultState = LibraryState()
 
-    override suspend fun onEvent(event: LibraryEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
-            LibraryEvent.NonSelect             -> deSelectManga()
+            LibraryEvent.NonSelect -> deSelectManga()
 
-            is LibraryEvent.SelectManga        ->
+            is LibraryEvent.SelectManga ->
                 selectedMangaState.update { SelectedMangaState.Visible(event.item) }
 
             is LibraryEvent.SetCurrentCategory -> currentCategory.update { event.item }
 
-            is LibraryEvent.ChangeCategory     -> {
+            is LibraryEvent.ChangeCategory -> {
                 deSelectManga()
                 mangaRepository.changeCategory(event.mangaId, event.categoryId)
             }
 
-            is LibraryEvent.DeleteManga        -> {
+            is LibraryEvent.DeleteManga -> {
                 deSelectManga()
-                MangaDeleteWorker.addTask(context, event.mangaId, event.withFiles)
+                MangaDeleteWorker.addTask(event.mangaId, event.withFiles)
             }
 
-            LibraryEvent.UpdateApp             -> AppUpdateWorker.addTask(context)
-            LibraryEvent.UpdateAll             -> {
+            LibraryEvent.UpdateApp -> AppUpdateWorker.addTask()
+            LibraryEvent.UpdateAll -> {
                 state.value.apply {
                     if (items is ItemsState.Ok) updateManager.addTasks(
                         items.items.flatMap { it.mangas.map { m -> m.id } }
@@ -88,16 +81,12 @@ internal class LibraryViewModel @Inject internal constructor(
 
     private fun deSelectManga() = selectedMangaState.update { SelectedMangaState.NonVisible }
 
-    private suspend fun checkWorks() {
-        WorkManager
-            .getInstance(context)
-            .getWorkInfosByTagLiveData(MangaDeleteWorker.tag)
-            .asFlow()
-            .filter { it.isNotEmpty() }
-            .mapLatest { works -> works.all { it.state.isFinished } }
-            .collectLatest { noWork ->
-                if (noWork) backgroundState.update { BackgroundState.None }
+    private fun checkWorks() {
+        viewModelScope.defaultLaunch {
+            collectWorkInfoByTag(MangaDeleteWorker.tag) { works ->
+                if (works.all { it.state.isFinished }) backgroundState.update { BackgroundState.None }
                 else backgroundState.update { BackgroundState.Work }
             }
+        }
     }
 }

@@ -20,14 +20,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.chapters.R
 import com.san.kir.chapters.utils.ChapterDate
 import com.san.kir.chapters.utils.ChapterName
@@ -48,15 +46,15 @@ import com.san.kir.core.compose.animation.FromTopToTopAnimContent
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.support.DownloadState
+import com.san.kir.core.utils.viewModel.stateHolder
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun LatestScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToViewer: (Long) -> Unit,
 ) {
-    val viewModel: LatestViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: LatestStateHolder = stateHolder { LatestViewModel() }
+    val state by holder.state.collectAsState()
 
     ScreenList(
         topBar = topBar(
@@ -77,13 +75,13 @@ fun LatestScreen(
             actions = latestActions(
                 selectionMode = state.selectionMode,
                 hasNewChapters = state.hasNewChapters,
-                sendEvent = viewModel::sendEvent
+                sendEvent = holder::sendEvent
             ),
             hasAction = state.hasBackgroundWork,
             navigationButton = navigationButton(
                 selectionMode = state.selectionMode,
                 navigateUp = navigateUp,
-                sendEvent = viewModel::sendEvent
+                sendEvent = holder::sendEvent
             )
         ),
         additionalPadding = Dimensions.zero,
@@ -95,7 +93,7 @@ fun LatestScreen(
                 index = index,
                 selectionMode = state.selectionMode,
                 navigateToViewer = navigateToViewer,
-                sendEvent = viewModel::sendEvent
+                sendEvent = holder::sendEvent
             )
         }
     }
@@ -104,7 +102,7 @@ fun LatestScreen(
 @Composable
 private fun navigationButton(
     selectionMode: Boolean,
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     sendEvent: (LatestEvent) -> Unit,
 ): NavigationButton {
     return if (selectionMode) {

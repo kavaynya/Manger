@@ -22,7 +22,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
 import com.google.accompanist.flowlayout.FlowMainAxisAlignment
 import com.google.accompanist.flowlayout.FlowRow
@@ -33,14 +32,15 @@ import com.san.kir.core.compose.FullWeightSpacer
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.viewModel.stateHolder
 
 @Composable
-fun AddOnlineScreen(
-    navigateUp: () -> Boolean,
+internal fun AddOnlineScreen(
+    navigateUp: () -> Unit,
     navigateToNext: (String) -> Unit,
 ) {
-    val viewModel: AddOnlineViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: AddOnlineStateHolder = stateHolder { AddOnlineViewModel() }
+    val state by holder.state.collectAsState()
 
     ScreenContent(
         topBar = topBar(
@@ -51,7 +51,7 @@ fun AddOnlineScreen(
     ) {
         Content(
             state = state,
-            sendEvent = viewModel::sendEvent,
+            sendEvent = holder::sendEvent,
             navigateUp = navigateUp,
             navigateToNext = navigateToNext
         )
@@ -62,7 +62,7 @@ fun AddOnlineScreen(
 private fun ColumnScope.Content(
     state: AddOnlineState,
     sendEvent: (AddOnlineEvent) -> Unit,
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToNext: (String) -> Unit,
 ) {
     var enteredText by remember { mutableStateOf("") }

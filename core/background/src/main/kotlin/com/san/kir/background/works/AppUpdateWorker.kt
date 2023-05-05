@@ -6,7 +6,6 @@ import android.content.Intent
 import android.net.Uri
 import androidx.core.app.NotificationCompat
 import androidx.core.app.NotificationManagerCompat
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
@@ -16,18 +15,18 @@ import com.san.kir.background.R
 import com.san.kir.background.util.cancelAction
 import com.san.kir.background.util.tryCreateNotificationChannel
 import com.san.kir.core.internet.ConnectManager
+import com.san.kir.core.internet.connectManager
 import com.san.kir.core.utils.ID
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.core.utils.ManualDI
 import timber.log.Timber
 import java.util.regex.Pattern
 
-@HiltWorker
-class AppUpdateWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val connectManager: ConnectManager,
+class AppUpdateWorker(
+    appContext: Context,
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
+
+    private val connectManager: ConnectManager = ManualDI.connectManager
 
     private val channelId = "${this::class.java.simpleName}Id"
     private val TAG = "App Update Finder"
@@ -122,7 +121,7 @@ class AppUpdateWorker @AssistedInject constructor(
         private val notifyId = ID.generate()
         private const val url = "http://4pda.to/forum/index.php?showtopic=772886&st=0#entry53336845"
 
-        fun addTask(ctx: Context) {
+        fun addTask(ctx: Context = ManualDI.context) {
             val deleteManga = OneTimeWorkRequestBuilder<AppUpdateWorker>().build()
             WorkManager.getInstance(ctx).enqueue(deleteManga)
         }

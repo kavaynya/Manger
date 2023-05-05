@@ -1,7 +1,0 @@
-<rotate
-    xmlns:android="http://schemas.android.com/apk/res/android"
-    android:drawable="@drawable/ic_sort_21"
-    android:fromDegrees="180"
-    android:pivotX="50%"
-    android:pivotY="50%"
-    android:toDegrees="180"/>

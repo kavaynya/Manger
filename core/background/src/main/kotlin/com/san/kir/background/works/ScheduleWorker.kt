@@ -3,7 +3,6 @@ package com.san.kir.background.works
 import android.app.AlarmManager
 import android.content.Context
 import androidx.core.content.ContextCompat
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
@@ -13,29 +12,33 @@ import androidx.work.workDataOf
 import com.san.kir.background.R
 import com.san.kir.background.logic.UpdateCatalogManager
 import com.san.kir.background.logic.UpdateMangaManager
+import com.san.kir.background.logic.di.updateCatalogManager
+import com.san.kir.background.logic.di.updateMangaManager
 import com.san.kir.core.support.PlannedPeriod
 import com.san.kir.core.support.PlannedType
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.longToast
+import com.san.kir.data.categoryDao
 import com.san.kir.data.db.dao.CategoryDao
 import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.db.dao.PlannedDao
+import com.san.kir.data.mangaDao
 import com.san.kir.data.models.base.PlannedTaskBase
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.data.plannedDao
 import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
-@HiltWorker
-class ScheduleWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val plannedDao: PlannedDao,
-    private val mangaDao: MangaDao,
-    private val categoryDao: CategoryDao,
-    private val updateCatalogManager: UpdateCatalogManager,
-    private val updateMangaManager: UpdateMangaManager,
+class ScheduleWorker(
+    appContext: Context,
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
+
+    private val plannedDao: PlannedDao = ManualDI.plannedDao
+    private val mangaDao: MangaDao = ManualDI.mangaDao
+    private val categoryDao: CategoryDao = ManualDI.categoryDao
+    private val updateCatalogManager: UpdateCatalogManager = ManualDI.updateCatalogManager
+    private val updateMangaManager: UpdateMangaManager = ManualDI.updateMangaManager
 
     override suspend fun doWork(): Result {
         val id = inputData.getLong("planned_task", -1L)
@@ -46,12 +49,12 @@ class ScheduleWorker @AssistedInject constructor(
             Timber.v("task $task")
 
             when (task.type) {
-                PlannedType.MANGA    -> {
+                PlannedType.MANGA -> {
                     val manga = mangaDao.itemById(task.mangaId)
                     updateMangaManager.addTask(manga.id)
                 }
 
-                PlannedType.GROUP    -> {
+                PlannedType.GROUP -> {
                     if (task.groupContent.isNotEmpty())
                         updateMangaManager.addTasks(mangaDao.itemIdsByNames(task.groupContent))
                     else if (task.mangas.isNotEmpty())
@@ -68,11 +71,11 @@ class ScheduleWorker @AssistedInject constructor(
                     updateMangaManager.addTasks(mangas)
                 }
 
-                PlannedType.CATALOG  -> {
+                PlannedType.CATALOG -> {
                     updateCatalogManager.addTask(task.catalog)
                 }
 
-                PlannedType.APP      -> {
+                PlannedType.APP -> {
                     AppUpdateWorker.addTask(applicationContext)
                 }
             }
@@ -134,7 +137,7 @@ class ScheduleWorker @AssistedInject constructor(
                 .addListener(
                     {
                         when (item.type) {
-                            PlannedType.MANGA    ->
+                            PlannedType.MANGA ->
                                 ctx.longToast(
                                     R.string.manga_updating_was_canceled_format,
                                     item.manga
@@ -146,19 +149,19 @@ class ScheduleWorker @AssistedInject constructor(
                                     item.category
                                 )
 
-                            PlannedType.GROUP    ->
+                            PlannedType.GROUP ->
                                 ctx.longToast(
                                     R.string.group_updating_was_canceled_format,
                                     item.groupName
                                 )
 
-                            PlannedType.CATALOG  ->
+                            PlannedType.CATALOG ->
                                 ctx.longToast(
                                     R.string.catalog_updating_was_canceled_format,
                                     item.catalog
                                 )
 
-                            PlannedType.APP      ->
+                            PlannedType.APP ->
                                 ctx.longToast(R.string.app_updating_was_canceled)
                         }
                     }, ContextCompat.getMainExecutor(ctx)

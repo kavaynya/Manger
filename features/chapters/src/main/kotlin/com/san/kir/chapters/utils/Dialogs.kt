@@ -172,7 +172,7 @@ internal fun ProgressDeletingChaptersDialog(
             ChapterDeleteWorker.addTask<ReadChapterDelete>(ctx, manga)
 
             // Подписка на выполняемую работу для изменения индикатора действия
-            ctx.collectWorkInfoByTag(ChapterDeleteWorker.tag) { works ->
+            collectWorkInfoByTag(ChapterDeleteWorker.tag) { works ->
                 // Индикатор убирается если нет задач ни одной задачи
                 action = works.any { it.state.isFinished.not() }
             }

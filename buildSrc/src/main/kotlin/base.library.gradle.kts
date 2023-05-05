@@ -1,8 +1,8 @@
-import gradle.kotlin.dsl.accessors._8685cfe1ed5e7bee92d5b3252376894e.kotlin
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
     id("com.android.library")
+    id("org.jetbrains.kotlin.plugin.parcelize")
     kotlin("android")
 }
 

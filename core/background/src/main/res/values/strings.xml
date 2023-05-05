@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="ic_launcher_background">#FFFFFF</color>
     <!--MangaUpdateService-->
     <string name="cancel_all">Отменить все</string>
     <string name="chapter_search_completed">Поиск глав завершен</string>
@@ -32,7 +31,6 @@
     <string name="complete_catalog_update">Обновление каталогов завершенно</string>
     <string name="updating_catalogs_canceled">Обновление каталогов отменено</string>
     <string name="updating_catalogs_completed_with_error">Обновление каталогов завершенно с ошибкой</string>
-    <string name="check_internet">Проверьте подключение к интернету</string>
 
     <!--Scheduler-->
     <string name="manga_updating_was_canceled_format">Было отменено обновление манги %s</string>
@@ -40,7 +38,6 @@
     <string name="group_updating_was_canceled_format">Было отменено обновление группы %s</string>
     <string name="catalog_updating_was_canceled_format">Было отменено обновление каталога %s</string>
     <string name="app_updating_was_canceled">Было отменено обновление приложения</string>
-    <string name="add">Добавить</string>
 
     <!--DownloadChapters-->
     <string name="press_notify_for_go_to_downloads">Нажмите на уведомление для перехода в Загрузки</string>

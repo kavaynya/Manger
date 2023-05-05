@@ -1,6 +1,6 @@
 package com.san.kir.background.logic
 
-import android.app.Application
+import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
@@ -12,12 +12,9 @@ import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.models.base.ChapterTask
 import kotlinx.coroutines.flow.first
 import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
 
-@Singleton
-class DownloadChaptersManager @Inject constructor(
-    private val context: Application,
+class DownloadChaptersManager(
+    context: Context,
     private val workerRepository: ChapterWorkerRepository,
     private val chapterRepository: ChapterRepository,
 ) {

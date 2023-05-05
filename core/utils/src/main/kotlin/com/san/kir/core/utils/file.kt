@@ -4,7 +4,6 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import com.san.kir.core.support.DIR
 import com.san.kir.core.utils.coroutines.withIoContext
-import timber.log.Timber
 import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
@@ -61,10 +60,6 @@ val File.isEmptyDirectory: Boolean
             isOk
         } else
             true
-
-fun delChapters(chapter: String): ResultDeleting {
-    return delChapters(listOf(chapter))
-}
 
 fun delChapters(chapters: List<String>): ResultDeleting {
     return delFiles(chapters)

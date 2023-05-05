@@ -1,30 +1,30 @@
 package com.san.kir.schedule.ui.tasks
 
-import android.app.Application
+import android.content.Context
 import com.san.kir.background.works.ScheduleWorker
 import com.san.kir.core.support.PlannedPeriod
 import com.san.kir.core.support.PlannedType
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.SimplifiedTask
 import com.san.kir.schedule.R
 import com.san.kir.schedule.logic.repo.TasksRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
+import com.san.kir.schedule.logic.repo.tasksRepository
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-@HiltViewModel
-internal class TasksViewModel @Inject constructor(
-    private val context: Application,
-    private val tasksRepository: TasksRepository,
-) : BaseViewModel<TasksEvent, TasksState>() {
+internal class TasksViewModel(
+    private val context: Context = ManualDI.context,
+    private val tasksRepository: TasksRepository = ManualDI.tasksRepository,
+) : ViewModel<TasksState>(), TasksStateHolder {
     override val tempState = tasksRepository.items.map(transform())
 
     override val defaultState = TasksState(persistentListOf())
 
-    override suspend fun onEvent(event: TasksEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is TasksEvent.Update -> {
                 tasksRepository.update(event.itemId, event.state)
@@ -47,10 +47,10 @@ internal class TasksViewModel @Inject constructor(
         }
 
     private fun itemName(item: SimplifiedTask) = when (item.type) {
-        PlannedType.MANGA    -> context.getString(R.string.planned_task_name_manga, item.manga)
-        PlannedType.GROUP    -> context.getString(R.string.planned_task_name_group, item.groupName)
-        PlannedType.CATALOG  -> context.getString(R.string.planned_task_name_catalog, item.catalog)
-        PlannedType.APP      -> context.getString(R.string.planned_task_name_app)
+        PlannedType.MANGA -> context.getString(R.string.planned_task_name_manga, item.manga)
+        PlannedType.GROUP -> context.getString(R.string.planned_task_name_group, item.groupName)
+        PlannedType.CATALOG -> context.getString(R.string.planned_task_name_catalog, item.catalog)
+        PlannedType.APP -> context.getString(R.string.planned_task_name_app)
         PlannedType.CATEGORY -> context.getString(
             R.string.planned_task_name_category,
             item.category

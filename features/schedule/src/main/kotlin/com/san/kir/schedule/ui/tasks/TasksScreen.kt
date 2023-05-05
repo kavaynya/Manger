@@ -7,18 +7,18 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.schedule.utils.ItemContent
 
 @Composable
 internal fun TasksScreen(
     navigateToItem: (Long) -> Unit,
 ) {
-    val viewModel: TasksViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: TasksStateHolder = stateHolder { TasksViewModel() }
+    val state by holder.state.collectAsState()
 
-    val sendEvent = remember { { event: TasksEvent -> viewModel.sendEvent(event) } }
+    val sendEvent = remember { { event: TasksEvent -> holder.sendEvent(event) } }
 
 
     LazyColumn(

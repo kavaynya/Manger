@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.categories.R
 import com.san.kir.core.compose.CheckBoxText
 import com.san.kir.core.compose.DefaultSpacer
@@ -36,6 +35,7 @@ import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.SmallSpacer
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.support.SortLibraryUtil
+import com.san.kir.core.utils.viewModel.stateHolder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -43,10 +43,10 @@ import kotlin.math.roundToInt
 
 @Composable
 fun CategoryScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     categoryName: String,
 ) {
-    val viewModel: CategoryViewModel = hiltViewModel()
+    val viewModel: CategoryStateHolder = stateHolder { CategoryViewModel() }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(categoryName) { viewModel.sendEvent(CategoryEvent.Set(categoryName)) }

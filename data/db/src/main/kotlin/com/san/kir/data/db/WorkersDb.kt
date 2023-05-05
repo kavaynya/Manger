@@ -1,6 +1,5 @@
 package com.san.kir.data.db
 
-import android.app.Application
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
@@ -14,7 +13,6 @@ import com.san.kir.data.db.typeConverters.ListStringConverter
 import com.san.kir.data.models.base.CatalogTask
 import com.san.kir.data.models.base.ChapterTask
 import com.san.kir.data.models.base.MangaTask
-import javax.inject.Inject
 
 @Database(
     entities = [CatalogTask::class, MangaTask::class, ChapterTask::class],
@@ -50,12 +48,5 @@ abstract class WorkersDb : RoomDatabase() {
 
     object Migrate {
         val migrations: Array<Migration> = arrayOf()
-    }
-
-    class Instance @Inject constructor(context: Application) {
-        val db = getDatabase(context)
-        val catalog = db.catalogDao
-        val mangas = db.mangasDao
-        val chapters = db.chaptersDao
     }
 }

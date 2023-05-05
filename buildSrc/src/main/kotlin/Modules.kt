@@ -14,6 +14,7 @@ object Modules {
         val settings = module("settings")
         val schedule = module("schedule")
         val catalog = module("catalog")
+        val accounts = module("accounts")
 
         object Catalogs : NestedModule("features:catalogs") {
             val allhen = module("allhen")

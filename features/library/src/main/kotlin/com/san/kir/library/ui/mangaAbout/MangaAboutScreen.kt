@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.CheckBoxText
 import com.san.kir.core.compose.DialogText
 import com.san.kir.core.compose.Dimensions
@@ -42,18 +41,19 @@ import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.browse
 import com.san.kir.core.utils.formatDouble
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.base.Manga
 import com.san.kir.library.R
 
 @Composable
 fun MangaAboutScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     itemId: Long,
 ) {
-    val viewModel: MangaAboutViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: MangaAboutStateHolder = stateHolder { MangaAboutViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(MangaAboutEvent.Set(itemId)) }
+    LaunchedEffect(Unit) { holder.sendEvent(MangaAboutEvent.Set(itemId)) }
 
     ScreenContent(
         topBar = topBar(
@@ -66,7 +66,7 @@ fun MangaAboutScreen(
                 .horizontalInsetsPadding()
                 .bottomInsetsPadding()
         ) {
-            Content(state.manga, state.categoryName, state.size, viewModel::sendEvent)
+            Content(state.manga, state.categoryName, state.size, holder::sendEvent)
         }
     }
 
@@ -77,7 +77,7 @@ private fun ColumnScope.Content(
     manga: Manga,
     categoryState: String,
     size: Double,
-    sendEvent: (MangaAboutEvent) -> Unit
+    sendEvent: (MangaAboutEvent) -> Unit,
 ) {
     val ctx = LocalContext.current
 
@@ -194,7 +194,7 @@ private fun ColumnScope.ColorPicker(initialValue: Int, onValueChange: (Int) -> U
 private fun Slider(
     text: String,
     value: Float,
-    onValueChange: (Float) -> Unit
+    onValueChange: (Float) -> Unit,
 ) {
     Row(
         modifier = Modifier

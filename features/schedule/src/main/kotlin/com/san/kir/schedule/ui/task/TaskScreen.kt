@@ -25,7 +25,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.LabelText
 import com.san.kir.core.compose.MultiChoiceList
@@ -42,6 +41,7 @@ import com.san.kir.core.compose.topBar
 import com.san.kir.core.support.PlannedPeriod
 import com.san.kir.core.support.PlannedType
 import com.san.kir.core.support.PlannedWeek
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.schedule.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -49,16 +49,16 @@ import kotlinx.collections.immutable.toPersistentList
 import java.util.Locale
 
 @Composable
-fun TaskScreen(
-    navigateUp: () -> Boolean,
+internal fun TaskScreen(
+    navigateUp: () -> Unit,
     itemId: Long,
 ) {
-    val viewModel: TaskViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: TaskStateHolder = stateHolder { TaskViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(TaskEvent.Set(itemId)) }
+    LaunchedEffect(Unit) { holder.sendEvent(TaskEvent.Set(itemId)) }
 
-    val sendEvent = remember { { event: TaskEvent -> viewModel.sendEvent(event) } }
+    val sendEvent = remember { { event: TaskEvent -> holder.sendEvent(event) } }
 
     ScreenContent(
         topBar = topBar(

@@ -17,6 +17,8 @@ import androidx.fragment.app.viewModels
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.flowWithLifecycle
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView.SCALE_TYPE_CUSTOM
 import com.davemorrissey.labs.subscaleview.decoder.SkiaPooledImageRegionDecoder
@@ -24,7 +26,6 @@ import com.san.kir.features.viewer.databinding.PageBinding
 import com.san.kir.features.viewer.utils.LoadState
 import com.san.kir.features.viewer.utils.Page
 import com.san.kir.features.viewer.utils.VIEW_OFFSET
-import dagger.hilt.android.AndroidEntryPoint
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.launchIn
@@ -37,7 +38,6 @@ import java.net.UnknownHostException
 import java.util.concurrent.Executors
 
 @SuppressLint("ClickableViewAccessibility")
-@AndroidEntryPoint
 internal class PageFragment : Fragment() {
     companion object {
         private const val page_name = "page_name"
@@ -50,7 +50,11 @@ internal class PageFragment : Fragment() {
     }
 
     private val viewModel: ViewerViewModel by activityViewModels()
-    private val images: LoadImageViewModel by viewModels()
+    private val images: LoadImageViewModel by viewModels(factoryProducer = {
+        viewModelFactory {
+            initializer { LoadImageViewModel() }
+        }
+    })
 
     private var _binding: PageBinding? = null
     private val binding get() = _binding!!
@@ -128,7 +132,7 @@ internal class PageFragment : Fragment() {
             images.state
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .onEach { state ->
-//                    Timber.i("state -> $state")
+                    //                    Timber.i("state -> $state")
                     when (state) {
                         is LoadState.Error -> {
                             binding.errorText.text = when (state.exception) {

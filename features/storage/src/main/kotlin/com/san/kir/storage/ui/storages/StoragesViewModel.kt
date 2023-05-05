@@ -1,16 +1,16 @@
 package com.san.kir.storage.ui.storages
 
-import android.app.Application
-import androidx.lifecycle.asFlow
-import androidx.lifecycle.viewModelScope
-import androidx.work.WorkManager
+import android.content.Context
+import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.StoragesUpdateWorker
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Storage
 import com.san.kir.data.models.extend.MangaLogo
+import com.san.kir.storage.logic.di.storageRepository
 import com.san.kir.storage.logic.repo.StorageRepository
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
@@ -18,16 +18,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-internal class StoragesViewModel @Inject constructor(
-    private val context: Application,
-    private val storageRepository: StorageRepository,
-) : BaseViewModel<StoragesEvent, StoragesState>() {
+internal class StoragesViewModel(
+    context: Context = ManualDI.context,
+    private val storageRepository: StorageRepository = ManualDI.storageRepository,
+) : ViewModel<StoragesState>(), StoragesStateHolder {
     private var job: Job? = null
     private val mangas = MutableStateFlow(persistentListOf<MangaLogo?>())
     private val backgroundState = MutableStateFlow<BackgroundState>(BackgroundState.Load)
@@ -42,7 +39,7 @@ internal class StoragesViewModel @Inject constructor(
 
     override val defaultState = StoragesState()
 
-    override suspend fun onEvent(event: StoragesEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             is StoragesEvent.Delete -> storageRepository.delete(event.item)
         }
@@ -51,10 +48,8 @@ internal class StoragesViewModel @Inject constructor(
     init {
         StoragesUpdateWorker.runTask(context)
 
-        WorkManager.getInstance(context)
-            .getWorkInfosByTagLiveData(StoragesUpdateWorker.tag)
-            .asFlow()
-            .onEach { works ->
+        viewModelScope.defaultLaunch {
+            collectWorkInfoByTag(StoragesUpdateWorker.tag) { works ->
                 if (works.isEmpty()) {
                     backgroundState.update { BackgroundState.None }
                 } else {
@@ -65,7 +60,7 @@ internal class StoragesViewModel @Inject constructor(
                     }
                 }
             }
-            .launchIn(viewModelScope)
+        }
     }
 
     private fun Flow<List<Storage>>.findMangaForStorage(): Flow<List<Storage>> =

@@ -1,7 +1,5 @@
 plugins {
     id("base.app")
-    id(Plugins.kapt)
-    id(Plugins.hilt)
 }
 
 android {
@@ -29,6 +27,4 @@ dependencies {
 
     implementation(libs.material)
 
-    implementation(libs.hilt.android)
-    kapt(libs.bundles.hiltCompilers)
 }

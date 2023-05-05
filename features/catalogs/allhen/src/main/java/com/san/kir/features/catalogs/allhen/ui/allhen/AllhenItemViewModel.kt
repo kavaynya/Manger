@@ -1,23 +1,23 @@
 package com.san.kir.features.catalogs.allhen.ui.allhen
 
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.internet.connectManager
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.parsing.sites.Allhentai
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-@HiltViewModel
-internal class AllhenItemViewModel @Inject internal constructor(
-    private val manager: ConnectManager,
-) : BaseViewModel<AllhenItemEvent, AllhenItemState>() {
+internal class AllhenItemViewModel(
+    private val manager: ConnectManager = ManualDI.connectManager,
+) : ViewModel<AllhenItemState>(), AllhenItemStateHolder {
     private val loginState = MutableStateFlow<LoginState>(LoginState.Loading)
 
     override val tempState = loginState.map { AllhenItemState(it) }
     override val defaultState = AllhenItemState()
 
-    override suspend fun onEvent(event: AllhenItemEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             AllhenItemEvent.Update -> update()
         }

@@ -1,8 +1,11 @@
 package com.san.kir.chapters.ui.chapters
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
@@ -11,30 +14,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.hilt.navigation.compose.hiltViewModel
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import com.san.kir.chapters.R
 import com.san.kir.chapters.utils.AboutPageContent
 import com.san.kir.chapters.utils.ListPageContent
 import com.san.kir.chapters.utils.topBar
 import com.san.kir.core.compose.ScreenPadding
 import com.san.kir.core.compose.Tabs
+import com.san.kir.core.utils.viewModel.stateHolder
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 
-@OptIn(ExperimentalPagerApi::class)
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun ChaptersScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToViewer: (Long) -> Unit,
     mangaId: Long,
 ) {
-    val viewModel: ChaptersViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: ChaptersStateHolder = stateHolder { ChaptersViewModel() }
+    val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { viewModel.sendEvent(ChaptersEvent.Set(mangaId)) }
+    LaunchedEffect(Unit) { holder.sendEvent(ChaptersEvent.Set(mangaId)) }
 
     val pagerState = rememberPagerState()
 
@@ -45,7 +45,7 @@ fun ChaptersScreen(
             backgroundAction = state.backgroundAction,
             manga = state.manga,
             navigateUp = navigateUp,
-            sendEvent = viewModel::sendEvent
+            sendEvent = holder::sendEvent
         ),
     ) { contentPadding ->
         Column(
@@ -59,7 +59,7 @@ fun ChaptersScreen(
             if (state.showTitle) Tabs(pagerState, pages)
 
             HorizontalPager(
-                count = pages.size,
+                pageCount = pages.size,
                 state = pagerState,
                 modifier = Modifier.weight(1f),
                 key = { it }
@@ -78,7 +78,7 @@ fun ChaptersScreen(
                         selectionMode = state.selectionMode,
                         items = state.items,
                         navigateToViewer = navigateToViewer,
-                        sendEvent = viewModel::sendEvent,
+                        sendEvent = holder::sendEvent,
                     )
                 }
             }

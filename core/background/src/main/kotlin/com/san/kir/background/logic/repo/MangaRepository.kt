@@ -5,9 +5,8 @@ import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.models.base.Chapter
 import com.san.kir.data.models.base.Manga
-import javax.inject.Inject
 
-class MangaRepository @Inject constructor(
+class MangaRepository(
     private val mangaDao: MangaDao,
     private val chapterDao: ChapterDao,
 ) {

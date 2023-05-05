@@ -25,11 +25,11 @@ import timber.log.Timber
 open class BaseUpdateWorker<T : BaseTask<T>>(
     context: Context,
     params: WorkerParameters,
-    private val workerRepository: BaseWorkerRepository<T>,
 ) : CoroutineWorker(context, params) {
     protected val notificationManager = NotificationManagerCompat.from(applicationContext)
     protected val channelId = "${this::class.java.simpleName}Id"
     protected open val TAG = "${this::class.java.simpleName}Tag"
+    protected open val workerRepository: BaseWorkerRepository<T> get() = TODO()
 
     private val scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
     private var mainJob: Job? = null
@@ -73,14 +73,14 @@ open class BaseUpdateWorker<T : BaseTask<T>>(
 
         when (command) {
             Command.Destroy -> mainJob?.cancel(WorkComplete)
-            Command.Stop    -> {
+            Command.Stop -> {
                 stopTask()
                 control()
             }
 
-            Command.Start   -> start()
-            Command.Update  -> notify()
-            else            -> {}
+            Command.Start -> start()
+            Command.Update -> notify()
+            else -> {}
         }
     }
 
@@ -101,12 +101,12 @@ open class BaseUpdateWorker<T : BaseTask<T>>(
             when {
                 hasRunningTask() -> when {
                     new.isEmpty() || task == null || !newIds.contains(task.id) -> Command.Stop
-                    queue.size != new.size                                     -> Command.Update
-                    else                                                       -> Command.None
+                    queue.size != new.size -> Command.Update
+                    else -> Command.None
                 }
 
                 new.isNotEmpty() -> Command.Start
-                else             -> Command.Destroy
+                else -> Command.Destroy
             }
         }.apply { queue = new }
     }

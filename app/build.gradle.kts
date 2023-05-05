@@ -1,8 +1,5 @@
 plugins {
     id("compose.app")
-    id(Plugins.hilt)
-    id(Plugins.kapt)
-    id(Plugins.parcelize)
 }
 
 android {
@@ -11,24 +8,10 @@ android {
     defaultConfig {
         applicationId = "com.san.kir.manger"
 
-        versionCode = 282
-        versionName = "2.8.2"
+        versionCode = 283
+        versionName = "2.8.3"
 
         setProperty("archivesBaseName", "Manger $versionName")
-
-        javaCompileOptions {
-            annotationProcessorOptions {
-                arguments += mapOf(
-                    //                    "room.schemaLocation" to "$projectDir/schemas",
-                    "room.incremental" to "true",
-                    //                    "room.expandProjection" to "true"
-                )
-            }
-        }
-    }
-
-    kapt {
-        correctErrorTypes = true
     }
 
     //    flavorDimensions += "version"
@@ -47,42 +30,19 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Features.viewer))
-    implementation(project(Modules.Features.shikimori))
-    implementation(project(Modules.Features.chapters))
     implementation(project(Modules.Features.library))
-    implementation(project(Modules.Features.categories))
-    implementation(project(Modules.Features.statistic))
-    implementation(project(Modules.Features.storage))
-    implementation(project(Modules.Features.settings))
-    implementation(project(Modules.Features.schedule))
-    implementation(project(Modules.Features.catalog))
-
-    implementation(project(Modules.Features.Catalogs.allhen))
 
     implementation(project(Modules.Core.utils))
     implementation(project(Modules.Core.support))
-    implementation(project(Modules.Core.internet))
     implementation(project(Modules.Core.compose))
     implementation(project(Modules.Core.background))
 
     implementation(project(Modules.Data.db))
 
-    implementation(libs.splash)
-    implementation(libs.activity)
     implementation(libs.appcompat)
     implementation(libs.vectordrawable)
 
-    implementation(libs.bundles.hilt)
-    kapt(libs.bundles.hiltCompilers)
-
-    implementation(libs.compose.hilt.navigation)
-
-    implementation(libs.lifecycle.viewmodel)
-
     //    debugImplementation(libs.bundles.hyper)
-
-    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.bundles.tests)

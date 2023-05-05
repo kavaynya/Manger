@@ -32,7 +32,7 @@
             tools:targetApi="q" />
 
         <activity
-            android:name=".ui.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="adjustResize">
@@ -43,18 +43,6 @@
             </intent-filter>
 
         </activity>
-
-        <provider
-            android:name="androidx.startup.InitializationProvider"
-            android:authorities="${applicationId}.androidx-startup"
-            android:exported="false"
-            tools:node="merge">
-            <!-- disable default -->
-            <meta-data
-                android:name="androidx.work.WorkManagerInitializer"
-                android:value="@string/androidx_startup"
-                tools:node="remove" />
-        </provider>
 
     </application>
 </manifest>

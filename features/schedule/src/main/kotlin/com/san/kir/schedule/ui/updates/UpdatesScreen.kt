@@ -8,14 +8,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.schedule.R
 import com.san.kir.schedule.utils.ItemContent
 
 @Composable
 fun UpdatesScreen() {
-    val viewModel: UpdatesViewModel = hiltViewModel()
+    val viewModel: UpdatesStateHolder = stateHolder { UpdatesViewModel() }
     val state by viewModel.state.collectAsState()
 
     val sendEvent = remember { { event: UpdatesEvent -> viewModel.sendEvent(event) } }

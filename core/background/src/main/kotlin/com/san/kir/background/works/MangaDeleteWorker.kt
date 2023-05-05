@@ -1,25 +1,25 @@
 package com.san.kir.background.works
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
+import com.san.kir.data.chapterDao
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MangaDao
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.data.mangaDao
 
-@HiltWorker
-class MangaDeleteWorker @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val mangaDao: MangaDao,
-    private val chapterDao: ChapterDao,
+class MangaDeleteWorker(
+    appContext: Context,
+    workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
+
+    private val mangaDao: MangaDao = ManualDI.mangaDao
+    private val chapterDao: ChapterDao = ManualDI.chapterDao
 
     override suspend fun doWork(): Result {
 
@@ -58,7 +58,11 @@ class MangaDeleteWorker @AssistedInject constructor(
 
         const val withFilesTag = "withFiles"
 
-        fun addTask(ctx: Context, mangaId: Long, withFiles: Boolean = false) {
+        fun addTask(
+            mangaId: Long,
+            withFiles: Boolean = false,
+            ctx: Context = ManualDI.context,
+        ) {
             val data = workDataOf("id" to mangaId, withFilesTag to withFiles)
             val deleteManga = OneTimeWorkRequestBuilder<MangaDeleteWorker>()
                 .setInputData(data)

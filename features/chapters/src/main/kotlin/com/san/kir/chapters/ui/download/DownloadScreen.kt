@@ -39,7 +39,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.chapters.R
 import com.san.kir.chapters.utils.ChapterName
 import com.san.kir.chapters.utils.Download
@@ -57,12 +56,13 @@ import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.internet.NetworkState
 import com.san.kir.core.support.DownloadState
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.DownloadChapter
 
 @Composable
-fun DownloadsScreen(navigateUp: () -> Boolean) {
-    val viewModel: DownloadsViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+fun DownloadsScreen(navigateUp: () -> Unit) {
+    val holder: DownloadsStateHolder = stateHolder { DownloadsViewModel() }
+    val state by holder.state.collectAsState()
 
     ScreenContent(
         topBar = topBar(
@@ -79,11 +79,11 @@ fun DownloadsScreen(navigateUp: () -> Boolean) {
                 .fillMaxWidth(),
         ) {
             items(items = state.items, key = { it.id }) { item ->
-                ItemView(item, viewModel::sendEvent)
+                ItemView(item, holder::sendEvent)
             }
         }
 
-        BottomScreenPart(state = state.network, sendEvent = viewModel::sendEvent)
+        BottomScreenPart(state = state.network, sendEvent = holder::sendEvent)
     }
 }
 
@@ -91,7 +91,7 @@ fun DownloadsScreen(navigateUp: () -> Boolean) {
 private fun BottomScreenPart(state: NetworkState, sendEvent: (DownloadsEvent) -> Unit) {
     FromBottomToBottomAnimContent(targetState = state) {
         when (it) {
-            NetworkState.NOT_WIFI     -> {
+            NetworkState.NOT_WIFI -> {
                 Snackbar(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,7 +111,7 @@ private fun BottomScreenPart(state: NetworkState, sendEvent: (DownloadsEvent) ->
                 }
             }
 
-            NetworkState.OK           -> {
+            NetworkState.OK -> {
                 var showMenu by remember { mutableStateOf(false) }
 
                 // Массовое управление загрузками
@@ -226,7 +226,7 @@ private fun LazyItemScope.ItemView(
         DownloadButton(state = item.status) {
             when (it) {
                 Download.START -> sendEvent(DownloadsEvent.StartDownload(item.id))
-                Download.STOP  -> sendEvent(DownloadsEvent.StopDownload(item.id))
+                Download.STOP -> sendEvent(DownloadsEvent.StopDownload(item.id))
             }
         }
     }
@@ -236,7 +236,7 @@ private fun LazyItemScope.ItemView(
 private fun ProgressIndicator(state: DownloadState, progress: Float) {
     FromTopToTopAnimContent(targetState = state) {
         when (it) {
-            DownloadState.QUEUED  -> {
+            DownloadState.QUEUED -> {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .padding(top = Dimensions.quarter)
@@ -255,7 +255,7 @@ private fun ProgressIndicator(state: DownloadState, progress: Float) {
                 )
             }
 
-            else                  -> {
+            else -> {
             }
         }
     }
@@ -275,7 +275,7 @@ private fun StatusText(
                 Text(stringResource(R.string.download_item_final_size_with_time, size, time))
             }
 
-            else                    -> {
+            else -> {
                 val pages = stringResource(
                     R.string.download_item_progress_text, downloadPages, totalPages
                 )

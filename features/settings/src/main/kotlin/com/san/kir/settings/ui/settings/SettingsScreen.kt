@@ -20,12 +20,12 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.base.Settings
 import com.san.kir.settings.R
 import com.san.kir.settings.utils.ListPreferenceItem
@@ -36,9 +36,9 @@ import kotlinx.collections.immutable.toPersistentList
 
 @Composable
 fun SettingsScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
 ) {
-    val viewModel: SettingsViewModel = hiltViewModel()
+    val viewModel: SettingsStateHolder = stateHolder { SettingsViewModel() }
     val state by viewModel.state.collectAsState()
 
     ScreenContent(
@@ -151,7 +151,7 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
     TogglePreferenceItem(
         title = R.string.settings_viewer_without_title,
         subtitle = R.string.settings_viewer_without_summary,
-//            icon = Icons.Default.ContentCut,
+        //            icon = Icons.Default.ContentCut,
         initialValue = viewer.withoutSaveFiles,
         onCheckedChange = { sendEvent(SettingsEvent.SaveViewer(viewer.copy(withoutSaveFiles = it))) }
     )

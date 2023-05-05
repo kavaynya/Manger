@@ -4,9 +4,8 @@ import com.san.kir.core.utils.coroutines.withDefaultContext
 import com.san.kir.data.db.dao.CategoryDao
 import com.san.kir.data.models.base.Category
 import java.util.Collections
-import javax.inject.Inject
 
-internal class CategoryRepository @Inject constructor(
+internal class CategoryRepository(
     private val categoryDao: CategoryDao
 ) {
 

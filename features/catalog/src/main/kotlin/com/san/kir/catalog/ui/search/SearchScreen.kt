@@ -6,28 +6,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.catalog.R
 import com.san.kir.catalog.utils.ListItem
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.MiniCatalogItem
 
 @Composable
 fun SearchScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToInfo: (String) -> Unit,
     navigateToAdd: (String) -> Unit,
     searchText: String,
 ) {
-    val viewModel: SearchViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: SearchStateHolder = stateHolder { SearchViewModel() }
+    val state by holder.state.collectAsState()
 
-    val query = remember { { arg: String -> viewModel.sendEvent(SearchEvent.Search(arg)) } }
+    val query = remember { { arg: String -> holder.sendEvent(SearchEvent.Search(arg)) } }
     val update =
-        remember { { arg: MiniCatalogItem -> viewModel.sendEvent(SearchEvent.UpdateManga(arg)) } }
+        remember { { arg: MiniCatalogItem -> holder.sendEvent(SearchEvent.UpdateManga(arg)) } }
 
     ScreenList(
         topBar = topBar(

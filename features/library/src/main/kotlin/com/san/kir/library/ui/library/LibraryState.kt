@@ -55,10 +55,8 @@ internal sealed interface BackgroundState {
 }
 
 //@Immutable
-data class LibraryNavigation(
+internal data class LibraryNavigation(
     val navigateToScreen: (MainMenuType) -> Unit,
-    val navigateToCategories: () -> Unit,
-    val navigateToCatalogs: () -> Unit,
     val navigateToInfo: (Long) -> Unit,
     val navigateToStorage: (Long) -> Unit,
     val navigateToStats: (Long) -> Unit,

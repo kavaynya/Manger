@@ -122,20 +122,12 @@ private class FuzzyComparison(
     /// <param name="sentence">Предложение.</param>
     /// <returns>Нормализованное предложение.</returns>
     private val String.normalizeSentence: String
-        get() {
-            val normalChars = toLowerCase(Locale.getDefault()).filter { c -> c.isNormalChar }
-
-            return buildString {
-                append(normalChars)
-            }
-        }
+        get() = lowercase(Locale.getDefault()).filter { c -> c.isNormalChar }
 
     /// Возвращает признак подходящего символа.
     /// <param name="c">Символ.</param>
     /// <returns>True - если символ буква или цифра или пробел, False - иначе.</returns>
     private val Char.isNormalChar: Boolean
-        get() {
-            return isLetterOrDigit() || isWhitespace()
-        }
+        get() = isLetterOrDigit() || isWhitespace()
 
 }

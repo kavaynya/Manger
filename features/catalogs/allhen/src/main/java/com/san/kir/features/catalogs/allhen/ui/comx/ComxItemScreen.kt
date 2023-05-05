@@ -17,19 +17,19 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.EndAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.utils.findInGoogle
+import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.parsing.sites.ComX
 import com.san.kir.features.catalogs.allhen.R
 import com.san.kir.features.catalogs.allhen.ui.allhen.LoginState
 
 @Composable
 fun ComxItemScreen(navigateToScreen: (String) -> Unit) {
-    val viewModel: ComxItemViewModel = hiltViewModel()
+    val viewModel: ComxItemStateHolder = stateHolder { ComxItemViewModel() }
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {

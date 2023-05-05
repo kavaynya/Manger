@@ -1,24 +1,24 @@
 package com.san.kir.features.catalogs.allhen.ui.comx
 
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.core.utils.viewModel.BaseViewModel
+import com.san.kir.core.internet.connectManager
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.parsing.sites.Allhentai
 import com.san.kir.features.catalogs.allhen.ui.allhen.LoginState
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.map
-import javax.inject.Inject
 
-@HiltViewModel
-internal class ComxItemViewModel @Inject internal constructor(
-    private val manager: ConnectManager,
-) : BaseViewModel<ComxItemEvent, ComxItemState>() {
+internal class ComxItemViewModel(
+    private val manager: ConnectManager = ManualDI.connectManager,
+) : ViewModel<ComxItemState>(), ComxItemStateHolder {
     private val loginState = MutableStateFlow<LoginState>(LoginState.Loading)
 
     override val tempState = loginState.map { ComxItemState(it) }
     override val defaultState = ComxItemState()
 
-    override suspend fun onEvent(event: ComxItemEvent) {
+    override suspend fun onEvent(event: ScreenEvent) {
         when (event) {
             ComxItemEvent.Update -> update()
         }

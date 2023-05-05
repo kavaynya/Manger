@@ -5,11 +5,9 @@
 
     <string name="login_text">Вы вошли, как %s</string>
     <string name="no_login_text">Не используется</string>
-    <string name="no_auth_text">Вы не авторизованы</string>
     <string name="error_try_again">Произошла ошибка! Попробуйте снова.</string>
     <string name="error">Произошла ошибка!</string>
     <string name="try_again">Попробовать снова</string>
-    <string name="login">Войти</string>
     <string name="logout">Выйти</string>
     <string name="logout_dialog_title">Внимание!</string>
     <string name="logout_dialog_text">Вы собираетесь выйти из профиля.</string>
@@ -18,10 +16,7 @@
     <string name="update_data">Обновить данные</string>
     <string name="reading">Прочитано: %1$d из %2$d</string>
     <string name="volumes_and_chapters">Томов: %1$d - Глав: %2$d</string>
-    <string name="nothing_founds">Ничего не найдено</string>
     <string name="current_status">Текущий статус: %s</string>
-    <string name="online_catalog">Манга из вашего профиля</string>
-    <string name="local_catalog">Манга из библиотеки</string>
     <string name="synced_catalog_items">Привязанные элементы %d</string>
     <string name="nonsynced_catalog_items">Непривязанные элементы %d</string>
     <string name="desc_hide">свернуть</string>

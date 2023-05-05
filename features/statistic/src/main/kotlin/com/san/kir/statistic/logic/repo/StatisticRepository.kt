@@ -3,9 +3,8 @@ package com.san.kir.statistic.logic.repo
 import com.san.kir.core.utils.coroutines.withDefaultContext
 import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.db.dao.StatisticDao
-import javax.inject.Inject
 
-class StatisticRepository @Inject constructor(
+internal class StatisticRepository(
     private val statisticDao: StatisticDao,
     private val mangaDao: MangaDao,
 ) {

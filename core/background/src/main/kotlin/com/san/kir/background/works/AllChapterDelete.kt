@@ -1,26 +1,27 @@
 package com.san.kir.background.works
 
 import android.content.Context
-import androidx.hilt.work.HiltWorker
 import androidx.work.WorkerParameters
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.shortPath
+import com.san.kir.data.chapterDao
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MangaDao
 import com.san.kir.data.db.dao.StorageDao
+import com.san.kir.data.mangaDao
 import com.san.kir.data.models.base.Manga
 import com.san.kir.data.models.base.getSizeAndIsNew
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedInject
+import com.san.kir.data.storageDao
 
-@HiltWorker
-class AllChapterDelete @AssistedInject constructor(
-    @Assisted appContext: Context,
-    @Assisted workerParams: WorkerParameters,
-    private val mangaDao: MangaDao,
-    private val chapterDao: ChapterDao,
-    private val storageDao: StorageDao,
+class AllChapterDelete(
+    appContext: Context,
+    workerParams: WorkerParameters,
 ) : ChapterDeleteWorker(appContext, workerParams) {
+
+    private val mangaDao: MangaDao = ManualDI.mangaDao
+    private val chapterDao: ChapterDao = ManualDI.chapterDao
+    private val storageDao: StorageDao = ManualDI.storageDao
 
     override suspend fun doWork(): Result {
         val mangaId = inputData.getLong("id", -1)

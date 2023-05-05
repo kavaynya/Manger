@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.catalog.R
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
@@ -33,17 +32,18 @@ import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.findInGoogle
+import com.san.kir.core.utils.viewModel.stateHolder
 
 @Composable
 fun CatalogsScreen(
-    navigateUp: () -> Boolean,
+    navigateUp: () -> Unit,
     navigateToItem: (String) -> Unit,
     navigateToSearch: () -> Unit,
 ) {
-    val viewModel: CatalogsViewModel = hiltViewModel()
-    val state by viewModel.state.collectAsState()
+    val holder: CatalogsStateHolder = stateHolder { CatalogsViewModel() }
+    val state by holder.state.collectAsState()
 
-    val sendEvent = remember { { event: CatalogsEvent -> viewModel.sendEvent(event) } }
+    val sendEvent = remember { { event: CatalogsEvent -> holder.sendEvent(event) } }
 
     ScreenList(
         topBar = topBar(

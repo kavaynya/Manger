@@ -1,11 +1,9 @@
 plugins {
     id("compose.library")
-    id(Plugins.kapt)
-    id(Plugins.hilt)
 }
 
 android {
-    namespace="com.san.kir.library"
+    namespace = "com.san.kir.library"
 }
 
 dependencies {
@@ -16,12 +14,13 @@ dependencies {
     implementation(project(Modules.Data.db))
     implementation(project(Modules.Data.parsing))
 
-    implementation(libs.timber)
-
-    implementation(libs.lifecycle.livedata)
-
-    implementation(libs.compose.hilt.navigation)
-    implementation(libs.hilt.android)
-    kapt(libs.bundles.hiltCompilers)
-
+    implementation(project(Modules.Features.chapters))
+    implementation(project(Modules.Features.catalog))
+    implementation(project(Modules.Features.viewer))
+    implementation(project(Modules.Features.categories))
+    implementation(project(Modules.Features.statistic))
+    implementation(project(Modules.Features.storage))
+    implementation(project(Modules.Features.settings))
+    implementation(project(Modules.Features.schedule))
+    implementation(project(Modules.Features.accounts))
 }

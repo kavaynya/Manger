@@ -8,7 +8,7 @@ object Versions {
     }
 
     object Compose {
-        const val COMPOSE_COMPILER = "1.4.0"
+        const val COMPOSE_COMPILER = "1.4.4"
     }
 
     object Google
