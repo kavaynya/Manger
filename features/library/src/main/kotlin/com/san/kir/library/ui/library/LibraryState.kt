@@ -2,6 +2,7 @@ package com.san.kir.library.ui.library
 
 import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.extend.CategoryWithMangas
@@ -58,8 +59,8 @@ internal sealed interface BackgroundState {
 internal data class LibraryNavigation(
     val navigateToScreen: (MainMenuType) -> Unit,
     val navigateToInfo: (Long) -> Unit,
-    val navigateToStorage: (Long) -> Unit,
-    val navigateToStats: (Long) -> Unit,
-    val navigateToChapters: (Long) -> Unit,
-    val navigateToOnline: () -> Unit,
+    val navigateToStorage: (Long, SharedParams) -> Unit,
+    val navigateToStats: (Long, SharedParams) -> Unit,
+    val navigateToChapters: (Long, SharedParams) -> Unit,
+    val navigateToOnline: (SharedParams) -> Unit,
 )

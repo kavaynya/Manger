@@ -19,7 +19,6 @@ import io.ktor.client.request.setBody
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.ContentType
 import io.ktor.http.contentType
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import timber.log.Timber
 
@@ -103,7 +102,7 @@ internal class ProfileItemRepository(
         rates(auth, targetId).onSuccess { newRates ->
             newRates.forEach { rate ->
                 addOrUpdate(rate)
-                delay(150L)
+//                delay(150L)
             }
         }
     }

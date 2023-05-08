@@ -31,7 +31,10 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.RemoveItemMenuOnHold
 import com.san.kir.core.compose.ScreenList
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.VectorConverter
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.format
 import com.san.kir.core.utils.formatDouble
@@ -45,7 +48,7 @@ import kotlin.math.roundToInt
 @Composable
 internal fun StoragesScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
 ) {
     val holder: StoragesStateHolder = stateHolder { StoragesViewModel() }
     val state by holder.state.collectAsState()
@@ -89,7 +92,7 @@ internal fun StoragesScreen(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun LazyItemScope.ItemView(
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
     item: Storage,
     manga: MangaLogo?,
     storageSize: Double,
@@ -103,10 +106,12 @@ private fun LazyItemScope.ItemView(
             .fillMaxWidth()
             .animateItemPlacement()
     ) {
+        val params = rememberSharedParams()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .onClick { manga?.let { navigateToItem(it.id) } ?: run { showMenu() } }
+                .saveParams(params)
+                .onClick { manga?.let { navigateToItem(it.id, params) } ?: run { showMenu() } }
                 .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
         ) {
             // Иконка манги, если для этой папки она еще есть

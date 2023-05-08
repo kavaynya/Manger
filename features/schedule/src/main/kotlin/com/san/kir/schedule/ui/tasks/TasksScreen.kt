@@ -5,21 +5,21 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.utils.navigation.rememberLambda
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.schedule.utils.ItemContent
 
 @Composable
 internal fun TasksScreen(
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
 ) {
     val holder: TasksStateHolder = stateHolder { TasksViewModel() }
     val state by holder.state.collectAsState()
 
-    val sendEvent = remember { { event: TasksEvent -> holder.sendEvent(event) } }
-
+    val sendEvent = rememberLambda { event: TasksEvent -> holder.sendEvent(event) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
@@ -33,7 +33,7 @@ internal fun TasksScreen(
                 subTitle = item.info,
                 checked = item.isEnabled,
                 onCheckedChange = { sendEvent(TasksEvent.Update(item.id, item.isEnabled.not())) },
-                onClick = { navigateToItem(item.id) }
+                onClick = { navigateToItem(item.id, it) }
             )
         }
     }

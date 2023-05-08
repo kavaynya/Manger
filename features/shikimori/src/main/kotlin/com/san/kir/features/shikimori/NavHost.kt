@@ -1,10 +1,19 @@
 package com.san.kir.features.shikimori
 
 import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.san.kir.catalog.CatalogsNavHost
 import com.san.kir.catalog.GlobalSearch
+import com.san.kir.core.compose.animation.EmptyStackAnimator
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.circleShapeAnimator
+import com.san.kir.core.compose.animation.shapeAnimator
+import com.san.kir.core.compose.animation.verticalSlide
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
+import com.san.kir.core.utils.navigation.NavContainer
 import com.san.kir.core.utils.navigation.NavHost
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.features.shikimori.ui.accountRate.AccountRateScreen
@@ -14,16 +23,14 @@ import com.san.kir.features.shikimori.ui.localItems.LocalItemsScreen
 import com.san.kir.features.shikimori.ui.search.ShikiSearchScreen
 import kotlinx.parcelize.Parcelize
 
-private const val duration = 600
-
 @Parcelize
-internal class MainConfig : NavConfig {
+internal class Main : NavConfig {
     companion object {
-        val creator = navCreator<MainConfig> {
+        val creator = navCreator<Main> {
             AccountScreen(
                 navigateUp = backPressed(),
                 navigateToShikiItem = add(::ProfileItem),
-                navigateToLocalItems = add(LocalItems()),
+                navigateToLocalItems = add(::LocalItems),
                 navigateToSearch = add(Search())
             )
         }
@@ -31,7 +38,7 @@ internal class MainConfig : NavConfig {
 }
 
 @Parcelize
-internal class LocalItems : NavConfig {
+internal class LocalItems(val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<LocalItems> {
             LocalItemsScreen(
@@ -43,7 +50,7 @@ internal class LocalItems : NavConfig {
 }
 
 @Parcelize
-internal class LocalItem(val id: Long) : NavConfig {
+internal class LocalItem(val id: Long, val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<LocalItem> { config ->
             LocalItemScreen(
@@ -69,7 +76,7 @@ internal class Search(val query: String = "") : NavConfig {
 }
 
 @Parcelize
-internal class ProfileItem(val mangaId: Long) : NavConfig {
+internal class ProfileItem(val mangaId: Long, val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<ProfileItem> { config ->
             AccountRateScreen(
@@ -92,9 +99,9 @@ internal class CatalogSearch(val query: String = "") : NavConfig {
 
 @Composable
 fun ShikimoriNavHost() {
-    NavHost(startConfig = MainConfig()) {
+    NavHost(Main(), animation) {
         when (it) {
-            is MainConfig -> MainConfig.creator(it)
+            is Main -> Main.creator(it)
             is LocalItems -> LocalItems.creator(it)
             is LocalItem -> LocalItem.creator(it)
             is Search -> Search.creator(it)
@@ -105,80 +112,17 @@ fun ShikimoriNavHost() {
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val initial = initialState.destination.route
-//    val target = targetState.destination.route
-//
-//    if (initial == null || target == null) null
-//    else
-//        when {
-//            GraphTree.Accounts.Shikimori.search in target            ->
-//                scaleIn(
-//                    animationSpec = tween(duration),
-//                    initialScale = 0.08f,
-//                    transformOrigin = TransformOrigin(0.9f, 0.05f)
-//                )
-//
-//            GraphTree.Accounts.Shikimori.localItems in target        ->
-//                scaleIn(
-//                    animationSpec = tween(duration),
-//                    initialScale = 0.08f,
-//                    transformOrigin = TransformOrigin(0.9f, 0.90f)
-//                )
-//
-//            GraphTree.Accounts.Shikimori.localItem in target ||
-//                    GraphTree.Accounts.Shikimori.shikiItem in target ->
-//                expandVertically(
-//                    animationSpec = tween(duration),
-//                    expandFrom = Alignment.CenterVertically
-//                )
-//
-//            else                                                     -> null
-//        }
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val exitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null) fadeOut(animationSpec = tween(duration))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popEnterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null) fadeIn(animationSpec = tween(duration))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val initial = initialState.destination.route
-//    val target = targetState.destination.route
-//
-//    if (initial == null || target == null) null
-//    else
-//        when {
-//            GraphTree.Accounts.Shikimori.search in initial            ->
-//                scaleOut(
-//                    animationSpec = tween(duration),
-//                    transformOrigin = TransformOrigin(0.9f, 0.05f)
-//                )
-//
-//            GraphTree.Accounts.Shikimori.localItems in initial        ->
-//                scaleOut(
-//                    animationSpec = tween(duration),
-//                    transformOrigin = TransformOrigin(0.9f, 0.90f)
-//                )
-//
-//            GraphTree.Accounts.Shikimori.localItem in initial ||
-//                    GraphTree.Accounts.Shikimori.shikiItem in initial ->
-//                shrinkVertically(
-//                    animationSpec = tween(duration),
-//                    shrinkTowards = Alignment.CenterVertically
-//                )
-//
-//            else                                                      -> null
-//        }
-//}
+private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
+    if (direction.isFront) frontAnimation(initial.configuration)
+    else frontAnimation(target.configuration)
+}
+
+private fun frontAnimation(config: NavConfig): StackAnimator {
+    return when (config) {
+        is ProfileItem -> shapeAnimator(config.params)
+        is LocalItems -> circleShapeAnimator(config.params)
+        is LocalItem -> shapeAnimator(config.params)
+        is Search, is CatalogSearch -> verticalSlide()
+        else -> EmptyStackAnimator
+    }
+}

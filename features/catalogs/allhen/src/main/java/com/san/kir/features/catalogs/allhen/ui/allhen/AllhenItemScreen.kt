@@ -20,6 +20,9 @@ import androidx.compose.ui.res.stringResource
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.EndAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.utils.findInGoogle
 import com.san.kir.core.utils.viewModel.stateHolder
@@ -27,9 +30,10 @@ import com.san.kir.data.parsing.sites.Allhentai
 import com.san.kir.features.catalogs.allhen.R
 
 @Composable
-fun AllhenItemScreen(navigateToScreen: (String) -> Unit) {
+fun AllhenItemScreen(navigateToScreen: (String, SharedParams) -> Unit) {
     val holder: AllhenItemStateHolder = stateHolder { AllhenItemViewModel() }
     val state by holder.state.collectAsState()
+    val params = rememberSharedParams()
 
     LaunchedEffect(Unit) {
         holder.sendEvent(AllhenItemEvent.Update)
@@ -38,7 +42,8 @@ fun AllhenItemScreen(navigateToScreen: (String) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { navigateToScreen.invoke(Allhentai.AUTH_URL) },
+            .saveParams(params)
+            .clickable { navigateToScreen.invoke(Allhentai.AUTH_URL, params) },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Image(

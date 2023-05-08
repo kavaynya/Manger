@@ -3,19 +3,19 @@
 kotlin = "1.8.10"
 coroutines = "1.6.4"
 ksp = "1.8.0-1.0.8"
-serialization = "1.4.1"
+serialization = "1.5.0"
 collections_immutable = "0.3.5"
 
 # decompose
-decompose = "1.0.0"
+decompose = "2.0.0-alpha-02"
 
 # AndroidX
-activity = "1.7.0"
+activity = "1.7.1"
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
 core = "1.10.0"
 datastore = "1.0.0"
-fragment = "1.5.6"
+fragment = "1.5.7"
 lifecycle = "2.6.1"
 paging = "3.1.1"
 room = "2.5.1"
@@ -30,7 +30,7 @@ compose_compiler = "1.4.4" # Don`t forget change field in Version.kt in buildSrc
 compose_paging = "1.0.0-alpha18"
 
 # Google
-material = "1.8.0"
+material = "1.9.0"
 accompanist = "0.30.0"
 
 # Test
@@ -52,7 +52,7 @@ subsampling = "3.10.0"
 timber = "5.0.1"
 
 # For Internet
-jsoup = "1.15.2"
+jsoup = "1.15.4"
 gson = "2.10"
 okio = "3.2.0"
 okhttp = "4.10.0"

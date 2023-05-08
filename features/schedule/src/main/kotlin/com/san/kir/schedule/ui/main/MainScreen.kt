@@ -12,6 +12,9 @@ import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.ScrollableTabs
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.schedule.R
 import com.san.kir.schedule.utils.pages
@@ -21,16 +24,18 @@ import kotlinx.collections.immutable.toPersistentList
 @Composable
 internal fun MainScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
 ) {
     ScreenContent(
         topBar = topBar(
             navigationButton = NavigationButton.Back(navigateUp),
             title = stringResource(R.string.schedule),
             actions = {
+                val params = rememberSharedParams(fromCenter = true)
                 MenuIcon(
                     icon = Icons.Default.Add,
-                    onClick = { navigateToItem(-1L) }
+                    modifier = Modifier.saveParams(params),
+                    onClick = { navigateToItem(-1L, params) }
                 )
             },
         ),

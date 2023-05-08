@@ -1,25 +1,31 @@
 package com.san.kir.catalog
 
 import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.san.kir.catalog.ui.addOnline.AddOnlineScreen
 import com.san.kir.catalog.ui.addStandart.AddStandartScreen
 import com.san.kir.catalog.ui.catalog.CatalogScreen
 import com.san.kir.catalog.ui.catalogItem.CatalogItemScreen
 import com.san.kir.catalog.ui.catalogs.CatalogsScreen
 import com.san.kir.catalog.ui.search.SearchScreen
+import com.san.kir.core.compose.animation.EmptyStackAnimator
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.shapeAnimator
+import com.san.kir.core.compose.animation.verticalSlide
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
+import com.san.kir.core.utils.navigation.NavContainer
 import com.san.kir.core.utils.navigation.NavHost
 import com.san.kir.core.utils.navigation.navCreator
 import kotlinx.parcelize.Parcelize
-
-private const val DURATION = 600
 
 // hasDeepLink = true
 @Parcelize
 internal class Main : NavConfig {
     companion object {
-        val creator = navCreator<Main> { config ->
+        val creator = navCreator<Main> { _ ->
             CatalogsScreen(
                 navigateUp = backPressed(),
                 navigateToSearch = add(GlobalSearch()),
@@ -30,7 +36,7 @@ internal class Main : NavConfig {
 }
 
 @Parcelize
-internal class Catalog(val catalogName: String) : NavConfig {
+internal class Catalog(val catalogName: String, val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<Catalog> { config ->
             CatalogScreen(
@@ -44,7 +50,7 @@ internal class Catalog(val catalogName: String) : NavConfig {
 }
 
 @Parcelize
-internal class Info(val url: String) : NavConfig {
+internal class Info(val url: String, val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<Info> { config ->
             CatalogItemScreen(
@@ -57,7 +63,7 @@ internal class Info(val url: String) : NavConfig {
 }
 
 @Parcelize
-internal class AddLocal(val url: String) : NavConfig {
+internal class AddLocal(val url: String, val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<AddLocal> { config ->
             AddStandartScreen(
@@ -85,7 +91,7 @@ class GlobalSearch(val query: String = "") : NavConfig {
 @Parcelize
 class AddOnline : NavConfig {
     companion object {
-        val creator = navCreator<AddOnline> { config ->
+        val creator = navCreator<AddOnline> { _ ->
             AddOnlineScreen(
                 navigateUp = backPressed(),
                 navigateToNext = add(::AddLocal),
@@ -98,7 +104,7 @@ class AddOnline : NavConfig {
 fun CatalogsNavHost(startConfig: NavConfig = Main()) {
     NavHost(
         startConfig = startConfig,
-        animation = null,
+        animation = animation,
     ) { config ->
         when (config) {
             is Main -> Main.creator(config)
@@ -112,90 +118,17 @@ fun CatalogsNavHost(startConfig: NavConfig = Main()) {
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val initial = initialState.destination.route
-//    val target = targetState.destination.route
-//
-//    if (initial == null || target == null) null
-//    else
-//        when {
-//            GraphTree.Catalogs.search in target   ->
-//                scaleIn(
-//                    animationSpec = tween(DURATION),
-//                    initialScale = 0.08f,
-//                    transformOrigin = TransformOrigin(0.9f, 0.05f)
-//                )
-//
-//            GraphTree.Catalogs.item in target     ->
-//                expandVertically(
-//                    animationSpec = tween(DURATION),
-//                    expandFrom = Alignment.CenterVertically
-//                )
-//
-//            GraphTree.Catalogs.itemInfo in target ->
-//                slideInVertically(
-//                    animationSpec = tween(DURATION),
-//                    initialOffsetY = { it }
-//                )
-//
-//            GraphTree.Catalogs.itemAdd in target  ->
-//                scaleIn(
-//                    animationSpec = tween(DURATION),
-//                    initialScale = 0.1f,
-//                    transformOrigin = TransformOrigin(0.95f, 0.01f)
-//                )
-//
-//            else                                  -> null
-//        }
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val exitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null) fadeOut(animationSpec = tween(DURATION))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popEnterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null) fadeIn(animationSpec = tween(DURATION))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val initial = initialState.destination.route
-//    val target = targetState.destination.route
-//
-//    if (initial == null || target == null) null
-//    else
-//        when {
-//            GraphTree.Catalogs.search in initial   ->
-//                scaleOut(
-//                    animationSpec = tween(DURATION),
-//                    transformOrigin = TransformOrigin(0.9f, 0.05f)
-//                )
-//
-//            GraphTree.Catalogs.item in initial     ->
-//                shrinkVertically(
-//                    animationSpec = tween(DURATION),
-//                    shrinkTowards = Alignment.CenterVertically
-//                )
-//
-//            GraphTree.Catalogs.itemInfo in initial ->
-//                slideOutVertically(
-//                    animationSpec = tween(DURATION),
-//                    targetOffsetY = { it }
-//                )
-//
-//            GraphTree.Catalogs.itemAdd in initial  ->
-//                scaleOut(
-//                    animationSpec = tween(DURATION),
-//                    transformOrigin = TransformOrigin(0.95f, 0.01f)
-//                )
-//
-//            else                                   -> null
-//        }
-//}
+private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
+    if (direction.isFront) frontAnimation(initial.configuration)
+    else frontAnimation(target.configuration)
+}
+
+private fun frontAnimation(config: NavConfig): StackAnimator {
+    return when (config) {
+        is GlobalSearch -> verticalSlide()
+        is Catalog -> shapeAnimator(config.params)
+        is Info -> shapeAnimator(config.params)
+        is AddLocal -> shapeAnimator(config.params)
+        else -> EmptyStackAnimator
+    }
+}

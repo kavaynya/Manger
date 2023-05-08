@@ -6,6 +6,12 @@ import androidx.compose.runtime.remember
 @Composable
 fun rememberLambda(block: () -> Unit) = remember { block }
 
+@Composable
+fun <P1> rememberLambda(block: (P1) -> Unit) = remember { block }
+
+@Composable
+fun <P1, P2> rememberLambda(block: (P1, P2) -> Unit) = remember { block }
+
 fun <C : NavConfig> navCreator(
     block: @Composable NavComponentScope.(C) -> Unit,
 ): (C) -> NavComponent<C> = { navComponent(it, block) }

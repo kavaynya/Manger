@@ -1,6 +1,7 @@
 package com.san.kir.core.utils.viewModel
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.runtime.remember
@@ -12,9 +13,10 @@ inline fun <reified VM : StateHolder<*>> stateHolder(
     componentContext: ComponentContext = checkNotNull(LocalComponentContext.current) {
         "No ComponentContext was provided via LocalComponentContext"
     },
-    creator: () -> VM,
+    crossinline creator: @DisallowComposableCalls () -> VM,
 ): VM {
-    return componentContext.instanceKeeper.getOrCreate(VM::class.java.simpleName) { creator() }
+    val key = VM::class.java.simpleName
+    return remember(key) { componentContext.instanceKeeper.getOrCreate(key) { creator() } }
 }
 
 object LocalComponentContext {
@@ -34,5 +36,5 @@ object LocalComponentContext {
 
 @Composable
 fun StateHolder<*>.rememberSendEvent(event: ScreenEvent): () -> Unit {
-    return remember { { sendEvent(event) }}
+    return remember { { sendEvent(event) } }
 }

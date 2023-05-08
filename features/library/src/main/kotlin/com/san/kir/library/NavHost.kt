@@ -2,31 +2,38 @@ package com.san.kir.library
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalContext
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.san.kir.accounts.AccountsNavHost
 import com.san.kir.catalog.AddOnline
 import com.san.kir.catalog.CatalogsNavHost
 import com.san.kir.categories.CategoriesNavHost
-import com.san.kir.chapters.ui.chapters.ChaptersScreen
+import com.san.kir.chapters.Chapters
+import com.san.kir.chapters.LatestCreator
 import com.san.kir.chapters.ui.download.DownloadsScreen
-import com.san.kir.chapters.ui.latest.LatestScreen
+import com.san.kir.core.compose.animation.EmptyStackAnimator
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.circleShapeAnimator
+import com.san.kir.core.compose.animation.horizontalSlide
+import com.san.kir.core.compose.animation.itemShapeAnimator
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.navigation.NavConfig
+import com.san.kir.core.utils.navigation.NavContainer
 import com.san.kir.core.utils.navigation.NavHost
 import com.san.kir.core.utils.navigation.navCreator
-import com.san.kir.features.viewer.MangaViewer
 import com.san.kir.library.ui.library.LibraryNavigation
 import com.san.kir.library.ui.library.LibraryScreen
 import com.san.kir.library.ui.mangaAbout.MangaAboutScreen
 import com.san.kir.schedule.ScheduleNavHost
 import com.san.kir.settings.ui.settings.SettingsScreen
+import com.san.kir.statistic.Statistic
 import com.san.kir.statistic.StatisticNavHost
+import com.san.kir.storage.Storage
 import com.san.kir.storage.StorageNavHost
 import kotlinx.parcelize.Parcelize
 import timber.log.Timber
-
-private const val DURATION = 600
 
 abstract class MenuNavConfig(val type: MainMenuType) : NavConfig
 
@@ -47,10 +54,12 @@ internal class MainMenuItem : MenuNavConfig(MainMenuType.Library) {
                         }
                     },
                     navigateToInfo = simpleAdd(::About),
-                    navigateToStorage = simpleAdd { StorageMenuItem(it, true) },
-                    navigateToStats = simpleAdd(::StatisticsMenuItem),
+                    navigateToStorage = simpleAdd { id, params ->
+                        Storage(id, params, true)
+                    },
+                    navigateToStats = simpleAdd(::Statistic),
                     navigateToChapters = simpleAdd(::Chapters),
-                    navigateToOnline = simpleAdd(Add()),
+                    navigateToOnline = simpleAdd(::Add),
                 )
             }
             LibraryScreen(navigation)
@@ -59,11 +68,14 @@ internal class MainMenuItem : MenuNavConfig(MainMenuType.Library) {
 }
 
 @Parcelize
-class StorageMenuItem(val mangaId: Long? = null, val hasUpdate: Boolean = false) :
-    MenuNavConfig(MainMenuType.Storage) {
+class StorageMenuItem(
+    val mangaId: Long? = null,
+    val params: SharedParams? = null,
+    val hasUpdate: Boolean = false,
+) : MenuNavConfig(MainMenuType.Storage) {
     companion object {
         val creator = navCreator<StorageMenuItem> {
-            StorageNavHost(it.mangaId, it.hasUpdate)
+            StorageNavHost(it.mangaId, it.params, it.hasUpdate)
         }
     }
 }
@@ -71,18 +83,14 @@ class StorageMenuItem(val mangaId: Long? = null, val hasUpdate: Boolean = false)
 @Parcelize
 class CategoriesMenuItem : MenuNavConfig(MainMenuType.Category) {
     companion object {
-        val creator = navCreator<CategoriesMenuItem> {
-            CategoriesNavHost()
-        }
+        val creator = navCreator<CategoriesMenuItem> { CategoriesNavHost() }
     }
 }
 
 @Parcelize
 class CatalogsMenuItem : MenuNavConfig(MainMenuType.Catalogs) {
     companion object {
-        val creator = navCreator<CatalogsMenuItem> {
-            CatalogsNavHost()
-        }
+        val creator = navCreator<CatalogsMenuItem> { CatalogsNavHost() }
     }
 }
 
@@ -90,9 +98,7 @@ class CatalogsMenuItem : MenuNavConfig(MainMenuType.Catalogs) {
 @Parcelize
 class DownloadsMenuItem : MenuNavConfig(MainMenuType.Downloader) {
     companion object {
-        val creator = navCreator<DownloadsMenuItem> {
-            DownloadsScreen(backPressed())
-        }
+        val creator = navCreator<DownloadsMenuItem> { DownloadsScreen(backPressed()) }
     }
 }
 
@@ -100,50 +106,36 @@ class DownloadsMenuItem : MenuNavConfig(MainMenuType.Downloader) {
 @Parcelize
 class LatestMenuItem : MenuNavConfig(MainMenuType.Latest) {
     companion object {
-        val creator = navCreator<LatestMenuItem> {
-            val context = LocalContext.current
-            LatestScreen(
-                navigateUp = backPressed(),
-                navigateToViewer = remember { { MangaViewer.start(context, it) } },
-            )
-        }
+        val creator = navCreator<LatestMenuItem> { LatestCreator() }
     }
 }
 
 @Parcelize
 class SettingsMenuItem : MenuNavConfig(MainMenuType.Settings) {
     companion object {
-        val creator = navCreator<SettingsMenuItem> {
-            SettingsScreen(backPressed())
-        }
+        val creator = navCreator<SettingsMenuItem> { SettingsScreen(backPressed()) }
     }
 }
 
 @Parcelize
-class StatisticsMenuItem(val statisticItemId: Long? = null) :
+class StatisticsMenuItem :
     MenuNavConfig(MainMenuType.Statistic) {
     companion object {
-        val creator = navCreator<StatisticsMenuItem> {
-            StatisticNavHost(it.statisticItemId)
-        }
+        val creator = navCreator<StatisticsMenuItem> { StatisticNavHost() }
     }
 }
 
 @Parcelize
 class ScheduleMenuItem : MenuNavConfig(MainMenuType.Schedule) {
     companion object {
-        val creator = navCreator<ScheduleMenuItem> {
-            ScheduleNavHost()
-        }
+        val creator = navCreator<ScheduleMenuItem> { ScheduleNavHost() }
     }
 }
 
 @Parcelize
 class AccountsMenuItem : MenuNavConfig(MainMenuType.Accounts) {
     companion object {
-        val creator = navCreator<AccountsMenuItem> {
-            AccountsNavHost()
-        }
+        val creator = navCreator<AccountsMenuItem> { AccountsNavHost() }
     }
 }
 
@@ -162,20 +154,6 @@ private val targets = listOf(
 val mainMenuItems = targets.associateBy { it.type }
 
 @Parcelize
-internal class Chapters(val mangaId: Long) : NavConfig {
-    companion object {
-        val creator = navCreator<Chapters> { config ->
-            val context = LocalContext.current
-            ChaptersScreen(
-                navigateUp = backPressed(),
-                navigateToViewer = remember { { MangaViewer.start(context, it) } },
-                mangaId = config.mangaId
-            )
-        }
-    }
-}
-
-@Parcelize
 internal class About(val mangaId: Long) : NavConfig {
     companion object {
         val creator = navCreator<About> { config ->
@@ -185,7 +163,7 @@ internal class About(val mangaId: Long) : NavConfig {
 }
 
 @Parcelize
-internal class Add : NavConfig {
+internal class Add(val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<Add> {
             CatalogsNavHost(AddOnline())
@@ -197,6 +175,7 @@ internal class Add : NavConfig {
 fun LibraryNavHost() {
     NavHost(
         startConfig = MainMenuItem(),
+        animation = animation
     ) { config ->
         when (config) {
             is MainMenuItem -> MainMenuItem.creator(config)
@@ -210,7 +189,9 @@ fun LibraryNavHost() {
             is ScheduleMenuItem -> ScheduleMenuItem.creator(config)
             is AccountsMenuItem -> AccountsMenuItem.creator(config)
 
+            is Statistic -> Statistic.creator(config)
             is Chapters -> Chapters.creator(config)
+            is Storage -> Storage.creator(config)
             is About -> About.creator(config)
             is Add -> Add.creator(config)
             else -> null
@@ -219,164 +200,18 @@ fun LibraryNavHost() {
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = targetState.destination.route
-//    if (target == null) null
-//    else
-//        when {
-//            GraphTree.Library.addOnline in target ->
-//                scaleIn(
-//                    animationSpec = tween(Constants.duration),
-//                    initialScale = 0.08f,
-//                    transformOrigin = TransformOrigin(0.9f, 0.05f)
-//                )
-//
-//            GraphTree.Library.item in target      ->
-//                expandIn(
-//                    animationSpec = tween(Constants.duration),
-//                    expandFrom = Alignment.Center
-//                )
-//
-//            GraphTree.Library.about in target     ->
-//                slideInVertically(
-//                    animationSpec = tween(Constants.duration),
-//                    initialOffsetY = { it }
-//                )
-//
-//            else                                  -> null
-//        }
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val initial = initialState.destination.route
-//
-//    if (initial == null) null
-//    else
-//        when {
-//            GraphTree.Library.addOnline in initial ->
-//                scaleOut(
-//                    animationSpec = tween(Constants.duration),
-//                    transformOrigin = TransformOrigin(0.9f, 0.05f)
-//                )
-//
-//            GraphTree.Library.item in initial      ->
-//                shrinkOut(
-//                    animationSpec = tween(Constants.duration),
-//                    shrinkTowards = Alignment.Center
-//                )
-//
-//            GraphTree.Library.about in initial     ->
-//                slideOutVertically(
-//                    animationSpec = tween(Constants.duration),
-//                    targetOffsetY = { it }
-//                )
-//
-//            else                                   -> null
-//        }
-//}
+private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
+    if (direction.isFront) frontAnimation(initial.configuration)
+    else frontAnimation(target.configuration)
+}
 
-
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition = {
-//    //    Timber.tag("animation").d("main enter init   -> ${initialState.destination.route}")
-//
-//    val target = targetState.destination.route
-//    val initial = initialState.destination.route
-//    if (target != null && initial != null && GraphTree.Library.main in initial)
-//        when {
-//            GraphTree.Statistic.item in target ||
-//                    GraphTree.Storage.item in target ->
-//                slideInVertically(
-//                    animationSpec = tween(Constants.duration),
-//                    initialOffsetY = { it }
-//                )
-//
-//            else ->
-//                slideIntoContainer(
-//                    AnimatedContentScope.SlideDirection.End,
-//                    animationSpec = tween(Constants.duration)
-//                )
-//        }
-//    else
-//        slideIntoContainer(
-//            AnimatedContentScope.SlideDirection.End,
-//            animationSpec = tween(Constants.duration)
-//        )
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val exitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition = {
-//    //    Timber.tag("animation").d("main exit target  -> ${targetState.destination.route}")
-//    //    Timber.tag("animation").d("main exit initial -> ${initialState.destination.route}")
-//
-//    val target = targetState.destination.route
-//    val initial = initialState.destination.route
-//
-//    if (initial != null
-//        && GraphTree.Library.main in initial
-//        && target != null
-//        && (GraphTree.Library.addOnline in target
-//                || GraphTree.Library.item in target
-//                || GraphTree.Library.about in target
-//                || GraphTree.Statistic.item in target
-//                || GraphTree.Storage.item in target))
-//        fadeOut(animationSpec = tween(Constants.duration))
-//    else
-//        slideOutOfContainer(
-//            AnimatedContentScope.SlideDirection.End, animationSpec = tween(Constants.duration)
-//        )
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popEnterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition = {
-//    //    Timber.tag("animation").d("main popEnter init   -> ${initialState.destination.route}")
-//    //    Timber.tag("animation").d("main popEnter target -> ${targetState.destination.route}")
-//
-//    val target = targetState.destination.route
-//    val initial = initialState.destination.route
-//
-//    if (target != null
-//        && GraphTree.Library.main in target
-//        && initial != null
-//        && (GraphTree.Library.addOnline in initial
-//                || GraphTree.Library.item in initial
-//                || GraphTree.Library.about in initial
-//                || GraphTree.Statistic.item in initial
-//                || GraphTree.Storage.item in initial))
-//        fadeIn(animationSpec = tween(Constants.duration))
-//    else
-//        slideIntoContainer(
-//            AnimatedContentScope.SlideDirection.Start, animationSpec = tween(Constants.duration)
-//        )
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition = {
-//    //    Timber.tag("animation").d("main popExit target -> ${targetState.destination.route}")
-//
-//    val initial = initialState.destination.route
-//    val target = targetState.destination.route
-//
-//    if (initial != null && target != null && GraphTree.Library.main in target)
-//        when {
-//            GraphTree.Statistic.item in initial ||
-//                    GraphTree.Storage.item in initial ->
-//                slideOutVertically(
-//                    animationSpec = tween(Constants.duration),
-//                    targetOffsetY = { it }
-//                )
-//
-//            else ->
-//                slideOutOfContainer(
-//                    AnimatedContentScope.SlideDirection.Start,
-//                    animationSpec = tween(Constants.duration)
-//                )
-//        }
-//    else
-//        slideOutOfContainer(
-//            AnimatedContentScope.SlideDirection.Start,
-//            animationSpec = tween(Constants.duration)
-//        )
-//}
+private fun frontAnimation(initial: NavConfig): StackAnimator {
+    return when (initial) {
+        is Add -> circleShapeAnimator(initial.params)
+        is Storage -> itemShapeAnimator(initial.params, 0.1F)
+        is Chapters -> itemShapeAnimator(initial.params)
+        is Statistic -> itemShapeAnimator(initial.params, 0.1F)
+        is MenuNavConfig -> horizontalSlide()
+        else -> EmptyStackAnimator
+    }
+}

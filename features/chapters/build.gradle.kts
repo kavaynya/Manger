@@ -14,4 +14,5 @@ dependencies {
     implementation(project(Modules.Core.internet))
     implementation(project(Modules.Data.db))
     implementation(project(Modules.Data.parsing))
+    implementation(project(Modules.Features.viewer))
 }

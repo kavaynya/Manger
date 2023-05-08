@@ -1,32 +1,37 @@
 package com.san.kir.schedule
 
 import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.san.kir.core.compose.animation.EmptyStackAnimator
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
+import com.san.kir.core.utils.navigation.NavContainer
 import com.san.kir.core.utils.navigation.NavHost
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.schedule.ui.main.MainScreen
 import com.san.kir.schedule.ui.task.TaskScreen
 import kotlinx.parcelize.Parcelize
 
-private const val DURATION = 600
-
 @Parcelize
-internal class MainConfig : NavConfig {
+internal class Main : NavConfig {
     companion object {
-        val creator = navCreator<MainConfig> {
+        val creator = navCreator<Main> {
             MainScreen(
                 navigateUp = backPressed(),
-                navigateToItem = add(::ScheduleConfig)
+                navigateToItem = add(::Schedule)
             )
         }
     }
 }
 
 @Parcelize
-internal class ScheduleConfig(val id: Long) : NavConfig {
+internal class Schedule(val id: Long, val params: SharedParams) : NavConfig {
     companion object {
-        val creator = navCreator<ScheduleConfig> { config ->
+        val creator = navCreator<Schedule> { config ->
             TaskScreen(
                 navigateUp = backPressed(),
                 itemId = config.id
@@ -38,45 +43,25 @@ internal class ScheduleConfig(val id: Long) : NavConfig {
 @Composable
 fun ScheduleNavHost() {
     NavHost(
-        startConfig = MainConfig(),
-        animation = null,
+        startConfig = Main(),
+        animation = animation,
     ) { config ->
         when (config) {
-            is MainConfig -> MainConfig.creator(config)
-            is ScheduleConfig -> ScheduleConfig.creator(config)
+            is Main -> Main.creator(config)
+            is Schedule -> Schedule.creator(config)
             else -> null
         }
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null && GraphTree.Schedule.main in target)
-//        expandIn(animationSpec = tween(DURATION), expandFrom = Alignment.Center)
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val exitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null && GraphTree.Schedule.item in target)
-//        fadeOut(animationSpec = tween(DURATION))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popEnterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null && GraphTree.Schedule.item in target)
-//        fadeIn(animationSpec = tween(DURATION))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null && GraphTree.Schedule.main in target)
-//        shrinkOut(animationSpec = tween(DURATION), shrinkTowards = Alignment.Center)
-//    else null
-//}
+private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
+    if (direction.isFront) frontAnimation(initial.configuration)
+    else frontAnimation(target.configuration)
+}
+
+private fun frontAnimation(initial: NavConfig): StackAnimator {
+    return when (initial) {
+        is Schedule -> shapeAnimator(initial.params)
+        else -> EmptyStackAnimator
+    }
+}

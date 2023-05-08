@@ -36,6 +36,9 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenPadding
 import com.san.kir.core.compose.ToolbarProgress
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.features.shikimori.R
@@ -49,8 +52,8 @@ import com.san.kir.features.shikimori.ui.util.TextLoginOrNot
 @Composable
 internal fun AccountScreen(
     navigateUp: () -> Unit,
-    navigateToShikiItem: (id: Long) -> Unit,
-    navigateToLocalItems: () -> Unit,
+    navigateToShikiItem: (id: Long, params: SharedParams) -> Unit,
+    navigateToLocalItems: (SharedParams) -> Unit,
     navigateToSearch: () -> Unit,
 ) {
     val holder: AccountStateHolder = stateHolder { AccountViewModel() }
@@ -66,10 +69,15 @@ internal fun AccountScreen(
         ),
         additionalPadding = Dimensions.zero,
         fab = {
-            if (state.login is LoginState.LogInOk)
-                FloatingActionButton(onClick = navigateToLocalItems) {
+            if (state.login is LoginState.LogInOk) {
+                val params = rememberSharedParams()
+                FloatingActionButton(
+                    onClick = { navigateToLocalItems(params) },
+                    modifier = Modifier.saveParams(params)
+                ) {
                     Icon(Icons.Default.LocalLibrary, contentDescription = "local library")
                 }
+            }
         },
         onRefresh = { holder.sendEvent(AccountEvent.Update) }
     ) { contentPadding ->
@@ -128,7 +136,7 @@ private fun topBar(
 @Composable
 private fun CatalogContent(
     state: ScreenItems,
-    navigateToItem: (id: Long) -> Unit,
+    navigateToItem: (id: Long, params: SharedParams) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -148,7 +156,7 @@ private fun CatalogContent(
                     allChapters = item.all,
                     currentStatus = item.status,
                     canBind = CanBind.Already,
-                    onClick = { navigateToItem(item.id) }
+                    onClick = { navigateToItem(item.id, it) }
                 )
             }
         }
@@ -171,7 +179,7 @@ private fun CatalogContent(
                     allChapters = item.all,
                     currentStatus = item.status,
                     canBind = canBind,
-                    onClick = { navigateToItem(item.id) }
+                    onClick = { navigateToItem(item.id, it) }
                 )
             }
         }

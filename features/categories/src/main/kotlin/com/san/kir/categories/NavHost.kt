@@ -1,15 +1,20 @@
 package com.san.kir.categories
 
 import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
 import com.san.kir.categories.ui.categories.CategoriesScreen
 import com.san.kir.categories.ui.category.CategoryScreen
+import com.san.kir.core.compose.animation.EmptyStackAnimator
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
+import com.san.kir.core.utils.navigation.NavContainer
 import com.san.kir.core.utils.navigation.NavHost
 import com.san.kir.core.utils.navigation.navCreator
 import kotlinx.parcelize.Parcelize
-
-private const val DURATION = 600
 
 @Parcelize
 internal class Main : NavConfig {
@@ -24,7 +29,7 @@ internal class Main : NavConfig {
 }
 
 @Parcelize
-internal class Category(val name: String) : NavConfig {
+internal class Category(val name: String, val params: SharedParams) : NavConfig {
     companion object {
         val creator = navCreator<Category> { config ->
             CategoryScreen(
@@ -39,7 +44,7 @@ internal class Category(val name: String) : NavConfig {
 fun CategoriesNavHost() {
     NavHost(
         startConfig = Main(),
-        animation = null,
+        animation = animation,
     ) { config ->
         when (config) {
             is Main -> Main.creator(config)
@@ -49,34 +54,14 @@ fun CategoriesNavHost() {
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null && GraphTree.Categories.main in target)
-//        expandIn(animationSpec = tween(DURATION), expandFrom = Alignment.Center)
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val exitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null && GraphTree.Categories.item in target)
-//        fadeOut(animationSpec = tween(DURATION))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popEnterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null && GraphTree.Categories.item in target)
-//        fadeIn(animationSpec = tween(DURATION))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null && GraphTree.Categories.main in target)
-//        shrinkOut(animationSpec = tween(DURATION), shrinkTowards = Alignment.Center)
-//    else null
-//}
+private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
+    if (direction.isFront) frontAnimation(initial.configuration)
+    else frontAnimation(target.configuration)
+}
+
+private fun frontAnimation(initial: NavConfig): StackAnimator {
+    return when (initial) {
+        is Category -> shapeAnimator(initial.params)
+        else -> EmptyStackAnimator
+    }
+}

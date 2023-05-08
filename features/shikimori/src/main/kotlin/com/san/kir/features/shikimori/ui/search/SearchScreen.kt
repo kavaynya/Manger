@@ -16,6 +16,7 @@ import androidx.compose.ui.text.style.TextAlign
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.features.shikimori.R
@@ -26,7 +27,7 @@ import com.san.kir.features.shikimori.ui.util.MangaItemContent
 @Composable
 internal fun ShikiSearchScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
     searchText: String,
 ) {
     val holder: SearchStateHolder = stateHolder { SearchViewModel() }
@@ -55,7 +56,7 @@ internal fun ShikiSearchScreen(
                             item.chapters,
                         ),
                         canBind = CanBind.No,
-                        onClick = { navigateToItem(item.id) })
+                        onClick = { navigateToItem(item.id, it) })
                 }
             }
             SearchingState.None -> {

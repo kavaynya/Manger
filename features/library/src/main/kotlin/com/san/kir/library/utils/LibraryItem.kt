@@ -27,12 +27,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.Dimensions
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.rememberImage
@@ -44,11 +48,11 @@ import com.san.kir.data.models.extend.SimplifiedManga
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyGridItemScope.LibraryLargeItem(
-    onClick: (Long) -> Unit,
+    onClick: (Long, SharedParams) -> Unit,
     onLongClick: (SimplifiedManga) -> Unit,
     manga: SimplifiedManga,
     cat: String,
-    showCategory: Boolean
+    showCategory: Boolean,
 ) {
     val context = LocalContext.current
     val defaultColor = MaterialTheme.colors.primary
@@ -56,6 +60,7 @@ fun LazyGridItemScope.LibraryLargeItem(
         runCatching { if (manga.color != 0) Color(manga.color) else null }
             .getOrNull() ?: defaultColor
     }
+    val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(
         shape = RoundedCornerShape(Dimensions.half),
@@ -66,9 +71,12 @@ fun LazyGridItemScope.LibraryLargeItem(
             .testTag(TestTags.Library.item)
             .padding(Dimensions.smallest)
             .fillMaxWidth()
+            .onGloballyPositioned {
+                buttonParams.bounds = it.boundsInWindow()
+            }
             .combinedClickable(
                 onLongClick = { onLongClick(manga) },
-                onClick = { onClick(manga.id) })
+                onClick = { onClick(manga.id, buttonParams) })
     ) {
         Column(modifier = Modifier.fillMaxWidth()) {
             Box(modifier = Modifier.squareMaxSize()) {
@@ -122,7 +130,7 @@ fun LazyGridItemScope.LibraryLargeItem(
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun LazyItemScope.LibrarySmallItem(
-    onClick: (Long) -> Unit,
+    onClick: (Long, SharedParams) -> Unit,
     onLongClick: (SimplifiedManga) -> Unit,
     manga: SimplifiedManga,
     cat: String,
@@ -133,6 +141,7 @@ fun LazyItemScope.LibrarySmallItem(
     val backgroundColor by remember {
         mutableStateOf(runCatching { Color(manga.color) }.getOrDefault(defaultColor))
     }
+    val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(
         shape = RoundedCornerShape(Dimensions.half),
@@ -142,9 +151,12 @@ fun LazyItemScope.LibrarySmallItem(
             .testTag(TestTags.Library.item)
             .padding(Dimensions.smallest)
             .fillMaxWidth()
+            .onGloballyPositioned {
+                buttonParams.bounds = it.boundsInWindow()
+            }
             .combinedClickable(
                 onLongClick = { onLongClick(manga) },
-                onClick = { onClick(manga.id) })
+                onClick = { onClick(manga.id, buttonParams) })
     ) {
         Row(
             modifier = Modifier

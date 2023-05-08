@@ -23,6 +23,7 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.san.kir.core.compose.Dimensions
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.systemBarBottomPadding
 import com.san.kir.core.support.MainMenuType
@@ -83,7 +84,7 @@ private fun EmptyView(navigateToCatalogs: () -> Unit) {
 
 @Composable
 private fun PageView(
-    navigateToChapters: (Long) -> Unit,
+    navigateToChapters: (Long, SharedParams) -> Unit,
     item: CategoryWithMangas,
     showCategory: Boolean,
     sendEvent: (LibraryEvent) -> Unit,

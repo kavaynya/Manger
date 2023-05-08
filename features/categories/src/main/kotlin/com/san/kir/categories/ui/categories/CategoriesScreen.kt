@@ -30,6 +30,9 @@ import com.san.kir.categories.R
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.systemBarsHorizontalPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
@@ -38,7 +41,7 @@ import com.san.kir.data.models.base.Category
 @Composable
 internal fun CategoriesScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (String) -> Unit,
+    navigateToItem: (String, SharedParams) -> Unit,
 ) {
 
     val viewModel: CategoriesStateHolder = stateHolder { CategoriesViewModel() }
@@ -49,9 +52,11 @@ internal fun CategoriesScreen(
             navigationButton = NavigationButton.Back(navigateUp),
             title = stringResource(R.string.categories),
             actions = {
+                val params = rememberSharedParams(fromCenter = true)
                 MenuIcon(
                     icon = Icons.Default.Add,
-                    onClick = { navigateToItem("") })
+                    modifier = Modifier.saveParams(params),
+                    onClick = { navigateToItem("", params) })
             },
         ),
         additionalPadding = Dimensions.quarter
@@ -62,7 +67,7 @@ internal fun CategoriesScreen(
                 max = state.items.count(),
                 category = item,
                 sendEvent = viewModel::sendEvent,
-                onClick = { navigateToItem(item.name) }
+                onClick = { navigateToItem(item.name, it) }
             )
         }
     }
@@ -75,16 +80,18 @@ private fun CategoryItemView(
     max: Int,
     category: Category,
     sendEvent: (CategoriesEvent) -> Unit,
-    onClick: () -> Unit
+    onClick: (SharedParams) -> Unit,
 ) {
     var visibleState by remember { mutableStateOf(category.isVisible) }
+    val params = rememberSharedParams()
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = { onClick(params) })
             .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
-            .padding(systemBarsHorizontalPadding()),
+            .padding(systemBarsHorizontalPadding())
+            .saveParams(params),
         verticalAlignment = Alignment.CenterVertically
     ) {
 

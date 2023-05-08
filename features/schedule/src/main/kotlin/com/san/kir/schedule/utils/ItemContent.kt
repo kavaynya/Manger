@@ -12,6 +12,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import com.san.kir.core.compose.Dimensions
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
 
@@ -20,13 +23,15 @@ internal fun ItemContent(
     title: String,
     subTitle: String,
     checked: Boolean,
-    onClick: (() -> Unit)? = null,
+    onClick: ((SharedParams) -> Unit)? = null,
     onCheckedChange: (Boolean) -> Unit,
 ) {
+    val params = rememberSharedParams()
     Row(
         modifier = Modifier
-            .clickable(enabled = onClick != null) { onClick?.invoke() }
+            .clickable(enabled = onClick != null) { onClick?.invoke(params) }
             .fillMaxWidth()
+            .saveParams(params)
             .padding(vertical = Dimensions.smaller, horizontal = Dimensions.half),
         verticalAlignment = Alignment.CenterVertically
     ) {

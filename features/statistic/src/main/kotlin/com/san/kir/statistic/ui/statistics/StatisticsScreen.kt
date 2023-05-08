@@ -21,6 +21,9 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.RemoveItemMenuOnHold
 import com.san.kir.core.compose.ScreenList
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.TimeFormat
 import com.san.kir.core.utils.viewModel.stateHolder
@@ -30,7 +33,7 @@ import com.san.kir.statistic.R
 @Composable
 internal fun StatisticsScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
 ) {
     val viewModel: StatisticsStateHolder = stateHolder { StatisticsViewModel() }
     val state by viewModel.state.collectAsState()
@@ -47,7 +50,7 @@ internal fun StatisticsScreen(
         additionalPadding = Dimensions.quarter
     ) {
         items(items = state.items, key = { stat -> stat.id }) { item ->
-            ItemView(item, state.allTime, viewModel::sendEvent) { navigateToItem(item.id) }
+            ItemView(item, state.allTime, viewModel::sendEvent) { navigateToItem(item.id, it) }
         }
     }
 }
@@ -58,7 +61,7 @@ private fun LazyItemScope.ItemView(
     item: SimplifiedStatistic,
     allTime: Long,
     sendEvent: (StatisticsEvent) -> Unit,
-    onClick: () -> Unit,
+    onClick: (SharedParams) -> Unit,
 ) {
     RemoveItemMenuOnHold(
         removeText = stringResource(R.string.statistic_delete),
@@ -68,10 +71,12 @@ private fun LazyItemScope.ItemView(
             .fillMaxWidth()
             .animateItemPlacement(),
     ) {
+        val params = rememberSharedParams()
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .onClick(onClick = onClick)
+                .onClick(onClick = { onClick(params.copy()) })
+                .saveParams(params)
                 .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
         ) {
 

@@ -16,7 +16,6 @@ import androidx.compose.material.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -28,7 +27,7 @@ import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.coroutines.mainLaunch
-import com.san.kir.core.utils.toast
+import com.san.kir.core.utils.navigation.rememberLambda
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.library.R
 import com.san.kir.library.ui.drawer.DrawerScreen
@@ -37,14 +36,12 @@ import com.san.kir.library.utils.LibraryContent
 import com.san.kir.library.utils.LibraryDropUpMenu
 import com.san.kir.library.utils.libraryActions
 
-private var backPressedTime = 0L
-
 @Composable
 internal fun LibraryScreen(navigation: LibraryNavigation) {
     val holder: LibraryStateHolder = stateHolder { LibraryViewModel() }
     val state by holder.state.collectAsState()
 
-    val unSelect = remember { { holder.sendEvent(LibraryEvent.NonSelect) } }
+    val unSelect = rememberLambda { holder.sendEvent(LibraryEvent.NonSelect) }
 
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
 
@@ -96,7 +93,7 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
         }
     }
 
-    BackHandler(scaffoldState)
+//    BackHandler(scaffoldState)
 }
 
 @Composable
@@ -139,12 +136,7 @@ private fun BackHandler(scaffoldState: ScaffoldState) {
             if (scaffoldState.drawerState.isOpen) {
                 scaffoldState.drawerState.close()
             } else {
-                if (backPressedTime + 2000 > System.currentTimeMillis()) {
-                    context?.finish()
-                } else {
-                    context?.toast(R.string.first_run_exit_text)
-                }
-                backPressedTime = System.currentTimeMillis()
+                context?.finish()
             }
         }
     }

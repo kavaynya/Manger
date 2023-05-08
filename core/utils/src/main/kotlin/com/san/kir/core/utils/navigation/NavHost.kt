@@ -63,25 +63,33 @@ internal class NavHostComponent(
     )
 
     private fun createChild(config: NavConfig, componentContext: ComponentContext): NavContainer {
-        Timber.i("config -> $config")
+        Timber.d("config -> $config")
         return NavContainer(componentContext, builder.invoke(config))
     }
 
     @Composable
-    override fun replace(config: NavConfig) = remember { { navigation.replaceCurrent(config) } }
-
-    @Composable
-    override fun add(config: NavConfig) = remember { { navigation.push(config) } }
+    override fun replace(config: NavConfig) = rememberLambda { navigation.replaceCurrent(config) }
 
     override fun simpleAdd(config: NavConfig): () -> Unit = { navigation.push(config) }
 
-    override fun <C> simpleAdd(config: (C) -> NavConfig): (C) -> Unit = { data ->
-        navigation.push(config.invoke(data))
+    override fun <P1> simpleAdd(config: (P1) -> NavConfig): (P1) -> Unit = { p1 ->
+        navigation.push(config.invoke(p1))
+    }
+
+    override fun <P1, P2> simpleAdd(config: (P1, P2) -> NavConfig): (P1, P2) -> Unit = { p1, p2 ->
+        navigation.push(config.invoke(p1, p2))
     }
 
     @Composable
-    override fun <C> add(config: (C) -> NavConfig) =
-        remember { { data: C -> navigation.push(config.invoke(data)) } }
+    override fun add(config: NavConfig) = rememberLambda { navigation.push(config) }
+
+    @Composable
+    override fun <P1> add(config: (P1) -> NavConfig): (P1) -> Unit =
+        rememberLambda { p1 -> navigation.push(config.invoke(p1)) }
+
+    @Composable
+    override fun <P1, P2> add(config: (P1, P2) -> NavConfig): (P1, P2) -> Unit =
+        rememberLambda { p1, p2 -> navigation.push(config.invoke(p1, p2)) }
 
     @Composable
     override fun back() = remember { { navigation.pop() } }

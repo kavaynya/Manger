@@ -49,7 +49,7 @@ import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.viewModel.stateHolder
 
 @Composable
-fun LatestScreen(
+internal fun LatestScreen(
     navigateUp: () -> Unit,
     navigateToViewer: (Long) -> Unit,
 ) {

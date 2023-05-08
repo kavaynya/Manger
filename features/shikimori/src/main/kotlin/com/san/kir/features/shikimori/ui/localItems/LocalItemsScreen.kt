@@ -19,6 +19,7 @@ import androidx.compose.ui.res.stringResource
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenPadding
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.SimplifiedMangaWithChapterCounts
@@ -29,7 +30,7 @@ import com.san.kir.features.shikimori.ui.util.MangaItemContent
 @Composable
 internal fun LocalItemsScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (Long) -> Unit,
+    navigateToItem: (Long, SharedParams) -> Unit,
 ) {
     val holder: LocalItemsStateHolder = stateHolder { LocalItemsViewModel() }
     val state by holder.state.collectAsState()
@@ -62,7 +63,7 @@ internal fun LocalItemsScreen(
 @Composable
 private fun CatalogContent(
     state: List<BindStatus<SimplifiedMangaWithChapterCounts>>,
-    navigateToItem: (id: Long) -> Unit,
+    navigateToItem: (id: Long, params: SharedParams) -> Unit,
 ) {
     LazyColumn(
         modifier = Modifier
@@ -81,7 +82,7 @@ private fun CatalogContent(
                 canBind = bind,
                 readingChapters = item.read,
                 allChapters = item.all,
-                onClick = { navigateToItem(item.id) }
+                onClick = { navigateToItem(item.id, it) }
             )
         }
     }

@@ -27,6 +27,9 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.compose.startInsetsPadding
@@ -35,9 +38,9 @@ import com.san.kir.core.utils.findInGoogle
 import com.san.kir.core.utils.viewModel.stateHolder
 
 @Composable
-fun CatalogsScreen(
+internal fun CatalogsScreen(
     navigateUp: () -> Unit,
-    navigateToItem: (String) -> Unit,
+    navigateToItem: (String, SharedParams) -> Unit,
     navigateToSearch: () -> Unit,
 ) {
     val holder: CatalogsStateHolder = stateHolder { CatalogsViewModel() }
@@ -68,18 +71,20 @@ fun CatalogsScreen(
         onRefresh = { sendEvent(CatalogsEvent.UpdateData) }
     ) {
         items(items = state.items, key = { it.hashCode() }) { item ->
-            ItemView(item) { navigateToItem(item.name) }
+            ItemView(item) { navigateToItem(item.name, it) }
         }
 
     }
 }
 
 @Composable
-private fun ItemView(item: CheckableSite, onClick: () -> Unit) {
+private fun ItemView(item: CheckableSite, onClick: (SharedParams) -> Unit) {
+    val params = rememberSharedParams()
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = { onClick(params) })
+            .saveParams(params)
             .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
     ) {
         Image(

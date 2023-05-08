@@ -1,15 +1,20 @@
 package com.san.kir.storage
 
 import androidx.compose.runtime.Composable
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.san.kir.core.compose.animation.EmptyStackAnimator
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
+import com.san.kir.core.utils.navigation.NavContainer
 import com.san.kir.core.utils.navigation.NavHost
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.storage.ui.storage.StorageScreen
 import com.san.kir.storage.ui.storages.StoragesScreen
 import kotlinx.parcelize.Parcelize
-
-private const val DURATION = 600
 
 @Parcelize
 private class Main : NavConfig {
@@ -24,7 +29,11 @@ private class Main : NavConfig {
 }
 
 @Parcelize
-private class Storage(val mangaId: Long, val hasUpdate: Boolean = false) : NavConfig {
+class Storage(
+    val mangaId: Long,
+    val params: SharedParams,
+    val hasUpdate: Boolean = false,
+) : NavConfig {
     companion object {
         val creator = navCreator<Storage> { config ->
             StorageScreen(
@@ -37,10 +46,14 @@ private class Storage(val mangaId: Long, val hasUpdate: Boolean = false) : NavCo
 }
 
 @Composable
-fun StorageNavHost(mangaId: Long? = null, hasUpdate: Boolean = false) {
+fun StorageNavHost(
+    mangaId: Long? = null,
+    params: SharedParams? = null,
+    hasUpdate: Boolean = false,
+) {
     NavHost(
-        startConfig = mangaId?.let { Storage(it, hasUpdate) } ?: Main(),
-        animation = null,
+        startConfig = mangaId?.let { params?.let { p -> Storage(it, p, hasUpdate) } } ?: Main(),
+        animation = animation,
     ) { config ->
         when (config) {
             is Main -> Main.creator(config)
@@ -50,34 +63,14 @@ fun StorageNavHost(mangaId: Long? = null, hasUpdate: Boolean = false) {
     }
 }
 
-//@OptIn(ExperimentalAnimationApi::class)
-//private val enterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null && GraphTree.Storage.main in target)
-//        expandIn(animationSpec = tween(Constants.duration), expandFrom = Alignment.Center)
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val exitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null && GraphTree.Storage.item in target)
-//        fadeOut(animationSpec = tween(Constants.duration))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popEnterTransition: AnimatedContentScope<NavBackStackEntry>.() -> EnterTransition? = {
-//    val target = initialState.destination.route
-//    if (target != null && GraphTree.Storage.item in target)
-//        fadeIn(animationSpec = tween(Constants.duration))
-//    else null
-//}
-//
-//@OptIn(ExperimentalAnimationApi::class)
-//private val popExitTransition: AnimatedContentScope<NavBackStackEntry>.() -> ExitTransition? = {
-//    val target = targetState.destination.route
-//    if (target != null && GraphTree.Storage.main in target)
-//        shrinkOut(animationSpec = tween(Constants.duration), shrinkTowards = Alignment.Center)
-//    else null
-//}
+private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
+    if (direction.isFront) frontAnimation(initial.configuration)
+    else frontAnimation(target.configuration)
+}
+
+private fun frontAnimation(initial: NavConfig): StackAnimator {
+    return when (initial) {
+        is Storage -> shapeAnimator(initial.params)
+        else -> EmptyStackAnimator
+    }
+}

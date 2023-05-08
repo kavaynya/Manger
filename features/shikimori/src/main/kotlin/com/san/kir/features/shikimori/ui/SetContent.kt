@@ -62,9 +62,9 @@ internal fun ShikimoriContent() {
                     navigateUp = {
                         nav = ShikiNavTarget.Start
                     },
-                    navigateToShikiItem = {
-                        Timber.v(it.toString())
-                        nav = ShikiNavTarget.AccountRate(it)
+                    navigateToShikiItem = { id, _ ->
+                        Timber.v(id.toString())
+                        nav = ShikiNavTarget.AccountRate(id)
                     },
                     navigateToLocalItems = { nav = ShikiNavTarget.LocalItems },
                     navigateToSearch = { /*nav = ShikiNavTarget.Search*/ }
@@ -86,7 +86,7 @@ internal fun ShikimoriContent() {
                     navigateUp = {
                         nav = ShikiNavTarget.Start
                     },
-                    navigateToItem = { nav = ShikiNavTarget.AccountRate(it) },
+                    navigateToItem = { id, _ -> nav = ShikiNavTarget.AccountRate(id) },
                     searchText = "Fetish na Yuu",
                 )
             }
@@ -96,7 +96,7 @@ internal fun ShikimoriContent() {
                     navigateUp = {
                         nav = ShikiNavTarget.Catalog
                     },
-                    navigateToItem = { nav = ShikiNavTarget.LocalItem(it) }
+                    navigateToItem = { id, _ ->  nav = ShikiNavTarget.LocalItem(id) }
                 )
             }
 

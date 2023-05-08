@@ -31,13 +31,16 @@ import com.san.kir.core.compose.Fonts
 import com.san.kir.core.compose.FullWeightSpacer
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 
 @Composable
 internal fun AddOnlineScreen(
     navigateUp: () -> Unit,
-    navigateToNext: (String) -> Unit,
+    navigateToNext: (String, SharedParams) -> Unit,
 ) {
     val holder: AddOnlineStateHolder = stateHolder { AddOnlineViewModel() }
     val state by holder.state.collectAsState()
@@ -63,7 +66,7 @@ private fun ColumnScope.Content(
     state: AddOnlineState,
     sendEvent: (AddOnlineEvent) -> Unit,
     navigateUp: () -> Unit,
-    navigateToNext: (String) -> Unit,
+    navigateToNext: (String, SharedParams) -> Unit,
 ) {
     var enteredText by remember { mutableStateOf("") }
 
@@ -134,9 +137,11 @@ private fun ColumnScope.Content(
             Text(stringResource(R.string.library_add_manga_cancel_btn))
         }
 
+        val params = rememberSharedParams()
         Button(
-            onClick = { navigateToNext(enteredText) },
-            enabled = state.isEnableAdding
+            onClick = { navigateToNext(enteredText, params) },
+            enabled = state.isEnableAdding,
+            modifier = Modifier.saveParams(params)
         ) {
             Text(stringResource(R.string.library_add_manga_add_btn))
         }

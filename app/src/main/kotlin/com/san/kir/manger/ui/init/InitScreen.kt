@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.Button
 import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Scaffold
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -56,46 +55,44 @@ fun InitScreen(navigateToItem: () -> Unit) {
     val next = holder.next { navigateToItem.invoke() }
 
     MaterialTheme {
-        Scaffold { padding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(Dimensions.default),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center,
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(Dimensions.default),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center,
+        ) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier.weight(3f)
             ) {
-                Box(
-                    contentAlignment = Alignment.Center,
-                    modifier = Modifier.weight(3f)
-                ) {
-                    Image(
-                        painterResource(R.mipmap.ic_launcher_foreground),
-                        "app icon",
-                        modifier = Modifier.size(300.dp),
-                    )
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(220.dp),
-                        color = Color.Black,
-                        strokeWidth = Dimensions.half
-                    )
-                }
+                Image(
+                    painterResource(R.mipmap.ic_launcher_foreground),
+                    "app icon",
+                    modifier = Modifier.size(300.dp),
+                )
+                CircularProgressIndicator(
+                    modifier = Modifier.size(220.dp),
+                    color = Color.Black,
+                    strokeWidth = Dimensions.half
+                )
+            }
 
-                FromBottomToBottomAnimContent(
-                    targetState = state,
-                    modifier = Modifier.weight(2f),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                        when (it) {
-                            InitState.Init -> Unit
+            FromBottomToBottomAnimContent(
+                targetState = state,
+                modifier = Modifier.weight(2f),
+                contentAlignment = Alignment.Center
+            ) {
+                Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                    when (it) {
+                        InitState.Init -> Unit
 
-                            InitState.Memory ->
-                                MemoryPermission(next::invoke)
+                        InitState.Memory ->
+                            MemoryPermission(next::invoke)
 
-                            InitState.Notification ->
-                                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
-                                    NotificationPermission(next::invoke)
-                        }
+                        InitState.Notification ->
+                            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU)
+                                NotificationPermission(next::invoke)
                     }
                 }
             }

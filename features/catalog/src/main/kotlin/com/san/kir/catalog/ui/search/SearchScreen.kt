@@ -11,6 +11,7 @@ import com.san.kir.catalog.utils.ListItem
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.MiniCatalogItem
@@ -18,8 +19,8 @@ import com.san.kir.data.models.extend.MiniCatalogItem
 @Composable
 fun SearchScreen(
     navigateUp: () -> Unit,
-    navigateToInfo: (String) -> Unit,
-    navigateToAdd: (String) -> Unit,
+    navigateToInfo: (String, SharedParams) -> Unit,
+    navigateToAdd: (String, SharedParams) -> Unit,
     searchText: String,
 ) {
     val holder: SearchStateHolder = stateHolder { SearchViewModel() }

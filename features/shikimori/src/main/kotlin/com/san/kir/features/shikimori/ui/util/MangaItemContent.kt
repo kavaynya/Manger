@@ -27,6 +27,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.Fonts
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.data.models.base.ShikimoriStatus
@@ -43,12 +46,14 @@ internal fun LazyItemScope.MangaItemContent(
     allChapters: Long = 0,
     secondaryText: String? = null,
     currentStatus: ShikimoriStatus? = null,
-    onClick: () -> Unit,
+    onClick: (SharedParams) -> Unit,
 ) {
+    val params = rememberSharedParams()
     Row(
         modifier = Modifier
             .animateItemPlacement()
-            .clickable(onClick = onClick)
+            .saveParams(params)
+            .clickable(onClick = { onClick(params) })
             .fillMaxWidth()
             .padding(vertical = Dimensions.half, horizontal = Dimensions.default)
             .horizontalInsetsPadding(),

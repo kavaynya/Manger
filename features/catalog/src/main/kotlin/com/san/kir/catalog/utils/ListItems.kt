@@ -2,7 +2,12 @@ package com.san.kir.catalog.utils
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
@@ -16,6 +21,9 @@ import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.Dimensions
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.systemBarsHorizontalPadding
 import com.san.kir.data.models.extend.MiniCatalogItem
 
@@ -23,15 +31,17 @@ import com.san.kir.data.models.extend.MiniCatalogItem
 fun ListItem(
     item: MiniCatalogItem,
     secondName: String,
-    toAdd: (link: String) -> Unit,
-    toInfo: (link: String) -> Unit,
+    toAdd: (link: String, params: SharedParams) -> Unit,
+    toInfo: (link: String, params: SharedParams) -> Unit,
     updateItem: (MiniCatalogItem) -> Unit,
 ) {
+    val params = rememberSharedParams()
     Row(
         Modifier
             .fillMaxWidth()
             .height(60.dp)
-            .clickable { toInfo(item.link) }
+            .saveParams(params)
+            .clickable { toInfo(item.link, params) }
             .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
             .padding(systemBarsHorizontalPadding())
     ) {
@@ -54,15 +64,18 @@ fun ListItem(
         }
 
         when (item.state) {
-            MiniCatalogItem.State.Added ->
+            MiniCatalogItem.State.Added -> {
+                val params = rememberSharedParams(fromCenter = true)
                 Image(
                     imageVector = Icons.Default.Add, "",
                     colorFilter = ColorFilter.tint(Color.Green),
                     modifier = Modifier
                         .size(Dimensions.Image.small)
                         .align(Alignment.CenterVertically)
-                        .clickable { toAdd(item.link) }
+                        .saveParams(params)
+                        .clickable { toAdd(item.link, params) }
                 )
+            }
 
             MiniCatalogItem.State.Update ->
                 Image(

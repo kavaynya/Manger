@@ -29,7 +29,7 @@ abstract class ViewModel<out S : ScreenState> : StateHolder<S> {
 
     override val state by lazy {
         tempState
-            .onEach { Timber.tag("ViewModel").i("NEW STATE $it") }
+            .onEach { Timber.tag("ViewModel").d("NEW STATE $it") }
             .flowOn(defaultDispatcher)
             .stateIn(viewModelScope, SharingStarted.Lazily, defaultState)
     }

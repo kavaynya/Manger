@@ -26,6 +26,9 @@ import androidx.compose.ui.res.stringResource
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.utils.viewModel.stateHolder
@@ -35,7 +38,7 @@ import com.san.kir.features.shikimori.ui.util.LogOutDialog
 import com.san.kir.features.shikimori.ui.util.TextLoginOrNot
 
 @Composable
-fun AccountItem(navigateToManager: () -> Unit) {
+fun AccountItem(navigateToManager: (SharedParams) -> Unit) {
     val holder: AccountItemStateHolder = stateHolder { AccountItemViewModel() }
     val state by holder.state.collectAsState()
 
@@ -44,8 +47,8 @@ fun AccountItem(navigateToManager: () -> Unit) {
         navigateToManager = {
             when (state.login) {
                 LoginState.LogOut, LoginState.Error -> holder.sendEvent(AccountItemEvent.LogIn)
-                is LoginState.LogInOk               -> navigateToManager()
-                else                                -> {}
+                is LoginState.LogInOk -> navigateToManager(it)
+                else -> {}
             }
         },
         login = { holder.sendEvent(AccountItemEvent.LogIn) },
@@ -62,14 +65,16 @@ fun AccountItem(navigateToManager: () -> Unit) {
 @Composable
 private fun LoginOrNot(
     state: LoginState,
-    navigateToManager: () -> Unit,
+    navigateToManager: (SharedParams) -> Unit,
     login: () -> Unit,
     logout: () -> Unit,
 ) {
+    val params = rememberSharedParams()
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = navigateToManager)
+            .saveParams(params)
+            .clickable(onClick = { navigateToManager(params) })
             .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
             .horizontalInsetsPadding(),
         verticalAlignment = Alignment.CenterVertically
@@ -104,7 +109,7 @@ private fun LoginOrNot(
                         }
                     }
 
-                    LoginState.LogOut                               -> {
+                    LoginState.LogOut -> {
                         IconButton(onClick = login) {
                             Icon(
                                 Icons.Default.Login, "",
@@ -113,9 +118,9 @@ private fun LoginOrNot(
                         }
                     }
 
-                    LoginState.Error                                -> Icon(Icons.Default.Error, "")
+                    LoginState.Error -> Icon(Icons.Default.Error, "")
 
-                    is LoginState.LogInCheck, LoginState.Loading    -> CircularProgressIndicator()
+                    is LoginState.LogInCheck, LoginState.Loading -> CircularProgressIndicator()
                 }
             }
         }

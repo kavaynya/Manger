@@ -16,7 +16,6 @@ dependencies {
 
     implementation(project(Modules.Features.chapters))
     implementation(project(Modules.Features.catalog))
-    implementation(project(Modules.Features.viewer))
     implementation(project(Modules.Features.categories))
     implementation(project(Modules.Features.statistic))
     implementation(project(Modules.Features.storage))

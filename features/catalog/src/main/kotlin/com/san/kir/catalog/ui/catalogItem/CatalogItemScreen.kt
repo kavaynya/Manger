@@ -27,7 +27,10 @@ import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.SmallSpacer
 import com.san.kir.core.compose.ToolbarProgress
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.browse
 import com.san.kir.core.utils.viewModel.stateHolder
@@ -36,7 +39,7 @@ import com.san.kir.data.models.base.SiteCatalogElement
 @Composable
 fun CatalogItemScreen(
     navigateUp: () -> Unit,
-    navigateToAdd: (String) -> Unit,
+    navigateToAdd: (String, SharedParams) -> Unit,
     url: String,
 ) {
     val holder: CatalogItemViewModel = stateHolder { CatalogItemViewModel() }
@@ -52,10 +55,14 @@ fun CatalogItemScreen(
                 FromEndToEndAnimContent(state.containingInLibrary) {
                     when (it) {
                         ContainingInLibraryState.Check -> ToolbarProgress()
-                        ContainingInLibraryState.None -> MenuIcon(
-                            icon = Icons.Default.Add,
-                            tint = MaterialTheme.colors.onBackground
-                        ) { navigateToAdd(url) }
+                        ContainingInLibraryState.None -> {
+                            val params = rememberSharedParams(fromCenter = true)
+                            MenuIcon(
+                                icon = Icons.Default.Add,
+                                tint = MaterialTheme.colors.onBackground,
+                                modifier = Modifier.saveParams(params)
+                            ) { navigateToAdd(url, params) }
+                        }
 
                         ContainingInLibraryState.Ok -> {}
                     }

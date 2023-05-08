@@ -67,6 +67,7 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
+import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
@@ -83,8 +84,8 @@ import java.net.URLDecoder
 @Composable
 fun CatalogScreen(
     navigateUp: () -> Unit,
-    navigateToInfo: (String) -> Unit,
-    navigateToAdd: (String) -> Unit,
+    navigateToInfo: (String, SharedParams) -> Unit,
+    navigateToAdd: (String, SharedParams) -> Unit,
     catalogName: String,
 ) {
     val holder: CatalogStateHolder = stateHolder { CatalogViewModel() }

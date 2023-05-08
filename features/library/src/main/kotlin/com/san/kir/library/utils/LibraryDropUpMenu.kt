@@ -28,6 +28,9 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.BottomAnimatedVisibility
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.systemBarBottomPadding
 import com.san.kir.data.models.extend.SimplifiedManga
@@ -41,8 +44,8 @@ import kotlinx.collections.immutable.toPersistentMap
 @Composable
 internal fun LibraryDropUpMenu(
     navigateToInfo: (Long) -> Unit,
-    navigateToStorage: (Long) -> Unit,
-    navigateToStats: (Long) -> Unit,
+    navigateToStorage: (Long, SharedParams) -> Unit,
+    navigateToStats: (Long, SharedParams) -> Unit,
     itemsState: ItemsState,
     selectedManga: SelectedMangaState.Visible,
     sendEvent: (LibraryEvent) -> Unit,
@@ -77,14 +80,14 @@ internal fun LibraryDropUpMenu(
             }
         )
 
-        Storage {
+        Storage { params ->
+            navigateToStorage(selectedManga.item.id, params)
             sendEvent(LibraryEvent.NonSelect)
-            navigateToStorage(selectedManga.item.id)
         }
 
-        Statistics {
+        Statistics { params ->
             sendEvent(LibraryEvent.NonSelect)
-            navigateToStats(selectedManga.item.id)
+            navigateToStats(selectedManga.item.id, params)
         }
 
         Delete(
@@ -192,22 +195,26 @@ private fun ColumnScope.ExpandedCategories(
 }
 
 @Composable
-private fun Storage(onClick: () -> Unit) {
+private fun Storage(onClick: (SharedParams) -> Unit) {
+    val params = rememberSharedParams()
     DropdownMenuItem(
-        onClick = onClick,
+        onClick = { onClick(params.copy()) },
         modifier = Modifier
             .horizontalInsetsPadding()
+            .saveParams(params)
     ) {
         Text(stringResource(R.string.library_popupmenu_storage))
     }
 }
 
 @Composable
-private fun Statistics(onClick: () -> Unit) {
+private fun Statistics(onClick: (SharedParams) -> Unit) {
+    val params = rememberSharedParams()
     DropdownMenuItem(
-        onClick = onClick,
+        onClick = { onClick(params.copy()) },
         modifier = Modifier
             .horizontalInsetsPadding()
+            .saveParams(params)
     ) {
         Text(stringResource(R.string.library_popupmenu_statistic))
     }
