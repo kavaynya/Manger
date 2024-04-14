@@ -20,7 +20,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
 import com.san.kir.catalog.ui.addOnline.AddOnlineScreen
 import com.san.kir.chapters.ui.chapters.ChaptersScreen
-import com.san.kir.core.support.MainMenuType
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.features.viewer.MangaViewer
 import com.san.kir.library.ui.library.LibraryNavigation
 import com.san.kir.library.ui.library.LibraryScreen
@@ -37,7 +37,7 @@ enum class LibraryNavTarget : NavTarget {
             val navigation = remember {
                 LibraryNavigation(
                     navigateToScreen = { type ->
-                        if (MainMenuType.Library != type)
+                        if (com.san.kir.data.models.utils.MainMenuType.Library != type)
                             mainMenuItems[type]?.let { navigate(it) }
                     },
                     navigateToCategories = { navigate(MainNavTarget.Categories) },

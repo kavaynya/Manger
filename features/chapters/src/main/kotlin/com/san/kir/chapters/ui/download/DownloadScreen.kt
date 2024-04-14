@@ -56,7 +56,7 @@ import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.internet.NetworkState
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.models.extend.DownloadChapter
 
 @Composable
@@ -186,7 +186,7 @@ private fun LazyItemScope.ItemView(
         ) {
             CircleLogo(logoUrl = item.logo)
 
-            if (item.status == DownloadState.ERROR)
+            if (item.status == com.san.kir.data.models.utils.DownloadState.ERROR)
                 Box(
                     contentAlignment = Alignment.TopEnd,
                     modifier = Modifier.size(Dimensions.Image.small)
@@ -233,10 +233,10 @@ private fun LazyItemScope.ItemView(
 }
 
 @Composable
-private fun ProgressIndicator(state: DownloadState, progress: Float) {
+private fun ProgressIndicator(state: com.san.kir.data.models.utils.DownloadState, progress: Float) {
     FromTopToTopAnimContent(targetState = state) {
         when (it) {
-            DownloadState.QUEUED  -> {
+            com.san.kir.data.models.utils.DownloadState.QUEUED  -> {
                 LinearProgressIndicator(
                     modifier = Modifier
                         .padding(top = Dimensions.quarter)
@@ -245,7 +245,7 @@ private fun ProgressIndicator(state: DownloadState, progress: Float) {
                 )
             }
 
-            DownloadState.LOADING -> {
+            com.san.kir.data.models.utils.DownloadState.LOADING -> {
                 LinearProgressIndicator(
                     progress = progress,
                     modifier = Modifier
@@ -263,7 +263,7 @@ private fun ProgressIndicator(state: DownloadState, progress: Float) {
 
 @Composable
 private fun StatusText(
-    state: DownloadState,
+    state: com.san.kir.data.models.utils.DownloadState,
     size: String,
     time: String,
     downloadPages: Int,
@@ -271,7 +271,7 @@ private fun StatusText(
 ) {
     FromTopToTopAnimContent(targetState = state) {
         when (it) {
-            DownloadState.COMPLETED -> {
+            com.san.kir.data.models.utils.DownloadState.COMPLETED -> {
                 Text(stringResource(R.string.download_item_final_size_with_time, size, time))
             }
 

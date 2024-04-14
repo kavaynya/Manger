@@ -1,6 +1,6 @@
 package com.san.kir.background.logic.repo
 
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.StatisticDao

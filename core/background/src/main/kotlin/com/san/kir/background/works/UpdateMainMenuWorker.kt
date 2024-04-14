@@ -8,7 +8,7 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.san.kir.core.support.MainMenuType
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.data.db.dao.MainMenuDao
 import com.san.kir.data.models.base.MainMenuItem
 import dagger.assisted.Assisted

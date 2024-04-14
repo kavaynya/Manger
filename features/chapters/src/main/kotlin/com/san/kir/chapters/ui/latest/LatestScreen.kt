@@ -47,7 +47,7 @@ import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.FromTopToTopAnimContent
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable
@@ -219,29 +219,29 @@ private fun RowScope.MangaName(manga: String) {
 }
 
 @Composable
-private fun StatusText(state: DownloadState, progress: Int, date: String) {
+private fun StatusText(state: com.san.kir.data.models.utils.DownloadState, progress: Int, date: String) {
     FromBottomToBottomAnimContent(targetState = state) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             when (it) {
-                DownloadState.LOADING -> {
+                com.san.kir.data.models.utils.DownloadState.LOADING -> {
                     LoadingIndicator()
                     LoadingText(progress)
                 }
 
-                DownloadState.QUEUED  -> {
+                com.san.kir.data.models.utils.DownloadState.QUEUED  -> {
                     LoadingIndicator()
                     WaitingText()
                     QuarterSpacer()
                 }
 
-                DownloadState.PAUSED,
-                DownloadState.COMPLETED,
-                DownloadState.UNKNOWN,
+                com.san.kir.data.models.utils.DownloadState.PAUSED,
+                com.san.kir.data.models.utils.DownloadState.COMPLETED,
+                com.san.kir.data.models.utils.DownloadState.UNKNOWN,
                 -> {
                     ChapterDate(date)
                 }
 
-                DownloadState.ERROR   -> {}
+                com.san.kir.data.models.utils.DownloadState.ERROR   -> {}
             }
         }
     }

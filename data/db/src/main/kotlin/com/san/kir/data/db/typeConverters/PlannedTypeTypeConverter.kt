@@ -1,7 +1,7 @@
 package com.san.kir.data.db.typeConverters
 
 import androidx.room.TypeConverter
-import com.san.kir.core.support.PlannedType
+import com.san.kir.data.models.utils.PlannedType
 
 internal class PlannedTypeTypeConverter {
     @TypeConverter

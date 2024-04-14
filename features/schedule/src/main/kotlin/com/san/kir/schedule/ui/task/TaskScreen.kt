@@ -39,9 +39,9 @@ import com.san.kir.core.compose.animation.FromTopToTopAnimContent
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.support.PlannedPeriod
-import com.san.kir.core.support.PlannedType
-import com.san.kir.core.support.PlannedWeek
+import com.san.kir.data.models.utils.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedType
+import com.san.kir.data.models.utils.PlannedWeek
 import com.san.kir.schedule.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList
@@ -102,7 +102,7 @@ private fun ColumnScope.Content(state: TaskState, sendEvent: (ChangeType) -> Uni
 
     Divider(modifier = Modifier.padding(vertical = Dimensions.half))
 
-    TopAnimatedVisibility(visible = state.item.period == PlannedPeriod.WEEK) {
+    TopAnimatedVisibility(visible = state.item.period == com.san.kir.data.models.utils.PlannedPeriod.WEEK) {
         PeriodConfig(dayOfWeek = state.item.dayOfWeek, sendEvent = sendEvent)
     }
 
@@ -110,7 +110,7 @@ private fun ColumnScope.Content(state: TaskState, sendEvent: (ChangeType) -> Uni
 }
 
 @Composable
-private fun TypeChanger(type: PlannedType, sendEvent: (ChangeType) -> Unit) {
+private fun TypeChanger(type: com.san.kir.data.models.utils.PlannedType, sendEvent: (ChangeType) -> Unit) {
     LabelText(idRes = R.string.planned_task_type_of_update)
 
     RadioGroup(
@@ -125,7 +125,7 @@ private fun TypeChanger(type: PlannedType, sendEvent: (ChangeType) -> Unit) {
 private fun TypeConfig(state: TaskState, sendEvent: (ChangeType) -> Unit) {
     FromTopToTopAnimContent(targetState = state.item.type) { currentState ->
         when (currentState) {
-            PlannedType.MANGA    ->
+            com.san.kir.data.models.utils.PlannedType.MANGA    ->
                 TypedItem(
                     label = R.string.planned_task_change_manga,
                     value = state.mangaName,
@@ -139,7 +139,7 @@ private fun TypeConfig(state: TaskState, sendEvent: (ChangeType) -> Unit) {
                     ) { sendEvent(ChangeType.Manga(it)) }
                 }
 
-            PlannedType.GROUP    ->
+            com.san.kir.data.models.utils.PlannedType.GROUP    ->
                 TypedItemList(
                     label = R.string.planned_task_name_of_group,
                     value = state.item.groupName,
@@ -155,7 +155,7 @@ private fun TypeConfig(state: TaskState, sendEvent: (ChangeType) -> Unit) {
                     ) { sendEvent(ChangeType.Mangas(it)) }
                 }
 
-            PlannedType.CATEGORY ->
+            com.san.kir.data.models.utils.PlannedType.CATEGORY ->
                 TypedItem(
                     label = R.string.planned_task_change_category,
                     value = state.categoryName,
@@ -169,7 +169,7 @@ private fun TypeConfig(state: TaskState, sendEvent: (ChangeType) -> Unit) {
                     ) { sendEvent(ChangeType.Category(it)) }
                 }
 
-            PlannedType.CATALOG  ->
+            com.san.kir.data.models.utils.PlannedType.CATALOG  ->
                 TypedItem(
                     label = R.string.planned_task_change_catalog,
                     value = state.item.catalog,
@@ -190,7 +190,7 @@ private fun TypeConfig(state: TaskState, sendEvent: (ChangeType) -> Unit) {
 }
 
 @Composable
-private fun PeriodChanger(period: PlannedPeriod, sendEvent: (ChangeType) -> Unit) {
+private fun PeriodChanger(period: com.san.kir.data.models.utils.PlannedPeriod, sendEvent: (ChangeType) -> Unit) {
     LabelText(R.string.planned_task_repeat)
 
     RadioGroup(
@@ -202,7 +202,7 @@ private fun PeriodChanger(period: PlannedPeriod, sendEvent: (ChangeType) -> Unit
 }
 
 @Composable
-private fun PeriodConfig(dayOfWeek: PlannedWeek, sendEvent: (ChangeType) -> Unit) {
+private fun PeriodConfig(dayOfWeek: com.san.kir.data.models.utils.PlannedWeek, sendEvent: (ChangeType) -> Unit) {
     Column {
         LabelText(R.string.planned_task_change_day)
 

@@ -4,7 +4,7 @@ import android.app.Application
 import androidx.lifecycle.viewModelScope
 import com.san.kir.background.logic.UpdateCatalogManager
 import com.san.kir.catalog.logic.repo.CatalogRepository
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
@@ -85,11 +85,11 @@ internal class CatalogViewModel @Inject constructor(
                     old.copy(updateCatalogs = false, progress = null)
                 } else {
                     when (task.state) {
-                        DownloadState.LOADING ->
+                        com.san.kir.data.models.utils.DownloadState.LOADING ->
                             old.copy(updateCatalogs = true, progress = task.progress)
 
-                        DownloadState.QUEUED,
-                        DownloadState.PAUSED,
+                        com.san.kir.data.models.utils.DownloadState.QUEUED,
+                        com.san.kir.data.models.utils.DownloadState.PAUSED,
                                               -> old.copy(updateCatalogs = true, progress = null)
 
                         else                  -> old

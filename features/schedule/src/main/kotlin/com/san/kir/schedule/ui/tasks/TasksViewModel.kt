@@ -2,8 +2,8 @@ package com.san.kir.schedule.ui.tasks
 
 import android.app.Application
 import com.san.kir.background.works.ScheduleWorker
-import com.san.kir.core.support.PlannedPeriod
-import com.san.kir.core.support.PlannedType
+import com.san.kir.data.models.utils.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.core.utils.viewModel.BaseViewModel
 import com.san.kir.data.models.extend.SimplifiedTask
 import com.san.kir.schedule.R
@@ -47,11 +47,11 @@ internal class TasksViewModel @Inject constructor(
         }
 
     private fun itemName(item: SimplifiedTask) = when (item.type) {
-        PlannedType.MANGA    -> context.getString(R.string.planned_task_name_manga, item.manga)
-        PlannedType.GROUP    -> context.getString(R.string.planned_task_name_group, item.groupName)
-        PlannedType.CATALOG  -> context.getString(R.string.planned_task_name_catalog, item.catalog)
-        PlannedType.APP      -> context.getString(R.string.planned_task_name_app)
-        PlannedType.CATEGORY -> context.getString(
+        com.san.kir.data.models.utils.PlannedType.MANGA    -> context.getString(R.string.planned_task_name_manga, item.manga)
+        com.san.kir.data.models.utils.PlannedType.GROUP    -> context.getString(R.string.planned_task_name_group, item.groupName)
+        com.san.kir.data.models.utils.PlannedType.CATALOG  -> context.getString(R.string.planned_task_name_catalog, item.catalog)
+        com.san.kir.data.models.utils.PlannedType.APP      -> context.getString(R.string.planned_task_name_app)
+        com.san.kir.data.models.utils.PlannedType.CATEGORY -> context.getString(
             R.string.planned_task_name_category,
             item.category
         )
@@ -59,7 +59,7 @@ internal class TasksViewModel @Inject constructor(
 
     private fun itemInfo(item: SimplifiedTask): String {
         val dayText = context.getString(
-            if (item.period == PlannedPeriod.DAY) item.period.dayText
+            if (item.period == com.san.kir.data.models.utils.PlannedPeriod.DAY) item.period.dayText
             else item.dayOfWeek.dayText
         )
         return context.getString(

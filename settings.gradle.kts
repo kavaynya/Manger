@@ -1,7 +1,6 @@
 include(":app")
 
 include(":core:utils")
-include(":core:support")
 include(":core:internet")
 include(":core:compose")
 include(":core:background")

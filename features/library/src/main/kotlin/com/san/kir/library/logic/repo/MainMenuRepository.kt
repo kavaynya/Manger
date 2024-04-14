@@ -1,7 +1,7 @@
 package com.san.kir.library.logic.repo
 
 import android.app.Application
-import com.san.kir.core.support.MainMenuType
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.data.db.dao.CategoryDao
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MainMenuDao
@@ -52,19 +52,19 @@ internal class MainMenuRepository @Inject constructor(
 
     private fun transform(siteCount: Int, transition: Transition): (MainMenuItem) -> MenuItem = {
         when (it.type) {
-            MainMenuType.Default,
-            MainMenuType.Library -> MenuItem(it, transition.libraryCount)
+            com.san.kir.data.models.utils.MainMenuType.Default,
+            com.san.kir.data.models.utils.MainMenuType.Library -> MenuItem(it, transition.libraryCount)
 
-            MainMenuType.Category -> MenuItem(it, transition.categoryCount)
-            MainMenuType.Catalogs -> MenuItem(it, "$siteCount")
-            MainMenuType.Downloader -> MenuItem(it, transition.downloadCount)
-            MainMenuType.Latest -> MenuItem(it, transition.latestCount)
-            MainMenuType.Schedule -> MenuItem(it, transition.plannedCount)
-            MainMenuType.Settings,
-            MainMenuType.Statistic,
-            MainMenuType.Accounts -> MenuItem(it, "")
+            com.san.kir.data.models.utils.MainMenuType.Category -> MenuItem(it, transition.categoryCount)
+            com.san.kir.data.models.utils.MainMenuType.Catalogs -> MenuItem(it, "$siteCount")
+            com.san.kir.data.models.utils.MainMenuType.Downloader -> MenuItem(it, transition.downloadCount)
+            com.san.kir.data.models.utils.MainMenuType.Latest -> MenuItem(it, transition.latestCount)
+            com.san.kir.data.models.utils.MainMenuType.Schedule -> MenuItem(it, transition.plannedCount)
+            com.san.kir.data.models.utils.MainMenuType.Settings,
+            com.san.kir.data.models.utils.MainMenuType.Statistic,
+            com.san.kir.data.models.utils.MainMenuType.Accounts -> MenuItem(it, "")
 
-            MainMenuType.Storage -> {
+            com.san.kir.data.models.utils.MainMenuType.Storage -> {
                 MenuItem(
                     it,
                     context.getString(R.string.main_menu_storage_size_mb, transition.storageSize)

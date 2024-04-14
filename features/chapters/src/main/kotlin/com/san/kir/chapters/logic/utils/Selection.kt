@@ -2,7 +2,7 @@ package com.san.kir.chapters.logic.utils
 
 import com.san.kir.chapters.ui.chapters.Items
 import com.san.kir.chapters.ui.chapters.SelectableItem
-import com.san.kir.core.support.ChapterFilter
+import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.data.models.base.Manga
 import com.san.kir.data.models.extend.SimplifiedChapter
 import com.san.kir.data.models.extend.SimplifiedChapterComparator
@@ -64,7 +64,7 @@ internal object SelectionHelper {
     fun update(
         old: Items,
         list: List<SimplifiedChapter>,
-        filter: ChapterFilter,
+        filter: com.san.kir.data.models.utils.ChapterFilter,
         manga: Manga
     ): Items {
         val newItems = list.applyFilter(filter, manga)
@@ -86,7 +86,7 @@ internal object SelectionHelper {
     }
 
     private fun List<SimplifiedChapter>.applyFilter(
-        filter: ChapterFilter,
+        filter: com.san.kir.data.models.utils.ChapterFilter,
         manga: Manga
     ): List<SimplifiedChapter> {
         var list = this
@@ -94,12 +94,12 @@ internal object SelectionHelper {
             list = list.sortedWith(simplifiedChapterComparator)
         }
         return when (filter) {
-            ChapterFilter.ALL_READ_ASC -> list
-            ChapterFilter.NOT_READ_ASC -> list.filterNot { it.isRead }
-            ChapterFilter.IS_READ_ASC -> list.filter { it.isRead }
-            ChapterFilter.ALL_READ_DESC -> list.reversed()
-            ChapterFilter.NOT_READ_DESC -> list.filterNot { it.isRead }.reversed()
-            ChapterFilter.IS_READ_DESC -> list.filter { it.isRead }.reversed()
+            com.san.kir.data.models.utils.ChapterFilter.ALL_READ_ASC -> list
+            com.san.kir.data.models.utils.ChapterFilter.NOT_READ_ASC -> list.filterNot { it.isRead }
+            com.san.kir.data.models.utils.ChapterFilter.IS_READ_ASC -> list.filter { it.isRead }
+            com.san.kir.data.models.utils.ChapterFilter.ALL_READ_DESC -> list.reversed()
+            com.san.kir.data.models.utils.ChapterFilter.NOT_READ_DESC -> list.filterNot { it.isRead }.reversed()
+            com.san.kir.data.models.utils.ChapterFilter.IS_READ_DESC -> list.filter { it.isRead }.reversed()
         }
     }
 }

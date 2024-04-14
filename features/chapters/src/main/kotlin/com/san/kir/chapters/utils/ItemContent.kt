@@ -26,7 +26,7 @@ import androidx.compose.ui.unit.dp
 import com.san.kir.chapters.R
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.toast
 import com.san.kir.data.models.extend.SimplifiedChapter
 
@@ -40,8 +40,8 @@ internal fun onClickItem(
     return {
         if (selectionMode.not()) {
             when (chapter.status) {
-                DownloadState.QUEUED,
-                DownloadState.LOADING,
+                com.san.kir.data.models.utils.DownloadState.QUEUED,
+                com.san.kir.data.models.utils.DownloadState.LOADING,
                      ->
                     context.toast(R.string.list_chapters_open_is_download)
 
@@ -99,28 +99,28 @@ internal fun LoadingIndicator() {
 }
 
 @Composable
-internal fun DownloadButton(state: DownloadState, sendEvent: (Download) -> Unit) {
+internal fun DownloadButton(state: com.san.kir.data.models.utils.DownloadState, sendEvent: (Download) -> Unit) {
     FromEndToEndAnimContent(targetState = state) {
         when (it) {
-            DownloadState.LOADING,
-            DownloadState.QUEUED,
+            com.san.kir.data.models.utils.DownloadState.LOADING,
+            com.san.kir.data.models.utils.DownloadState.QUEUED,
             ->
                 // cancel button
                 IconButton(onClick = { sendEvent(Download.STOP) }) {
                     Icon(Icons.Default.Close, contentDescription = "cancel download button")
                 }
 
-            DownloadState.ERROR,
-            DownloadState.PAUSED,
-            DownloadState.COMPLETED,
-            DownloadState.UNKNOWN,
+            com.san.kir.data.models.utils.DownloadState.ERROR,
+            com.san.kir.data.models.utils.DownloadState.PAUSED,
+            com.san.kir.data.models.utils.DownloadState.COMPLETED,
+            com.san.kir.data.models.utils.DownloadState.UNKNOWN,
             -> Box {
                 // download button
                 IconButton(onClick = { sendEvent(Download.START) }) {
                     Icon(Icons.Default.Download, contentDescription = "download button")
                 }
 
-                if (it == DownloadState.ERROR)
+                if (it == com.san.kir.data.models.utils.DownloadState.ERROR)
                     Icon(
                         painterResource(com.san.kir.core.compose.R.drawable.unknown),
                         contentDescription = "last downloading error",

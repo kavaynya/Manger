@@ -4,7 +4,7 @@ kotlin = "1.9.20"
 coroutines = "1.7.1"
 ksp = "1.9.20-1.0.14"
 serialization = "1.6.3"
-collections_immutable = "0.3.5"
+datetime = "0.6.0-RC.2"
 
 # decompose
 decompose = "2.2.2"
@@ -69,7 +69,7 @@ stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "ko
 coroutines_core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines_android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-collections_immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collections_immutable" }
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 
 # decompose
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
@@ -86,7 +86,6 @@ lifecycle_viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", v
 lifecycle_runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle_livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
 lifecycle_common = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "lifecycle" }
-lifecycle_service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
 
 # Work Manager
 work_runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }

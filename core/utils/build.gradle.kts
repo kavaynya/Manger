@@ -9,8 +9,6 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.support))
-
     implementation(libs.compose.runtime)
     implementation(libs.compose.runtime.saveable)
     implementation(libs.compose.ui)

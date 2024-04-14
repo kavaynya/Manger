@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import com.san.kir.core.support.ChapterStatus
+import com.san.kir.data.models.utils.ChapterStatus
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.models.base.action
 import dagger.assisted.Assisted

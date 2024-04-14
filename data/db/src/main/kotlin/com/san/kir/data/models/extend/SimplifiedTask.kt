@@ -1,9 +1,9 @@
 package com.san.kir.data.models.extend
 
 import androidx.room.ColumnInfo
-import com.san.kir.core.support.PlannedPeriod
-import com.san.kir.core.support.PlannedType
-import com.san.kir.core.support.PlannedWeek
+import com.san.kir.data.models.utils.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedType
+import com.san.kir.data.models.utils.PlannedWeek
 import com.san.kir.data.models.base.PlannedTaskBase
 
 data class SimplifiedTask(

@@ -12,7 +12,6 @@ dependencies {
     implementation(project(Modules.Data.models))
     implementation(project(Modules.Data.db))
     implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.support))
     implementation(project(Modules.Core.internet))
 
     implementation(libs.okhttp.loging)

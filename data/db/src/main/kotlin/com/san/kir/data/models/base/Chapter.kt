@@ -5,8 +5,8 @@ import androidx.compose.runtime.Stable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.san.kir.core.support.ChapterStatus
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.ChapterStatus
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.getCountPagesForChapterInMemory
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isEmptyDirectory

@@ -19,7 +19,6 @@ android {
 dependencies {
     implementation(project(Modules.Data.models))
     implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.support))
 
 //    ksp(libs.room.compiler)
     api(libs.room.runtime)

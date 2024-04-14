@@ -36,13 +36,13 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.systemBarBottomPadding
-import com.san.kir.core.support.MainMenuType
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.core.utils.TestTags
 import com.san.kir.library.R
 
 // Боковое меню с выбором пунктов для навигации по приложению
 @Composable
-internal fun DrawerScreen(navigateToScreen: (MainMenuType) -> Unit) {
+internal fun DrawerScreen(navigateToScreen: (com.san.kir.data.models.utils.MainMenuType) -> Unit) {
 
     val viewModel: DrawerViewModel = hiltViewModel()
     val state by viewModel.state.collectAsState()

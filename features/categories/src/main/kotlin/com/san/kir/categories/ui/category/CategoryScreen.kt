@@ -35,7 +35,7 @@ import com.san.kir.core.compose.RadioGroup
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.support.SortLibraryUtil
+import com.san.kir.data.models.utils.SortLibraryUtil
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toImmutableList
@@ -201,9 +201,9 @@ private fun ChangeSortType(typeSort: String, sendEvent: (CategoryEvent) -> Unit)
         typeSort,
         onSelected = { sendEvent(CategoryEvent.Update(newTypeSort = it)) },
         stateList = persistentListOf(
-            SortLibraryUtil.add,
-            SortLibraryUtil.abc,
-            SortLibraryUtil.pop
+            com.san.kir.data.models.utils.SortLibraryUtil.add,
+            com.san.kir.data.models.utils.SortLibraryUtil.abc,
+            com.san.kir.data.models.utils.SortLibraryUtil.pop
         ),
         textList = listOf(
             R.string.library_sort_dialog_add,

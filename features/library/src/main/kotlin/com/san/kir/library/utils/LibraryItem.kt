@@ -37,7 +37,7 @@ import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.compose.squareMaxSize
-import com.san.kir.core.support.CATEGORY_ALL
+import com.san.kir.data.models.utils.CATEGORY_ALL
 import com.san.kir.core.utils.TestTags
 import com.san.kir.data.models.extend.SimplifiedManga
 

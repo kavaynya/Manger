@@ -1,7 +1,7 @@
 package com.san.kir.data.models.extend
 
 import androidx.compose.runtime.Immutable
-import com.san.kir.core.support.SortLibraryUtil
+import com.san.kir.data.models.utils.SortLibraryUtil
 
 @Immutable
 data class CategoryWithMangas(

@@ -19,7 +19,7 @@ import com.san.kir.core.internet.CellularNetwork
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.internet.NetworkState
 import com.san.kir.core.internet.WifiNetwork
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.bytesToMb
 import com.san.kir.core.utils.formatDouble

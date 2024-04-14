@@ -2,7 +2,7 @@ package com.san.kir.data.db.dao
 
 import androidx.room.Dao
 import androidx.room.Query
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.models.base.Chapter
 import com.san.kir.data.models.extend.DownloadChapter
 import com.san.kir.data.models.extend.SimplifiedChapter

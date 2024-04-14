@@ -3,7 +3,7 @@ package com.san.kir.categories.ui.category
 import android.app.Application
 import com.san.kir.background.works.RemoveCategoryWorker
 import com.san.kir.categories.logic.repo.CategoryRepository
-import com.san.kir.core.support.CATEGORY_ALL
+import com.san.kir.data.models.utils.CATEGORY_ALL
 import com.san.kir.core.utils.viewModel.BaseViewModel
 import com.san.kir.data.models.base.Category
 import dagger.hilt.android.lifecycle.HiltViewModel

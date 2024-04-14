@@ -2,7 +2,7 @@ package com.san.kir.background.logic
 
 import com.san.kir.background.logic.repo.ChapterRepository
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.convertImagesToPng
 import com.san.kir.core.utils.coroutines.ioLaunch
 import com.san.kir.core.utils.coroutines.withIoContext

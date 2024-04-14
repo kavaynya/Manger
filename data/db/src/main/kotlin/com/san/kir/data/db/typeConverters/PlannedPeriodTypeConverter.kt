@@ -1,7 +1,7 @@
 package com.san.kir.data.db.typeConverters
 
 import androidx.room.TypeConverter
-import com.san.kir.core.support.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedPeriod
 
 internal class PlannedPeriodTypeConverter {
     @TypeConverter

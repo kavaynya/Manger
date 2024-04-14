@@ -17,7 +17,7 @@ import androidx.navigation.NavHostController
 import com.google.accompanist.navigation.animation.AnimatedNavHost
 import com.san.kir.chapters.ui.download.DownloadsScreen
 import com.san.kir.chapters.ui.latest.LatestScreen
-import com.san.kir.core.support.MainMenuType
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.features.viewer.MangaViewer
 import com.san.kir.manger.navigation.utils.Constants
 import com.san.kir.manger.navigation.utils.NavTarget
@@ -26,25 +26,25 @@ import com.san.kir.manger.navigation.utils.navTarget
 import com.san.kir.settings.ui.settings.SettingsScreen
 
 enum class MainNavTarget(
-    val type: MainMenuType,
+    val type: com.san.kir.data.models.utils.MainMenuType,
 ) : NavTarget {
-    Library(MainMenuType.Library) {
+    Library(com.san.kir.data.models.utils.MainMenuType.Library) {
         override val content = navTarget(route = GraphTree.Library())
     },
 
-    Storage(MainMenuType.Storage) {
+    Storage(com.san.kir.data.models.utils.MainMenuType.Storage) {
         override val content = navTarget(route = GraphTree.Storage())
     },
 
-    Categories(MainMenuType.Category) {
+    Categories(com.san.kir.data.models.utils.MainMenuType.Category) {
         override val content = navTarget(route = GraphTree.Categories())
     },
 
-    Catalogs(MainMenuType.Catalogs) {
+    Catalogs(com.san.kir.data.models.utils.MainMenuType.Catalogs) {
         override val content = navTarget(route = GraphTree.Catalogs())
     },
 
-    Downloader(MainMenuType.Downloader) {
+    Downloader(com.san.kir.data.models.utils.MainMenuType.Downloader) {
         override val content = navTarget(
             route = GraphTree.downloader,
             hasDeepLink = true
@@ -53,7 +53,7 @@ enum class MainNavTarget(
         }
     },
 
-    Latest(MainMenuType.Latest) {
+    Latest(com.san.kir.data.models.utils.MainMenuType.Latest) {
         override val content = navTarget(
             route = GraphTree.latest,
             hasDeepLink = true
@@ -69,21 +69,21 @@ enum class MainNavTarget(
         }
     },
 
-    Settings(MainMenuType.Settings) {
+    Settings(com.san.kir.data.models.utils.MainMenuType.Settings) {
         override val content = navTarget(route = GraphTree.settings) {
             SettingsScreen(navigateUp())
         }
     },
 
-    Statistic(MainMenuType.Statistic) {
+    Statistic(com.san.kir.data.models.utils.MainMenuType.Statistic) {
         override val content = navTarget(route = GraphTree.Statistic())
     },
 
-    Schedule(MainMenuType.Schedule) {
+    Schedule(com.san.kir.data.models.utils.MainMenuType.Schedule) {
         override val content = navTarget(route = GraphTree.Schedule())
     },
 
-    Accounts(MainMenuType.Accounts) {
+    Accounts(com.san.kir.data.models.utils.MainMenuType.Accounts) {
         override val content = navTarget(route = GraphTree.Accounts())
     },
 }

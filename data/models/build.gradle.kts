@@ -8,9 +8,11 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.support))
     implementation(project(Modules.Core.utils))
 
     implementation(libs.compose.runtime)
-    implementation(libs.room.ktx)
+    implementation(libs.compose.material.icons)
+    implementation(libs.compose.material.icons.ext)
+    implementation(libs.datetime)
+    implementation(libs.timber)
 }

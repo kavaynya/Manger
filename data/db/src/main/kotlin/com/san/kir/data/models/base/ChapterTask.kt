@@ -4,7 +4,7 @@ import android.os.Parcelable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import kotlinx.parcelize.Parcelize
 
 @Parcelize

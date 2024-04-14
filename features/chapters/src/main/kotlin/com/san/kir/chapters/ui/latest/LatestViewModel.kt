@@ -7,7 +7,7 @@ import androidx.work.WorkManager
 import com.san.kir.background.logic.DownloadChaptersManager
 import com.san.kir.background.works.LatestClearWorkers
 import com.san.kir.chapters.logic.repo.LatestRepository
-import com.san.kir.core.support.ChapterStatus
+import com.san.kir.data.models.utils.ChapterStatus
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.viewModel.BaseViewModel
 import com.san.kir.data.models.base.action
@@ -44,7 +44,7 @@ internal class LatestViewModel @Inject constructor(
         .notReadItems
         .distinctUntilChanged()
         .flowOn(defaultDispatcher)
-        .mapLatest { list -> list.filter { it.action == ChapterStatus.DOWNLOADABLE } }
+        .mapLatest { list -> list.filter { it.action == com.san.kir.data.models.utils.ChapterStatus.DOWNLOADABLE } }
 
     init {
         latestRepository

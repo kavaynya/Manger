@@ -8,8 +8,8 @@ import com.san.kir.chapters.R
 import com.san.kir.chapters.logic.repo.ChaptersRepository
 import com.san.kir.chapters.logic.repo.SettingsRepository
 import com.san.kir.chapters.logic.utils.SelectionHelper
-import com.san.kir.core.support.ChapterFilter
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.ChapterFilter
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext
@@ -49,7 +49,7 @@ internal class ChaptersViewModel @Inject constructor(
     private val backgroundAction = MutableStateFlow(BackgroundActions())
     private val manga = MutableStateFlow(Manga())
     private val items = MutableStateFlow(Items())
-    private val filter = MutableStateFlow(ChapterFilter.ALL_READ_ASC)
+    private val filter = MutableStateFlow(com.san.kir.data.models.utils.ChapterFilter.ALL_READ_ASC)
     private val nextChapter = items
         .map { items -> checkNextChapter(items.items) }
         .onStart { emit(NextChapter.None) }
@@ -125,10 +125,10 @@ internal class ChaptersViewModel @Inject constructor(
             backgroundAction.update { it.copy(updateManga = task != null) }
 
             when (task?.state) {
-                DownloadState.UNKNOWN   -> withMainContext {
+                com.san.kir.data.models.utils.DownloadState.UNKNOWN   -> withMainContext {
                     context.longToast(R.string.list_chapters_message_error)
                 }
-                DownloadState.COMPLETED -> withMainContext {
+                com.san.kir.data.models.utils.DownloadState.COMPLETED -> withMainContext {
                     if (task.newChapters <= 0) context.longToast(R.string.new_chapters_no_found)
                     else context.longToast(R.string.have_new_chapters_count, task.newChapters)
                 }

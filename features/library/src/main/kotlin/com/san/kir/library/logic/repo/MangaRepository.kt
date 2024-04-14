@@ -2,8 +2,8 @@ package com.san.kir.library.logic.repo
 
 import android.app.Application
 import android.content.Context
-import com.san.kir.core.support.CATEGORY_ALL
-import com.san.kir.core.support.SortLibraryUtil
+import com.san.kir.data.models.utils.CATEGORY_ALL
+import com.san.kir.data.models.utils.SortLibraryUtil
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.core.utils.mapP
 import com.san.kir.data.db.dao.CategoryDao
@@ -57,9 +57,9 @@ internal class MangaRepository @Inject constructor(
             .filter { cat.name == CATEGORY_ALL || it.categoryId == cat.id }
 
         when (cat.typeSort) {
-            SortLibraryUtil.add -> prepareMangas = prepareMangas.sortedBy { it.id }
-            SortLibraryUtil.abc -> prepareMangas = prepareMangas.sortedBy { it.name }
-            SortLibraryUtil.pop -> prepareMangas = prepareMangas.sortedBy { it.populate }
+            com.san.kir.data.models.utils.SortLibraryUtil.add -> prepareMangas = prepareMangas.sortedBy { it.id }
+            com.san.kir.data.models.utils.SortLibraryUtil.abc -> prepareMangas = prepareMangas.sortedBy { it.name }
+            com.san.kir.data.models.utils.SortLibraryUtil.pop -> prepareMangas = prepareMangas.sortedBy { it.populate }
         }
 
         return CategoryWithMangas(

@@ -6,7 +6,7 @@ import com.san.kir.chapters.logic.repo.SettingsRepository
 import com.san.kir.core.internet.CellularNetwork
 import com.san.kir.core.internet.NetworkState
 import com.san.kir.core.internet.WifiNetwork
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.viewModel.BaseViewModel
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
@@ -58,7 +58,7 @@ internal class DownloadsViewModel @Inject constructor(
         chaptersRepository.clear(
             state.value
                 .items
-                .filter { it.status == DownloadState.COMPLETED || it.status == DownloadState.PAUSED }
+                .filter { it.status == com.san.kir.data.models.utils.DownloadState.COMPLETED || it.status == com.san.kir.data.models.utils.DownloadState.PAUSED }
                 .map { it.id }
         )
     }
@@ -67,7 +67,7 @@ internal class DownloadsViewModel @Inject constructor(
         chaptersRepository.clear(
             state.value
                 .items
-                .filter { it.status == DownloadState.ERROR }
+                .filter { it.status == com.san.kir.data.models.utils.DownloadState.ERROR }
                 .map { it.id }
         )
     }
@@ -76,7 +76,7 @@ internal class DownloadsViewModel @Inject constructor(
         chaptersRepository.clear(
             state.value
                 .items
-                .filter { it.status == DownloadState.PAUSED }
+                .filter { it.status == com.san.kir.data.models.utils.DownloadState.PAUSED }
                 .map { it.id }
         )
     }
@@ -85,7 +85,7 @@ internal class DownloadsViewModel @Inject constructor(
         chaptersRepository.clear(
             state.value
                 .items
-                .filter { it.status == DownloadState.COMPLETED }
+                .filter { it.status == com.san.kir.data.models.utils.DownloadState.COMPLETED }
                 .map { it.id }
         )
     }
