@@ -82,7 +82,7 @@ internal class AddStandartViewModel @Inject constructor(
                     categoryId = catalogRepository.categoryId(categoryName.value),
                     path = path
                 ).copy(
-                    isAlternativeSite = manager.getSite(element.link) is SiteCatalogAlternative
+                    isAlternativeSite = manager.catalog(element.link) is SiteCatalogAlternative
                 )
             ).ifEmpty { throw ArrayIndexOutOfBoundsException() }.first()
 

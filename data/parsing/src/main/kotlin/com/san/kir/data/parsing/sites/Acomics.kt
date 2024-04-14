@@ -193,7 +193,7 @@ class Acomics(private val connectManager: ConnectManager) : SiteCatalogAlternati
     }
 
     companion object {
-        private const val contentTemplate = "#contentMargin .list-loadable"
+        private const val contentTemplate = "#content .list-loadable"
         private const val AUTHOR = "Авторы:"
         private const val VOLUME = "Количество выпусков:"
         private const val POPULATE = "Количество подписчиков:"

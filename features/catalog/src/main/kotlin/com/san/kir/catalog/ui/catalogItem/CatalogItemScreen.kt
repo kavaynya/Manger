@@ -25,7 +25,7 @@ import com.san.kir.core.compose.ImageWithStatus
 import com.san.kir.core.compose.LabelText
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
-import com.san.kir.core.compose.SmallSpacer
+import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.core.compose.ToolbarProgress
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
@@ -88,37 +88,37 @@ private fun ColumnScope.MangaInfoContent(
     LabelText(R.string.manga_info_dialog_name)
     DialogText(item.name)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_authors)
     DialogText(item.authors.joinToString())
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_type)
     DialogText(item.type)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_status_edition)
     DialogText(item.statusEdition)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_volume)
     DialogText(stringResource(R.string.catalog_for_one_site_prefix_volume, item.volume))
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_status_translate)
     DialogText(item.statusTranslate)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_genres)
     DialogText(item.genres.joinToString())
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_link)
     DialogText(
@@ -126,12 +126,12 @@ private fun ColumnScope.MangaInfoContent(
         color = if (MaterialTheme.colors.isLight) Color.Blue else Color.Cyan
     ) { ctx.browse(item.link) }
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_about)
     DialogText(item.about)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.manga_info_dialog_logo)
     ImageWithStatus(item.logo)

@@ -10,21 +10,20 @@ import com.san.kir.core.utils.connectivityManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
 enum class NetworkState {
     NOT_WIFI, NOT_CELLURAR, OK
 }
 
-class CellularNetwork @Inject constructor(context: Application) : TemplateNetwork(
+class CellularNetwork(context: Application) : NetworkManager(
     context, NetworkCapabilities.TRANSPORT_CELLULAR
 )
 
-class WifiNetwork @Inject constructor(context: Application) : TemplateNetwork(
+class WifiNetwork(context: Application) : NetworkManager(
     context, NetworkCapabilities.TRANSPORT_WIFI,
 )
 
-abstract class TemplateNetwork(
+abstract class NetworkManager(
     private val context: Context,
     networkTransport: Int,
 ) : ConnectivityManager.NetworkCallback() {

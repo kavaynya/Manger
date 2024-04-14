@@ -40,7 +40,7 @@ import com.san.kir.chapters.utils.onClickItem
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
-import com.san.kir.core.compose.SmallerSpacer
+import com.san.kir.core.compose.QuarterSpacer
 import com.san.kir.core.compose.TopBarActions
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
@@ -231,7 +231,7 @@ private fun StatusText(state: DownloadState, progress: Int, date: String) {
                 DownloadState.QUEUED  -> {
                     LoadingIndicator()
                     WaitingText()
-                    SmallerSpacer()
+                    QuarterSpacer()
                 }
 
                 DownloadState.PAUSED,

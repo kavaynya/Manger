@@ -1,32 +1,32 @@
 package com.san.kir.core.compose
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BasicAlertDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.toMutableStateList
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.toImmutableList
 
 @Composable
 fun <T> SingleChoiceList(
     title: Int = -1,
     initialValue: T,
-    stateList: ImmutableList<T>,
-    textList: ImmutableList<String>,
+    stateList: List<T>,
+    textList: List<String>,
     onDismiss: () -> Unit,
-    onSelect: (T) -> Unit
+    onSelect: (T) -> Unit,
+    onClear: () -> Unit = {}
 ) {
-    BaseListAlert(title, onDismiss, onDismiss) {
+    BaseListAlert(title, onDismiss, onDismiss, onClear) {
         LazyRadioGroup(
             state = initialValue,
             onSelected = {
@@ -42,17 +42,19 @@ fun <T> SingleChoiceList(
 @Composable
 fun <T> MultiChoiceList(
     title: Int = -1,
-    items: PersistentList<T>,
-    stateList: ImmutableList<T>,
-    textList: ImmutableList<String>,
+    items: List<T>,
+    stateList: List<T>,
+    textList: List<String>,
     onDismiss: () -> Unit,
-    onSelect: (ImmutableList<T>) -> Unit
+    onSelect: (List<T>) -> Unit,
+    onClear: () -> Unit,
 ) {
     val tempItems = remember(items) { items.toMutableStateList() }
     BaseListAlert(
         title = title,
         onDismiss = onDismiss,
-        onSuccess = { onSelect(tempItems.toImmutableList()) }
+        onSuccess = { onSelect(tempItems) },
+        onClear = onClear
     ) {
         LazyColumn {
             items(stateList.size, key = { it }) { index ->
@@ -78,31 +80,42 @@ private fun BaseListAlert(
     title: Int = -1,
     onDismiss: () -> Unit,
     onSuccess: () -> Unit,
+    onClear: () -> Unit,
     content: @Composable () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = if (title != -1) {
-            {
-                Text(stringResource(title))
-            }
-        } else null,
-        text = content,
-        buttons = {
-            Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                TextButton(
-                    modifier = Modifier.padding(
-                        bottom = Dimensions.default,
-                        end = Dimensions.default
-                    ),
-                    onClick = {
+        confirmButton = {
+            Row(
+                horizontalArrangement = Arrangement.End,
+                verticalAlignment = Alignment.Top,
+                modifier = Modifier.fillMaxWidth()
+            ) {
+                Text(
+                    stringResource(R.string.clear),
+                    modifier = Modifier.clickable {
+                        onClear()
+                        onDismiss()
+                    }
+                )
+
+                DefaultSpacer()
+
+                Text(
+                    stringResource(R.string.ready),
+                    modifier = Modifier.clickable {
                         onSuccess()
                         onDismiss()
                     }
-                ) {
-                    Text(stringResource(R.string.planned_task_button_ready))
-                }
+                )
+
             }
-        }
+        },
+        title = if (title != -1) {
+            { Text(stringResource(title)) }
+        } else {
+            null
+        },
+        text = content
     )
 }

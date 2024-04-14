@@ -33,7 +33,7 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.RadioGroup
 import com.san.kir.core.compose.ScreenContent
-import com.san.kir.core.compose.SmallSpacer
+import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.support.SortLibraryUtil
 import kotlinx.collections.immutable.ImmutableList
@@ -105,7 +105,7 @@ fun CategoryScreen(
 
         Text(stringResource(R.string.category_dialog_portrait))
 
-        SmallSpacer()
+        HalfSpacer()
 
         ChangePortraitOptions(
             isLarge = state.category.isLargePortrait,
@@ -117,7 +117,7 @@ fun CategoryScreen(
 
         Text(stringResource(R.string.category_dialog_landscape))
 
-        SmallSpacer()
+        HalfSpacer()
 
         ChangeLandscapeOptions(
             isLarge = state.category.isLargeLandscape,
@@ -245,7 +245,7 @@ private fun ColumnScope.ChangePortraitOptions(
         secondTextId = R.string.category_dialog_small_cells
     )
 
-    SmallSpacer()
+    HalfSpacer()
 
     AnimatedVisibility(isLarge) {
         TextWithSlider(R.string.category_dialog_span_text, span, 5) {
@@ -267,7 +267,7 @@ private fun ColumnScope.ChangeLandscapeOptions(
         secondTextId = R.string.category_dialog_small_cells
     )
 
-    SmallSpacer()
+    HalfSpacer()
 
     AnimatedVisibility(visible = isLarge) {
         TextWithSlider(R.string.category_dialog_span_text, span, 7) {

@@ -136,7 +136,7 @@ class ChapterDownloader(
                 .downloadFile(
                     downloadFile,
                     connectManager.prepareUrl(link),
-                    runCatching { siteCatalogsManager.getSite(link) }
+                    runCatching { siteCatalogsManager.catalog(link) }
                         .onFailure(Timber.Forest::e)
                         .getOrNull()?.headers,
                 )

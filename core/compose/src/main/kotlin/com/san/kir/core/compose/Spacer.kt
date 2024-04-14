@@ -9,23 +9,28 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ColumnScope.SmallestSpacer() {
+fun SmallestSpacer() {
     Spacer(modifier = Modifier.height(Dimensions.smallest))
 }
 
 @Composable
-fun ColumnScope.SmallSpacer() {
+fun QuarterSpacer() {
+    Spacer(modifier = Modifier.width(Dimensions.quarter))
+}
+
+@Composable
+fun HalfSpacer() {
     Spacer(modifier = Modifier.height(Dimensions.half))
 }
 
 @Composable
-fun ColumnScope.DefaultSpacer() {
+fun DefaultSpacer() {
     Spacer(modifier = Modifier.height(Dimensions.default))
 }
 
 @Composable
-fun RowScope.SmallerSpacer() {
-    Spacer(modifier = Modifier.width(Dimensions.quarter))
+fun BigSpacer() {
+    Spacer(modifier = Modifier.height(Dimensions.big))
 }
 
 @Composable

@@ -104,6 +104,7 @@ class Unicomics(private val connectManager: ConnectManager) : SiteCatalogClassic
                     path = "${manga.path}/${name}"
                 )
             }
+            .asReversed()
     }
 
     private suspend fun chapters(url: String): List<Element> {

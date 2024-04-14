@@ -35,7 +35,7 @@ import com.san.kir.core.compose.ImageWithStatus
 import com.san.kir.core.compose.LabelText
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
-import com.san.kir.core.compose.SmallSpacer
+import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
@@ -84,37 +84,37 @@ private fun ColumnScope.Content(
     LabelText(R.string.about_manga_dialog_name)
     DialogText(manga.name)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_category)
     DialogText(categoryState)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_authors)
     DialogText(manga.authorsList.toString().trim().removeSurrounding("[", "]"))
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_status_edition)
     DialogText(manga.status)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_genres)
     DialogText(manga.genresList.toString().trim().removeSurrounding("[", "]"))
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_storage)
     DialogText(manga.path)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_volume)
     DialogText(stringResource(R.string.library_page_item_size, formatDouble(size)))
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_link)
     DialogText(
@@ -123,7 +123,7 @@ private fun ColumnScope.Content(
         onClick = { ctx.browse(manga.host + manga.shortLink) }
     )
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.add_manga_update)
     CheckBoxText(
@@ -132,17 +132,17 @@ private fun ColumnScope.Content(
         firstTextId = R.string.add_manga_update_available
     )
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.add_manga_color)
     ColorPicker(manga.color) { sendEvent(MangaAboutEvent.ChangeColor(it)) }
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_about)
     DialogText(manga.about)
 
-    SmallSpacer()
+    HalfSpacer()
 
     LabelText(R.string.about_manga_dialog_logo)
     ImageWithStatus(manga.logo)

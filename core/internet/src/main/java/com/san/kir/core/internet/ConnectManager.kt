@@ -29,12 +29,9 @@ import timber.log.Timber
 import java.io.File
 import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
-import javax.inject.Inject
-import javax.inject.Singleton
 import kotlin.time.Duration.Companion.seconds
 
-@Singleton
-class ConnectManager @Inject constructor(context: Application) {
+class ConnectManager(context: Application) {
     private val defaultCacheDirectory = File(context.cacheDir, "http_cache")
 
     private val defaultCache = Cache(
@@ -88,6 +85,7 @@ class ConnectManager @Inject constructor(context: Application) {
                     ?.let { defaultClient.submitForm(url.prepare(), it) }
                     ?: defaultClient.get(url.prepare())
 
+            Timber.d("url $url\nresponce -> ${response.status}")
             when (response.status) {
                 HttpStatusCode.TooManyRequests -> {
                     val toMultimap = response.headers
@@ -98,6 +96,10 @@ class ConnectManager @Inject constructor(context: Application) {
                     } else {
                         delay(10.seconds)
                     }
+                }
+
+                HttpStatusCode.NotFound -> {
+                    throw PageNotFoundException()
                 }
 
                 else -> {

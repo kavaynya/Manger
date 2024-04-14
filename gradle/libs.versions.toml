@@ -43,7 +43,7 @@ kakaocup = "0.0.2"
 espresso = "3.5.1"
 
 #
-gradle = "8.3.0" # Don`t forget update in buildSrc
+gradle = "8.3.1" # Don`t forget update in buildSrc
 
 hyperion = "0.9.31"
 subsampling = "3.10.0"

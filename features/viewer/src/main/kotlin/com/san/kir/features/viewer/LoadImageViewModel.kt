@@ -13,7 +13,6 @@ import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.features.viewer.logic.SettingsRepository
 import com.san.kir.features.viewer.utils.LoadState
 import com.san.kir.features.viewer.utils.Page
-import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.CancellationException
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,10 +21,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.io.File
-import javax.inject.Inject
 
-@HiltViewModel
-internal class LoadImageViewModel @Inject constructor(
+internal class LoadImageViewModel(
     private val connectManager: ConnectManager,
     private val settingsRepository: SettingsRepository,
     private val siteCatalogsManager: SiteCatalogsManager,
@@ -94,7 +91,7 @@ internal class LoadImageViewModel @Inject constructor(
                     connectManager
                         .downloadBitmap(
                             connectManager.prepareUrl(page.pagelink),
-                            runCatching { siteCatalogsManager.getSite(page.pagelink) }
+                            runCatching { siteCatalogsManager.catalog(page.pagelink) }
                                 .onFailure(Timber.Forest::e)
                                 .getOrNull()?.headers,
                             onProgress = { progress ->
@@ -117,7 +114,7 @@ internal class LoadImageViewModel @Inject constructor(
             connectManager.downloadFile(
                 file,
                 connectManager.prepareUrl(page.pagelink),
-                runCatching { siteCatalogsManager.getSite(page.pagelink) }
+                runCatching { siteCatalogsManager.catalog(page.pagelink) }
                     .onFailure(Timber.Forest::e)
                     .getOrNull()?.headers,
                 onProgress = { progress ->
