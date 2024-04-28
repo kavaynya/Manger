@@ -8,6 +8,8 @@ import com.san.kir.core.support.DIR
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.ScreenEvent
 import com.san.kir.core.utils.viewModel.ViewModel
+import com.san.kir.core.utils.DIR
+import com.san.kir.core.utils.viewModel.BaseViewModel
 import com.san.kir.data.models.base.Category
 import com.san.kir.data.models.base.Statistic
 import com.san.kir.data.models.base.toManga
@@ -85,7 +87,7 @@ internal class AddStandartViewModel(
                     categoryId = catalogRepository.categoryId(categoryName.value),
                     path = path
                 ).copy(
-                    isAlternativeSite = manager.getSite(element.link) is SiteCatalogAlternative
+                    isAlternativeSite = manager.catalog(element.link) is SiteCatalogAlternative
                 )
             ).ifEmpty { throw ArrayIndexOutOfBoundsException() }.first()
 

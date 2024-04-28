@@ -14,15 +14,15 @@ enum class NetworkState {
     NOT_WIFI, NOT_CELLURAR, OK
 }
 
-class CellularNetwork(context: Context) : TemplateNetwork(
+class CellularNetwork(context: Application) : NetworkManager(
     context, NetworkCapabilities.TRANSPORT_CELLULAR
 )
 
-class WifiNetwork(context: Context) : TemplateNetwork(
+class WifiNetwork(context: Application) : NetworkManager(
     context, NetworkCapabilities.TRANSPORT_WIFI,
 )
 
-abstract class TemplateNetwork(
+abstract class NetworkManager(
     private val context: Context,
     networkTransport: Int,
 ) : ConnectivityManager.NetworkCallback() {

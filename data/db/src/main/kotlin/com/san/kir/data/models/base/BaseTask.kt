@@ -1,6 +1,6 @@
 package com.san.kir.data.models.base
 
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 
 interface BaseTask<T : BaseTask<T>> {
     val id: Long

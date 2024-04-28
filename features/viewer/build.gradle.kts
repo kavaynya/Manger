@@ -17,7 +17,6 @@ dependencies {
     implementation(project(Modules.Data.parsing))
     implementation(project(Modules.Core.internet))
     implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.support))
 
     implementation(libs.subsampling)
 
@@ -31,4 +30,6 @@ dependencies {
     implementation(libs.lifecycle.common)
 
     implementation(libs.material)
+
+    implementation(libs.timber)
 }

@@ -17,6 +17,8 @@ import com.san.kir.background.logic.di.updateMangaManager
 import com.san.kir.core.support.PlannedPeriod
 import com.san.kir.core.support.PlannedType
 import com.san.kir.core.utils.ManualDI
+import com.san.kir.data.models.utils.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.core.utils.longToast
 import com.san.kir.data.categoryDao
 import com.san.kir.data.db.dao.CategoryDao

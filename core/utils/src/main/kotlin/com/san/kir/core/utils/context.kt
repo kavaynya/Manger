@@ -1,15 +1,41 @@
 package com.san.kir.core.utils
 
+import android.app.Service
 import android.content.ActivityNotFoundException
+import android.content.BroadcastReceiver
+import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
+import android.content.IntentFilter
 import android.net.ConnectivityManager
 import android.net.Uri
+import android.os.Build
+import android.os.Bundle
+import android.os.Parcelable
 import android.widget.Toast
+import java.io.Serializable
+
+fun Context.isOnWifi(): Boolean {
+    val activeNetworkInfo = connectivityManager.activeNetworkInfo
+    return if (activeNetworkInfo != null && activeNetworkInfo.isConnected) {
+        activeNetworkInfo.type == ConnectivityManager.TYPE_WIFI
+    } else {
+        false
+    }
+}
+
+fun Context.isNetworkAvailable(): Boolean {
+    val activeNetworkInfo = connectivityManager.activeNetworkInfo
+    return activeNetworkInfo != null && activeNetworkInfo.isConnected
+}
 
 val Context.connectivityManager: ConnectivityManager
     get() = getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
 
+
+fun Context.quantitySimple(id: Int, quantity: Int): String {
+    return resources.getQuantityString(id, quantity, quantity)
+}
 
 fun Context.longToast(resId: Int, vararg formatArgs: Any?) {
     longToast(getString(resId, *formatArgs))

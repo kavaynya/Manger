@@ -4,6 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.runtime.Stable
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.support.MainMenuType
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.extend.CategoryWithMangas
 import com.san.kir.data.models.extend.SimplifiedManga

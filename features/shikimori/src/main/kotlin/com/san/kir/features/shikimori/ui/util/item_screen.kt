@@ -17,7 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import com.san.kir.core.compose.Dimensions
-import com.san.kir.core.compose.SmallSpacer
+import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.features.shikimori.R
 import com.san.kir.features.shikimori.logic.SyncDialogEvent
 import com.san.kir.features.shikimori.logic.SyncDialogState
@@ -90,11 +90,11 @@ internal fun LazyListScope.body(
             ) {
                 ItemHeader(notFoundsTextId)
 
-                SmallSpacer()
+                HalfSpacer()
 
                 ItemHeader(notFoundsSearchTextId)
 
-                SmallSpacer()
+                HalfSpacer()
 
                 Button(onClick = { onSearch(state.name) }) {
                     Text(stringResource(R.string.local_search_not_founds_go))

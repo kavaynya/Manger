@@ -10,6 +10,7 @@ android {
         ksp {
             arg("room.schemaLocation", "$projectDir/schemas")
             arg("room.incremental", "true")
+            allWarningsAsErrors = true
             allowSourcesFromOtherPlugins = true
         }
     }
@@ -18,17 +19,12 @@ android {
 dependencies {
     implementation(project(Modules.Data.models))
     implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.support))
 
-    implementation(platform(libs.compose.bom))
-
-    ksp(libs.room.compiler)
+//    ksp(libs.room.compiler)
     api(libs.room.runtime)
     implementation(libs.bundles.room)
 
-    implementation(libs.paging)
     implementation(libs.compose.runtime)
 
-    implementation(libs.gson)
     implementation(libs.timber)
 }

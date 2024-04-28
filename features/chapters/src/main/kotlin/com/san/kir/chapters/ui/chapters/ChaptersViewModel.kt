@@ -14,6 +14,8 @@ import com.san.kir.chapters.logic.utils.SelectionHelper
 import com.san.kir.core.support.ChapterFilter
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
+import com.san.kir.data.models.utils.ChapterFilter
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext

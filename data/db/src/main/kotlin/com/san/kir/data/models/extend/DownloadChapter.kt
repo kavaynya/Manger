@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.compose.runtime.Stable
 import androidx.room.ColumnInfo
 import androidx.room.Ignore
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.TimeFormat
 import com.san.kir.core.utils.bytesToMb
 import com.san.kir.core.utils.format

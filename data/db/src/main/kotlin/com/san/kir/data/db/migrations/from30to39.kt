@@ -1,8 +1,7 @@
 package com.san.kir.data.db.migrations
 
-import com.san.kir.core.support.ChapterFilter
-import com.san.kir.core.support.DownloadState
-import com.san.kir.data.models.base.Chapter
+import com.san.kir.data.models.utils.ChapterFilter
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.models.columns.DownloadColumn
 
 /*

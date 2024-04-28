@@ -9,11 +9,13 @@ object Dimensions {
     val quarter = 4.dp
     val smaller = 6.dp
     val half = 8.dp
+    val middle = 12.dp
     val default = 16.dp
     val bigger = 20.dp
     val big = 24.dp
 
     object Image {
+        val mini = 26.dp
         val small = 36.dp
         val default = 56.dp
         val bigger = 64.dp
@@ -24,6 +26,7 @@ object Dimensions {
 
     object ProgressBar {
         val default = 18.dp
+        val big = 30.dp
         val toolbar = 40.dp
 
         val storage = 60.dp

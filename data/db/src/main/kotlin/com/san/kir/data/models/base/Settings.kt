@@ -6,7 +6,7 @@ import androidx.room.Embedded
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
-import com.san.kir.core.support.ChapterFilter
+import com.san.kir.data.models.utils.ChapterFilter
 
 @Entity(tableName = "settings")
 data class Settings(

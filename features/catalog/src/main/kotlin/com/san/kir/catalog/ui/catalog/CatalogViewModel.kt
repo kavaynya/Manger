@@ -7,6 +7,7 @@ import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
@@ -90,7 +91,7 @@ internal class CatalogViewModel(
 
                         DownloadState.QUEUED,
                         DownloadState.PAUSED,
-                        -> old.copy(updateCatalogs = true, progress = null)
+                                              -> old.copy(updateCatalogs = true, progress = null)
 
                         else -> old
                     }

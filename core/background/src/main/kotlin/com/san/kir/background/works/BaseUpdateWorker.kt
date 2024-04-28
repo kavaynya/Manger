@@ -114,7 +114,10 @@ open class BaseUpdateWorker<T : BaseTask<T>>(
     private suspend fun start() {
         Timber.i("start")
 
-        if (currentJob != null && currentTask != null && currentJob?.isActive == true) return
+        if (currentJob != null
+            && currentTask != null
+            && currentJob?.isActive == true
+            && queue.isNotEmpty()) return
 
         currentJob = scope.launch {
             currentTask = queue.first()

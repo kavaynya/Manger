@@ -2,7 +2,6 @@ package com.san.kir.core.utils
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import com.san.kir.core.support.DIR
 import com.san.kir.core.utils.coroutines.withIoContext
 import java.io.File
 import java.io.FileOutputStream
@@ -23,18 +22,16 @@ fun bytesToMb(value: Long): Double = value.toDouble() / (1024.0 * 1024.0)
 fun folderSize(directory: File): Long {
     var length = 0L
     directory.listFiles()?.forEach { file ->
-        length += if (file.isFile) file.length()
-        else folderSize(file)
+        length += if (file.isFile) file.length() else folderSize(file)
     }
     return length
 }
 
 fun getCountPagesForChapterInMemory(shortPath: String): Int {
-    val listFiles = getFullPath(shortPath)
-        .ifExists?.listFiles { _, s ->
-            checkExtension(s)
-        }
-    return listFiles?.size ?: 0
+    return getFullPath(shortPath)
+        .ifExists
+        ?.listFiles { _, s -> checkExtension(s) }
+        ?.size ?: 0
 }
 
 val File.ifExists: File?

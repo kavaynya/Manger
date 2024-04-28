@@ -33,16 +33,22 @@ dependencies {
     implementation(project(Modules.Features.library))
 
     implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.support))
+    implementation(project(Modules.Core.internet))
     implementation(project(Modules.Core.compose))
     implementation(project(Modules.Core.background))
 
     implementation(project(Modules.Data.db))
 
+    implementation(libs.activity)
     implementation(libs.appcompat)
     implementation(libs.vectordrawable)
 
+    implementation(libs.bundles.decompose)
+    implementation(libs.lifecycle.viewmodel)
+
     //    debugImplementation(libs.bundles.hyper)
+
+    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.bundles.tests)

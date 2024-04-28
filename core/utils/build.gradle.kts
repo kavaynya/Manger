@@ -1,6 +1,7 @@
 plugins {
-    id("compose.library")
+    id("base.library")
     id(Plugins.kotlin)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -8,16 +9,15 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.support))
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.runtime.saveable)
+    implementation(libs.compose.ui)
+    implementation(libs.serialization)
+
+    api(libs.bundles.coroutines)
+    api(libs.decompose)
+    api(libs.decompose.extensions)
 
     implementation(libs.stdlib)
-
-    api(libs.collections.immutable)
-    api(libs.bundles.coroutines)
-    api(libs.bundles.decompose)
-    api(libs.timber)
-
-    implementation(libs.compose.runtime)
-    implementation(libs.compose.ui)
-    implementation(libs.lifecycle.viewmodel)
+    implementation(libs.timber)
 }

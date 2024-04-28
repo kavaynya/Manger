@@ -2,6 +2,8 @@ package com.san.kir.library.logic.repo
 
 import android.content.Context
 import com.san.kir.core.support.MainMenuType
+import android.app.Application
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.data.db.dao.CategoryDao
 import com.san.kir.data.db.dao.ChapterDao
 import com.san.kir.data.db.dao.MainMenuDao
@@ -52,8 +54,7 @@ internal class MainMenuRepository(
     private fun transform(siteCount: Int, transition: Transition): (MainMenuItem) -> MenuItem = {
         when (it.type) {
             MainMenuType.Default,
-            MainMenuType.Library,
-            -> MenuItem(it, transition.libraryCount)
+            MainMenuType.Library -> MenuItem(it, transition.libraryCount)
 
             MainMenuType.Category -> MenuItem(it, transition.categoryCount)
             MainMenuType.Catalogs -> MenuItem(it, "$siteCount")
@@ -62,8 +63,7 @@ internal class MainMenuRepository(
             MainMenuType.Schedule -> MenuItem(it, transition.plannedCount)
             MainMenuType.Settings,
             MainMenuType.Statistic,
-            MainMenuType.Accounts,
-            -> MenuItem(it, "")
+            MainMenuType.Accounts -> MenuItem(it, "")
 
             MainMenuType.Storage -> {
                 MenuItem(

@@ -5,10 +5,9 @@ import androidx.compose.runtime.Stable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.san.kir.core.support.SortLibraryUtil
+import com.san.kir.data.models.utils.SortLibraryUtil
 import kotlinx.parcelize.Parcelize
 
-@Stable
 @Parcelize
 @Entity(tableName = "categories")
 data class Category(

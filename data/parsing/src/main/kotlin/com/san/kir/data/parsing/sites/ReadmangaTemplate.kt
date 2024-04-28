@@ -1,5 +1,7 @@
 package com.san.kir.data.parsing.sites
 
+import android.R
+import com.san.kir.core.internet.AuthorizationException
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.data.models.base.Chapter
 import com.san.kir.data.models.base.Manga
@@ -8,6 +10,7 @@ import com.san.kir.data.parsing.SiteCatalogClassic
 import com.san.kir.data.parsing.Status
 import com.san.kir.data.parsing.Translate
 import com.san.kir.data.parsing.getShortLink
+import io.ktor.client.statement.request
 import io.ktor.http.HttpStatusCode
 import kotlinx.coroutines.flow.flow
 import org.json.JSONArray
@@ -47,6 +50,8 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
     override suspend fun elementByUrl(url: String) = kotlin.runCatching {
         val doc = connectManager.getDocument(url)
 
+        if (checkAuthorization(doc)) throw AuthorizationException()
+
         val name = doc.select("#mangaBox .leftContent span.name").text()
         val shortLink = allCatalogName
             .map { url.split(it) }
@@ -56,13 +61,13 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
         val status = doc.select("#mangaBox .leftContent .expandable .subject-meta p")
 
         val statusEdition = when {
-            status.first()?.text()?.contains(Status.SINGLE, true) == true       ->
+            status.first()?.text()?.contains(Status.SINGLE, true) == true ->
                 Status.SINGLE
 
             status.first()?.text()?.contains(Status.NOT_COMPLETE, true) == true ->
                 Status.NOT_COMPLETE
 
-            else                                                                ->
+            else ->
                 Status.COMPLETE
         }
 
@@ -85,27 +90,36 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
     }.onFailure { Timber.v(it, message = url) }.getOrNull()
 
     override suspend fun fullElement(element: SiteCatalogElement): SiteCatalogElement {
-        val doc = connectManager.getDocument(element.link).select("div.leftContent")
+        val doc = connectManager.getDocument(element.link)
 
+        if (checkAuthorization(doc)) throw AuthorizationException()
+
+        val content = doc.select("div.leftContent")
         var type = "Манга"
-        doc.select(".flex-row .subject-meta .elem_category").forEach {
+        content.select(".flex-row .subject-meta .elem_category").forEach {
             if (categories.contains(it.select("a").text()))
                 type = it.select("a").text()
         }
 
-        val volume = maxOf(doc.select(".chapters-link tr").size - 1, 0)
-        val about = doc.select("meta[itemprop=description]").attr("content")
-        val logo = doc.select(".expandable .subject-cover img").attr("src")
+        val volume = maxOf(content.select(".chapters-link tr").size - 1, 0)
+        val about = content.select("meta[itemprop=description]").attr("content")
+        val logo = content.select(".expandable .subject-cover img").attr("src")
 
-        val authors = doc
+        val authors = content
             .select(".flex-row .elementList .elem_author")
-            .map { it.select(".person-link").text() }.ifEmpty {
-                doc.select(".flex-row .elementList .elem_publisher span").map { it.text() }
+            .map { it.select(".person-link").text() }
+            .ifEmpty {
+                content.select(".flex-row .elementList .elem_publisher span").map { it.text() }
             }
 
-        val genres = doc
-            .select("span.elem_genre")
-            .map { it.select("a.element-link").text() }
+        var genres = emptyList<String>()
+        content.select(".flex-row .subject-meta .elementList")
+            .forEach { elem ->
+                if (elem.text().contains("Жанры")) {
+                    genres = elem.select("a.element-link").map { it.text() }
+                }
+            }
+
 
         return element.copy(
             type = type,
@@ -125,8 +139,8 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
 
         var statusEdition = when {
             elem.select("span.mangaCompleted").text().isNotEmpty() -> Status.COMPLETE
-            elem.select("span.mangaSingle").text().isNotEmpty()    -> Status.SINGLE
-            else                                                   -> Status.NOT_COMPLETE
+            elem.select("span.mangaSingle").text().isNotEmpty() -> Status.SINGLE
+            else -> Status.NOT_COMPLETE
         }
 
         val statusTranslate =
@@ -169,6 +183,8 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
     override fun catalog() = flow {
         var docLocal: Document = connectManager.getDocument(catalog)
 
+        if (checkAuthorization(docLocal)) throw AuthorizationException()
+
         suspend fun isGetNext(): Boolean {
             val next = docLocal.select(".pagination > a.nextLink").attr("href")
             if (next.isNotEmpty()) docLocal = connectManager.getDocument(host + next)
@@ -184,11 +200,14 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
 
     override suspend fun chapters(manga: Manga) =
         connectManager.getDocument(host + manga.shortLink)
-            .select("div.leftContent .chapters-link")
+            .select("#chapters-list")
             .select("tr")
-            .filterNot { it.select("a").text().isEmpty() }
+            .filterNot {
+                val text = it.select("a").text()
+                text.isEmpty() || text.contains("Загрузить обложку")
+            }
             .map {
-                var name = it.select("a").text()
+                var name = it.select(".item-title > a").text()
                 val pat = Pattern.compile("v.+").matcher(name)
                 if (pat.find())
                     name = pat.group()
@@ -196,41 +215,41 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
                     mangaId = manga.id,
                     name = name,
                     date = it.select("td").last()?.text() ?: "",
-                    link = host + it.select("a").attr("href"),
+                    link = host + it.select(".item-title > a").attr("href"),
                     path = "${manga.path}/$name"
                 )
             }
 
     override suspend fun pages(item: Chapter): List<String> {
-        val list = mutableListOf<String>()
+
         val shortLink = getShortLink(item.link)
 
         //        delay(1.seconds)
 
         kotlin.runCatching {
             val doc = connectManager.getDocument("$host$shortLink?mtr=1")
-            val pat = Pattern.compile("rm_h.readerInit\\(.+").matcher(doc.body().html())
-            if (pat.find()) {
-                val data = /*"[" +*/ pat.group()
-                    .replace("rm_h.readerInit(", "[")
-                    .replace(");", "]")
-                // избавляюсь от ненужного и разделяю строку в список и отправляю
-                val json = JSONArray(data).getJSONArray(1)
 
-                repeat(json.length()) { index ->
-                    val jsonArray = json.getJSONArray(index)
-                    val url = jsonArray.getString(0) + jsonArray.getString(2)
-                    list += url
-                }
+            if (checkAuthorization(doc)) throw AuthorizationException()
+            val html = doc.body().html()
+            Timber.v(html)
+
+            var list = tryReaderDoInit(html)
+            if (list.isEmpty()) {
+               list = tryReaderInit(html)
             }
 
             val clearUrls = if (list.isNotEmpty()) {
                 val response = runCatching { connectManager.url(list.first()) }.getOrNull()
-                if (response == null) true
-                else response.status in listOf(
-                    HttpStatusCode.Forbidden,
-                    HttpStatusCode.MultipleChoices
-                )
+                Timber.w("$response")
+
+                if (response != null && !response.request.url.host.contains("wikimedia", true)) {
+                    response.status in listOf(
+                        HttpStatusCode.Forbidden,
+                        HttpStatusCode.MultipleChoices
+                    )
+                } else {
+                    true
+                }
             } else false
 
             return list.map {
@@ -239,5 +258,41 @@ abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
             }
         }.onFailure(Timber.Forest::e)
         return emptyList()
+    }
+
+    open fun checkAuthorization(document: Document) = false
+
+    private fun tryReaderDoInit(html: String): List<String> {
+        val list = mutableListOf<String>()
+        val pat = Pattern.compile("rm_h.readerDoInit\\(.+").matcher(html)
+        if (pat.find()) {
+            val group = pat.group()
+            val data = group.replace("rm_h.readerDoInit(", "")
+            val json = JSONArray(data)
+            Timber.v("json: $json")
+            repeat(json.length()) { index ->
+                val jsonArray = json.getJSONArray(index)
+                val url = jsonArray.getString(0) + jsonArray.getString(2)
+                list.add(url)
+            }
+        }
+        return list
+    }
+
+    private fun tryReaderInit(html: String): List<String> {
+        val list = mutableListOf<String>()
+        val pat = Pattern.compile("rm_h.readerInit\\(.+").matcher(html)
+        if (pat.find()) {
+            val group = pat.group()
+            val data = group.replace("rm_h.readerInit(", "[").replace(");", "]")
+            val json = JSONArray(data).getJSONArray(1)
+            Timber.v("json: $json")
+            repeat(json.length()) { index ->
+                val jsonArray = json.getJSONArray(index)
+                val url = jsonArray.getString(0) + jsonArray.getString(2)
+                list.add(url)
+            }
+        }
+        return list
     }
 }

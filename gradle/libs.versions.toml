@@ -1,36 +1,34 @@
 [versions]
 # Kotlin
-kotlin = "1.8.10"
-coroutines = "1.6.4"
-ksp = "1.8.0-1.0.8"
-serialization = "1.5.0"
-collections_immutable = "0.3.5"
+kotlin = "1.9.20"
+coroutines = "1.7.1"
+ksp = "1.9.20-1.0.14"
+serialization = "1.6.3"
+datetime = "0.6.0-RC.2"
 
 # decompose
-decompose = "2.0.0-alpha-02"
+decompose = "2.2.2"
 
 # AndroidX
-activity = "1.7.1"
+activity = "1.8.2"
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
-core = "1.10.0"
+core = "1.12.0"
 datastore = "1.0.0"
-fragment = "1.5.7"
-lifecycle = "2.6.1"
-paging = "3.1.1"
-room = "2.5.1"
+fragment = "1.6.2"
+lifecycle = "2.7.0"
+paging = "3.2.1"
+room = "2.6.1"
 vectordrawable = "1.2.0-beta01"
-workmanager = "2.8.1"
+workmanager = "2.9.0"
 
 # Compose
-compose_bom = "2023.03.00"
-compose = "1.2.1"
-material3 = "1.1.0-beta01"
-compose_compiler = "1.4.4" # Don`t forget change field in Version.kt in buildSrc
-compose_paging = "1.0.0-alpha18"
+compose = "1.6.3"
+material3 = "1.2.1"
+compose_compiler = "1.5.10" # Don`t forget change field in Version.kt in buildSrc
 
 # Google
-material = "1.9.0"
+material = "1.11.0"
 accompanist = "0.30.0"
 
 # Test
@@ -40,20 +38,19 @@ test_rules = "1.5.0"
 test_junit = "1.1.5"
 test_runner = "1.5.2"
 truth = "1.0.1"
-benchmark_junit = "1.1.1"
+benchmark_junit = "1.2.3"
 kakaocup = "0.0.2"
 espresso = "3.5.1"
 
 #
-gradle = "7.4.2" # Don`t forget update in buildSrc
+gradle = "8.3.1" # Don`t forget update in buildSrc
 
 hyperion = "0.9.31"
 subsampling = "3.10.0"
 timber = "5.0.1"
 
 # For Internet
-jsoup = "1.15.4"
-gson = "2.10"
+jsoup = "1.15.2"
 okio = "3.2.0"
 okhttp = "4.10.0"
 ktor = "2.1.1"
@@ -72,7 +69,7 @@ stdlib = { module = "org.jetbrains.kotlin:kotlin-stdlib-jdk8", version.ref = "ko
 coroutines_core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", version.ref = "coroutines" }
 coroutines_android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
-collections_immutable = { module = "org.jetbrains.kotlinx:kotlinx-collections-immutable", version.ref = "collections_immutable" }
+datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
 
 # decompose
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
@@ -89,7 +86,6 @@ lifecycle_viewmodel = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", v
 lifecycle_runtime = { module = "androidx.lifecycle:lifecycle-runtime-ktx", version.ref = "lifecycle" }
 lifecycle_livedata = { module = "androidx.lifecycle:lifecycle-livedata-ktx", version.ref = "lifecycle" }
 lifecycle_common = { module = "androidx.lifecycle:lifecycle-common-java8", version.ref = "lifecycle" }
-lifecycle_service = { module = "androidx.lifecycle:lifecycle-service", version.ref = "lifecycle" }
 
 # Work Manager
 work_runtime = { module = "androidx.work:work-runtime-ktx", version.ref = "workmanager" }
@@ -119,7 +115,6 @@ datastore = { module = "androidx.datastore:datastore-preferences", version.ref =
 
 # For Internet
 jsoup = { module = "org.jsoup:jsoup", version.ref = "jsoup" }
-gson = { module = "com.google.code.gson:gson", version.ref = "gson" }
 okio = { module = "com.squareup.okio:okio", version.ref = "okio" }
 okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
 okhttp_loging = { module = "com.squareup.okhttp3:logging-interceptor", version.ref = "okhttp" }
@@ -132,18 +127,16 @@ ktor_content = { module = "io.ktor:ktor-client-content-negotiation", version.ref
 ktor_json = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
 
 # Compose
-compose_bom = { group = "androidx.compose", name = "compose-bom", version.ref = "compose_bom" }
-compose_ui = { group = "androidx.compose.ui", name = "ui" }
-compose_ui_tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
-compose_ui_tooling_preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
-compose_runtime = { group = "androidx.compose.runtime", name = "runtime" }
-compose_animation = { group = "androidx.compose.animation", name = "animation" }
-compose_foundation = { group = "androidx.compose.foundation", name = "foundation" }
-compose_foundation_layout = { group = "androidx.compose.foundation", name = "foundation-layout" }
-compose_material = { group = "androidx.compose.material", name = "material" }
-compose_material_icons = { group = "androidx.compose.material", name = "material-icons-core" }
-compose_material_icons_ext = { group = "androidx.compose.material", name = "material-icons-extended" }
-compose_paging = { module = "androidx.paging:paging-compose", version.ref = "compose_paging" }
+compose_ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }
+compose_ui_tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "compose" }
+compose_ui_tooling_preview = { group = "androidx.compose.ui", name = "ui-tooling-preview", version.ref = "compose" }
+compose_runtime = { group = "androidx.compose.runtime", name = "runtime", version.ref = "compose" }
+compose_runtime_saveable = { group = "androidx.compose.runtime", name = "runtime-saveable", version.ref = "compose" }
+compose_animation = { group = "androidx.compose.animation", name = "animation", version.ref = "compose" }
+compose_foundation = { group = "androidx.compose.foundation", name = "foundation", version.ref = "compose" }
+compose_foundation_layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "compose" }
+compose_material_icons = { group = "androidx.compose.material", name = "material-icons-core", version.ref = "compose" }
+compose_material_icons_ext = { group = "androidx.compose.material", name = "material-icons-extended", version.ref = "compose" }
 compose_material3 = { module = "androidx.compose.material3:material3", version.ref = "material3" }
 
 hyperion-core = { module = "com.willowtreeapps.hyperion:hyperion-core", version.ref = "hyperion" }
@@ -165,8 +158,8 @@ espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "esp
 [bundles]
 coroutines = ["coroutines_core", "coroutines_android"]
 room = ["room_ktx", "room_paging"]
-compose = ["compose_ui", "compose_ui_tooling", "compose_ui_tooling_preview", "compose_runtime", "compose_animation", "compose_foundation", "compose_foundation_layout", "compose_material", "compose_material_icons", "compose_material_icons_ext", "compose_material3"]
-accompanist = ["flowlayout", "permissions", "systemuicontroller", "webview"]
+compose = ["compose_ui", "compose_ui_tooling", "compose_ui_tooling_preview", "compose_runtime", "compose_animation", "compose_foundation", "compose_foundation_layout", "compose_material_icons", "compose_material_icons_ext", "compose_material3"]
+accompanist = ["flowlayout", "pager", "pager_indicators", "permissions", "systemuicontroller", "navigation_animation", "webview"]
 work = ["work_runtime", "work_gcm", "work_multiprocess"]
 hyper = ["hyperion-core", "hyperion-crash"]
 tests = ["test_core", "test_rules", "test_junit", "test_runner", "compose_junit", "kakaocup", "espresso"]
@@ -175,6 +168,7 @@ decompose = ["decompose", "decompose-extensions"]
 
 [plugins]
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
+kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
 
 parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 

@@ -1,6 +1,6 @@
 package com.san.kir.chapters.logic.repo
 
-import com.san.kir.core.support.ChapterFilter
+import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.db.dao.SettingsDao
 import com.san.kir.data.db.repositories.AbstractSettingsRepository
@@ -16,7 +16,7 @@ class SettingsRepository(
     val showTitle = settings().map { it.chapters.isTitle }
     val isIndividual = settings().map { it.chapters.isIndividual }
 
-    suspend fun update(newFilter: ChapterFilter) = withIoContext {
+    suspend fun update(newFilter: com.san.kir.data.models.utils.ChapterFilter) = withIoContext {
         settingsDao.update(
             currentSettings().copy(chapters = currentChapters().copy(filterStatus = newFilter))
         )

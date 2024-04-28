@@ -12,7 +12,6 @@ dependencies {
     implementation(project(Modules.Data.models))
     implementation(project(Modules.Data.db))
     implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.support))
     implementation(project(Modules.Core.internet))
 
     implementation(project(Modules.Features.catalog))
@@ -26,6 +25,6 @@ dependencies {
     implementation(libs.lifecycle.runtime)
     implementation(libs.lifecycle.common)
 
-    implementation(libs.gson)
+    implementation(libs.timber)
     implementation(libs.datastore)
 }

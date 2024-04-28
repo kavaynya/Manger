@@ -48,8 +48,8 @@ import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
-import com.san.kir.core.support.ChapterFilter
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.ChapterFilter
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.models.extend.countPages
 import kotlinx.collections.immutable.ImmutableList
@@ -57,7 +57,7 @@ import kotlinx.collections.immutable.ImmutableList
 // Страница со списком и инструментами для манипуляции с ним
 @Composable
 internal fun ListPageContent(
-    chapterFilter: ChapterFilter,
+    chapterFilter: com.san.kir.data.models.utils.ChapterFilter,
     selectionMode: Boolean,
     items: ImmutableList<SelectableItem>,
     navigateToViewer: (Long) -> Unit,
@@ -97,7 +97,7 @@ internal fun ListPageContent(
 // Нижний бар управления сортировкой и фильтрацией списка
 @Composable
 private fun BottomOrderBar(
-    currentFilter: ChapterFilter,
+    currentFilter: com.san.kir.data.models.utils.ChapterFilter,
     sendEvent: (Filter) -> Unit,
 ) {
     val allColor = animatedColor(currentFilter.isAll)
@@ -169,8 +169,10 @@ private fun BottomOrderBar(
 private fun animatedColor(state: Boolean): Color {
     val defaultIconColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
     val selectedIconColor = Color(0xff36a0da)
-    return animateColorAsState(targetValue = if (state) selectedIconColor else defaultIconColor)
-        .value
+    return animateColorAsState(
+        targetValue = if (state) selectedIconColor else defaultIconColor,
+        label = ""
+    ).value
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -255,7 +257,7 @@ private fun LazyItemScope.ItemContent(
 
 @Composable
 private fun StatusText(
-    state: DownloadState,
+    state: com.san.kir.data.models.utils.DownloadState,
     downloadProgress: Int,
     progress: Int,
     size: Int,
@@ -264,20 +266,20 @@ private fun StatusText(
     FromBottomToBottomAnimContent(targetState = state) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             when (it) {
-                DownloadState.LOADING -> {
+                com.san.kir.data.models.utils.DownloadState.LOADING -> {
                     LoadingIndicator()
                     LoadingText(downloadProgress)
                 }
 
-                DownloadState.QUEUED -> {
+                com.san.kir.data.models.utils.DownloadState.QUEUED -> {
                     LoadingIndicator()
                     WaitingText()
                 }
 
-                DownloadState.ERROR,
-                DownloadState.PAUSED,
-                DownloadState.COMPLETED,
-                DownloadState.UNKNOWN,
+                com.san.kir.data.models.utils.DownloadState.ERROR,
+                com.san.kir.data.models.utils.DownloadState.PAUSED,
+                com.san.kir.data.models.utils.DownloadState.COMPLETED,
+                com.san.kir.data.models.utils.DownloadState.UNKNOWN,
                 -> {
                     Text(
                         stringResource(

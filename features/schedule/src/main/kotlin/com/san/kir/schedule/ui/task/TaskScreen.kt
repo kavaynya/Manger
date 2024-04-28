@@ -42,6 +42,9 @@ import com.san.kir.core.support.PlannedPeriod
 import com.san.kir.core.support.PlannedType
 import com.san.kir.core.support.PlannedWeek
 import com.san.kir.core.utils.viewModel.stateHolder
+import com.san.kir.data.models.utils.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedType
+import com.san.kir.data.models.utils.PlannedWeek
 import com.san.kir.schedule.R
 import kotlinx.collections.immutable.ImmutableList
 import kotlinx.collections.immutable.toImmutableList

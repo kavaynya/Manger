@@ -30,7 +30,7 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
-class ConnectManager(context: Context) {
+class ConnectManager(context: Application) {
     private val defaultCacheDirectory = File(context.cacheDir, "http_cache")
 
     private val defaultCache = Cache(
@@ -84,6 +84,7 @@ class ConnectManager(context: Context) {
                     ?.let { defaultClient.submitForm(url.prepare(), it) }
                     ?: defaultClient.get(url.prepare())
 
+            Timber.d("url $url\nresponce -> ${response.status}")
             when (response.status) {
                 HttpStatusCode.TooManyRequests -> {
                     val toMultimap = response.headers
@@ -94,6 +95,10 @@ class ConnectManager(context: Context) {
                     } else {
                         delay(10.seconds)
                     }
+                }
+
+                HttpStatusCode.NotFound -> {
+                    throw PageNotFoundException()
                 }
 
                 else -> {
@@ -118,10 +123,11 @@ class ConnectManager(context: Context) {
 
     suspend fun downloadBitmap(
         url: String,
+        headers: StringValues? = null,
         onProgress: (percent: Float) -> Unit = {},
     ): Result<BitmapResult> = kotlin.runCatching {
         withIoContext {
-            val (source, length, time) = download(url, onProgress)
+            val (source, length, time) = download(url, headers, onProgress)
             BitmapResult(
                 bitmap = BitmapFactory.decodeByteArray(source, 0, source.size),
                 size = length,
@@ -133,10 +139,11 @@ class ConnectManager(context: Context) {
     suspend fun downloadFile(
         file: File,
         url: String,
+        headers: StringValues? = null,
         onProgress: suspend ((percent: Float) -> Unit) = {},
     ): Result<DownloadResult> = withIoContext {
         runCatching {
-            val result = download(url, onProgress)
+            val result = download(url, headers, onProgress)
             file.delete()
             file.parentFile?.mkdirs()
             file.createNewFile()
@@ -160,6 +167,7 @@ class ConnectManager(context: Context) {
 
     private suspend fun download(
         url: String,
+        headers: StringValues? = null,
         onProgress: suspend ((percent: Float) -> Unit) = {},
     ): DownloadResult {
         val startTime = System.currentTimeMillis()
@@ -167,6 +175,7 @@ class ConnectManager(context: Context) {
 
         val source: ByteArray =
             defaultClient.get(url.prepare()) {
+                headers { headers?.let(::appendAll) }
                 onDownload { bytesSentTotal, contentLength ->
                     onProgress(bytesSentTotal.toFloat() / contentLength)
                 }

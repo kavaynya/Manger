@@ -5,7 +5,7 @@ import androidx.compose.runtime.Stable
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.san.kir.core.support.ChapterFilter
+import com.san.kir.data.models.utils.ChapterFilter
 import kotlinx.parcelize.Parcelize
 
 @Stable

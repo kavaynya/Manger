@@ -20,6 +20,7 @@ dependencies {
     api(libs.bundles.ktor)
 
     implementation(libs.compose.runtime)
+    implementation(libs.timber)
 
 //        testImplementation(JUNIT)
 //        androidTestImplementation(TEST_CORE)

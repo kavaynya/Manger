@@ -14,7 +14,7 @@ import com.san.kir.background.logic.di.catalogWorkerRepository
 import com.san.kir.background.logic.repo.CatalogRepository
 import com.san.kir.background.logic.repo.CatalogWorkerRepository
 import com.san.kir.background.util.cancelAction
-import com.san.kir.core.support.DownloadState
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.models.base.CatalogTask

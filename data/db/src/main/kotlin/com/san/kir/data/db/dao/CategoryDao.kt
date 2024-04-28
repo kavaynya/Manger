@@ -3,7 +3,7 @@ package com.san.kir.data.db.dao
 import android.content.Context
 import androidx.room.Dao
 import androidx.room.Query
-import com.san.kir.core.support.CATEGORY_ALL
+import com.san.kir.data.models.utils.CATEGORY_ALL
 import com.san.kir.data.models.base.Category
 import com.san.kir.data.models.extend.NameAndId
 import kotlinx.coroutines.flow.Flow

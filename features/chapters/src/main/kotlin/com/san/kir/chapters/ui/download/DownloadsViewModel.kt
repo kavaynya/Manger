@@ -15,6 +15,9 @@ import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.ScreenEvent
 import com.san.kir.core.utils.viewModel.ViewModel
+import com.san.kir.data.models.utils.DownloadState
+import com.san.kir.core.utils.viewModel.BaseViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.combine
 

@@ -17,7 +17,6 @@ android {
 dependencies {
     implementation(project(Modules.Features.shikimori))
     implementation(project(Modules.Data.db))
-    implementation(project(Modules.Core.support))
     implementation(project(Modules.Core.utils))
 
     implementation(libs.core)

@@ -9,6 +9,7 @@ import com.san.kir.chapters.logic.di.latestRepository
 import com.san.kir.chapters.logic.repo.LatestRepository
 import com.san.kir.core.support.ChapterStatus
 import com.san.kir.core.utils.ManualDI
+import com.san.kir.data.models.utils.ChapterStatus
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.viewModel.ScreenEvent

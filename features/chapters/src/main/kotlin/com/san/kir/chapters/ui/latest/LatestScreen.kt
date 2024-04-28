@@ -38,7 +38,7 @@ import com.san.kir.chapters.utils.onClickItem
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
-import com.san.kir.core.compose.SmallerSpacer
+import com.san.kir.core.compose.QuarterSpacer
 import com.san.kir.core.compose.TopBarActions
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
@@ -47,6 +47,7 @@ import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.viewModel.stateHolder
+import com.san.kir.data.models.utils.DownloadState
 
 @Composable
 internal fun LatestScreen(

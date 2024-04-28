@@ -1,9 +1,9 @@
 package com.san.kir.schedule.ui.task
 
 import androidx.compose.runtime.Stable
-import com.san.kir.core.support.PlannedPeriod
-import com.san.kir.core.support.PlannedType
-import com.san.kir.core.support.PlannedWeek
+import com.san.kir.data.models.utils.PlannedPeriod
+import com.san.kir.data.models.utils.PlannedType
+import com.san.kir.data.models.utils.PlannedWeek
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.base.PlannedTask
 import kotlinx.collections.immutable.ImmutableList
@@ -23,9 +23,9 @@ internal data class TaskState(
     val availableAction: AvailableAction = AvailableAction.None,
 ) : ScreenState {
     companion object {
-        val weeks = persistentListOf(*PlannedWeek.values())
-        val periods = persistentListOf(*PlannedPeriod.values())
-        val types = persistentListOf(*PlannedType.values())
+        val weeks = persistentListOf(*com.san.kir.data.models.utils.PlannedWeek.values())
+        val periods = persistentListOf(*com.san.kir.data.models.utils.PlannedPeriod.values())
+        val types = persistentListOf(*com.san.kir.data.models.utils.PlannedType.values())
     }
 }
 

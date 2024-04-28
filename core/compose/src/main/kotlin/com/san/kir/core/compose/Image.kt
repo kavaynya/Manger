@@ -21,6 +21,7 @@ import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.Dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
 import com.san.kir.core.internet.connectManager
@@ -30,7 +31,7 @@ import timber.log.Timber
 import java.io.File
 
 @Composable
-fun ImageWithStatus(url: String?) {
+fun ImageWithStatus(url: String?, modifier: Modifier = Modifier) {
     var statusLogo by remember { mutableStateOf(StatusLogo.Init) }
     var logo by remember { mutableStateOf(ImageBitmap(60, 60)) }
 
@@ -38,22 +39,24 @@ fun ImageWithStatus(url: String?) {
         DialogText(
             text = stringResource(
                 id = when (statusLogo) {
-                    StatusLogo.Init     -> R.string.manga_info_dialog_loading
-                    StatusLogo.Error    -> R.string.manga_info_dialog_loading_failed
-                    StatusLogo.None     -> R.string.manga_info_dialog_not_image
+                    StatusLogo.Init -> R.string.manga_info_dialog_loading
+                    StatusLogo.Error -> R.string.manga_info_dialog_loading_failed
+                    StatusLogo.None -> R.string.manga_info_dialog_not_image
                     StatusLogo.Complete -> R.string.manga_info_dialog_loading
                 }
             )
         )
     }
-    AnimatedVisibility(statusLogo == StatusLogo.Complete) {
+    BottomAnimatedVisibility(statusLogo == StatusLogo.Complete, modifier = modifier) {
         Image(logo, null, modifier = Modifier.fillMaxWidth())
     }
 
     LaunchedEffect(url) {
+        Timber.w("LaunchedEffect -> ImageWithStatus($url)")
         if (!url.isNullOrEmpty()) {
             statusLogo = StatusLogo.Init
-            ManualDI.connectManager.downloadBitmap(url)
+            ManualDI.connectManager()
+                .downloadBitmap(url)
                 .onSuccess { (bitmap, _, _) ->
                     logo = bitmap.asImageBitmap()
                     statusLogo = StatusLogo.Complete
@@ -71,6 +74,7 @@ fun rememberImage(url: String?): BitmapPainter {
     var logo by remember { mutableStateOf(BitmapPainter(ImageBitmap(2, 2))) }
 
     LaunchedEffect(url) {
+        Timber.w("LaunchedEffect -> rememberImage($url) logo($logo)")
         withDefaultContext {
             if (url != null && url.isNotEmpty()) {
                 val name = ManualDI.connectManager.nameFromUrl2(url)
@@ -80,8 +84,7 @@ fun rememberImage(url: String?): BitmapPainter {
                 Timber.v("remember image with path ${icon.path}")
 
                 kotlin.runCatching {
-                    logo =
-                        BitmapPainter(BitmapFactory.decodeFile(icon.path).asImageBitmap())
+                    logo = BitmapPainter(BitmapFactory.decodeFile(icon.path).asImageBitmap())
                     return@withDefaultContext
                 }
 
@@ -105,14 +108,18 @@ enum class StatusLogo {
 }
 
 @Composable
-fun CircleLogo(logoUrl: String) {
+fun CircleLogo(
+    logoUrl: String,
+    modifier: Modifier = Modifier,
+    size: Dp = Dimensions.Image.bigger
+) {
     Image(
         rememberImage(logoUrl),
         contentDescription = "",
-        modifier = Modifier
+        modifier = modifier
             .padding(Dimensions.smallest)
             .clip(CircleShape)
-            .size(Dimensions.Image.bigger),
+            .size(size),
         contentScale = ContentScale.Crop
     )
 }

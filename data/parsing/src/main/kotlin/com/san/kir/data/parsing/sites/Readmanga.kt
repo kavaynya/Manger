@@ -11,4 +11,7 @@ class Readmanga(connectManager: ConnectManager) : ReadmangaTemplate(connectManag
     override var volume = 0
     override val allCatalogName: List<String>
         get() = super.allCatalogName + "readmanga.me" + "readmanga.io"
+
+    override val servers: List<String>
+        get() = listOf("rmr.rocks")
 }

@@ -12,4 +12,8 @@ dependencies {
     implementation(project(Modules.Core.compose))
     implementation(project(Modules.Core.internet))
     implementation(project(Modules.Data.parsing))
+
+    implementation(libs.lifecycle.viewmodel)
+
+    implementation(libs.timber)
 }

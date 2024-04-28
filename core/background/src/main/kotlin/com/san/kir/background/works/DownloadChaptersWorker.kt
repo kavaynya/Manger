@@ -57,7 +57,7 @@ class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
             chapterRepository,
             connectManager,
             if (settingsRepository.currentDownload().concurrent) 4 else 1,
-            checkNetwork = ::awaitNetwork
+            checkNetwork = ::awaitNetwork,
         ) { chapter ->
             updateCurrentTask {
                 copy(

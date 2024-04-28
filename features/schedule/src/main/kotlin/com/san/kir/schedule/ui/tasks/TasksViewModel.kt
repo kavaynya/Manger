@@ -47,10 +47,10 @@ internal class TasksViewModel(
         }
 
     private fun itemName(item: SimplifiedTask) = when (item.type) {
-        PlannedType.MANGA -> context.getString(R.string.planned_task_name_manga, item.manga)
-        PlannedType.GROUP -> context.getString(R.string.planned_task_name_group, item.groupName)
-        PlannedType.CATALOG -> context.getString(R.string.planned_task_name_catalog, item.catalog)
-        PlannedType.APP -> context.getString(R.string.planned_task_name_app)
+        PlannedType.MANGA    -> context.getString(R.string.planned_task_name_manga, item.manga)
+        PlannedType.GROUP    -> context.getString(R.string.planned_task_name_group, item.groupName)
+        PlannedType.CATALOG  -> context.getString(R.string.planned_task_name_catalog, item.catalog)
+        PlannedType.APP      -> context.getString(R.string.planned_task_name_app)
         PlannedType.CATEGORY -> context.getString(
             R.string.planned_task_name_category,
             item.category

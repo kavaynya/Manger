@@ -11,6 +11,7 @@ import com.san.kir.core.utils.convertImagesToPng
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isOkPng
 import com.san.kir.data.models.base.preparedPath
+import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.features.viewer.logic.SettingsRepository
 import com.san.kir.features.viewer.logic.di.settingsRepository
 import com.san.kir.features.viewer.utils.LoadState
@@ -92,6 +93,9 @@ internal class LoadImageViewModel(
                     connectManager
                         .downloadBitmap(
                             connectManager.prepareUrl(page.pagelink),
+                            runCatching { siteCatalogsManager.catalog(page.pagelink) }
+                                .onFailure(Timber.Forest::e)
+                                .getOrNull()?.headers,
                             onProgress = { progress ->
                                 _state.update { LoadState.Load(progress) }
                             }
@@ -110,7 +114,11 @@ internal class LoadImageViewModel(
             // Загрузка файла с сохранением в памяти смартфона
             file = File(fullPath, name)
             connectManager.downloadFile(
-                file, connectManager.prepareUrl(page.pagelink),
+                file,
+                connectManager.prepareUrl(page.pagelink),
+                runCatching { siteCatalogsManager.catalog(page.pagelink) }
+                    .onFailure(Timber.Forest::e)
+                    .getOrNull()?.headers,
                 onProgress = { progress ->
                     _state.update { LoadState.Load(progress) }
                 }

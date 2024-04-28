@@ -1,6 +1,9 @@
 package com.san.kir.data.parsing.sites
 
 import com.san.kir.core.internet.ConnectManager
+import com.san.kir.data.parsing.LoginAvatar
+import com.san.kir.data.parsing.SiteConstants
+import org.jsoup.nodes.Document
 
 class Allhentai(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
     override val name = SITE_NAME
@@ -18,9 +21,24 @@ class Allhentai(connectManager: ConnectManager) : ReadmangaTemplate(connectManag
         "Порно манхва"
     )
 
-    companion object {
-        const val SITE_NAME = "All Hentai"
-        const val HOST_NAME = "2023.allhen.online"
-        const val AUTH_URL = "$HOST_NAME/internal/auth"
+    override fun checkAuthorization(document: Document): Boolean {
+        val text = document.select(".container .auth-page .alert").text()
+        return "нужно авторизоваться!" in text
+    }
+
+    companion object : SiteConstants {
+        override val SITE_NAME = "All Hentai"
+        override val HOST_NAME = "2023.allhen.online"
+        override val AUTH_URL = "$HOST_NAME/internal/auth"
+
+        override suspend fun User(connectManager: ConnectManager): LoginAvatar? {
+            val document = connectManager.getDocument(HOST_NAME)
+            val doc = document.select(".account-menu")
+            val name = doc.select("#accountMenu span.strong").first()?.text() ?: return null
+            return LoginAvatar(
+                login = name,
+                avatar = document.select(".user-profile-settings-link img").attr("src")
+            )
+        }
     }
 }

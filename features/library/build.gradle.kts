@@ -9,7 +9,6 @@ android {
 dependencies {
     implementation(project(Modules.Core.compose))
     implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.support))
     implementation(project(Modules.Core.background))
     implementation(project(Modules.Data.db))
     implementation(project(Modules.Data.parsing))
@@ -22,4 +21,8 @@ dependencies {
     implementation(project(Modules.Features.settings))
     implementation(project(Modules.Features.schedule))
     implementation(project(Modules.Features.accounts))
+
+    implementation(libs.timber)
+
+    implementation(libs.lifecycle.livedata)
 }

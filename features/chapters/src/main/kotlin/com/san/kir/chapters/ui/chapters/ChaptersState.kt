@@ -1,7 +1,7 @@
 package com.san.kir.chapters.ui.chapters
 
 import androidx.compose.runtime.Stable
-import com.san.kir.core.support.ChapterFilter
+import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.base.Manga
 import com.san.kir.data.models.extend.SimplifiedChapter
@@ -17,7 +17,7 @@ internal data class ChaptersState(
     val backgroundAction: Boolean = false,
     val showTitle: Boolean = true,
     val nextChapter: NextChapter = NextChapter.None,
-    val chapterFilter: ChapterFilter = ChapterFilter.ALL_READ_ASC,
+    val chapterFilter: com.san.kir.data.models.utils.ChapterFilter = com.san.kir.data.models.utils.ChapterFilter.ALL_READ_ASC,
     val selectionCount: Int = items.count { it.selected },
     val selectionMode: Boolean = selectionCount > 0,
     val count: Int = items.count(),
@@ -36,7 +36,7 @@ internal data class SelectableItem(val chapter: SimplifiedChapter, val selected:
 
 internal class SelectableItemComparator : Comparator<SelectableItem> {
     override fun compare(o1: SelectableItem, o2: SelectableItem): Int {
-        return compareChapterNames(o1.chapter.name, o2.chapter.name)
+        return com.san.kir.data.models.utils.compareChapterNames(o1.chapter.name, o2.chapter.name)
     }
 }
 

@@ -1,5 +1,6 @@
 plugins {
     id("compose.library")
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -10,12 +11,10 @@ dependencies {
     implementation(project(Modules.Core.utils))
     implementation(project(Modules.Core.internet))
 
-    implementation(platform(libs.compose.bom))
-
     api(libs.bundles.compose)
     api(libs.bundles.accompanist)
-    api(libs.collections.immutable)
 
-    api(libs.core)
-    api(libs.activity)
+    implementation(libs.serialization)
+    implementation(libs.core)
+    implementation(libs.timber)
 }
