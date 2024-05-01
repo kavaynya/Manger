@@ -1,7 +1,7 @@
 package com.san.kir.core.compose
 
+import androidx.compose.foundation.gestures.awaitEachGesture
 import androidx.compose.foundation.gestures.awaitFirstDown
-import androidx.compose.foundation.gestures.forEachGesture
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.layout.LayoutModifier
@@ -33,17 +33,14 @@ class SquareMaxSizeModifier : LayoutModifier {
 
 fun Modifier.holdPress(onDown: () -> Unit, onUp: () -> Unit) =
     pointerInput(Unit) {
-        forEachGesture {
-            awaitPointerEventScope {
-                awaitFirstDown()
+        awaitEachGesture {
+            awaitFirstDown()
+            onDown()
 
-                onDown()
+            do {
+                val event = awaitPointerEvent()
+            } while (event.changes.any { it.pressed })
 
-                do {
-                    val event = awaitPointerEvent()
-                } while (event.changes.any { it.pressed })
-
-                onUp()
-            }
+            onUp()
         }
     }

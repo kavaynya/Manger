@@ -47,7 +47,7 @@ class Acomics(private val connectManager: ConnectManager) : SiteCatalogAlternati
             i++
         }
 
-        Timber.v("Acomics volume = ${volume}")
+        Timber.v("Acomics volume = $volume")
         return this
     }
 

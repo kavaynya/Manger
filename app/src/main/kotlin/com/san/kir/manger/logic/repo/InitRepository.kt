@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.core.content.edit
 import com.san.kir.background.works.ScheduleWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.dao.PlannedDao
+import com.san.kir.data.db.main.dao.PlannedDao
 import kotlinx.coroutines.flow.first
 
 class InitRepository(

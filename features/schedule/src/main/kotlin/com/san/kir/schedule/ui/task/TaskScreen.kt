@@ -7,11 +7,11 @@ import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Save
@@ -46,9 +46,9 @@ import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.data.models.utils.PlannedWeek
 import com.san.kir.schedule.R
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
-import kotlinx.collections.immutable.toPersistentList
+
+
+
 import java.util.Locale
 
 @Composable
@@ -59,9 +59,9 @@ internal fun TaskScreen(
     val holder: TaskStateHolder = stateHolder { TaskViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(TaskEvent.Set(itemId)) }
+    LaunchedEffect(Unit) { holder.sendAction(TaskEvent.Set(itemId)) }
 
-    val sendEvent = remember { { event: TaskEvent -> holder.sendEvent(event) } }
+    val sendEvent = remember { { event: TaskEvent -> holder.sendAction(event) } }
 
     ScreenContent(
         topBar = topBar(
@@ -151,7 +151,7 @@ private fun TypeConfig(state: TaskState, sendEvent: (ChangeType) -> Unit) {
                     items = state.groupNames
                 ) { dismiss ->
                     MultiChoiceList(
-                        items = state.item.mangas.toPersistentList(),
+                        items = state.item.mangas,
                         textList = state.mangaNames,
                         stateList = state.mangaIds,
                         onDismiss = dismiss,
@@ -274,7 +274,7 @@ private fun TypedItemList(
     value: String,
     onValueChange: (String) -> Unit,
     label2: Int,
-    items: ImmutableList<String>,
+    items: List<String>,
     dialogContent: @Composable (dismiss: () -> Unit) -> Unit,
 ) {
     var dialog by remember { mutableStateOf(false) }

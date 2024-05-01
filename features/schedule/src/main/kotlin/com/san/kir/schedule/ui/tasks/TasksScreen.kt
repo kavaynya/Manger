@@ -19,7 +19,7 @@ internal fun TasksScreen(
     val holder: TasksStateHolder = stateHolder { TasksViewModel() }
     val state by holder.state.collectAsState()
 
-    val sendEvent = rememberLambda { event: TasksEvent -> holder.sendEvent(event) }
+    val sendEvent = rememberLambda { event: TasksEvent -> holder.sendAction(event) }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

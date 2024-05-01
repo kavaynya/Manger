@@ -3,7 +3,7 @@ package com.san.kir.features.catalogs.allhen.ui.allhen
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.internet.connectManager
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.parsing.sites.Allhentai
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,7 +17,7 @@ internal class AllhenItemViewModel(
     override val tempState = loginState.map { AllhenItemState(it) }
     override val defaultState = AllhenItemState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             AllhenItemEvent.Update -> update()
         }

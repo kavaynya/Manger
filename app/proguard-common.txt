@@ -95,7 +95,6 @@
 -keep class **$$InjectAdapter
 -keep class **$$StaticInjection
 
--keepnames class dagger.Lazy
 -keepnames class io.getstream.**
 
 -keep class com.google.common.** { *; }

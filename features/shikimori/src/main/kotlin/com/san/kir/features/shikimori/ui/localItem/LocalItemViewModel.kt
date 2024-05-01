@@ -4,7 +4,7 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.flow.Result
 import com.san.kir.core.utils.flow.asResult
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.ShikiDbManga
 import com.san.kir.data.models.extend.SimplifiedMangaWithChapterCounts
@@ -65,7 +65,7 @@ internal class LocalItemViewModel(
 
     override val defaultState = LocalItemState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is LocalItemEvent.Update -> setId(event.mangaId)
             is LocalItemEvent.Sync -> onSyncEvent(event.event)

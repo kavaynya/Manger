@@ -3,9 +3,9 @@ package com.san.kir.schedule.ui.task
 import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.data.models.utils.PlannedWeek
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 
-internal sealed interface TaskEvent : ScreenEvent {
+internal sealed interface TaskEvent : Action {
     data class Set(val itemId: Long) : TaskEvent
     data class Change(val type: ChangeType) : TaskEvent
     data object Save : TaskEvent

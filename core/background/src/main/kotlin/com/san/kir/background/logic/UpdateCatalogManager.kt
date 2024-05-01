@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import com.san.kir.background.logic.repo.CatalogWorkerRepository
 import com.san.kir.background.works.UpdateCatalogWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.models.base.CatalogTask
+import com.san.kir.data.db.workers.entities.DbCatalogTask
 import java.util.UUID
 
 class UpdateCatalogManager(
@@ -19,7 +19,7 @@ class UpdateCatalogManager(
 
     suspend fun addTask(name: String) = withIoContext {
         if (workerRepository.task(name) == null)
-            workerRepository.add(CatalogTask(name = name))
+            workerRepository.add(DbCatalogTask(name = name))
 
         startWorker()
     }

@@ -217,9 +217,9 @@ internal data class ManagerState(
         return buildString {
             appendLine("ManagerState")
             appendLine("\tpages -> ${pages.size}")
-            appendLine("\tpage -> ${pagePosition}")
+            appendLine("\tpage -> $pagePosition")
             appendLine("\tchapters -> ${chapters.size}")
-            appendLine("\tchapter -> ${chapterPosition}")
+            appendLine("\tchapter -> $chapterPosition")
         }
     }
 }

@@ -10,11 +10,11 @@ datetime = "0.6.0-RC.2"
 decompose = "2.2.2"
 
 # AndroidX
-activity = "1.8.2"
+activity = "1.9.0"
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
-core = "1.12.0"
-datastore = "1.0.0"
+core = "1.13.0"
+datastore = "1.1.0"
 fragment = "1.6.2"
 lifecycle = "2.7.0"
 paging = "3.2.1"
@@ -23,7 +23,7 @@ vectordrawable = "1.2.0-beta01"
 workmanager = "2.9.0"
 
 # Compose
-compose = "1.6.3"
+compose = "1.6.6"
 material3 = "1.2.1"
 compose_compiler = "1.5.10" # Don`t forget change field in Version.kt in buildSrc
 
@@ -38,12 +38,12 @@ test_rules = "1.5.0"
 test_junit = "1.1.5"
 test_runner = "1.5.2"
 truth = "1.0.1"
-benchmark_junit = "1.2.3"
+benchmark_junit = "1.2.4"
 kakaocup = "0.0.2"
 espresso = "3.5.1"
 
 #
-gradle = "8.3.1" # Don`t forget update in buildSrc
+gradle = "8.3.2" # Don`t forget update in buildSrc
 
 hyperion = "0.9.31"
 subsampling = "3.10.0"
@@ -159,7 +159,7 @@ espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "esp
 coroutines = ["coroutines_core", "coroutines_android"]
 room = ["room_ktx", "room_paging"]
 compose = ["compose_ui", "compose_ui_tooling", "compose_ui_tooling_preview", "compose_runtime", "compose_animation", "compose_foundation", "compose_foundation_layout", "compose_material_icons", "compose_material_icons_ext", "compose_material3"]
-accompanist = ["flowlayout", "pager", "pager_indicators", "permissions", "systemuicontroller", "navigation_animation", "webview"]
+accompanist = ["flowlayout", "permissions", "systemuicontroller", "webview"]
 work = ["work_runtime", "work_gcm", "work_multiprocess"]
 hyper = ["hyperion-core", "hyperion-crash"]
 tests = ["test_core", "test_rules", "test_junit", "test_runner", "compose_junit", "kakaocup", "espresso"]

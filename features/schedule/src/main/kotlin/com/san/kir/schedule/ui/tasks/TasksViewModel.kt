@@ -5,14 +5,12 @@ import com.san.kir.background.works.ScheduleWorker
 import com.san.kir.core.support.PlannedPeriod
 import com.san.kir.core.support.PlannedType
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.SimplifiedTask
 import com.san.kir.schedule.R
 import com.san.kir.schedule.logic.repo.TasksRepository
 import com.san.kir.schedule.logic.repo.tasksRepository
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 
@@ -22,9 +20,9 @@ internal class TasksViewModel(
 ) : ViewModel<TasksState>(), TasksStateHolder {
     override val tempState = tasksRepository.items.map(transform())
 
-    override val defaultState = TasksState(persistentListOf())
+    override val defaultState = TasksState(emptyList())
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is TasksEvent.Update -> {
                 tasksRepository.update(event.itemId, event.state)
@@ -42,7 +40,7 @@ internal class TasksViewModel(
             TasksState(
                 items
                     .map { Task(it.id, itemName(it), itemInfo(it), it.isEnabled) }
-                    .toPersistentList()
+                    
             )
         }
 

@@ -26,10 +26,9 @@ class AppUpdateWorker(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
 
-    private val connectManager: ConnectManager = ManualDI.connectManager
+    private val connectManager: ConnectManager = ManualDI.connectManager()
 
     private val channelId = "${this::class.java.simpleName}Id"
-    private val TAG = "App Update Finder"
 
     private val notificationManager by lazy { NotificationManagerCompat.from(appContext) }
 
@@ -46,7 +45,7 @@ class AppUpdateWorker(
         }
 
         runCatching {
-            val doc = connectManager.getText(url)
+            val doc = connectManager.getText(URL)
             val texts = doc.split("MANGa readER").last()
             val matcher = Pattern.compile("[0-9]+\\.[0-9]+\\.[0-9]+")
                 .matcher(texts)
@@ -100,7 +99,7 @@ class AppUpdateWorker(
 
     private fun openLinkAction(): NotificationCompat.Action {
         val intent = Intent(Intent.ACTION_VIEW)
-        intent.data = Uri.parse(url)
+        intent.data = Uri.parse(URL)
         val cancelAll = PendingIntent.getActivity(
             applicationContext,
             0,
@@ -119,8 +118,8 @@ class AppUpdateWorker(
 
     companion object {
         private val notifyId = ID.generate()
-        private const val url = "http://4pda.to/forum/index.php?showtopic=772886&st=0#entry53336845"
-
+        private const val URL = "http://4pda.to/forum/index.php?showtopic=772886&st=0#entry53336845"
+        private const val TAG = "App Update Finder"
         fun addTask(ctx: Context = ManualDI.context) {
             val deleteManga = OneTimeWorkRequestBuilder<AppUpdateWorker>().build()
             WorkManager.getInstance(ctx).enqueue(deleteManga)

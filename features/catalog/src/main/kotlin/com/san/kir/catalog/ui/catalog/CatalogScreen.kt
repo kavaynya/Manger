@@ -21,29 +21,29 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Button
-import androidx.compose.material.Checkbox
-import androidx.compose.material.IconButton
-import androidx.compose.material.IconToggleButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Button
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconToggleButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScaffoldState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.ThumbsUpDown
 import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -77,7 +77,7 @@ import com.san.kir.core.compose.systemBarTopPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.MiniCatalogItem
-import kotlinx.collections.immutable.ImmutableList
+
 import kotlinx.coroutines.launch
 import java.net.URLDecoder
 
@@ -92,7 +92,7 @@ fun CatalogScreen(
     val state by holder.state.collectAsState()
     val filters by holder.filters.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(CatalogEvent.Set(catalogName)) }
+    LaunchedEffect(Unit) { holder.sendAction(CatalogEvent.Set(catalogName)) }
 
     val scaffoldState = rememberScaffoldState()
     val coroutineScope = rememberCoroutineScope()
@@ -101,11 +101,11 @@ fun CatalogScreen(
     val query: ((String) -> Unit)? =
         remember(enableSearch) {
             if (enableSearch) {
-                { holder.sendEvent(CatalogEvent.Search(it)) }
+                { holder.sendAction(CatalogEvent.Search(it)) }
             } else null
         }
     val update =
-        remember { { arg: MiniCatalogItem -> holder.sendEvent(CatalogEvent.UpdateManga(arg)) } }
+        remember { { arg: MiniCatalogItem -> holder.sendAction(CatalogEvent.UpdateManga(arg)) } }
 
     ScreenList(
         scaffoldState = scaffoldState,
@@ -119,12 +119,12 @@ fun CatalogScreen(
             hasAction = state.background.currentState,
             progressAction = state.background.progress,
         ),
-        drawerContent = drawerToogle(filters, holder::sendEvent),
+        drawerContent = drawerToogle(filters, holder::sendAction),
         bottomBar = { height ->
             BottomBar(
                 sort = state.sort,
                 background = state.background,
-                sendEvent = holder::sendEvent,
+                sendEvent = holder::sendAction,
                 height = height
             )
         },
@@ -173,13 +173,13 @@ private fun BottomBar(
             onCheckedChange = { sendEvent(CatalogEvent.Reverse) },
         ) {
             Image(
-                Icons.Default.Sort, "",
+                Icons.AutoMirrored.Filled.Sort, "",
                 Modifier
                     .size(Dimensions.Image.small)
                     .graphicsLayer {
                         rotationZ = if (sort.reverse) 0f else 180f
                     },
-                colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface)
+                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
             )
         }
         Row(
@@ -214,7 +214,7 @@ private fun BottomBar(
                     Image(
                         Icons.Default.Close, "",
                         Modifier.size(Dimensions.Image.small),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface)
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
                     )
                 }
 
@@ -222,7 +222,7 @@ private fun BottomBar(
                     Image(
                         Icons.Default.Update, "",
                         Modifier.size(Dimensions.Image.small),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colors.onSurface)
+                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
                     )
                 }
             }
@@ -292,7 +292,7 @@ private fun navigationButtonToggle(
     if (state) NavigationButton.Scaffold(scaffoldState)
     else NavigationButton.Back(navigateUp)
 
-private fun drawerToogle(filters: ImmutableList<Filter>, sendEvent: (CatalogEvent) -> Unit):
+private fun drawerToogle(filters: List<Filter>, sendEvent: (CatalogEvent) -> Unit):
         @Composable (ColumnScope.() -> Unit)? =
     if (filters.isNotEmpty()) {
         { DrawerContent(filters = filters, sendEvent = sendEvent) }
@@ -300,14 +300,14 @@ private fun drawerToogle(filters: ImmutableList<Filter>, sendEvent: (CatalogEven
 
 // Боковое меню
 @Composable
-private fun DrawerContent(filters: ImmutableList<Filter>, sendEvent: (CatalogEvent) -> Unit) {
-    var currentIndex by rememberSaveable { mutableStateOf(0) }
+private fun DrawerContent(filters: List<Filter>, sendEvent: (CatalogEvent) -> Unit) {
+    var currentIndex by rememberSaveable { mutableIntStateOf(0) }
 
     // Списки фильтров
     Column {
         Crossfade(
             targetState = currentIndex,
-            modifier = Modifier.weight(1f, true)
+            modifier = Modifier.weight(1f, true), label = ""
         ) { pageIndex ->
             val currentFilter = filters[pageIndex]
 
@@ -339,7 +339,7 @@ private fun DrawerContent(filters: ImmutableList<Filter>, sendEvent: (CatalogEve
                 .fillMaxWidth()
                 .height(Dimensions.smallest)
                 .clip(RectangleShape)
-                .background(MaterialTheme.colors.onBackground)
+                .background(MaterialTheme.colorScheme.onBackground)
         )
 
         // Переключатели вкладок доступных фильтров
@@ -366,9 +366,9 @@ private fun DrawerContent(filters: ImmutableList<Filter>, sendEvent: (CatalogEve
                             text = stringResource(catalogFilter.type.stringId),
                             modifier = Modifier.padding(Dimensions.smaller),
                             color = if (currentIndex == index)
-                                MaterialTheme.colors.primary
+                                MaterialTheme.colorScheme.primary
                             else
-                                MaterialTheme.colors.onBackground,
+                                MaterialTheme.colorScheme.onBackground,
                             textAlign = TextAlign.Center,
                         )
                     }
@@ -398,7 +398,7 @@ private fun MiddleBottomBtn(state: Boolean, onChange: () -> Unit, icon: ImageVec
         Image(
             icon, "",
             Modifier.size(Dimensions.Image.small),
-            colorFilter = ColorFilter.tint(if (state) Color.Cyan else MaterialTheme.colors.onSurface)
+            colorFilter = ColorFilter.tint(if (state) Color.Cyan else MaterialTheme.colorScheme.onSurface)
         )
     }
 }

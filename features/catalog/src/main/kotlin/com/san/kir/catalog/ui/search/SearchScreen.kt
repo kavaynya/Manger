@@ -26,9 +26,9 @@ fun SearchScreen(
     val holder: SearchStateHolder = stateHolder { SearchViewModel() }
     val state by holder.state.collectAsState()
 
-    val query = remember { { arg: String -> holder.sendEvent(SearchEvent.Search(arg)) } }
+    val query = remember { { arg: String -> holder.sendAction(SearchEvent.Search(arg)) } }
     val update =
-        remember { { arg: MiniCatalogItem -> holder.sendEvent(SearchEvent.UpdateManga(arg)) } }
+        remember { { arg: MiniCatalogItem -> holder.sendAction(SearchEvent.UpdateManga(arg)) } }
 
     ScreenList(
         topBar = topBar(

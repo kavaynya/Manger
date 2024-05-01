@@ -77,7 +77,7 @@ fun rememberImage(url: String?): BitmapPainter {
         Timber.w("LaunchedEffect -> rememberImage($url) logo($logo)")
         withDefaultContext {
             if (url != null && url.isNotEmpty()) {
-                val name = ManualDI.connectManager.nameFromUrl2(url)
+                val name = ManualDI.connectManager().nameFromUrl2(url)
                 val imageCacheDirectory = File(context.cacheDir, "image_cache")
                 val icon = File(imageCacheDirectory, name)
 
@@ -88,7 +88,7 @@ fun rememberImage(url: String?): BitmapPainter {
                     return@withDefaultContext
                 }
 
-                ManualDI.connectManager.downloadFile(icon, url)
+                ManualDI.connectManager().downloadFile(icon, url)
                     .mapCatching {
                         logo = BitmapPainter(BitmapFactory.decodeFile(icon.path).asImageBitmap())
                     }

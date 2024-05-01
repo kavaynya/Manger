@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
@@ -32,7 +32,6 @@ import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.compose.systemBarsHorizontalPadding
 
 // Простая страница с минимум возможностей для быстрого продолжения чтения
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 internal fun AboutPageContent(
     nextChapter: NextChapter,
@@ -63,7 +62,7 @@ internal fun AboutPageContent(
                     count
                 ),
                 modifier = Modifier
-                    .background(MaterialTheme.colors.primary)
+                    .background(MaterialTheme.colorScheme.primary)
                     .padding(systemBarsHorizontalPadding(all = Dimensions.default))
                     .fillMaxWidth(),
                 fontWeight = FontWeight.Bold,

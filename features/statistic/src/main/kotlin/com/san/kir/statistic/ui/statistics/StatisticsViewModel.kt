@@ -1,11 +1,11 @@
 package com.san.kir.statistic.ui.statistics
 
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.statistic.logic.di.statisticRepository
 import com.san.kir.statistic.logic.repo.StatisticRepository
-import kotlinx.collections.immutable.toPersistentList
+
 import kotlinx.coroutines.flow.combine
 
 internal class StatisticsViewModel(
@@ -14,12 +14,12 @@ internal class StatisticsViewModel(
 
     override val tempState =
         combine(statisticRepository.items, statisticRepository.allTime) { items, time ->
-            StatisticsState(items.toPersistentList(), time)
+            StatisticsState(items, time)
         }
 
     override val defaultState = StatisticsState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is StatisticsEvent.Delete -> statisticRepository.delete(event.itemId)
         }

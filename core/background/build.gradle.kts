@@ -15,8 +15,6 @@ dependencies {
 
     implementation(libs.core)
 
-    implementation(libs.bundles.coroutines)
-
     api(libs.work.runtime)
     implementation(libs.work.gcm)
     implementation(libs.work.multiprocess)

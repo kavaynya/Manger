@@ -13,7 +13,7 @@ internal data class StorageState(
 
 @Stable
 internal sealed interface BackgroundState {
-    object None : BackgroundState
-    object Load : BackgroundState
-    object Deleting : BackgroundState
+    data object None : BackgroundState
+    data object Load : BackgroundState
+    data object Deleting : BackgroundState
 }

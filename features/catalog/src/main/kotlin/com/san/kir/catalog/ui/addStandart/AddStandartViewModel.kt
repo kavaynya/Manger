@@ -4,9 +4,8 @@ import com.san.kir.background.logic.UpdateMangaManager
 import com.san.kir.background.logic.di.updateMangaManager
 import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
-import com.san.kir.core.support.DIR
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.core.utils.DIR
 import com.san.kir.core.utils.viewModel.BaseViewModel
@@ -16,7 +15,7 @@ import com.san.kir.data.models.base.toManga
 import com.san.kir.data.parsing.SiteCatalogAlternative
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
-import kotlinx.collections.immutable.toPersistentList
+
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -40,7 +39,7 @@ internal class AddStandartViewModel(
         categoryName, catalogRepository.categoryNames, processState, progress,
     ) { category, categories, process, progress ->
 
-        val filteredCategories = categories.filter { category in it }.toPersistentList()
+        val filteredCategories = categories.filter { category in it }
 
         AddStandartState(
             categoryName = category,
@@ -54,7 +53,7 @@ internal class AddStandartViewModel(
 
     override val defaultState = AddStandartState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is AddStandartEvent.Set -> url = event.url
             is AddStandartEvent.UpdateText -> categoryName.update { event.text }

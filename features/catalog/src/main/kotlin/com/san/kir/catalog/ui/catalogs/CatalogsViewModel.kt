@@ -6,10 +6,8 @@ import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -20,13 +18,13 @@ internal class CatalogsViewModel(
     private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager,
 ) : ViewModel<CatalogsState>(), CatalogsStateHolder {
     private var job: Job? = null
-    private val items = MutableStateFlow(persistentListOf<CheckableSite>())
+    private val items = MutableStateFlow(emptyList<CheckableSite>())
     private val background = MutableStateFlow(false)
 
     override val tempState = combine(items, background, ::CatalogsState)
 
     override val defaultState = CatalogsState(
-        items = persistentListOf(),
+        items = emptyList(),
         background = false
     )
 
@@ -34,7 +32,7 @@ internal class CatalogsViewModel(
         updateItemData()
     }
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             CatalogsEvent.UpdateData -> updateItemData()
             CatalogsEvent.UpdateContent -> {
@@ -53,11 +51,11 @@ internal class CatalogsViewModel(
             )
         }
 
-        items.update { temp.map { it.second }.toPersistentList() }
+        items.update { temp.map { it.second } }
         setUpdateCatalogsListener()
 
         temp.forEachIndexed { index, (catalog, site) ->
-            viewModelScope.defaultLaunch {
+            defaultLaunch {
                 val volume = kotlin.runCatching { catalog.init() }.getOrNull()?.volume
                 items.update { list ->
                     val result =
@@ -84,7 +82,7 @@ internal class CatalogsViewModel(
 
     private fun setUpdateCatalogsListener() {
         job?.cancel()
-        job = viewModelScope.defaultLaunch {
+        job = defaultLaunch {
             manager.loadTasks()
                 .collect { tasks ->
                     background.update { tasks.isNotEmpty() }

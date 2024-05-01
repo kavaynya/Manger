@@ -1,7 +1,5 @@
 package com.san.kir.data.models.catalog
 
-import com.san.kir.data.models.catalog.SiteCatalogElement
-
 data class MiniCatalogItem(
     val id: Long = 0,
     val catalogName: String = "",
@@ -24,6 +22,18 @@ data class MiniCatalogItem(
 }
 
 fun MiniCatalogItem.toFullItem(): SiteCatalogElement {
-    return
+    return SiteCatalogElement(
+        id = id,
+        catalogName = catalogName,
+        name = name,
+        statusEdition = statusEdition,
+        shortLink = shortLink,
+        link = link,
+        genres = genres,
+        type = type,
+        authors = authors,
+        dateId = dateId,
+        populate = populate
+    )
 }
 

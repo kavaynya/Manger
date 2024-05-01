@@ -3,9 +3,9 @@ package com.san.kir.catalog.ui.catalogItem
 import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.db.catalog.entities.DbSiteCatalogElement
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +16,7 @@ internal class CatalogItemViewModel(
     private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager,
     private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
 ) : ViewModel<CatalogItemState>(), CatalogItemStateHolder {
-    private val item = MutableStateFlow(SiteCatalogElement())
+    private val item = MutableStateFlow(DbSiteCatalogElement())
     private val containingInLibrary =
         MutableStateFlow<ContainingInLibraryState>(ContainingInLibraryState.Check)
     private val background = MutableStateFlow<BackgroundState>(BackgroundState.Load)
@@ -25,7 +25,7 @@ internal class CatalogItemViewModel(
 
     override val defaultState = CatalogItemState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is CatalogItemEvent.Set -> {
                 val item = manager.elementByUrl(event.url)

@@ -5,15 +5,9 @@ import androidx.compose.runtime.Stable
 import com.san.kir.catalog.R
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.extend.MiniCatalogItem
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-
 
 internal data class CatalogState(
-    val items: ImmutableList<MiniCatalogItem> = persistentListOf(),
+    val items: List<MiniCatalogItem> = emptyList(),
     val title: String = "",
     val search: String = "",
     val background: BackgroundState = BackgroundState(
@@ -36,7 +30,7 @@ internal data class SortState(
 
 internal data class FilterState(
     val search: String = "",
-    val selectedFilters: PersistentMap<FilterType, List<String>> = persistentMapOf()
+    val selectedFilters: Map<FilterType, List<String>> = emptyMap()
 )
 
 internal sealed interface SortType {
@@ -48,7 +42,7 @@ internal sealed interface SortType {
 @Stable
 internal data class Filter(
     val type: FilterType,
-    val items: PersistentList<SelectableItem>
+    val items: List<SelectableItem>
 )
 
 @Stable

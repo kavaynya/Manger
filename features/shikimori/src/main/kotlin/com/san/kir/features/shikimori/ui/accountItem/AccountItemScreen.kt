@@ -8,15 +8,15 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Login
+import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.Login
-import androidx.compose.material.icons.filled.Logout
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,19 +46,19 @@ fun AccountItem(navigateToManager: (SharedParams) -> Unit) {
         state = state.login,
         navigateToManager = {
             when (state.login) {
-                LoginState.LogOut, LoginState.Error -> holder.sendEvent(AccountItemEvent.LogIn)
+                LoginState.LogOut, LoginState.Error -> holder.sendAction(AccountItemEvent.LogIn)
                 is LoginState.LogInOk -> navigateToManager(it)
                 else -> {}
             }
         },
-        login = { holder.sendEvent(AccountItemEvent.LogIn) },
-        logout = { holder.sendEvent(AccountItemEvent.LogOut) }
+        login = { holder.sendAction(AccountItemEvent.LogIn) },
+        logout = { holder.sendAction(AccountItemEvent.LogOut) }
     )
 
     LogOutDialog(
         state = state.dialog,
-        onDismiss = { holder.sendEvent(AccountItemEvent.CancelLogOut) },
-        onConfirm = { holder.sendEvent(AccountItemEvent.LogOut) }
+        onDismiss = { holder.sendAction(AccountItemEvent.CancelLogOut) },
+        onConfirm = { holder.sendAction(AccountItemEvent.LogOut) }
     )
 }
 
@@ -93,7 +93,7 @@ private fun LoginOrNot(
             Text(stringResource(R.string.site_name))
             TextLoginOrNot(state)
             BottomAnimatedVisibility(visible = state is LoginState.LogInError) {
-                Text(stringResource(R.string.whoami_error), color = MaterialTheme.colors.error)
+                Text(stringResource(R.string.whoami_error), color = MaterialTheme.colorScheme.error)
             }
         }
 
@@ -103,7 +103,7 @@ private fun LoginOrNot(
                     is LoginState.LogInError, is LoginState.LogInOk -> {
                         IconButton(onClick = logout) {
                             Icon(
-                                Icons.Default.Logout, "",
+                                Icons.AutoMirrored.Filled.Logout, "",
                                 modifier = Modifier.size(Dimensions.Image.small)
                             )
                         }
@@ -112,7 +112,7 @@ private fun LoginOrNot(
                     LoginState.LogOut -> {
                         IconButton(onClick = login) {
                             Icon(
-                                Icons.Default.Login, "",
+                                Icons.AutoMirrored.Filled.Login, "",
                                 modifier = Modifier.size(Dimensions.Image.small)
                             )
                         }

@@ -13,12 +13,10 @@ import com.san.kir.core.internet.cellularNetwork
 import com.san.kir.core.internet.wifiNetwork
 import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.utils.DownloadState
-import com.san.kir.core.utils.viewModel.BaseViewModel
-import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.collections.immutable.toPersistentList
+
 import kotlinx.coroutines.flow.combine
 
 internal class DownloadsViewModel(
@@ -41,14 +39,14 @@ internal class DownloadsViewModel(
             if (cell || wifi) NetworkState.OK else NetworkState.NOT_CELLURAR
         }
         DownloadsState(
-            items = items.toPersistentList(),
+            items = items,
             network = network
         )
     }
 
     override val defaultState = DownloadsState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             DownloadsEvent.ClearAll -> clearAll()
             DownloadsEvent.CompletedClear -> clearCompleted()

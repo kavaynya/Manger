@@ -3,9 +3,9 @@ package com.san.kir.manger
 import androidx.compose.animation.core.EaseInExpo
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.GenericShape
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
@@ -41,10 +41,10 @@ class Library : NavConfig {
             val mainViewModel: MainStateHolder = stateHolder { MainViewModel() }
             val state by mainViewModel.state.collectAsState()
 
-            MaterialTheme(colors = if (state.theme) darkColors() else lightColors()) {
+            MaterialTheme(colorScheme = if (state.theme) darkColorScheme() else lightColorScheme()) {
                 // Remember a SystemUiController
                 val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colors.isLight
+                val useDarkIcons = MaterialTheme.colorScheme.isLight
 
                 SideEffect {
                     // Update all of the system bar colors to be transparent, and use

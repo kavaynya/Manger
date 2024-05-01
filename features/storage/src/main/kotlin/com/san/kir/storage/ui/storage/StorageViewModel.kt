@@ -11,7 +11,7 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.shortPath
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Manga
 import com.san.kir.data.models.base.Storage
@@ -52,7 +52,7 @@ internal class StorageViewModel(
     }
     override val defaultState = StorageState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is StorageEvent.Set     -> set(event.mangaId, event.hasUpdate)
 

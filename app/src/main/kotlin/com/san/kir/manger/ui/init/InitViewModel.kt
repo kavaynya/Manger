@@ -2,12 +2,12 @@ package com.san.kir.manger.ui.init
 
 import android.content.Context
 import android.os.Build
-import com.san.kir.core.support.DIR
+import com.san.kir.core.utils.DIR
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withDefaultContext
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.core.utils.getFullPath
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.manger.logic.di.initRepository
 import com.san.kir.manger.logic.repo.InitRepository
@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
-class InitViewModel constructor(
+class InitViewModel(
     private val ctx: Context = ManualDI.context,
     private val repository: InitRepository = ManualDI.initRepository,
 ) : ViewModel<InitState>(), InitStateHolder {
@@ -25,7 +25,7 @@ class InitViewModel constructor(
     override val defaultState = InitState.Memory
     override val tempState = MutableStateFlow<InitState>(defaultState)
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is InitEvent.Next -> {
                 tempState.update { previous ->

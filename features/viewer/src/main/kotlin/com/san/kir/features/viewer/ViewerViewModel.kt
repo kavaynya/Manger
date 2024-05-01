@@ -5,9 +5,9 @@ import androidx.lifecycle.viewModelScope
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.data.chapterDao
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.StatisticDao
+import com.san.kir.data.db.main.dao.ChapterDao
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.dao.StatisticDao
 import com.san.kir.data.mangaDao
 import com.san.kir.data.models.base.Settings
 import com.san.kir.data.statisticDao

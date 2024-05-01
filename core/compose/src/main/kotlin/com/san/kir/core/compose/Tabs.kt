@@ -6,14 +6,14 @@ import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.windowInsetsPadding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ScrollableTabRow
-import androidx.compose.material.Tab
-import androidx.compose.material.TabPosition
-import androidx.compose.material.TabRow
-import androidx.compose.material.TabRowDefaults
-import androidx.compose.material.Text
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ScrollableTabRow
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -26,7 +26,7 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.lerp
 import com.san.kir.core.utils.TestTags
-import kotlinx.collections.immutable.ImmutableList
+
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
@@ -42,7 +42,7 @@ private fun indicator(pagerState: PagerState): @Composable (tabPositions: List<T
 @Composable
 fun ScrollableTabs(
     pagerState: PagerState,
-    items: ImmutableList<String>,
+    items: List<String>,
     modifier: Modifier = Modifier,
     onTabClick: suspend (index: Int) -> Unit = { pagerState.animateScrollToPage(it) },
 ) {
@@ -53,7 +53,7 @@ fun ScrollableTabs(
         selectedTabIndex = pagerState.currentPage,
         indicator = indicator(pagerState),
         divider = {},
-        modifier = modifier.background(MaterialTheme.colors.primarySurface)
+        modifier = modifier.background(MaterialTheme.colorScheme.primarySurface)
     ) {
         items.forEachIndexed { index, item ->
             Tab(
@@ -70,7 +70,7 @@ fun ScrollableTabs(
 @Composable
 fun Tabs(
     pagerState: PagerState,
-    items: ImmutableList<Int>,
+    items: List<Int>,
     onTabClick: suspend (index: Int) -> Unit = { pagerState.animateScrollToPage(it) },
 ) {
     val scope: CoroutineScope = rememberCoroutineScope()

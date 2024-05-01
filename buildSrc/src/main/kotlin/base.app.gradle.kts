@@ -1,4 +1,3 @@
-import org.gradle.kotlin.dsl.extra
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 
 plugins {
@@ -23,20 +22,20 @@ android {
         resourceConfigurations.addAll(listOf("en", "ru"))
     }
 
-    signingConfigs {
+    /*signingConfigs {
         create("release") {
             keyAlias = "kir-san"
             keyPassword = Private.KEY_PASSWORD
             storeFile = file("../../Key.jks")
             storePassword = Private.KEYSTORE_PASSWORD
         }
-    }
+    }*/
 
     buildTypes {
         getByName("release") {
             isMinifyEnabled = true
             isShrinkResources = true
-            signingConfig = signingConfigs.getByName("release")
+//            signingConfig = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android.txt"),
                 "proguard-rules.pro",
@@ -70,15 +69,7 @@ android {
         )
     }
 
-    kotlin.sourceSets.configureEach {
-        languageSettings.enableLanguageFeature("DataObjects")
-    }
-
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions.languageVersion = "1.8"
-    }
-
-    packagingOptions {
+    packaging {
         resources.excludes.addAll(resourceExcludes)
     }
 

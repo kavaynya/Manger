@@ -11,6 +11,7 @@ dependencies {
     implementation(project(Modules.Core.utils))
     implementation(project(Modules.Core.background))
     implementation(project(Modules.Data.db))
+    implementation(project(Modules.Data.models))
 
     implementation(libs.timber)
 }

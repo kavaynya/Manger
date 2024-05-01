@@ -8,14 +8,14 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.ContentAlpha
-import androidx.compose.material.Icon
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Switch
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.ContentAlpha
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentAlpha
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Switch
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
@@ -37,8 +37,8 @@ import com.san.kir.core.compose.SmallestSpacer
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.settings.R
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.toImmutableList
+
+
 
 @Composable
 private fun TemplatePreferenceItem(
@@ -115,7 +115,7 @@ internal fun PreferenceTitle(id: Int) {
             Text(
                 text = stringResource(id),
 //                fontSize = 14.sp,
-                color = MaterialTheme.colors.secondary,
+                color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
             )
@@ -129,7 +129,7 @@ internal fun <T> ListPreferenceItem(
     subtitle: Int,
     icon: ImageVector? = null,
     entries: Int,
-    entryValues: ImmutableList<T>,
+    entryValues: List<T>,
     initialValue: T,
     onValueChange: (T) -> Unit,
 ) {
@@ -197,7 +197,7 @@ internal fun MultiSelectListPreferenceItem(
     subtitle: Int,
     icon: ImageVector? = null,
     entries: Int,
-    initialValue: ImmutableList<Boolean>,
+    initialValue: List<Boolean>,
     onValueChange: (List<Boolean>) -> Unit
 ) {
     val items = remember(initialValue) { mutableStateListOf(*initialValue.toTypedArray()) }

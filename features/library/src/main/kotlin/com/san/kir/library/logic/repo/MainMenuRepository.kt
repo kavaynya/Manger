@@ -2,15 +2,14 @@ package com.san.kir.library.logic.repo
 
 import android.content.Context
 import com.san.kir.core.support.MainMenuType
-import android.app.Application
 import com.san.kir.data.models.utils.MainMenuType
-import com.san.kir.data.db.dao.CategoryDao
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.MainMenuDao
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.PlannedDao
-import com.san.kir.data.db.dao.StorageDao
-import com.san.kir.data.models.base.MainMenuItem
+import com.san.kir.data.db.main.dao.CategoryDao
+import com.san.kir.data.db.main.dao.ChapterDao
+import com.san.kir.data.db.main.dao.MainMenuDao
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.dao.PlannedDao
+import com.san.kir.data.db.main.dao.StorageDao
+import com.san.kir.data.db.main.entites.DbMainMenuItem
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.library.R
 import com.san.kir.library.ui.drawer.MenuItem
@@ -46,7 +45,7 @@ internal class MainMenuRepository(
         }.distinctUntilChanged()
 
     suspend fun swap(from: Int, to: Int) {
-        val items = mainMenuDao.getItems().toMutableList()
+        val items = mainMenuDao.items().toMutableList()
         Collections.swap(items, from, to)
         mainMenuDao.update(*items.mapIndexed { i, m -> m.copy(order = i) }.toTypedArray())
     }

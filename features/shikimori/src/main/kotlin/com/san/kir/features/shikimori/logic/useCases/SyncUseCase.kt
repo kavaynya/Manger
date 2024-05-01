@@ -99,9 +99,9 @@ internal class SyncUseCase<T : ShikimoriMangaItem>(
 
 // Состояние связывания
 internal sealed interface SyncState {
-    object None : SyncState
+    data object None : SyncState
     class Ok(val manga: ShikimoriMangaItem) : SyncState
-    object Finding : SyncState
+    data object Finding : SyncState
     class Founds(val items: List<ShikimoriMangaItem>) : SyncState
     class NotFounds(val name: String) : SyncState
 }

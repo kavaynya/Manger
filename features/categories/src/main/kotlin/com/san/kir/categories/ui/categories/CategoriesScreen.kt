@@ -1,22 +1,21 @@
 package com.san.kir.categories.ui.categories
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.ArrowDropUp
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -66,14 +65,13 @@ internal fun CategoriesScreen(
                 index = index,
                 max = state.items.count(),
                 category = item,
-                sendEvent = viewModel::sendEvent,
+                sendEvent = viewModel::sendAction,
                 onClick = { navigateToItem(item.name, it) }
             )
         }
     }
 }
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun CategoryItemView(
     index: Int,
@@ -108,7 +106,7 @@ private fun CategoryItemView(
                 visibleState = visibleState.not()
                 sendEvent(CategoriesEvent.ChangeVisibility(category, visibleState))
             }) {
-                AnimatedContent(targetState = visibleState) {
+                AnimatedContent(targetState = visibleState, label = "") {
                     when (it) {
                         true -> Icon(Icons.Default.Visibility, "")
                         false -> Icon(Icons.Default.VisibilityOff, "")

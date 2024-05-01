@@ -1,5 +1,3 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("com.android.library")
     id("org.jetbrains.kotlin.plugin.parcelize")
@@ -42,14 +40,6 @@ android {
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
         )
-    }
-
-    kotlin.sourceSets.configureEach {
-        languageSettings.enableLanguageFeature("DataObjects")
-    }
-
-    tasks.withType<KotlinCompile>().configureEach {
-        kotlinOptions.languageVersion = "1.8"
     }
 
     kotlin {

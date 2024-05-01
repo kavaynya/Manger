@@ -1,10 +1,10 @@
 package com.san.kir.library.ui.library
 
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.data.models.extend.CategoryWithMangas
-import com.san.kir.data.models.extend.SimplifiedManga
+import com.san.kir.data.db.main.views.ViewManga
 
-internal sealed interface LibraryEvent : ScreenEvent {
+internal sealed interface LibraryEvent : Action {
     data class SelectManga(val item: SimplifiedManga) : LibraryEvent
     data object NonSelect : LibraryEvent
     data class SetCurrentCategory(val item: CategoryWithMangas) : LibraryEvent

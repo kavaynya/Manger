@@ -24,9 +24,6 @@ object ManualDI {
         app = application
     }
 
-    val context: Context
-        get() = requireNotNull(app) { "call init before use" }
-
     val application: Application
         get() = requireNotNull(app) { "call init before use" }
 

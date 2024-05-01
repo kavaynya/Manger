@@ -8,8 +8,8 @@ internal data class SearchState(
 ) : ScreenState
 
 internal sealed interface SearchingState {
-    object Load : SearchingState
-    object None : SearchingState
-    object Error : SearchingState
+    data object Load : SearchingState
+    data object None : SearchingState
+    data object Error : SearchingState
     data class Ok(val items: List<ShikimoriManga>) : SearchingState
 }

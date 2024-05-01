@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.Text
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -50,7 +50,7 @@ internal fun StatisticsScreen(
         additionalPadding = Dimensions.quarter
     ) {
         items(items = state.items, key = { stat -> stat.id }) { item ->
-            ItemView(item, state.allTime, viewModel::sendEvent) { navigateToItem(item.id, it) }
+            ItemView(item, state.allTime, viewModel::sendAction) { navigateToItem(item.id, it) }
         }
     }
 }

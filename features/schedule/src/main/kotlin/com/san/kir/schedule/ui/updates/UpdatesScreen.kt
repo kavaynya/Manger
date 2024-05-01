@@ -18,7 +18,7 @@ fun UpdatesScreen() {
     val viewModel: UpdatesStateHolder = stateHolder { UpdatesViewModel() }
     val state by viewModel.state.collectAsState()
 
-    val sendEvent = remember { { event: UpdatesEvent -> viewModel.sendEvent(event) } }
+    val sendEvent = remember { { event: UpdatesEvent -> viewModel.sendAction(event) } }
 
     LazyColumn(
         modifier = Modifier.fillMaxSize(),

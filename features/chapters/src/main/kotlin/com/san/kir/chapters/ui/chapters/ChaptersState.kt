@@ -6,13 +6,9 @@ import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.base.Manga
 import com.san.kir.data.models.extend.SimplifiedChapter
 import com.san.kir.data.models.utils.compareChapterNames
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-
 
 internal data class ChaptersState(
-    val items: ImmutableList<SelectableItem> = persistentListOf(),
+    val items: List<SelectableItem> = emptyList(),
     val manga: Manga = Manga(),
     val backgroundAction: Boolean = false,
     val showTitle: Boolean = true,
@@ -49,7 +45,7 @@ internal data class BackgroundActions(
 }
 
 internal data class Items(
-    val items: PersistentList<SelectableItem> = persistentListOf(),
+    val items: List<SelectableItem> = emptyList(),
     val count: Int = items.count(),
     val readCount: Int = items.count { it.chapter.isRead },
 )

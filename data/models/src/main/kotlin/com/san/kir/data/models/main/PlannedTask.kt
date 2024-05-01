@@ -25,10 +25,8 @@ data class PlannedTask(
     val addedTime: Long = 0L,
     val errorMessage: String = "",
     override val manga: String = "",
-    val category: String = "",
-) : Parcelable, PlannedTaskBase {
-
-}
+    override val category: String = "",
+) : Parcelable, PlannedTaskBase
 
 fun PlannedTask.toBase(mangaName: String, categoryName: String): PlannedTaskBase {
     return copy(manga = mangaName, category = categoryName)

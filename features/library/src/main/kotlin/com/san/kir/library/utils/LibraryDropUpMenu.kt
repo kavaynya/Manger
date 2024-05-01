@@ -9,11 +9,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.MenuDefaults
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.MenuDefaults
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -112,18 +112,18 @@ private inline fun Title(
     DropdownMenuItem(
         onClick = { sendEvent(LibraryEvent.NonSelect) },
         modifier = Modifier
-            .background(color = MaterialTheme.colors.primary)
-            .horizontalInsetsPadding()
-    ) {
-
-        Text(
-            stringResource(R.string.library_popupmenu_title, text),
-            maxLines = 1,
-            fontWeight = FontWeight.Bold,
-            color = MaterialTheme.colors.onPrimary,
-            overflow = TextOverflow.Ellipsis
-        )
-    }
+            .background(color = MaterialTheme.colorScheme.primary)
+            .horizontalInsetsPadding(),
+        text = {
+            Text(
+                stringResource(R.string.library_popupmenu_title, text),
+                maxLines = 1,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onPrimary,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
+    )
 }
 
 @Composable

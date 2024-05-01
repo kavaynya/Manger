@@ -2,8 +2,8 @@ package com.san.kir.library.ui.drawer
 
 import androidx.compose.runtime.Stable
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.models.base.MainMenuItem
-import kotlinx.collections.immutable.ImmutableList
+import com.san.kir.data.db.main.entites.DbMainMenuItem
+
 
 internal data class DrawerState(
     val hasEditMenu: Boolean = false,
@@ -12,7 +12,7 @@ internal data class DrawerState(
 
 internal sealed interface MainMenuItemsState {
     data object Load : MainMenuItemsState
-    data class Ok(val items: ImmutableList<MenuItem>) : MainMenuItemsState
+    data class Ok(val items: List<MenuItem>) : MainMenuItemsState
 }
 
 @Stable

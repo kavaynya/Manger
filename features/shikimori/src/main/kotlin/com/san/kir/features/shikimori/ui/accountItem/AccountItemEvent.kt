@@ -1,9 +1,9 @@
 package com.san.kir.features.shikimori.ui.accountItem
 
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 
-internal sealed interface AccountItemEvent : ScreenEvent {
-    object LogIn : AccountItemEvent
-    object LogOut : AccountItemEvent
-    object CancelLogOut : AccountItemEvent
+internal sealed interface AccountItemEvent : Action {
+    data object LogIn : AccountItemEvent
+    data object LogOut : AccountItemEvent
+    data object CancelLogOut : AccountItemEvent
 }

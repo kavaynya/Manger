@@ -5,13 +5,13 @@ import androidx.work.WorkInfo
 import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.ScheduleWorker
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.PlannedTask
 import com.san.kir.data.models.base.toBase
 import com.san.kir.schedule.logic.repo.TasksRepository
 import com.san.kir.schedule.logic.repo.tasksRepository
-import kotlinx.collections.immutable.toImmutableList
+
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -60,7 +60,7 @@ internal class TaskViewModel(
 
     override val defaultState = TaskState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is TaskEvent.Set -> set(event.itemId)
             is TaskEvent.Change -> change(event.type)

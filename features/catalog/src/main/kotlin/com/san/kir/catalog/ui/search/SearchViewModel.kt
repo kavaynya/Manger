@@ -4,15 +4,13 @@ import android.content.Context
 import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
 import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.addAll
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.MiniCatalogItem
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +27,7 @@ internal class SearchViewModel(
 
     private val background = MutableStateFlow(false)
     private val search = MutableStateFlow("")
-    private val items = MutableStateFlow(persistentListOf<MiniCatalogItem>())
+    private val items = MutableStateFlow(emptyList<MiniCatalogItem>())
 
     override val tempState = combine(items, search, background) { items, search, background ->
         SearchState(items.applyFilters(search), background)
@@ -41,16 +39,16 @@ internal class SearchViewModel(
         loadItems()
     }
 
-    override suspend fun onEvent(event: ScreenEvent) {
-        when (event) {
-            is SearchEvent.Search -> updateFilter(event.query)
-            is SearchEvent.UpdateManga -> updateManga(event.item)
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            is SearchEvent.Search -> updateFilter(action.query)
+            is SearchEvent.UpdateManga -> updateManga(action.item)
         }
     }
 
     private fun loadItems() {
         background.update { true }
-        viewModelScope.defaultLaunch {
+        defaultLaunch {
             catalogRepository.items.forEach { catalog ->
                 items.update { old ->
                     old.addAll(catalogRepository.items(catalog.name))
@@ -62,7 +60,7 @@ internal class SearchViewModel(
 
     private fun updateFilter(value: String) {
         job?.cancel()
-        job = viewModelScope.launch {
+        job = launch {
             delay(1.seconds)
             search.update { value }
         }
@@ -75,9 +73,9 @@ internal class SearchViewModel(
         }
     }
 
-    private fun PersistentList<MiniCatalogItem>.applyFilters(query: String): PersistentList<MiniCatalogItem> {
+    private fun List<MiniCatalogItem>.applyFilters(query: String): List<MiniCatalogItem> {
         return if (query.isNotEmpty()) {
-            filter { it.name.lowercase().contains(query.lowercase()) }.toPersistentList()
+            filter { it.name.lowercase().contains(query.lowercase()) }
         } else this
     }
 }

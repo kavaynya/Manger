@@ -5,7 +5,7 @@ import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.defaultExcLaunch
 import com.san.kir.core.utils.flow.Result
 import com.san.kir.core.utils.flow.asResult
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.ShikiDbManga
 import com.san.kir.features.shikimori.logic.Helper
@@ -106,7 +106,7 @@ internal class AccountViewModel(
 
     override val defaultState = AccountState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             AccountEvent.LogOut -> when (dialogState.value) {
                 DialogState.Hide -> {

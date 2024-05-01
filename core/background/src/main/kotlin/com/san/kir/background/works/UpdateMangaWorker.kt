@@ -14,12 +14,12 @@ import com.san.kir.background.logic.di.mangaWorkerRepository
 import com.san.kir.background.logic.repo.MangaRepository
 import com.san.kir.background.logic.repo.MangaWorkerRepository
 import com.san.kir.background.util.cancelAction
-import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.fuzzy
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.MangaTask
+import com.san.kir.data.db.main.entites.DbChapter
+import com.san.kir.data.db.workers.entities.DbMangaTask
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.CancellationException
@@ -29,19 +29,19 @@ import java.util.regex.Pattern
 class UpdateMangaWorker(
     context: Context,
     params: WorkerParameters,
-) : BaseUpdateWorker<MangaTask>(context, params) {
+) : BaseUpdateWorker<DbMangaTask>(context, params) {
 
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository
-    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager()
 
     override val workerRepository: MangaWorkerRepository = ManualDI.mangaWorkerRepository
     override val TAG = "Chapter Finder"
 
     private val reg = Pattern.compile("\\d+")
-    private var successfuled = listOf<MangaTask>()
+    private var successfuled = listOf<DbMangaTask>()
 
-    override suspend fun prepareTasks(new: List<MangaTask>): List<Long> {
-        val unicsTasks = new.fold(listOf<MangaTask>()) { list, item ->
+    override suspend fun prepareTasks(new: List<DbMangaTask>): List<Long> {
+        val unicsTasks = new.fold(listOf<DbMangaTask>()) { list, item ->
             if (item.mangaId in list.map { it.mangaId }) list else list + item
         }
 
@@ -50,7 +50,7 @@ class UpdateMangaWorker(
         return super.prepareTasks(unicsTasks)
     }
 
-    override suspend fun work(task: MangaTask) {
+    override suspend fun work(task: DbMangaTask) {
 
         kotlin.runCatching {
             val mangaDb = mangaRepository.manga(task.mangaId)
@@ -105,7 +105,7 @@ class UpdateMangaWorker(
         }
     }
 
-    override suspend fun onNotify(task: MangaTask?) {
+    override suspend fun onNotify(task: DbMangaTask?) {
         with(NotificationCompat.Builder(applicationContext, channelId)) {
             setSmallIcon(R.drawable.ic_notification_update)
 
@@ -212,7 +212,7 @@ class UpdateMangaWorker(
      *
      * @return Результат слияния
      * */
-    private fun compare(old: List<Chapter>, new: List<Chapter>): ChaptersContainer {
+    private fun compare(old: List<DbChapter>, new: List<DbChapter>): ChaptersContainer {
         val oldRemovable = old.toMutableList()
 
         val prepared = new.map { newChapter ->
@@ -277,7 +277,7 @@ class UpdateMangaWorker(
 
 private data class ChaptersContainer(
     val prepared: List<ChapterContainer>,
-    val remains: List<Chapter>,
+    val remains: List<DbChapter>,
 )
 
-private data class ChapterContainer(val ch: Chapter, val isNew: Boolean)
+private data class ChapterContainer(val ch: DbChapter, val isNew: Boolean)

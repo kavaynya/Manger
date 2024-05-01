@@ -10,7 +10,7 @@ data class Category(
     val name: String = "",
     val order: Int = 0,
     val isVisible: Boolean = true,
-    val typeSort: String = SortLibraryUtil.abc,
+    val typeSort: String = SortLibraryUtil.ABC,
     val isReverseSort: Boolean = false,
     val spanPortrait: Int = 2,
     val spanLandscape: Int = 3,

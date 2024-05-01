@@ -17,7 +17,7 @@ import com.san.kir.data.parsing.sites.Selfmanga
 import com.san.kir.data.parsing.sites.Unicomics
 import com.san.kir.data.parsing.sites.Yaoichan
 
-class SiteCatalogsManager constructor(
+class SiteCatalogsManager(
     context: Context,
     connectManager: ConnectManager,
 ) {

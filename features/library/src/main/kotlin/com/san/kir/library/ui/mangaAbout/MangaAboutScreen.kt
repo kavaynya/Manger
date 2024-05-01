@@ -9,10 +9,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -53,7 +52,7 @@ fun MangaAboutScreen(
     val holder: MangaAboutStateHolder = stateHolder { MangaAboutViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(MangaAboutEvent.Set(itemId)) }
+    LaunchedEffect(Unit) { holder.sendAction(MangaAboutEvent.Set(itemId)) }
 
     ScreenContent(
         topBar = topBar(
@@ -66,7 +65,7 @@ fun MangaAboutScreen(
                 .horizontalInsetsPadding()
                 .bottomInsetsPadding()
         ) {
-            Content(state.manga, state.categoryName, state.size, holder::sendEvent)
+            Content(state.manga, state.categoryName, state.size, holder::sendAction)
         }
     }
 
@@ -150,7 +149,7 @@ private fun ColumnScope.Content(
 
 @Composable
 private fun ColumnScope.ColorPicker(initialValue: Int, onValueChange: (Int) -> Unit) {
-    val defaultColor = MaterialTheme.colors.primary
+    val defaultColor = MaterialTheme.colorScheme.primary
 
     var color by remember(initialValue) {
         mutableStateOf(

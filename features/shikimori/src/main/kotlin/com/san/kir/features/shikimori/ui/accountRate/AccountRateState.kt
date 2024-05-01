@@ -15,12 +15,12 @@ internal data class AccountRateState(
 
 internal sealed interface ProfileState {
     data class Ok(val rate: ShikimoriRate) : ProfileState
-    object None : ProfileState
-    object Load : ProfileState
+    data object None : ProfileState
+    data object Load : ProfileState
 }
 
 internal sealed interface MangaState {
     data class Ok(val item: ShikimoriManga) : MangaState
-    object Load : MangaState
-    object Error : MangaState
+    data object Load : MangaState
+    data object Error : MangaState
 }

@@ -5,11 +5,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Slider
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Slider
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Create
 import androidx.compose.material.icons.filled.Delete
@@ -35,11 +35,7 @@ import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.core.compose.topBar
 import com.san.kir.data.models.utils.SortLibraryUtil
-import com.san.kir.core.support.SortLibraryUtil
 import com.san.kir.core.utils.viewModel.stateHolder
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toImmutableList
 import kotlin.math.roundToInt
 
 @Composable
@@ -50,7 +46,7 @@ fun CategoryScreen(
     val viewModel: CategoryStateHolder = stateHolder { CategoryViewModel() }
     val state by viewModel.state.collectAsState()
 
-    LaunchedEffect(categoryName) { viewModel.sendEvent(CategoryEvent.Set(categoryName)) }
+    LaunchedEffect(categoryName) { viewModel.sendAction(CategoryEvent.Set(categoryName)) }
 
     var hasError by rememberSaveable { mutableStateOf(false) }
     var deleteDialog by rememberSaveable { mutableStateOf(false) }
@@ -67,7 +63,7 @@ fun CategoryScreen(
                     MenuIcon(
                         icon = if (state.hasCreatedNew) Icons.Default.Create else Icons.Default.Save,
                     ) {
-                        viewModel.sendEvent(CategoryEvent.Save)
+                        viewModel.sendAction(CategoryEvent.Save)
                     }
                 // Удаление категории полностью
                 if (state.hasAll.not())
@@ -82,7 +78,7 @@ fun CategoryScreen(
             categoryNames = state.categoryNames,
             hasAll = state.hasAll,
             hasError = hasError,
-            sendEvent = viewModel::sendEvent,
+            sendEvent = viewModel::sendAction,
             changeHasError = { hasError = it }
         )
 
@@ -90,17 +86,17 @@ fun CategoryScreen(
 
         Text(stringResource(R.string.category_dialog_sort))
 
-        ChangeSortType(state.category.typeSort, viewModel::sendEvent)
+        ChangeSortType(state.category.typeSort, viewModel::sendAction)
 
         DefaultSpacer()
 
-        ChangeReverseSort(state.category.isReverseSort, viewModel::sendEvent)
+        ChangeReverseSort(state.category.isReverseSort, viewModel::sendAction)
 
         DefaultSpacer()
 
         Text(stringResource(R.string.category_dialog_visible))
 
-        ChangeVisibility(state.category.isVisible, viewModel::sendEvent)
+        ChangeVisibility(state.category.isVisible, viewModel::sendAction)
 
         DefaultSpacer()
 
@@ -111,7 +107,7 @@ fun CategoryScreen(
         ChangePortraitOptions(
             isLarge = state.category.isLargePortrait,
             span = state.category.spanPortrait,
-            sendEvent = viewModel::sendEvent
+            sendEvent = viewModel::sendAction
         )
 
         DefaultSpacer()
@@ -123,7 +119,7 @@ fun CategoryScreen(
         ChangeLandscapeOptions(
             isLarge = state.category.isLargeLandscape,
             span = state.category.spanLandscape,
-            sendEvent = viewModel::sendEvent
+            sendEvent = viewModel::sendAction
         )
     }
 
@@ -134,7 +130,7 @@ fun CategoryScreen(
             confirmButton = {
                 OutlinedButton(
                     onClick = {
-                        viewModel.sendEvent(CategoryEvent.Delete)
+                        viewModel.sendAction(CategoryEvent.Delete)
                         navigateUp()
                     }
                 ) {
@@ -155,7 +151,7 @@ fun CategoryScreen(
 @Composable
 private fun TextWithValidate(
     categoryName: String,
-    categoryNames: ImmutableList<String>,
+    categoryNames: List<String>,
     hasAll: Boolean,
     hasError: Boolean,
     sendEvent: (CategoryEvent) -> Unit,
@@ -201,17 +197,12 @@ private fun ChangeSortType(typeSort: String, sendEvent: (CategoryEvent) -> Unit)
     RadioGroup(
         typeSort,
         onSelected = { sendEvent(CategoryEvent.Update(newTypeSort = it)) },
-        stateList = persistentListOf(
-            SortLibraryUtil.add,
-            SortLibraryUtil.abc,
-            SortLibraryUtil.pop
-        ),
+        stateList = listOf(SortLibraryUtil.ADD, SortLibraryUtil.ABC, SortLibraryUtil.POP),
         textList = listOf(
             R.string.library_sort_dialog_add,
             R.string.library_sort_dialog_abc,
             R.string.library_sort_dialog_pop
         ).map { stringResource(id = it) }
-            .toImmutableList()
     )
 }
 

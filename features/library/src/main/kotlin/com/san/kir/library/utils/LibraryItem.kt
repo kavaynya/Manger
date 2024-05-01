@@ -15,10 +15,10 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.contentColorFor
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -55,7 +55,7 @@ fun LazyGridItemScope.LibraryLargeItem(
     showCategory: Boolean,
 ) {
     val context = LocalContext.current
-    val defaultColor = MaterialTheme.colors.primary
+    val defaultColor = MaterialTheme.colorScheme.primary
     val backgroundColor = remember {
         runCatching { if (manga.color != 0) Color(manga.color) else null }
             .getOrNull() ?: defaultColor
@@ -119,7 +119,7 @@ fun LazyGridItemScope.LibraryLargeItem(
                         color = defaultColor,
                         modifier = Modifier
                             .padding(end = 3.dp)
-                            .background(MaterialTheme.colors.contentColorFor(defaultColor))
+                            .background(MaterialTheme.colorScheme.contentColorFor(defaultColor))
                             .padding(start = 3.dp, bottom = 1.dp, end = 3.dp)
                     )
             }
@@ -137,7 +137,7 @@ fun LazyItemScope.LibrarySmallItem(
     showCategory: Boolean,
 ) {
     val context = LocalContext.current
-    val defaultColor = MaterialTheme.colors.primary
+    val defaultColor = MaterialTheme.colorScheme.primary
     val backgroundColor by remember {
         mutableStateOf(runCatching { Color(manga.color) }.getOrDefault(defaultColor))
     }
@@ -200,7 +200,7 @@ fun LazyItemScope.LibrarySmallItem(
             ) {
                 Text(
                     text = manga.category,
-                    color = MaterialTheme.colors.contentColorFor(backgroundColor),
+                    color = MaterialTheme.colorScheme.contentColorFor(backgroundColor),
                     modifier = Modifier
                         .background(backgroundColor)
                         .padding(Dimensions.smallest)

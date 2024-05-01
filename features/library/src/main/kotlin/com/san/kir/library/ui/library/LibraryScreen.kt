@@ -1,18 +1,17 @@
 package com.san.kir.library.ui.library
 
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.DrawerValue
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
-import androidx.compose.material.rememberDrawerState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ScaffoldState
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.material3.rememberScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,7 +24,6 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.coroutines.mainLaunch
 import com.san.kir.core.utils.navigation.rememberLambda
 import com.san.kir.core.utils.viewModel.stateHolder
@@ -41,7 +39,7 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
     val holder: LibraryStateHolder = stateHolder { LibraryViewModel() }
     val state by holder.state.collectAsState()
 
-    val unSelect = rememberLambda { holder.sendEvent(LibraryEvent.NonSelect) }
+    val unSelect = rememberLambda { holder.sendAction(LibraryEvent.NonSelect) }
 
     val scaffoldState = rememberScaffoldState(rememberDrawerState(DrawerValue.Closed))
 
@@ -56,14 +54,14 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
                 navigateToStats = navigation.navigateToStats,
                 itemsState = state.items,
                 selectedManga = it,
-                sendEvent = holder::sendEvent
+                sendEvent = holder::sendAction
             )
         }
     ) {
         ScreenContent(
             topBar = topBar(
                 title = stringResource(R.string.library_title),
-                actions = libraryActions(navigation.navigateToOnline, holder::sendEvent),
+                actions = libraryActions(navigation.navigateToOnline, holder::sendAction),
                 navigationButton = NavigationButton.Scaffold(scaffoldState),
                 hasAction = state.background is BackgroundState.Work
             ),
@@ -86,7 +84,7 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
                         navigation = navigation,
                         state = state,
                         itemsState = currentState,
-                        sendEvent = holder::sendEvent
+                        sendEvent = holder::sendAction
                     )
                 }
             }

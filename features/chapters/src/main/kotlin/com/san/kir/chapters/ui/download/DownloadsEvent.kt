@@ -1,9 +1,9 @@
 package com.san.kir.chapters.ui.download
 
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 
 
-internal sealed interface DownloadsEvent : ScreenEvent {
+internal sealed interface DownloadsEvent : Action {
     data object StartAll : DownloadsEvent
     data object StopAll : DownloadsEvent
     data object ClearAll : DownloadsEvent

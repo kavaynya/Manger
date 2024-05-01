@@ -5,14 +5,12 @@ import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.StoragesUpdateWorker
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Storage
 import com.san.kir.data.models.extend.MangaLogo
 import com.san.kir.storage.logic.di.storageRepository
 import com.san.kir.storage.logic.repo.StorageRepository
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -34,12 +32,12 @@ internal class StoragesViewModel(
         mangas,
         backgroundState
     ) { items, mangas, background ->
-        StoragesState(items.toPersistentList(), mangas, background)
+        StoragesState(items, mangas, background)
     }
 
     override val defaultState = StoragesState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is StoragesEvent.Delete -> storageRepository.delete(event.item)
         }

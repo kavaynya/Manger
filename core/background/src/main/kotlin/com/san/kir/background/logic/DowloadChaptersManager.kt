@@ -9,7 +9,7 @@ import com.san.kir.background.logic.repo.ChapterRepository
 import com.san.kir.background.logic.repo.ChapterWorkerRepository
 import com.san.kir.background.works.DownloadChaptersWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.models.base.ChapterTask
+import com.san.kir.data.db.workers.entities.DbChapterTask
 import kotlinx.coroutines.flow.first
 import java.util.UUID
 
@@ -22,7 +22,7 @@ class DownloadChaptersManager(
 
     suspend fun addTask(chapterId: Long) = withIoContext {
         if (workerRepository.task(chapterId) == null) {
-            workerRepository.add(ChapterTask(chapterId = chapterId))
+            workerRepository.add(DbChapterTask(chapterId = chapterId))
             chapterRepository.addToQueue(chapterId)
         }
 
@@ -32,7 +32,7 @@ class DownloadChaptersManager(
     suspend fun addTasks(chapterIds: List<Long>) = withIoContext {
         chapterIds.forEach { chapterId ->
             if (workerRepository.task(chapterId) == null) {
-                workerRepository.add(ChapterTask(chapterId = chapterId))
+                workerRepository.add(DbChapterTask(chapterId = chapterId))
                 chapterRepository.addToQueue(chapterId)
             }
         }

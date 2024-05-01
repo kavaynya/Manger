@@ -1,19 +1,18 @@
 package com.san.kir.chapters.utils
 
 import androidx.compose.foundation.layout.Row
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Update
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.text.style.TextOverflow
 import com.san.kir.chapters.R
@@ -57,9 +56,9 @@ internal fun topBar(
         NavigationButton.Back(navigateUp)
     },
     backgroundColor = if (selectionMode) {
-        MaterialTheme.colors.secondary
+        MaterialTheme.colorScheme.secondary
     } else {
-        MaterialTheme.colors.primarySurface
+        MaterialTheme.colorScheme.primarySurface
     },
     actions = {
         FromEndToEndAnimContent(targetState = selectionMode) {

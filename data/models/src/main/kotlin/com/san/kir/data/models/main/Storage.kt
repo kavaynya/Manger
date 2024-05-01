@@ -2,8 +2,6 @@ package com.san.kir.data.models.main
 
 import android.os.Parcelable
 import androidx.compose.runtime.Stable
-import androidx.room.Entity
-import androidx.room.PrimaryKey
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.lengthMb
 import kotlinx.parcelize.Parcelize

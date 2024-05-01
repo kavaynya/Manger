@@ -14,14 +14,14 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.Snackbar
-import androidx.compose.material.Text
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.PlayArrow
@@ -55,7 +55,6 @@ import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.internet.NetworkState
-import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.DownloadChapter
 
@@ -79,11 +78,11 @@ fun DownloadsScreen(navigateUp: () -> Unit) {
                 .fillMaxWidth(),
         ) {
             items(items = state.items, key = { it.id }) { item ->
-                ItemView(item, holder::sendEvent)
+                ItemView(item, holder::sendAction)
             }
         }
 
-        BottomScreenPart(state = state.network, sendEvent = holder::sendEvent)
+        BottomScreenPart(state = state.network, sendEvent = holder::sendAction)
     }
 }
 

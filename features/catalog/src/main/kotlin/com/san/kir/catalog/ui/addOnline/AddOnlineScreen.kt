@@ -6,11 +6,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,7 +54,7 @@ internal fun AddOnlineScreen(
     ) {
         Content(
             state = state,
-            sendEvent = holder::sendEvent,
+            sendEvent = holder::sendAction,
             navigateUp = navigateUp,
             navigateToNext = navigateToNext
         )
@@ -93,7 +93,7 @@ private fun ColumnScope.Content(
         Text(
             stringResource(R.string.library_add_manga_error),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.error
+            color = MaterialTheme.colorScheme.error
         )
     }
 
@@ -115,7 +115,7 @@ private fun ColumnScope.Content(
                 ) {
                     Text(
                         item,
-                        color = MaterialTheme.colors.error,
+                        color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(Dimensions.quarter)
                     )
                 }

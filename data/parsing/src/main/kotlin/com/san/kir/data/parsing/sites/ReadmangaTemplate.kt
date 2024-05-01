@@ -1,6 +1,5 @@
 package com.san.kir.data.parsing.sites
 
-import android.R
 import com.san.kir.core.internet.AuthorizationException
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.data.models.base.Chapter

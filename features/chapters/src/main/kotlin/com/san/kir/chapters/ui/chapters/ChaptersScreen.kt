@@ -21,8 +21,6 @@ import com.san.kir.chapters.utils.topBar
 import com.san.kir.core.compose.ScreenPadding
 import com.san.kir.core.compose.Tabs
 import com.san.kir.core.utils.viewModel.stateHolder
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -34,7 +32,7 @@ internal fun ChaptersScreen(
     val holder: ChaptersStateHolder = stateHolder { ChaptersViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(ChaptersEvent.Set(mangaId)) }
+    LaunchedEffect(Unit) { holder.sendAction(ChaptersEvent.Set(mangaId)) }
 
     val pagerState = rememberPagerState()
 
@@ -45,7 +43,7 @@ internal fun ChaptersScreen(
             backgroundAction = state.backgroundAction,
             manga = state.manga,
             navigateUp = navigateUp,
-            sendEvent = holder::sendEvent
+            sendEvent = holder::sendAction
         ),
     ) { contentPadding ->
         Column(
@@ -78,7 +76,7 @@ internal fun ChaptersScreen(
                         selectionMode = state.selectionMode,
                         items = state.items,
                         navigateToViewer = navigateToViewer,
-                        sendEvent = holder::sendEvent,
+                        sendEvent = holder::sendAction,
                     )
                 }
             }
@@ -87,11 +85,11 @@ internal fun ChaptersScreen(
 }
 
 @Composable
-internal fun chapterPages(isAlternative: Boolean): ImmutableList<Int> {
+internal fun chapterPages(isAlternative: Boolean): List<Int> {
     return remember(isAlternative) {
         if (isAlternative)
-            persistentListOf(R.string.list_chapters_page_about)
+            emptyList(R.string.list_chapters_page_about)
         else
-            persistentListOf(R.string.list_chapters_page_about, R.string.list_chapters_page_list)
+            emptyList(R.string.list_chapters_page_about, R.string.list_chapters_page_list)
     }
 }

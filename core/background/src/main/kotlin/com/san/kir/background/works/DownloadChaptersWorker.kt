@@ -16,19 +16,20 @@ import com.san.kir.background.logic.di.settingsRepository
 import com.san.kir.background.logic.repo.ChapterRepository
 import com.san.kir.background.logic.repo.SettingsRepository
 import com.san.kir.background.util.cancelAction
-import com.san.kir.core.internet.CellularNetwork
 import com.san.kir.core.internet.ConnectManager
+import com.san.kir.core.internet.NetworkManager
 import com.san.kir.core.internet.NetworkState
-import com.san.kir.core.internet.WifiNetwork
 import com.san.kir.core.internet.cellularNetwork
 import com.san.kir.core.internet.connectManager
 import com.san.kir.core.internet.wifiNetwork
-import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.bytesToMb
 import com.san.kir.core.utils.formatDouble
-import com.san.kir.data.models.base.ChapterTask
+import com.san.kir.data.db.workers.entities.DbChapterTask
+import com.san.kir.data.models.utils.DownloadState
+import com.san.kir.data.parsing.SiteCatalogsManager
+import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.combine
@@ -37,26 +38,28 @@ import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
 class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
-    BaseUpdateWorker<ChapterTask>(context, params) {
+    BaseUpdateWorker<DbChapterTask>(context, params) {
 
     override val TAG = "Chapter Downloader"
 
     override val workerRepository get() = ManualDI.chapterWorkerRepository
     private val chapterRepository: ChapterRepository = ManualDI.chapterRepository
     private val settingsRepository: SettingsRepository = ManualDI.settingsRepository
-    private val connectManager: ConnectManager = ManualDI.connectManager
-    private val cellularNetwork: CellularNetwork = ManualDI.cellularNetwork
-    private val wifiNetwork: WifiNetwork = ManualDI.wifiNetwork
+    private val connectManager: ConnectManager = ManualDI.connectManager()
+    private val siteCatalogsManager: SiteCatalogsManager = ManualDI.siteCatalogsManager()
+    private val cellularNetwork: NetworkManager = ManualDI.cellularNetwork()
+    private val wifiNetwork: NetworkManager = ManualDI.wifiNetwork()
 
-    private var successfuled = listOf<ChapterTask>()
+    private var successfuled = listOf<DbChapterTask>()
     private var networkState = NetworkState.OK
 
-    override suspend fun work(task: ChapterTask) {
+    override suspend fun work(task: DbChapterTask) {
         val loader = ChapterDownloader(
             chapterRepository.chapter(task.chapterId),
             chapterRepository,
             connectManager,
-            if (settingsRepository.currentDownload().concurrent) 4 else 1,
+            siteCatalogsManager = siteCatalogsManager,
+            concurrent = if (settingsRepository.currentDownload().concurrent) 4 else 1,
             checkNetwork = ::awaitNetwork,
         ) { chapter ->
             updateCurrentTask {
@@ -88,7 +91,7 @@ class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
             }
     }
 
-    override suspend fun onNotify(task: ChapterTask?) {
+    override suspend fun onNotify(task: DbChapterTask?) {
         with(NotificationCompat.Builder(applicationContext, channelId)) {
             setSmallIcon(R.drawable.ic_notification_download)
 
@@ -104,13 +107,8 @@ class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
                     setContentText(task.chapterName)
 
                     when (task.state) {
-                        DownloadState.LOADING -> {
-                            setProgress(task.max, task.progress, false)
-                        }
-
-                        else -> {
-                            setProgress(0, 0, true)
-                        }
+                        DownloadState.LOADING -> setProgress(task.max, task.progress, false)
+                        else -> setProgress(0, 0, true)
                     }
 
                     setSubText(messageToGo)
@@ -202,7 +200,7 @@ class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
         notificationManager.notify(notifyId + 1, builder.build())
     }
 
-    override suspend fun onRemoveAllTasks(tasks: List<ChapterTask>) {
+    override suspend fun onRemoveAllTasks(tasks: List<DbChapterTask>) {
         chapterRepository.pauseChapters(tasks.map { it.chapterId })
     }
 

@@ -6,18 +6,17 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.san.kir.core.utils.DIR
-import com.san.kir.core.support.DIR
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.shortPath
 import com.san.kir.data.chapterDao
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.StorageDao
-import com.san.kir.data.db.dao.itemByPath
+import com.san.kir.data.db.main.dao.ChapterDao
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.dao.StorageDao
+import com.san.kir.data.db.main.dao.itemByPath
 import com.san.kir.data.mangaDao
-import com.san.kir.data.models.base.Storage
-import com.san.kir.data.models.base.getSizeAndIsNew
+import com.san.kir.data.db.main.entites.DbStorage
+import com.san.kir.data.db.main.entites.getSizeAndIsNew
 import com.san.kir.data.storageDao
 
 /*
@@ -43,7 +42,7 @@ class StoragesUpdateWorker(
                     dir.listFiles()?.forEach { item ->
                         if (list.none { it.name == item.name }) {
                             storageDao.insert(
-                                Storage(
+                                DbStorage(
                                     name = item.name,
                                     path = item.shortPath,
                                     catalogName = dir.name

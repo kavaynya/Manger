@@ -3,8 +3,6 @@
     <string name="app_name_version" translatable="false">Manger: %s</string>
     <string name="name">Автор: Kir San</string>
 
-    <string name="first_run_exit_text">Двойное нажатие закроет приложение</string>
-
     <string name="library_title">Библиотека</string>
     <string name="library_sort_dialog_add">По дате добавления</string>
     <string name="library_sort_dialog_abc">В алфавитном порядке</string>

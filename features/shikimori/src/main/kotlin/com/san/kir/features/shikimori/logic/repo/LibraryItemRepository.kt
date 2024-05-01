@@ -1,7 +1,7 @@
 package com.san.kir.features.shikimori.logic.repo
 
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.dao.ShikimoriDao
+import com.san.kir.data.db.main.dao.ShikimoriDao
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 

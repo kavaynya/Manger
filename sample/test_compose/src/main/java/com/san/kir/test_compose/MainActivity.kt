@@ -11,12 +11,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -48,9 +49,12 @@ fun LazyScrollView() {
 
     val density = LocalDensity.current
     val pixelValue = with(density) { appBarHeight.toPx() }
-    val (height, heightChanger) = remember { mutableStateOf(pixelValue) }
+    val (height, heightChanger) = remember { mutableFloatStateOf(pixelValue) }
 
-    val animatedHeight by animateDpAsState(targetValue = with(density) { height.toDp() })
+    val animatedHeight by animateDpAsState(
+        targetValue = with(density) { height.toDp() },
+        label = "", label = ""
+    )
 
     Column {
         TopAppBar(
@@ -58,21 +62,24 @@ fun LazyScrollView() {
             modifier = Modifier.height(animatedHeight)
         )
 
-        Box(modifier = Modifier
-            .weight(1f)
-            .background(Color.Blue)
-            .nestedScroll(
-                rememberNestedScrollConnection(
-                    onOffsetChanged = heightChanger,
-                    appBarHeight = pixelValue,
+        Box(
+            modifier = Modifier
+                .weight(1f)
+                .background(Color.Blue)
+                .nestedScroll(
+                    rememberNestedScrollConnection(
+                        onOffsetChanged = heightChanger,
+                        appBarHeight = pixelValue,
+                    )
                 )
-            )
         ) {
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(count = 50) { index ->
-                    Text(text = "Some $index",
+                    Text(
+                        text = "Some $index",
                         modifier = Modifier.padding(8.dp),
-                        color = MaterialTheme.colors.onBackground)
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
                 }
             }
         }

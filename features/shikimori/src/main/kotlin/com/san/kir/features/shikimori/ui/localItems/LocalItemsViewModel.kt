@@ -2,7 +2,7 @@ package com.san.kir.features.shikimori.ui.localItems
 
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultDispatcher
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.SimplifiedMangaWithChapterCounts
 import com.san.kir.features.shikimori.logic.Helper
@@ -32,13 +32,13 @@ internal class LocalItemsViewModel(
     private val bindingHelper = BindingUseCase(profileRepository)
 
     init {
-        sendEvent(LocalItemsEvent.Update)
+        sendAction(LocalItemsEvent.Update)
     }
 
     override val tempState = combine(hasAction, unbindedItems, ::LocalItemsState)
     override val defaultState = LocalItemsState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             LocalItemsEvent.Update -> updateItemsAndBinding()
         }

@@ -18,7 +18,7 @@ import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.schedule.R
 import com.san.kir.schedule.utils.pages
-import kotlinx.collections.immutable.toPersistentList
+
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -46,7 +46,7 @@ internal fun MainScreen(
 
         ScrollableTabs(
             pagerState,
-            items = pages.map { stringResource(it.nameId) }.toPersistentList()
+            items = pages.map { stringResource(it.nameId) }
         )
 
         HorizontalPager(

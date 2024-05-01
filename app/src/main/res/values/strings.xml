@@ -23,9 +23,6 @@
     разрешения, приложение не сможет работать.</string>
     <string name="notificaton_permission_nonpermission">Вы запретили приложению доступ к уведомлениям и оно превратилось в тыкву. Для исправления перейдите в настройки</string>
 
-    <!-- FirstRun -->
-    <string name="first_run_exit_text">Двойное нажатие закроет приложение</string>
-
     <!-- MainMenu -->
     <string name="storage">Хранилище</string>
     <string name="statistic">Статистика</string>

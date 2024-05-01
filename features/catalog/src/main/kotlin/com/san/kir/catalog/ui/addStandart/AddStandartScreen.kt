@@ -6,14 +6,14 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.Button
-import androidx.compose.material.Card
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
-import androidx.compose.material.TextField
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.darkColorScheme
+import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -35,8 +35,6 @@ import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
-import kotlinx.collections.immutable.ImmutableList
-import kotlinx.collections.immutable.persistentListOf
 
 @Composable
 fun AddStandartScreen(
@@ -46,7 +44,7 @@ fun AddStandartScreen(
     val holder: AddStandartViewModel = stateHolder { AddStandartViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(AddStandartEvent.Set(url)) }
+    LaunchedEffect(Unit) { holder.sendAction(AddStandartEvent.Set(url)) }
 
     ScreenContent(
         topBar = topBar(
@@ -54,7 +52,7 @@ fun AddStandartScreen(
             navigationButton = NavigationButton.Back(navigateUp)
         ),
     ) {
-        Content(state, holder::sendEvent, navigateUp)
+        Content(state, holder::sendAction, navigateUp)
     }
 }
 
@@ -119,7 +117,7 @@ private inline fun ColumnScope.MessageAboutCreatingNewCategory(visible: Boolean)
         Text(
             stringResource(id = R.string.add_manga_screen_add_new),
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.error,
+            color = MaterialTheme.colorScheme.error,
             modifier = Modifier.fillMaxWidth()
         )
     }
@@ -127,7 +125,7 @@ private inline fun ColumnScope.MessageAboutCreatingNewCategory(visible: Boolean)
 
 @Composable
 fun ListOfAvailableCategories(
-    listOfCategories: ImmutableList<String>,
+    listOfCategories: List<String>,
     onItemSelect: (String) -> Unit,
 ) {
     FlowRow(
@@ -193,8 +191,8 @@ private fun ColumnScope.Process(state: AddStandartState) {
 )
 @Composable
 fun PreviewListOfAvailableCategoriesLight() {
-    MaterialTheme(colors = lightColors()) {
-        ListOfAvailableCategories(listOfCategories = persistentListOf("Test 1", "Test 2", "Test 3"),
+    MaterialTheme(colorScheme = lightColorScheme()) {
+        ListOfAvailableCategories(listOfCategories = listOf("Test 1", "Test 2", "Test 3"),
                                   onItemSelect = {})
     }
 }
@@ -205,8 +203,8 @@ fun PreviewListOfAvailableCategoriesLight() {
 )
 @Composable
 fun PreviewListOfAvailableCategoriesDark() {
-    MaterialTheme(colors = darkColors()) {
-        ListOfAvailableCategories(listOfCategories = persistentListOf("Test 1", "Test 2", "Test 3"),
+    MaterialTheme(colorScheme = darkColorScheme()) {
+        ListOfAvailableCategories(listOfCategories = listOf("Test 1", "Test 2", "Test 3"),
                                   onItemSelect = {})
     }
 }

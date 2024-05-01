@@ -44,7 +44,7 @@ internal fun LocalItemsScreen(
             progressAction = state.action.progress
         ),
         additionalPadding = Dimensions.zero,
-        onRefresh = { holder.sendEvent(LocalItemsEvent.Update) }
+        onRefresh = { holder.sendAction(LocalItemsEvent.Update) }
     ) { contentPadding ->
         Column(
             modifier = Modifier

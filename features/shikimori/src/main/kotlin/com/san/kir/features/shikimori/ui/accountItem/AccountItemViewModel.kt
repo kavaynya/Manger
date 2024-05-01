@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.datastore.preferences.core.edit
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.features.shikimori.AuthActivity
 import com.san.kir.features.shikimori.CODE
@@ -56,7 +56,7 @@ internal class AccountItemViewModel(
     override val tempState = combine(loginState, dialogState, ::AccountItemState)
     override val defaultState = AccountItemState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             AccountItemEvent.LogIn -> {
                 loginState.update { LoginState.Loading }

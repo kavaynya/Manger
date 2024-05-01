@@ -1,6 +1,5 @@
 package com.san.kir.data.models.main
 
-import android.content.Context
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.TimeFormat
 import com.san.kir.core.utils.bytesToMb
@@ -19,12 +18,11 @@ data class DownloadItem(
     val downloadPages: Int,
     val pages: List<String>,
 ) {
-    val progress =
-        if (pages.isNotEmpty()) downloadPages.toFloat() / pages.size.toFloat() else 0F
+    val progress = if (pages.isNotEmpty()) downloadPages.toFloat() / pages.size else 0F
 
     val size = bytesToMb(downloadSize).format()
 
-    fun time() = TimeFormat(totalTime / 1000).toString(ManualDI.context)
+    fun time() = TimeFormat(totalTime / 1000).toString(ManualDI.application)
 
     val needShowMangaName: Boolean = manga.fuzzy(name).second.not()
 }

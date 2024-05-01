@@ -2,10 +2,9 @@ package com.san.kir.settings.ui.settings
 
 import android.os.Build
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material.Divider
+import androidx.compose.material3.Divider
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.CompareArrows
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.CropLandscape
 import androidx.compose.material.icons.filled.DarkMode
@@ -32,7 +31,7 @@ import com.san.kir.settings.utils.ListPreferenceItem
 import com.san.kir.settings.utils.MultiSelectListPreferenceItem
 import com.san.kir.settings.utils.PreferenceTitle
 import com.san.kir.settings.utils.TogglePreferenceItem
-import kotlinx.collections.immutable.toPersistentList
+
 
 @Composable
 fun SettingsScreen(
@@ -49,16 +48,16 @@ fun SettingsScreen(
         additionalPadding = Dimensions.zero
     ) {
         Column(modifier = Modifier.bottomInsetsPadding()) {
-            Main(state.main, viewModel::sendEvent)
+            Main(state.main, viewModel::sendAction)
             Divider()
 
-            Chapters(state.chapters, viewModel::sendEvent)
+            Chapters(state.chapters, viewModel::sendAction)
             Divider()
 
-            Viewer(state.viewer, viewModel::sendEvent)
+            Viewer(state.viewer, viewModel::sendAction)
             Divider()
 
-            Download(state.download, viewModel::sendEvent)
+            Download(state.download, viewModel::sendAction)
         }
     }
 }
@@ -133,7 +132,7 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
         subtitle = R.string.settings_viewer_control_summary,
         icon = Icons.Default.VideogameAsset,
         entries = R.array.settings_viewer_control_array,
-        initialValue = viewer.controls.toPersistentList(),
+        initialValue = viewer.controls,
         onValueChange = {
             sendEvent(SettingsEvent.SaveViewer(viewer.copy(control = viewer.controls(it))))
         }

@@ -9,7 +9,7 @@ data class SimplifiedTask(
     override val id: Long = 0L,
     override val manga: String = "",
     override val groupName: String = "",
-    val category: String = "",
+    override val category: String = "",
     override val catalog: String = "",
     override val type: PlannedType = PlannedType.MANGA,
     val isEnabled: Boolean = false,

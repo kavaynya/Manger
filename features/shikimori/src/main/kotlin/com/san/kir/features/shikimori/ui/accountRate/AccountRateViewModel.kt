@@ -1,7 +1,7 @@
 package com.san.kir.features.shikimori.ui.accountRate
 
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.ShikiDbManga
 import com.san.kir.data.models.base.ShikimoriRate
@@ -63,7 +63,7 @@ internal class AccountRateViewModel(
 
     override val defaultState = AccountRateState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             AccountRateEvent.ExistToggle -> {
                 when (val profile = state.value.profile) {

@@ -18,10 +18,10 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Card
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
-import androidx.compose.material.Text
+import androidx.compose.material3.Card
+import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.LocalLibrary
 import androidx.compose.material.icons.filled.Search
@@ -61,7 +61,7 @@ internal fun AccountScreen(
 
     ScreenPadding(
         topBar = topBar(
-            onSendEvent = holder::sendEvent,
+            onSendEvent = holder::sendAction,
             navigateUp = navigateUp,
             navigateToSearch = navigateToSearch,
             state = state.login,
@@ -79,7 +79,7 @@ internal fun AccountScreen(
                 }
             }
         },
-        onRefresh = { holder.sendEvent(AccountEvent.Update) }
+        onRefresh = { holder.sendAction(AccountEvent.Update) }
     ) { contentPadding ->
         Column(
             modifier = Modifier
@@ -97,8 +97,8 @@ internal fun AccountScreen(
 
     LogOutDialog(
         state = state.dialog,
-        onDismiss = { holder.sendEvent(AccountEvent.CancelLogOut) },
-        onConfirm = { holder.sendEvent(AccountEvent.LogOut) }
+        onDismiss = { holder.sendAction(AccountEvent.CancelLogOut) },
+        onConfirm = { holder.sendAction(AccountEvent.LogOut) }
     )
 }
 

@@ -1,7 +1,7 @@
 package com.san.kir.features.shikimori.ui
 
 import androidx.compose.animation.Crossfade
-import androidx.compose.material.MaterialTheme
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -14,7 +14,6 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.support.R
 import com.san.kir.features.shikimori.ui.accountItem.AccountItem
 import com.san.kir.features.shikimori.ui.accountRate.AccountRateScreen
 import com.san.kir.features.shikimori.ui.accountScreen.AccountScreen

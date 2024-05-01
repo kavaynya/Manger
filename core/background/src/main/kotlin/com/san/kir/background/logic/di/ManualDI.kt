@@ -11,7 +11,7 @@ import com.san.kir.background.logic.repo.MangaRepository
 import com.san.kir.background.logic.repo.MangaWorkerRepository
 import com.san.kir.background.logic.repo.SettingsRepository
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.catalogDatabaseFactory
+import com.san.kir.data.catalogsRepository
 import com.san.kir.data.catalogTaskDao
 import com.san.kir.data.chapterDao
 import com.san.kir.data.chapterTaskDao
@@ -56,7 +56,7 @@ internal val ManualDI.catalogWorkerRepository: CatalogWorkerRepository
     get() = CatalogWorkerRepository(catalogTaskDao)
 
 internal val ManualDI.chapterRepository: ChapterRepository
-    get() = ChapterRepository(siteCatalogsManager, chapterDao, statisticDao)
+    get() = ChapterRepository(siteCatalogsManager(), chapterDao, statisticDao)
 
 internal val ManualDI.mangaRepository: MangaRepository
     get() = MangaRepository(mangaDao, chapterDao)
@@ -65,4 +65,4 @@ internal val ManualDI.settingsRepository: SettingsRepository
     get() = SettingsRepository(settingsDao)
 
 internal val ManualDI.catalogRepository: CatalogRepository
-    get() = CatalogRepository(catalogDatabaseFactory, siteCatalogsManager)
+    get() = CatalogRepository(catalogsRepository, siteCatalogsManager())

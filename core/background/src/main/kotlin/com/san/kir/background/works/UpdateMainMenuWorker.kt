@@ -7,12 +7,11 @@ import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
 import androidx.work.WorkManager
 import androidx.work.WorkerParameters
-import com.san.kir.core.support.MainMenuType
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.models.utils.MainMenuType
-import com.san.kir.data.db.dao.MainMenuDao
+import com.san.kir.data.db.main.dao.MainMenuDao
 import com.san.kir.data.mainMenuDao
-import com.san.kir.data.models.base.MainMenuItem
+import com.san.kir.data.db.main.entites.DbMainMenuItem
+import com.san.kir.data.models.utils.MainMenuType
 
 class UpdateMainMenuWorker(
     private val ctx: Context,
@@ -32,7 +31,7 @@ class UpdateMainMenuWorker(
 
     private suspend fun checkNewItems() {
         // Добавление новых
-        val items = mainMenuDao.getItems()
+        val items = mainMenuDao.items()
         MainMenuType.values()
             .filter { it.added }
             .filter { type ->
@@ -40,7 +39,7 @@ class UpdateMainMenuWorker(
             }
             .forEach {
                 mainMenuDao.insert(
-                    MainMenuItem(name = ctx.getString(it.stringId()), order = 100, type = it)
+                    DbMainMenuItem(name = ctx.getString(it.stringId()), order = 100, type = it)
                 )
             }
     }
@@ -48,7 +47,7 @@ class UpdateMainMenuWorker(
     private suspend fun updateMenuItems() {
         // Обновление старых
         mainMenuDao.update(*mainMenuDao
-            .getItems()
+            .items()
             .map { item ->
                 item.copy(name = ctx.getString(item.type.stringId()))
             }
@@ -61,7 +60,7 @@ class UpdateMainMenuWorker(
         // Удаление не нужных
         val notNeeded = MainMenuType.values().filter { it.added.not() }
         if (notNeeded.isNotEmpty())
-            mainMenuDao.getItems().filter { type ->
+            mainMenuDao.items().filter { type ->
                 notNeeded.any { it == type.type }
             }.forEach {
                 mainMenuDao.delete(it)

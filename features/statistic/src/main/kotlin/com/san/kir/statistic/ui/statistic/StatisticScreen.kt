@@ -29,7 +29,7 @@ internal fun StatisticScreen(navigateUp: () -> Unit, itemId: Long) {
     val holder: StatisticStateHolder = stateHolder { StatisticViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(StatisticEvent.Set(itemId)) }
+    LaunchedEffect(Unit) { holder.sendAction(StatisticEvent.Set(itemId)) }
 
     ScreenContent(
         topBar = topBar(

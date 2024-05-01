@@ -5,7 +5,7 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.chapterDao
-import com.san.kir.data.db.dao.ChapterDao
+import com.san.kir.data.db.main.dao.ChapterDao
 
 class AllLatestClearWorker(
     appContext: Context,

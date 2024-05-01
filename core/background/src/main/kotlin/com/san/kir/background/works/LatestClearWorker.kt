@@ -6,11 +6,11 @@ import androidx.work.WorkManager
 
 
 object LatestClearWorkers {
-    const val tag = "cleanLatest"
+    const val TAG = "cleanLatest"
 
     fun clearAll(ctx: Context) {
         val task = OneTimeWorkRequestBuilder<AllLatestClearWorker>()
-            .addTag(tag)
+            .addTag(TAG)
             .build()
 
         WorkManager
@@ -20,7 +20,7 @@ object LatestClearWorkers {
 
     fun clearDownloaded(ctx: Context) {
         val task = OneTimeWorkRequestBuilder<DownloadedLatestClearWorker>()
-            .addTag(tag)
+            .addTag(TAG)
             .build()
 
         WorkManager
@@ -30,7 +30,7 @@ object LatestClearWorkers {
 
     fun clearReaded(ctx: Context) {
         val task = OneTimeWorkRequestBuilder<ReadLatestClearWorker>()
-            .addTag(tag)
+            .addTag(TAG)
             .build()
 
         WorkManager

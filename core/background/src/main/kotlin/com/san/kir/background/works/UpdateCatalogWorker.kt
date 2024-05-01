@@ -14,11 +14,11 @@ import com.san.kir.background.logic.di.catalogWorkerRepository
 import com.san.kir.background.logic.repo.CatalogRepository
 import com.san.kir.background.logic.repo.CatalogWorkerRepository
 import com.san.kir.background.util.cancelAction
-import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.models.base.CatalogTask
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.db.workers.entities.DbCatalogTask
+import com.san.kir.data.db.catalog.entities.DbSiteCatalogElement
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.flow.collectIndexed
@@ -27,19 +27,19 @@ import timber.log.Timber
 class UpdateCatalogWorker(
     context: Context,
     params: WorkerParameters,
-) : BaseUpdateWorker<CatalogTask>(context, params) {
+) : BaseUpdateWorker<DbCatalogTask>(context, params) {
 
-    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager()
     private val catalogRepository: CatalogRepository = ManualDI.catalogRepository
 
     override val workerRepository: CatalogWorkerRepository = ManualDI.catalogWorkerRepository
     override val TAG = "Catalogs Updater"
 
-    override suspend fun work(task: CatalogTask) {
+    override suspend fun work(task: DbCatalogTask) {
         updateCurrentTask { copy(progress = 0f, state = DownloadState.QUEUED) }
         notify()
 
-        val tempList = mutableListOf<SiteCatalogElement>()
+        val tempList = mutableListOf<DbSiteCatalogElement>()
         kotlin.runCatching {
             val site = manager.catalog.first { it.name == task.name }
             site.init()
@@ -86,7 +86,7 @@ class UpdateCatalogWorker(
         }
     }
 
-    override suspend fun onNotify(task: CatalogTask?) {
+    override suspend fun onNotify(task: DbCatalogTask?) {
         with(NotificationCompat.Builder(applicationContext, channelId)) {
             setSmallIcon(R.drawable.ic_notification_update)
 

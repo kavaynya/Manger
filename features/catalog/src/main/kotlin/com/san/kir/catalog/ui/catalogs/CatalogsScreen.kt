@@ -8,10 +8,10 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DeviceUnknown
 import androidx.compose.material.icons.filled.Search
@@ -46,7 +46,7 @@ internal fun CatalogsScreen(
     val holder: CatalogsStateHolder = stateHolder { CatalogsViewModel() }
     val state by holder.state.collectAsState()
 
-    val sendEvent = remember { { event: CatalogsEvent -> holder.sendEvent(event) } }
+    val sendEvent = remember { { event: CatalogsEvent -> holder.sendAction(event) } }
 
     ScreenList(
         topBar = topBar(
@@ -116,7 +116,7 @@ private fun ItemView(item: CheckableSite, onClick: (SharedParams) -> Unit) {
                 SiteState.Error ->
                     Icon(
                         Icons.Default.DeviceUnknown, "",
-                        tint = MaterialTheme.colors.error,
+                        tint = MaterialTheme.colorScheme.error,
                     )
 
                 SiteState.Load ->

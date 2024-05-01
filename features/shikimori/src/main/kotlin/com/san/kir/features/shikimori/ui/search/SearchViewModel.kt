@@ -2,7 +2,7 @@ package com.san.kir.features.shikimori.ui.search
 
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.features.shikimori.logic.di.profileItemRepository
 import com.san.kir.features.shikimori.logic.repo.ProfileItemRepository
@@ -24,7 +24,7 @@ internal class SearchViewModel(
     override val tempState = searchingState.map { search -> SearchState(search) }
     override val defaultState = SearchState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is SearchEvent.Search -> {
                 job?.cancel()

@@ -1,16 +1,15 @@
 package com.san.kir.library.logic.repo
 
 import android.content.Context
+import com.san.kir.core.utils.coroutines.withIoContext
+import com.san.kir.data.db.main.dao.CategoryDao
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.entites.DbCategory
+import com.san.kir.data.db.main.entites.DbManga
+import com.san.kir.data.db.main.views.ViewManga
+import com.san.kir.data.models.extend.CategoryWithMangas
 import com.san.kir.data.models.utils.CATEGORY_ALL
 import com.san.kir.data.models.utils.SortLibraryUtil
-import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.core.utils.mapP
-import com.san.kir.data.db.dao.CategoryDao
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.models.base.Category
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.extend.CategoryWithMangas
-import com.san.kir.data.models.extend.SimplifiedManga
 import com.san.kir.library.ui.library.ItemsState
 import kotlinx.collections.immutable.toPersistentMap
 import kotlinx.coroutines.flow.combine
@@ -32,7 +31,7 @@ internal class MangaRepository(
             ItemsState.Ok(
                 items = cats
                     .filter { it.isVisible }
-                    .mapP { context.transform(it, mangas) },
+                    .map { context.transform(it, mangas) },
                 categories = cats.associate { it.id to it.name }.toPersistentMap()
             )
     }

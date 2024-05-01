@@ -1,7 +1,7 @@
 package com.san.kir.manger
 
-//import androidx.compose.material.MaterialTheme
-//import androidx.compose.material.darkColors
+//import androidx.compose.material3.MaterialTheme
+//import androidx.compose.material3.darkColorScheme
 import androidx.compose.ui.test.junit4.createComposeRule
 import androidx.compose.ui.test.onRoot
 import androidx.compose.ui.test.printToLog

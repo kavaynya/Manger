@@ -1,9 +1,9 @@
 package com.san.kir.settings.logic.repo
 
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.dao.SettingsDao
-import com.san.kir.data.db.repositories.AbstractSettingsRepository
-import com.san.kir.data.models.base.Settings
+import com.san.kir.data.db.main.dao.SettingsDao
+import com.san.kir.data.db.main.repo.AbstractSettingsRepository
+import com.san.kir.data.db.main.entites.DbSettings
 
 internal class SettingsRepository(
     settingsDao: SettingsDao

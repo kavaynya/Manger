@@ -5,8 +5,8 @@ import androidx.compose.animation.core.animateIntAsState
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +41,7 @@ internal fun Description(
             when (state) {
                 is ProfileState.Ok -> if (showFullDesc) fullText else smallText
                 ProfileState.None, ProfileState.Load -> fullText
-            }
+            }, label = ""
         )
 
         Column(
@@ -77,7 +77,7 @@ internal fun Description(description: String?) {
 
     if (description != null && description.isNotEmpty()) {
         var showFullDesc by remember { mutableStateOf(false) }
-        val animateSize by animateIntAsState(if (showFullDesc) fullText else smallText)
+        val animateSize by animateIntAsState(if (showFullDesc) fullText else smallText, label = "")
 
         Column(
             modifier = Modifier.fillMaxWidth(),

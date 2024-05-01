@@ -8,13 +8,12 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Scaffold
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.pullrefresh.PullRefreshIndicator
-import androidx.compose.material.pullrefresh.pullRefresh
-import androidx.compose.material.pullrefresh.rememberPullRefreshState
-import androidx.compose.material.rememberScaffoldState
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.ScaffoldState
+import androidx.compose.material3.pullrefresh.PullRefreshIndicator
+import androidx.compose.material3.pullrefresh.pullRefresh
+import androidx.compose.material3.pullrefresh.rememberPullRefreshState
+import androidx.compose.material3.rememberScaffoldState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,11 +42,13 @@ internal fun BaseScreen(
 ) {
     val density = LocalDensity.current
     val pixelValue = with(density) { Dimensions.appBarHeight.toPx() }
-    val (height, heightChanger) = remember { mutableStateOf(pixelValue) }
+    val (height, heightChanger) = remember { mutableFloatStateOf(pixelValue) }
     val scope = rememberCoroutineScope()
     var refreshing by remember { mutableStateOf(false) }
 
-    val animatedHeight by animateDpAsState(targetValue = with(density) { height.toDp() })
+    val animatedHeight by animateDpAsState(targetValue = with(density) { height.toDp() },
+        label = ""
+    )
 
     fun refresh() = scope.launch {
         refreshing = true

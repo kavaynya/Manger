@@ -15,17 +15,16 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.BottomAppBar
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.BottomAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentAlpha
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.SelectAll
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
 import androidx.compose.runtime.Composable
@@ -52,14 +51,14 @@ import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.models.extend.countPages
-import kotlinx.collections.immutable.ImmutableList
+
 
 // Страница со списком и инструментами для манипуляции с ним
 @Composable
 internal fun ListPageContent(
     chapterFilter: com.san.kir.data.models.utils.ChapterFilter,
     selectionMode: Boolean,
-    items: ImmutableList<SelectableItem>,
+    items: List<SelectableItem>,
     navigateToViewer: (Long) -> Unit,
     sendEvent: (ChaptersEvent) -> Unit,
 ) {
@@ -103,7 +102,7 @@ private fun BottomOrderBar(
     val allColor = animatedColor(currentFilter.isAll)
     val readColor = animatedColor(currentFilter.isRead)
     val notColor = animatedColor(currentFilter.isNot)
-    val reverseRotate by animateFloatAsState(if (currentFilter.isAsc) 0f else 180f)
+    val reverseRotate by animateFloatAsState(if (currentFilter.isAsc) 0f else 180f, label = "")
 
     BottomAppBar(
         modifier = Modifier
@@ -115,7 +114,7 @@ private fun BottomOrderBar(
         // Смена порядка сортировки
         IconButton(onClick = { sendEvent(Filter.Reverse) }) {
             Icon(
-                Icons.Default.Sort,
+                Icons.AutoMirrored.Filled.Sort,
                 contentDescription = "reverse sort",
                 modifier = Modifier.rotate(reverseRotate)
             )

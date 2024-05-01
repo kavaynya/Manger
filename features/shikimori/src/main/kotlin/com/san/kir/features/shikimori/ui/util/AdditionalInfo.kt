@@ -12,23 +12,24 @@ import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.Card
-import androidx.compose.material.DropdownMenuItem
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.ExposedDropdownMenuBox
-import androidx.compose.material.ExposedDropdownMenuDefaults
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.OutlinedTextField
-import androidx.compose.material.Text
-import androidx.compose.material.TextButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ExposedDropdownMenuBox
+import androidx.compose.material3.ExposedDropdownMenuDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Remove
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -241,7 +242,6 @@ private fun ChangeButton(
         }
 }
 
-@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun Dialog(
     onDismiss: () -> Unit,
@@ -340,7 +340,7 @@ private fun WithLabel(textRes: Int, width: Dp, content: @Composable () -> Unit) 
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun StatusChanger(
     status: ShikimoriStatus,
@@ -369,14 +369,13 @@ private fun StatusChanger(
         ) {
             ShikimoriStatus.values().forEach { item ->
                 DropdownMenuItem(
+                    text = { Text(text = statuses[item.ordinal]) },
                     onClick = {
                         currentStatus = item
                         onChange(item)
                         expandMenu = false
                     },
-                ) {
-                    Text(text = statuses[item.ordinal])
-                }
+                )
             }
         }
     }
@@ -388,7 +387,7 @@ private fun CountChanger(
     maxCount: Long? = null,
     onChange: (Long) -> Unit,
 ) {
-    var counter by remember { mutableStateOf(initialCount) }
+    var counter by remember { mutableLongStateOf(initialCount) }
     var isWrongText by remember { mutableStateOf(false) }
 
     onChange(counter)

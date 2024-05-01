@@ -7,9 +7,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,7 +33,7 @@ fun ComxItemScreen(navigateToScreen: (String) -> Unit) {
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        viewModel.sendEvent(ComxItemEvent.Update)
+        viewModel.sendAction(ComxItemEvent.Update)
     }
 
     Row(
@@ -56,7 +56,7 @@ fun ComxItemScreen(navigateToScreen: (String) -> Unit) {
             FromBottomToBottomAnimContent(targetState = state.login) {
                 when (it) {
                     LoginState.Error    -> {
-                        Text(stringResource(R.string.error), color = MaterialTheme.colors.error)
+                        Text(stringResource(R.string.error), color = MaterialTheme.colorScheme.error)
                     }
                     LoginState.Loading  -> {}
                     is LoginState.LogIn -> Row(verticalAlignment = Alignment.CenterVertically) {

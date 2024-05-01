@@ -6,7 +6,7 @@ import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.data.models.base.Manga
 import com.san.kir.data.models.extend.SimplifiedChapter
 import com.san.kir.data.models.extend.SimplifiedChapterComparator
-import kotlinx.collections.immutable.toPersistentList
+
 
 internal object SelectionHelper {
     private val simplifiedChapterComparator by lazy { SimplifiedChapterComparator() }
@@ -17,7 +17,7 @@ internal object SelectionHelper {
         val newItems = old
             .items
             .mapIndexed { index, item -> item.copy(selected = firstSelected > index) }
-            .toPersistentList()
+            
 
         return old.copy(items = newItems)
     }
@@ -28,7 +28,7 @@ internal object SelectionHelper {
         val newItems = old
             .items
             .mapIndexed { index, item -> item.copy(selected = firstSelected < index) }
-            .toPersistentList()
+            
 
         return old.copy(items = newItems)
     }
@@ -37,7 +37,7 @@ internal object SelectionHelper {
         val newItems = old
             .items
             .map { item -> item.copy(selected = true) }
-            .toPersistentList()
+            
 
         return old.copy(items = newItems)
     }
@@ -46,7 +46,7 @@ internal object SelectionHelper {
         val newItems = old
             .items
             .map { item -> item.copy(selected = false) }
-            .toPersistentList()
+            
 
         return old.copy(items = newItems)
     }
@@ -80,7 +80,7 @@ internal object SelectionHelper {
             }
 
         return Items(
-            items = items.toPersistentList(),
+            items = items,
             count = list.size,
             readCount = list.count { it.isRead })
     }

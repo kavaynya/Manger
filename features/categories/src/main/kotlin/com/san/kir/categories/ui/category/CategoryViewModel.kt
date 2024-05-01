@@ -4,14 +4,11 @@ import android.content.Context
 import com.san.kir.background.works.RemoveCategoryWorker
 import com.san.kir.categories.logic.di.categoryRepository
 import com.san.kir.categories.logic.repo.CategoryRepository
-import com.san.kir.core.support.CATEGORY_ALL
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.utils.CATEGORY_ALL
-import com.san.kir.core.utils.viewModel.BaseViewModel
 import com.san.kir.data.models.base.Category
-import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -35,7 +32,7 @@ internal class CategoryViewModel(
     ) { cat, hasCreatedNew, items, oldName, changes ->
         CategoryState(
             category = cat,
-            categoryNames = items.toPersistentList(),
+            categoryNames = items,
             hasCreatedNew = hasCreatedNew,
             oldCategoryName = oldName,
             hasAll = oldName == context.CATEGORY_ALL,
@@ -45,7 +42,7 @@ internal class CategoryViewModel(
 
     override val defaultState = CategoryState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             CategoryEvent.Save -> save()
             is CategoryEvent.Set -> setCategory(event.categoryName)

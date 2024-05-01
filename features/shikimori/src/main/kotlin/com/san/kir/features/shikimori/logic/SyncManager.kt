@@ -167,7 +167,7 @@ internal class SyncManager(
 
 // Запросы при выполнении связывания
 internal sealed interface SyncDialogState {
-    object None : SyncDialogState
+    data object None : SyncDialogState
 
     data class Init(
         val manga: ShikimoriMangaItem,
@@ -201,7 +201,7 @@ internal sealed interface SyncDialogEvent {
         val onlineIsTruth: Boolean = false,
     ) : SyncDialogEvent
 
-    object DialogDismiss : SyncDialogEvent
+    data object DialogDismiss : SyncDialogEvent
     data class SyncCancel(
         val rate: ShikimoriRate,
     ) : SyncDialogEvent

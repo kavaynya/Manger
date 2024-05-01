@@ -1,9 +1,9 @@
 package com.san.kir.data.models.utils
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.Download
-import androidx.compose.material.icons.filled.FormatListBulleted
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.LocalLibrary
 import androidx.compose.material.icons.filled.People
@@ -28,12 +28,12 @@ enum class MainMenuType {
     Category {
         override fun stringId() = R.string.categories
         override val icon: ImageVector
-            get() = Icons.Default.Category
+            get() = Icons.Filled.Category
     },
     Catalogs {
         override fun stringId() = R.string.catalogs
         override val icon: ImageVector
-            get() = Icons.Default.FormatListBulleted
+            get() = Icons.AutoMirrored.Filled.FormatListBulleted
     },
     Downloader {
         override fun stringId() = R.string.downloader
@@ -48,12 +48,12 @@ enum class MainMenuType {
     Settings {
         override fun stringId() = R.string.settings
         override val icon: ImageVector
-            get() = Icons.Default.Settings
+            get() = Icons.Filled.Settings
     },
     Schedule {
         override fun stringId() = R.string.schedule
         override val icon: ImageVector
-            get() = Icons.Default.Schedule
+            get() = Icons.Filled.Schedule
     },
     Statistic {
         override fun stringId() = R.string.statistic
@@ -68,7 +68,7 @@ enum class MainMenuType {
     Default {
         override fun stringId() = R.string.storage
         override val icon: ImageVector
-            get() = Icons.Default.Schedule
+            get() = Icons.Filled.Schedule
         override val added = false
     };
 

@@ -1,7 +1,7 @@
 package com.san.kir.statistic.ui.statistic
 
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Statistic
 import com.san.kir.statistic.logic.di.statisticRepository
@@ -19,7 +19,7 @@ internal class StatisticViewModel(
     override val tempState = combine(statistic, mangaName, ::StatisticState)
     override val defaultState = StatisticState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is StatisticEvent.Set -> set(event.itemId)
         }

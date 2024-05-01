@@ -5,7 +5,7 @@ import com.san.kir.data.models.utils.SortLibraryUtil
 data class CategoryWithMangas(
     val id: Long = 0,
     val name: String = "",
-    val typeSort: String = SortLibraryUtil.abc,
+    val typeSort: String = SortLibraryUtil.ABC,
     val isReverseSort: Boolean = false,
     val spanPortrait: Int = 2,
     val spanLandscape: Int = 3,

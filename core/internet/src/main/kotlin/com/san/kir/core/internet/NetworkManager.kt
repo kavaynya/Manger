@@ -1,5 +1,6 @@
 package com.san.kir.core.internet
 
+import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -14,11 +15,11 @@ enum class NetworkState {
     NOT_WIFI, NOT_CELLURAR, OK
 }
 
-class CellularNetwork(context: Application) : NetworkManager(
+internal class CellularNetwork(context: Application) : NetworkManager(
     context, NetworkCapabilities.TRANSPORT_CELLULAR
 )
 
-class WifiNetwork(context: Application) : NetworkManager(
+internal class WifiNetwork(context: Application) : NetworkManager(
     context, NetworkCapabilities.TRANSPORT_WIFI,
 )
 

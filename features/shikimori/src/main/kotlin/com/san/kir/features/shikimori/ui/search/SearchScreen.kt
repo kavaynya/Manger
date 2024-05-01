@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -38,7 +38,7 @@ internal fun ShikiSearchScreen(
             navigationButton = NavigationButton.Back(navigateUp),
             title = stringResource(R.string.online_search_title),
             initSearchText = searchText,
-            onSearchTextChange = { holder.sendEvent(SearchEvent.Search(it)) },
+            onSearchTextChange = { holder.sendAction(SearchEvent.Search(it)) },
             hasAction = state.search is SearchingState.Load,
         ),
         enableCollapsingBars = true

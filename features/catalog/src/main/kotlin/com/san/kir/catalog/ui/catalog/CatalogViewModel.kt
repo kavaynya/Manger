@@ -5,21 +5,17 @@ import com.san.kir.background.logic.UpdateCatalogManager
 import com.san.kir.background.logic.di.updateCatalogManager
 import com.san.kir.catalog.logic.di.catalogRepository
 import com.san.kir.catalog.logic.repo.CatalogRepository
-import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
-import com.san.kir.core.utils.mapP
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.put
+import com.san.kir.core.utils.remove
+import com.san.kir.core.utils.set
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.data.models.extend.MiniCatalogItem
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.PersistentMap
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.persistentMapOf
-import kotlinx.collections.immutable.toPersistentList
+import com.san.kir.data.models.catalog.MiniCatalogItem
+import com.san.kir.data.models.utils.DownloadState
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,7 +31,7 @@ internal class CatalogViewModel(
     private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager,
 ) : ViewModel<CatalogState>(), CatalogStateHolder {
     private var job: Job? = null
-    private val items = MutableStateFlow(persistentListOf<MiniCatalogItem>())
+    private val items = MutableStateFlow(emptyList<MiniCatalogItem>())
     private val title = MutableStateFlow("")
     private val background = MutableStateFlow(
         BackgroundState(updateItems = false, updateCatalogs = false, progress = null)
@@ -43,7 +39,7 @@ internal class CatalogViewModel(
     private val sort = MutableStateFlow(SortState())
     private val filter = MutableStateFlow(FilterState())
 
-    private val _filters = MutableStateFlow(persistentListOf<Filter>())
+    private val _filters = MutableStateFlow(emptyList<Filter>())
     override val filters = _filters.asStateFlow()
 
     override val tempState = combine(
@@ -60,7 +56,7 @@ internal class CatalogViewModel(
 
     override val defaultState = CatalogState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is CatalogEvent.Set -> set(event.catalogName)
             is CatalogEvent.UpdateManga -> updateManga(event.item)
@@ -91,7 +87,7 @@ internal class CatalogViewModel(
 
                         DownloadState.QUEUED,
                         DownloadState.PAUSED,
-                                              -> old.copy(updateCatalogs = true, progress = null)
+                        -> old.copy(updateCatalogs = true, progress = null)
 
                         else -> old
                     }
@@ -105,21 +101,21 @@ internal class CatalogViewModel(
 
     private suspend fun updateData(catalogName: String) {
         background.update { it.copy(updateItems = true) }
-        items.update { catalogRepository.items(catalogName).toPersistentList() }
+        items.update { catalogRepository.items(catalogName) }
         _filters.update { initFilters() }
         background.update { it.copy(updateItems = false) }
     }
 
-    private fun initFilters(): PersistentList<Filter> {
+    private fun initFilters(): List<Filter> {
         return listOf(
             Filter(FilterType.Genres, items.value.flatMap { it.genres }.toSetSortedList()),
             Filter(FilterType.Types, items.value.map { it.type }.toSetSortedList()),
             Filter(FilterType.Statuses, items.value.map { it.statusEdition }.toSetSortedList()),
             Filter(FilterType.Authors, items.value.flatMap { it.authors }.toSetSortedList())
-        ).filter { it.items.size > 1 }.toPersistentList()
+        ).filter { it.items.size > 1 }
     }
 
-    private fun PersistentList<MiniCatalogItem>.applyFilters(filter: FilterState): PersistentList<MiniCatalogItem> {
+    private fun List<MiniCatalogItem>.applyFilters(filter: FilterState): List<MiniCatalogItem> {
         var prepare = if (filter.search.isNotEmpty()) {
             filter { it.name.lowercase().contains(filter.search.lowercase()) }
         } else this
@@ -133,17 +129,17 @@ internal class CatalogViewModel(
             }
         }
 
-        return prepare.toPersistentList()
+        return prepare
     }
 
-    private fun PersistentList<MiniCatalogItem>.applySort(sort: SortState): PersistentList<MiniCatalogItem> {
+    private fun List<MiniCatalogItem>.applySort(sort: SortState): List<MiniCatalogItem> {
         val sorted = when (sort.type) {
             SortType.Date -> sortedBy { it.dateId }
             SortType.Name -> sortedBy { it.name }
             SortType.Pop -> sortedBy { it.populate }
         }.sortedByDescending { it.state is MiniCatalogItem.State.Update }
 
-        return (if (sort.reverse) sorted.reversed() else sorted).toPersistentList()
+        return (if (sort.reverse) sorted.reversed() else sorted)
     }
 
     private fun changeFilter(type: FilterType, index: Int) {
@@ -163,9 +159,9 @@ internal class CatalogViewModel(
         }
     }
 
-    private fun PersistentMap<FilterType, List<String>>.addOrRemoveSelectedFilter(
+    private fun Map<FilterType, List<String>>.addOrRemoveSelectedFilter(
         type: FilterType, item: SelectableItem,
-    ): PersistentMap<FilterType, List<String>> {
+    ): Map<FilterType, List<String>> {
         val oldItems = get(type)
         return if (oldItems == null) {
             put(type, if (item.state) listOf(item.name) else listOf())
@@ -179,10 +175,10 @@ internal class CatalogViewModel(
     }
 
     private fun clearFilters() {
-        filter.update { it.copy(selectedFilters = persistentMapOf()) }
+        filter.update { it.copy(selectedFilters = emptyMap()) }
         _filters.update { old ->
-            old.mapP { filter ->
-                filter.copy(items = filter.items.mapP { it.copy(state = false) })
+            old.map { filter ->
+                filter.copy(items = filter.items.map { it.copy(state = false) })
             }
         }
     }
@@ -199,5 +195,5 @@ internal class CatalogViewModel(
             .toHashSet()
             .sorted()
             .filter(String::isNotEmpty)
-            .mapP { SelectableItem(it, false) }
+            .map { SelectableItem(it, false) }
 }

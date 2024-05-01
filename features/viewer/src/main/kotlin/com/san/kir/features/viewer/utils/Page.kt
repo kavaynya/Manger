@@ -5,8 +5,8 @@ import com.san.kir.data.models.base.Chapter
 import kotlinx.parcelize.Parcelize
 
 sealed class Page {
-    object NonePrev : Page()
-    object Prev : Page()
+    data object NonePrev : Page()
+    data object Prev : Page()
     @Parcelize
     data class Current(val pagelink: String, val chapter: Chapter = Chapter()) : Page(), Parcelable
     object Next : Page()

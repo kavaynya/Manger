@@ -16,10 +16,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -114,7 +115,7 @@ class DropDownMenuOnHoldScopeImpl(
 
     val animator = Animatable(0.dp, Dp.VectorConverter)
     var maxWidth by mutableStateOf(0.dp)
-    var maxHeight by mutableStateOf(0)
+    var maxHeight by mutableIntStateOf(0)
 
     override fun Modifier.onClick(onClick: () -> Unit) =
         then(

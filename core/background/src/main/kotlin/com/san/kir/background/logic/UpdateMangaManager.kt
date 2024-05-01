@@ -8,7 +8,7 @@ import androidx.work.WorkManager
 import com.san.kir.background.logic.repo.MangaWorkerRepository
 import com.san.kir.background.works.UpdateMangaWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.models.base.MangaTask
+import com.san.kir.data.db.workers.entities.DbMangaTask
 import java.util.UUID
 
 class UpdateMangaManager(
@@ -19,7 +19,7 @@ class UpdateMangaManager(
 
     suspend fun addTask(mangaId: Long) = withIoContext {
         if (workerRepository.task(mangaId) == null)
-            workerRepository.add(MangaTask(mangaId = mangaId))
+            workerRepository.add(DbMangaTask(mangaId = mangaId))
 
         startWorker()
     }
@@ -27,7 +27,7 @@ class UpdateMangaManager(
     suspend fun addTasks(mangaIds: List<Long>) = withIoContext {
         mangaIds.forEach {
             if (workerRepository.task(it) == null)
-                workerRepository.add(MangaTask(mangaId = it))
+                workerRepository.add(DbMangaTask(mangaId = it))
         }
 
         startWorker()

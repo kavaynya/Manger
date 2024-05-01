@@ -2,6 +2,7 @@
 
 package com.san.kir.core.compose.animation
 
+import android.annotation.SuppressLint
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -36,6 +37,7 @@ const val ANIMATION_DURATION = 600
 
 object EmptyStackAnimator : StackAnimator {
 
+    @SuppressLint("ComposableNaming")
     @Composable
     override fun invoke(
         direction: Direction,

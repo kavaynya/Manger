@@ -7,12 +7,12 @@ import com.san.kir.core.utils.delChapters
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.shortPath
 import com.san.kir.data.chapterDao
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.StorageDao
+import com.san.kir.data.db.main.dao.ChapterDao
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.dao.StorageDao
 import com.san.kir.data.mangaDao
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.getSizeAndIsNew
+import com.san.kir.data.db.main.entites.DbManga
+import com.san.kir.data.db.main.entites.getSizeAndIsNew
 import com.san.kir.data.storageDao
 
 class ReadChapterDelete(
@@ -40,7 +40,7 @@ class ReadChapterDelete(
         )
     }
 
-    private suspend fun deleteReadChapters(manga: Manga) {
+    private suspend fun deleteReadChapters(manga: DbManga) {
         val chapters = chapterDao
             .itemsByMangaId(manga.id)
             .filter { chapter -> chapter.isRead }
@@ -49,7 +49,7 @@ class ReadChapterDelete(
         delChapters(chapters)
     }
 
-    private suspend fun updateStorageItem(manga: Manga) {
+    private suspend fun updateStorageItem(manga: DbManga) {
         val storageItem = storageDao.items()
             .first { it.path == getFullPath(manga.path).shortPath }
 

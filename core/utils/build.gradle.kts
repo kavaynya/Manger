@@ -17,7 +17,7 @@ dependencies {
     api(libs.bundles.coroutines)
     api(libs.decompose)
     api(libs.decompose.extensions)
+    api(libs.timber)
 
     implementation(libs.stdlib)
-    implementation(libs.timber)
 }

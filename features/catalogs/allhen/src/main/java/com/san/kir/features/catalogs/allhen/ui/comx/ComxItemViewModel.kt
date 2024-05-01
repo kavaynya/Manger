@@ -3,7 +3,7 @@ package com.san.kir.features.catalogs.allhen.ui.comx
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.internet.connectManager
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.parsing.sites.Allhentai
 import com.san.kir.features.catalogs.allhen.ui.allhen.LoginState
@@ -18,7 +18,7 @@ internal class ComxItemViewModel(
     override val tempState = loginState.map { ComxItemState(it) }
     override val defaultState = ComxItemState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             ComxItemEvent.Update -> update()
         }

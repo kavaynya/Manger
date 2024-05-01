@@ -1,11 +1,10 @@
 package com.san.kir.catalog.ui.catalogItem
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.Composable
@@ -34,7 +33,7 @@ import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.browse
 import com.san.kir.core.utils.viewModel.stateHolder
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.db.catalog.entities.DbSiteCatalogElement
 
 @Composable
 fun CatalogItemScreen(
@@ -45,7 +44,7 @@ fun CatalogItemScreen(
     val holder: CatalogItemViewModel = stateHolder { CatalogItemViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(CatalogItemEvent.Set(url)) }
+    LaunchedEffect(Unit) { holder.sendAction(CatalogItemEvent.Set(url)) }
 
     ScreenContent(
         topBar = topBar(
@@ -59,7 +58,7 @@ fun CatalogItemScreen(
                             val params = rememberSharedParams(fromCenter = true)
                             MenuIcon(
                                 icon = Icons.Default.Add,
-                                tint = MaterialTheme.colors.onBackground,
+                                tint = MaterialTheme.colorScheme.onBackground,
                                 modifier = Modifier.saveParams(params)
                             ) { navigateToAdd(url, params) }
                         }
@@ -77,9 +76,9 @@ fun CatalogItemScreen(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = Dimensions.half)
-                    .background(MaterialTheme.colors.onError),
+                    .background(MaterialTheme.colorScheme.onError),
                 textAlign = TextAlign.Center,
-                color = MaterialTheme.colors.error
+                color = MaterialTheme.colorScheme.error
             )
         }
         MangaInfoContent(state.item)
@@ -87,8 +86,8 @@ fun CatalogItemScreen(
 }
 
 @Composable
-private fun ColumnScope.MangaInfoContent(
-    item: SiteCatalogElement,
+private fun MangaInfoContent(
+    item: DbSiteCatalogElement,
 ) {
     val ctx = LocalContext.current
 
@@ -130,7 +129,7 @@ private fun ColumnScope.MangaInfoContent(
     LabelText(R.string.manga_info_dialog_link)
     DialogText(
         item.link,
-        color = if (MaterialTheme.colors.isLight) Color.Blue else Color.Cyan
+        color = if (MaterialTheme.colorScheme.isLight) Color.Blue else Color.Cyan
     ) { ctx.browse(item.link) }
 
     HalfSpacer()

@@ -1,16 +1,16 @@
 package com.san.kir.background.logic.repo
 
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.dao.MangaTaskDao
-import com.san.kir.data.models.base.MangaTask
+import com.san.kir.data.db.workers.dao.MangaTaskDao
+import com.san.kir.data.db.workers.entities.DbMangaTask
 
 class MangaWorkerRepository(
     private val mangaDao: MangaTaskDao,
-) : BaseWorkerRepository<MangaTask> {
+) : BaseWorkerRepository<DbMangaTask> {
 
     override val catalog = mangaDao.loadItems()
 
-    override suspend fun remove(item: MangaTask) {
+    override suspend fun remove(item: DbMangaTask) {
         withIoContext { mangaDao.removeById(item.id) }
     }
 
@@ -20,6 +20,6 @@ class MangaWorkerRepository(
 
     fun loadTask(mangaId: Long) = mangaDao.loadItemByMangaId(mangaId)
     suspend fun task(mangaId: Long) = withIoContext { mangaDao.itemByMangaId(mangaId) }
-    suspend fun add(item: MangaTask) = withIoContext { mangaDao.insert(item) }
-    suspend fun update(item: MangaTask) = withIoContext { mangaDao.update(item) }
+    suspend fun add(item: DbMangaTask) = withIoContext { mangaDao.insert(item) }
+    suspend fun update(item: DbMangaTask) = withIoContext { mangaDao.update(item) }
 }

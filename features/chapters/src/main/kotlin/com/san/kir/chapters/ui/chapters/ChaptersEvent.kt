@@ -1,8 +1,8 @@
 package com.san.kir.chapters.ui.chapters
 
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 
-internal sealed interface ChaptersEvent : ScreenEvent {
+internal sealed interface ChaptersEvent : Action {
     data class Set(val mangaId: Long) : ChaptersEvent
     data class WithSelected(val mode: Selection) : ChaptersEvent
     data class ChangeFilter(val mode: Filter) : ChaptersEvent

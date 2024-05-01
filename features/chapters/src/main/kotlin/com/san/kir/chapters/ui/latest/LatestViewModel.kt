@@ -7,17 +7,13 @@ import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.LatestClearWorkers
 import com.san.kir.chapters.logic.di.latestRepository
 import com.san.kir.chapters.logic.repo.LatestRepository
-import com.san.kir.core.support.ChapterStatus
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.models.utils.ChapterStatus
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.data.models.base.action
-import kotlinx.collections.immutable.PersistentList
-import kotlinx.collections.immutable.persistentListOf
-import kotlinx.collections.immutable.toPersistentList
+import com.san.kir.data.db.main.entites.action
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -39,7 +35,7 @@ internal class LatestViewModel(
 
     private var job: Job? = null
     private val hasBackground = MutableStateFlow(true)
-    private val items = MutableStateFlow<PersistentList<SelectableItem>>(persistentListOf())
+    private val items = MutableStateFlow<List<SelectableItem>>(emptyList())
 
     private val newItems = latestRepository
         .notReadItems
@@ -54,11 +50,11 @@ internal class LatestViewModel(
                 items.update { oldItems ->
                     if (list.size != oldItems.size) {
                         list.map { SelectableItem(it, false) }
-                            .toPersistentList()
+                            
                     } else {
                         list.zip(oldItems)
                             .map { (chapter, item) -> item.copy(chapter = chapter) }
-                            .toPersistentList()
+                            
                     }
                 }
             }
@@ -80,7 +76,7 @@ internal class LatestViewModel(
 
     override val defaultState = LatestState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             LatestEvent.CleanAll -> LatestClearWorkers.clearAll(context)
             LatestEvent.CleanDownloaded -> LatestClearWorkers.clearDownloaded(context)
@@ -115,14 +111,14 @@ internal class LatestViewModel(
     }
 
     private fun unselect() {
-        items.update { list -> list.map { it.copy(selected = false) }.toPersistentList() }
+        items.update { list -> list.map { it.copy(selected = false) } }
     }
 
     private fun runWorkersObserver() {
         if (job?.isActive == true) return
         hasBackground.value = false
         job = viewModelScope.defaultLaunch {
-            collectWorkInfoByTag(LatestClearWorkers.tag) { works ->
+            collectWorkInfoByTag(LatestClearWorkers.TAG) { works ->
                 hasBackground.value = works.any { it.state.isFinished.not() }
             }
         }

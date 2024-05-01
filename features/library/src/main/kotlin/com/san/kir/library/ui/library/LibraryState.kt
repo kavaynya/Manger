@@ -7,10 +7,10 @@ import com.san.kir.core.support.MainMenuType
 import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.extend.CategoryWithMangas
-import com.san.kir.data.models.extend.SimplifiedManga
-import kotlinx.collections.immutable.ImmutableList
+import com.san.kir.data.db.main.views.ViewManga
+
 import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.toImmutableList
+
 
 @Immutable
 internal data class LibraryState(
@@ -28,11 +28,11 @@ internal sealed interface ItemsState {
 
     @Stable
     data class Ok(
-        val items: ImmutableList<CategoryWithMangas>,
+        val items: List<CategoryWithMangas>,
         //    Имена всех категорий и их id
         val categories: ImmutableMap<Long, String>,
         // Имена категорий с количество содержимой манги для заголовка вкладок
-        val names: ImmutableList<String> =
+        val names: List<String> =
             items
                 .map { cat -> "${cat.name}: ${cat.mangas.count()}" }
                 .toImmutableList(),

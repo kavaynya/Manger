@@ -2,10 +2,10 @@ package com.san.kir.storage.logic.repo
 
 import com.san.kir.core.utils.coroutines.withDefaultContext
 import com.san.kir.core.utils.getFullPath
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.StorageDao
-import com.san.kir.data.db.dao.itemByPath
-import com.san.kir.data.models.base.Storage
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.dao.StorageDao
+import com.san.kir.data.db.main.dao.itemByPath
+import com.san.kir.data.db.main.entites.DbStorage
 
 internal class StorageRepository(
     private val storageDao: StorageDao,

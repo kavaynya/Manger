@@ -8,8 +8,8 @@ import com.san.kir.core.utils.coroutines.ioLaunch
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isOkPng
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.preparedPath
+import com.san.kir.data.db.main.entites.DbChapter
+import com.san.kir.data.db.main.entites.preparedPath
 import com.san.kir.data.parsing.SiteCatalogsManager
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
@@ -22,13 +22,13 @@ import java.io.File
 import java.net.SocketException
 
 class ChapterDownloader(
-    private var chapter: Chapter,
+    private var chapter: DbChapter,
     private val chapterRepository: ChapterRepository,
     private val connectManager: ConnectManager,
     private val siteCatalogsManager: SiteCatalogsManager,
     concurrent: Int,
     private val checkNetwork: suspend () -> Boolean,
-    private val onProgress: suspend (Chapter) -> Unit,
+    private val onProgress: suspend (DbChapter) -> Unit,
 ) {
     private val semaphore = Semaphore(concurrent)
     private val lock = Mutex()
@@ -169,6 +169,6 @@ class ChapterDownloader(
         }
     }
 
-    private suspend inline fun update(chapter: Chapter) =
+    private suspend inline fun update(chapter: DbChapter) =
         chapter.also { chapterRepository.update(it) }
 }

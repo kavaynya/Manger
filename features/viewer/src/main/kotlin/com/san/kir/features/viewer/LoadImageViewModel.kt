@@ -10,8 +10,7 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.convertImagesToPng
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isOkPng
-import com.san.kir.data.models.base.preparedPath
-import com.san.kir.data.parsing.SiteCatalogsManager
+import com.san.kir.data.db.main.entites.preparedPath
 import com.san.kir.features.viewer.logic.SettingsRepository
 import com.san.kir.features.viewer.logic.di.settingsRepository
 import com.san.kir.features.viewer.utils.LoadState

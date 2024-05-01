@@ -1,11 +1,11 @@
 package com.san.kir.categories.ui.category
 
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 
-internal sealed interface CategoryEvent : ScreenEvent {
+internal sealed interface CategoryEvent : Action {
     data class Set(val categoryName: String) : CategoryEvent
-    object Save : CategoryEvent
-    object Delete : CategoryEvent
+    data object Save : CategoryEvent
+    data object Delete : CategoryEvent
     data class Update(
         val newName: String? = null,
         val newTypeSort: String? = null,

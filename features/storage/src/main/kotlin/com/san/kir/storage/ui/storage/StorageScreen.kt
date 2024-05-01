@@ -13,11 +13,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.AlertDialog
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Icon
-import androidx.compose.material.OutlinedButton
-import androidx.compose.material.Text
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
@@ -54,7 +54,7 @@ internal fun StorageScreen(
     val holder: StorageStateHolder = stateHolder { StorageViewModel() }
     val state by holder.state.collectAsState()
 
-    LaunchedEffect(Unit) { holder.sendEvent(StorageEvent.Set(mangaId, hasUpdate)) }
+    LaunchedEffect(Unit) { holder.sendAction(StorageEvent.Set(mangaId, hasUpdate)) }
 
     ScreenContent(
         topBar = topBar(
@@ -67,7 +67,7 @@ internal fun StorageScreen(
             background = state.background,
             storage = state.item,
             size = state.size,
-            sendEvent = holder::sendEvent
+            sendEvent = holder::sendAction
         )
     }
 }
@@ -212,7 +212,7 @@ private fun DialogBtn(id: Int, onClick: () -> Unit) {
 }
 
 sealed class DeleteStatus {
-    object Read : DeleteStatus()
-    object All : DeleteStatus()
-    object None : DeleteStatus()
+    data object Read : DeleteStatus()
+    data object All : DeleteStatus()
+    data object None : DeleteStatus()
 }

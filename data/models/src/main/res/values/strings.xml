@@ -39,4 +39,11 @@
     <string name="schedule">Расписание</string>
     <string name="statistic">Статистика</string>
     <string name="accounts">Аккаунты</string>
+
+    <string name="loading">Загрузка…</string>
+    <string name="paused">Приостановленные</string>
+    <string name="completed">Завершеннные</string>
+    <string name="unknown">Обычные</string>
+    <string name="error">Произошла ошибка!</string>
+
 </resources>

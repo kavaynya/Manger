@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.Divider
+import androidx.compose.material3.Divider
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,7 +40,7 @@ fun LocalItemScreen(
     val holder: LocalItemStateHolder = stateHolder { LocalItemViewModel() }
 
     LaunchedEffect(Unit) {
-        holder.sendEvent(LocalItemEvent.Update(mangaId))
+        holder.sendAction(LocalItemEvent.Update(mangaId))
     }
 
     val state by holder.state.collectAsState()
@@ -65,7 +65,7 @@ fun LocalItemScreen(
                 is MangaState.Ok -> content(
                     manga,
                     state.sync,
-                    holder::sendEvent,
+                    holder::sendAction,
                     navigateToSearch
                 )
                 MangaState.Error -> {}
@@ -74,7 +74,7 @@ fun LocalItemScreen(
         }
     }
 
-    DialogsSyncState(state.dialog) { holder.sendEvent(LocalItemEvent.Sync(it)) }
+    DialogsSyncState(state.dialog) { holder.sendAction(LocalItemEvent.Sync(it)) }
 }
 
 private fun LazyListScope.content(

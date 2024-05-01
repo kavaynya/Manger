@@ -7,6 +7,7 @@ import com.san.kir.data.models.utils.PlannedWeek
 interface PlannedTaskBase {
     val id: Long
     val catalog: String
+    val category: String
     val dayOfWeek: PlannedWeek
     val groupName: String
     val hour: Int

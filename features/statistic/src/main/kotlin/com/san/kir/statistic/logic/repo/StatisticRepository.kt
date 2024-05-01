@@ -1,8 +1,8 @@
 package com.san.kir.statistic.logic.repo
 
 import com.san.kir.core.utils.coroutines.withDefaultContext
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.StatisticDao
+import com.san.kir.data.db.main.dao.MangaDao
+import com.san.kir.data.db.main.dao.StatisticDao
 
 internal class StatisticRepository(
     private val statisticDao: StatisticDao,

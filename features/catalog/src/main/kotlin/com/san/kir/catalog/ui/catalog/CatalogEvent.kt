@@ -1,10 +1,10 @@
 package com.san.kir.catalog.ui.catalog
 
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.data.models.extend.MiniCatalogItem
 
 
-internal sealed interface CatalogEvent : ScreenEvent {
+internal sealed interface CatalogEvent : Action {
     data class Set(val catalogName: String) : CatalogEvent
     data class Search(val query: String) : CatalogEvent
     data class ChangeFilter(val type: FilterType, val index: Int) : CatalogEvent

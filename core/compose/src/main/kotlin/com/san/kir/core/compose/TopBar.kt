@@ -7,22 +7,22 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
-import androidx.compose.material.LocalContentAlpha
-import androidx.compose.material.LocalContentColor
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ProvideTextStyle
-import androidx.compose.material.ScaffoldState
-import androidx.compose.material.Text
-import androidx.compose.material.TopAppBar
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentAlpha
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.ScaffoldState
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.primarySurface
+import androidx.compose.material3.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.getValue
@@ -49,11 +49,11 @@ private fun PreparedTopBar(
     height: Dp = Dimensions.appBarHeight,
     navigationIcon: @Composable () -> Unit,
     actions: @Composable TopBarActions.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+    backgroundColor: Color = MaterialTheme.colorScheme.primarySurface,
 ) {
 
     val topBarActions = remember { TopBarActions() }
-    val color by animateColorAsState(targetValue = backgroundColor)
+    val color by animateColorAsState(targetValue = backgroundColor, label = "")
 
     TopAppBar(
         title = {
@@ -105,7 +105,7 @@ fun topBar(
     onSearchTextChange: ((String) -> Unit)? = null,
     hasAction: Boolean = false,
     progressAction: Float? = null,
-    backgroundColor: Color = MaterialTheme.colors.primarySurface,
+    backgroundColor: Color = MaterialTheme.colorScheme.primarySurface,
 ): @Composable (Dp) -> Unit = {
     Column(modifier = Modifier.fillMaxWidth()) {
         PreparedTopBar(

@@ -3,7 +3,7 @@ package com.san.kir.library.ui.mangaAbout
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.lengthMb
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.base.Manga
 import com.san.kir.library.logic.di.mangaRepository
@@ -24,7 +24,7 @@ internal class MangaAboutViewModel(
 
     override val defaultState = MangaAboutState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is MangaAboutEvent.Set -> set(event.id)
             is MangaAboutEvent.ChangeUpdate -> change(event.newState)

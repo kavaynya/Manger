@@ -1,16 +1,16 @@
 package com.san.kir.background.logic.repo
 
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.dao.CatalogTaskDao
-import com.san.kir.data.models.base.CatalogTask
+import com.san.kir.data.db.workers.dao.CatalogTaskDao
+import com.san.kir.data.db.workers.entities.DbCatalogTask
 
 class CatalogWorkerRepository(
     private val catalogDao: CatalogTaskDao,
-) : BaseWorkerRepository<CatalogTask> {
+) : BaseWorkerRepository<DbCatalogTask> {
 
     override val catalog = catalogDao.loadItems()
 
-    override suspend fun remove(item: CatalogTask) {
+    override suspend fun remove(item: DbCatalogTask) {
         withIoContext { catalogDao.removeById(item.id) }
     }
 
@@ -18,6 +18,6 @@ class CatalogWorkerRepository(
 
     fun loadTask(name: String) = catalogDao.loadItemByName(name)
     suspend fun task(name: String) = withIoContext { catalogDao.itemByName(name) }
-    suspend fun add(item: CatalogTask) = withIoContext { catalogDao.insert(item) }
-    suspend fun update(item: CatalogTask) = withIoContext { catalogDao.update(item) }
+    suspend fun add(item: DbCatalogTask) = withIoContext { catalogDao.insert(item) }
+    suspend fun update(item: DbCatalogTask) = withIoContext { catalogDao.update(item) }
 }

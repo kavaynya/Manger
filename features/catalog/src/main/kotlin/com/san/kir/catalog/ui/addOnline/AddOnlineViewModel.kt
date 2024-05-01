@@ -2,11 +2,11 @@ package com.san.kir.catalog.ui.addOnline
 
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
-import kotlinx.collections.immutable.toPersistentList
+
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -31,14 +31,14 @@ internal class AddOnlineViewModel(
         isErrorAvailableState,
         isEnableAddingState
     ) { check, validate, error, add ->
-        AddOnlineState(check, validate.toPersistentList(), error, add)
+        AddOnlineState(check, validate, error, add)
     }
 
     override val defaultState = AddOnlineState(
-        validatesCatalogs = siteNames.toPersistentList(),
+        validatesCatalogs = siteNames,
     )
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is AddOnlineEvent.Update -> {
                 checkUrl(event.text)

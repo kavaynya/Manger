@@ -7,7 +7,7 @@ import com.san.kir.background.works.AppUpdateWorker
 import com.san.kir.background.works.MangaDeleteWorker
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.models.extend.CategoryWithMangas
 import com.san.kir.library.logic.di.mangaRepository
@@ -45,7 +45,7 @@ internal class LibraryViewModel internal constructor(
 
     override val defaultState = LibraryState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             LibraryEvent.NonSelect -> deSelectManga()
 
@@ -83,7 +83,7 @@ internal class LibraryViewModel internal constructor(
 
     private fun checkWorks() {
         viewModelScope.defaultLaunch {
-            collectWorkInfoByTag(MangaDeleteWorker.tag) { works ->
+            collectWorkInfoByTag(MangaDeleteWorker.TAG) { works ->
                 if (works.all { it.state.isFinished }) backgroundState.update { BackgroundState.None }
                 else backgroundState.update { BackgroundState.Work }
             }

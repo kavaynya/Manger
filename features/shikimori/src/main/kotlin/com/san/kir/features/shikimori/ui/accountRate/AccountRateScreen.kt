@@ -5,11 +5,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
-import androidx.compose.material.Button
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.Divider
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Divider
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
@@ -45,7 +45,7 @@ internal fun AccountRateScreen(
     val viewModel: AccountRateStateHolder = stateHolder { AccountRateViewModel() }
 
     LaunchedEffect(Unit) {
-        viewModel.sendEvent(AccountRateEvent.Update(id = mangaId))
+        viewModel.sendAction(AccountRateEvent.Update(id = mangaId))
     }
 
     val state by viewModel.state.collectAsState()
@@ -62,18 +62,18 @@ internal fun AccountRateScreen(
                         is ProfileState.Ok ->
                             MenuIcon(
                                 icon = Icons.Default.Delete,
-                                onClick = { viewModel.sendEvent(AccountRateEvent.ExistToggle) }
+                                onClick = { viewModel.sendAction(AccountRateEvent.ExistToggle) }
                             )
                         ProfileState.None  ->
                             MenuIcon(
                                 icon = Icons.Default.Add,
-                                onClick = { viewModel.sendEvent(AccountRateEvent.ExistToggle) }
+                                onClick = { viewModel.sendAction(AccountRateEvent.ExistToggle) }
                             )
                         ProfileState.Load  -> ToolbarProgress()
                     }
             }
         ),
-        onRefresh = { viewModel.sendEvent(AccountRateEvent.Update()) }
+        onRefresh = { viewModel.sendAction(AccountRateEvent.Update()) }
     ) {
         LazyColumn(
             modifier = Modifier
@@ -90,7 +90,7 @@ internal fun AccountRateScreen(
                         manga = manga,
                         profile = state.profile,
                         sync = state.sync,
-                        sendEvent = viewModel::sendEvent,
+                        sendEvent = viewModel::sendAction,
                         navigateToSearch = navigateToSearch
                     )
                 }
@@ -119,7 +119,7 @@ internal fun AccountRateScreen(
                             )
                             Button(
                                 onClick = {
-                                    viewModel.sendEvent(AccountRateEvent.Update(id = mangaId))
+                                    viewModel.sendAction(AccountRateEvent.Update(id = mangaId))
                                 }
                             ) {
                                 Text(stringResource(R.string.try_again))
@@ -131,7 +131,7 @@ internal fun AccountRateScreen(
         }
     }
 
-    DialogsSyncState(state.dialog) { viewModel.sendEvent(AccountRateEvent.Sync(it)) }
+    DialogsSyncState(state.dialog) { viewModel.sendAction(AccountRateEvent.Sync(it)) }
 }
 
 private fun LazyListScope.content(

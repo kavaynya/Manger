@@ -8,8 +8,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Update
@@ -80,7 +80,7 @@ fun ListItem(
             MiniCatalogItem.State.Update ->
                 Image(
                     imageVector = Icons.Default.Update, "",
-                    colorFilter = ColorFilter.tint(MaterialTheme.colors.onBackground),
+                    colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onBackground),
                     modifier = Modifier
                         .size(Dimensions.Image.small)
                         .align(Alignment.CenterVertically)

@@ -1,72 +1,54 @@
 package com.san.kir.data
 
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.db.CatalogDb
-import com.san.kir.data.db.RoomDB
-import com.san.kir.data.db.WorkersDb
-import com.san.kir.data.db.dao.CatalogTaskDao
-import com.san.kir.data.db.dao.CategoryDao
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.ChapterTaskDao
-import com.san.kir.data.db.dao.MainMenuDao
-import com.san.kir.data.db.dao.MangaDao
-import com.san.kir.data.db.dao.MangaTaskDao
-import com.san.kir.data.db.dao.PlannedDao
-import com.san.kir.data.db.dao.SettingsDao
-import com.san.kir.data.db.dao.ShikimoriDao
-import com.san.kir.data.db.dao.StorageDao
+import com.san.kir.data.db.catalog.CatalogDb
+import com.san.kir.data.db.catalog.repo.CatalogsRepository
+import com.san.kir.data.db.main.RoomDB
+import com.san.kir.data.db.main.repo.AccountRepository
+import com.san.kir.data.db.main.repo.AccountsMangaRepository
+import com.san.kir.data.db.main.repo.CategoryRepository
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.main.repo.MainMenuRepository
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.data.db.main.repo.PlannedRepository
+import com.san.kir.data.db.main.repo.SettingsRepository
+import com.san.kir.data.db.main.repo.StatisticsRepository
+import com.san.kir.data.db.main.repo.StorageRepository
+import com.san.kir.data.db.workers.WorkersDb
+import com.san.kir.data.db.workers.repo.CatalogWorkerRepository
+import com.san.kir.data.db.workers.repo.ChapterWorkerRepository
+import com.san.kir.data.db.workers.repo.MangaWorkerRepository
 
 /** Main Database */
-val ManualDI.appDatabase: RoomDB
-    get() = RoomDB.getDatabase(context)
+private val ManualDI.appDatabase: RoomDB
+    get() = RoomDB.getDatabase(application)
 
-val ManualDI.plannedDao: PlannedDao
-    get() = appDatabase.plannedDao()
+fun ManualDI.accountMangaRepository() = AccountsMangaRepository(appDatabase.accountMangaDao())
+fun ManualDI.accountsRepository() = AccountRepository(appDatabase.accountDao())
+fun ManualDI.categoryRepository() = CategoryRepository(appDatabase.categoryDao())
+fun ManualDI.chapterRepository() = ChapterRepository(appDatabase.chapterDao())
+fun ManualDI.mainMenuRepository() = MainMenuRepository(appDatabase.mainMenuDao())
+fun ManualDI.mangaRepository() = MangaRepository(appDatabase.mangaDao())
+fun ManualDI.plannedRepository() = PlannedRepository(appDatabase.plannedDao())
+fun ManualDI.settingsRepository() = SettingsRepository(appDatabase.settingsDao())
+fun ManualDI.statisticsRepository() = StatisticsRepository(appDatabase.statisticDao())
+fun ManualDI.storageRepository() = StorageRepository(appDatabase.storageDao())
 
-val ManualDI.lazyPlannedDao: Lazy<PlannedDao>
-    get() = lazy { plannedDao }
-
-val ManualDI.settingsDao: SettingsDao
-    get() = appDatabase.settingsDao()
-
-val ManualDI.mangaDao: MangaDao
-    get() = appDatabase.mangaDao()
-
-val ManualDI.categoryDao: CategoryDao
-    get() = appDatabase.categoryDao()
-
-val ManualDI.storageDao: StorageDao
-    get() = appDatabase.storageDao()
-
-val ManualDI.chapterDao: ChapterDao
-    get() = appDatabase.chapterDao()
-
-val ManualDI.mainMenuDao: MainMenuDao
-    get() = appDatabase.mainMenuDao()
-
-val ManualDI.shikimoriDao: ShikimoriDao
-    get() = appDatabase.shikimoriDao()
-
-val ManualDI.statisticDao
-    get() = appDatabase.statisticDao()
 
 /** Database for catalogs*/
-fun ManualDI.catalogDatabase(catalogName: String): CatalogDb {
-    return CatalogDb.getDatabase(context, catalogName)
-}
+private fun ManualDI.catalogDatabase(catalogName: String) =
+    CatalogDb.getDatabase(application, catalogName)
 
-val ManualDI.catalogDatabaseFactory: (String) -> CatalogDb
-    get() = ::catalogDatabase
+fun ManualDI.catalogsRepository() = CatalogsRepository(::catalogDatabase)
 
 /** Database for task managers */
-val ManualDI.workerDatabase: WorkersDb
-    get() = WorkersDb.getDatabase(context)
+private fun ManualDI.workerDatabase(): WorkersDb = WorkersDb.getDatabase(application)
 
-val ManualDI.mangaTaskDao: MangaTaskDao
-    get() = workerDatabase.mangasDao
+val ManualDI.mangaWorkerRepository: MangaWorkerRepository
+    get() = MangaWorkerRepository(workerDatabase().mangasDao)
 
-val ManualDI.chapterTaskDao: ChapterTaskDao
-    get() = workerDatabase.chaptersDao
+val ManualDI.chapterWorkerRepository: ChapterWorkerRepository
+    get() = ChapterWorkerRepository(workerDatabase().chaptersDao)
 
-val ManualDI.catalogTaskDao: CatalogTaskDao
-    get() = workerDatabase.catalogDao
+val ManualDI.catalogWorkerRepository: CatalogWorkerRepository
+    get() = CatalogWorkerRepository(workerDatabase().catalogDao)

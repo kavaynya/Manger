@@ -22,12 +22,11 @@ import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.delChapters
 import com.san.kir.core.utils.longToast
 import com.san.kir.core.utils.toast
-import com.san.kir.core.utils.viewModel.ScreenEvent
+import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.data.models.base.Manga
-import kotlinx.collections.immutable.PersistentList
+import com.san.kir.data.models.base.ga
+
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
@@ -79,7 +78,7 @@ internal class ChaptersViewModel(
 
     override val defaultState = ChaptersState()
 
-    override suspend fun onEvent(event: ScreenEvent) {
+    override suspend fun onEvent(event: Action) {
         when (event) {
             is ChaptersEvent.Set -> set(event.mangaId)
             is ChaptersEvent.WithSelected -> withSelected(event.mode)
@@ -95,11 +94,10 @@ internal class ChaptersViewModel(
         }
     }
 
-    @OptIn(FlowPreview::class)
     private fun set(mangaId: Long) {
         if (job?.isActive == true) return
 
-        job = viewModelScope.defaultLaunch {
+        job = defaultLaunch {
             chaptersRepository
                 .loadManga(mangaId)
                 .filterNotNull()
@@ -239,7 +237,7 @@ internal class ChaptersViewModel(
         }
     }
 
-    private fun checkNextChapter(list: PersistentList<SelectableItem>): NextChapter {
+    private fun checkNextChapter(list: List<SelectableItem>): NextChapter {
         val newList = kotlin.runCatching {
             if (manga.value.isAlternativeSort.not()) null
             else list.sortedWith(selectableItemComparator)

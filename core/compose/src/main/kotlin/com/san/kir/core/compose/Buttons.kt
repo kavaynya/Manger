@@ -10,22 +10,22 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.RadioButton
-import androidx.compose.material.Text
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import kotlinx.collections.immutable.ImmutableList
+
 
 @Composable
 fun <T> LazyRadioGroup(
     state: T,
     onSelected: (T) -> Unit,
-    stateList: ImmutableList<T>,
-    textList: ImmutableList<String>,
+    stateList: List<T>,
+    textList: List<String>,
 ) {
     LazyColumn {
         items(stateList.size, key = { it }) { index ->
@@ -49,8 +49,8 @@ fun <T> LazyRadioGroup(
 fun <T> RadioGroup(
     state: T,
     onSelected: (T) -> Unit,
-    stateList: ImmutableList<T>,
-    textList: ImmutableList<String>,
+    stateList: List<T>,
+    textList: List<String>,
 ) {
     Column {
         stateList.zip(textList).forEach { (s, text) ->
@@ -71,7 +71,7 @@ fun <T> RadioGroup(
 fun OutlinedButton(
     text: String,
     modifier: Modifier = Modifier,
-    borderColor: Color = MaterialTheme.colors.primary
+    borderColor: Color = MaterialTheme.colorScheme.primary
 ) {
     Row(
         Modifier
@@ -89,6 +89,6 @@ fun OutlinedButton(
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Text(text = text, color = MaterialTheme.colors.primary)
+        Text(text = text, color = MaterialTheme.colorScheme.primary)
     }
 }

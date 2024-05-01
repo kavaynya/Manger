@@ -9,8 +9,8 @@ import androidx.work.workDataOf
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.data.chapterDao
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.MangaDao
+import com.san.kir.data.db.main.dao.ChapterDao
+import com.san.kir.data.db.main.dao.MangaDao
 import com.san.kir.data.mangaDao
 
 class MangaDeleteWorker(
@@ -24,7 +24,7 @@ class MangaDeleteWorker(
     override suspend fun doWork(): Result {
 
         val mangaId = inputData.getLong("id", -1)
-        val withFiles = inputData.getBoolean(withFilesTag, false)
+        val withFiles = inputData.getBoolean(WITH_FILES, false)
 
         return runCatching {
             removeWithChapters(mangaId, withFiles)
@@ -54,19 +54,18 @@ class MangaDeleteWorker(
     }
 
     companion object {
-        const val tag = "mangaDelete"
-
-        const val withFilesTag = "withFiles"
+        const val TAG = "mangaDelete"
+        const val WITH_FILES = "withFiles"
 
         fun addTask(
             mangaId: Long,
             withFiles: Boolean = false,
             ctx: Context = ManualDI.context,
         ) {
-            val data = workDataOf("id" to mangaId, withFilesTag to withFiles)
+            val data = workDataOf("id" to mangaId, WITH_FILES to withFiles)
             val deleteManga = OneTimeWorkRequestBuilder<MangaDeleteWorker>()
                 .setInputData(data)
-                .addTag(tag)
+                .addTag(TAG)
                 .build()
             WorkManager.getInstance(ctx).enqueue(deleteManga)
         }

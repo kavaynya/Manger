@@ -11,8 +11,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Download
@@ -38,14 +38,12 @@ import com.san.kir.chapters.utils.onClickItem
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
-import com.san.kir.core.compose.QuarterSpacer
 import com.san.kir.core.compose.TopBarActions
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.FromTopToTopAnimContent
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.utils.DownloadState
 
@@ -76,13 +74,13 @@ internal fun LatestScreen(
             actions = latestActions(
                 selectionMode = state.selectionMode,
                 hasNewChapters = state.hasNewChapters,
-                sendEvent = holder::sendEvent
+                sendEvent = holder::sendAction
             ),
             hasAction = state.hasBackgroundWork,
             navigationButton = navigationButton(
                 selectionMode = state.selectionMode,
                 navigateUp = navigateUp,
-                sendEvent = holder::sendEvent
+                sendEvent = holder::sendAction
             )
         ),
         additionalPadding = Dimensions.zero,
@@ -94,7 +92,7 @@ internal fun LatestScreen(
                 index = index,
                 selectionMode = state.selectionMode,
                 navigateToViewer = navigateToViewer,
-                sendEvent = holder::sendEvent
+                sendEvent = holder::sendAction
             )
         }
     }
