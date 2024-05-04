@@ -1,25 +1,23 @@
 package com.san.kir.background.logic
 
-import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
-import com.san.kir.background.logic.repo.MangaWorkerRepository
 import com.san.kir.background.works.UpdateMangaWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.workers.entities.DbMangaTask
+import com.san.kir.data.db.workers.repo.MangaWorkerRepository
+import com.san.kir.data.models.workers.MangaTask
 import java.util.UUID
 
 class UpdateMangaManager(
-    context: Context,
-    private val workerRepository: MangaWorkerRepository,
+    private val manager: WorkManager,
+    private val workerRepository: MangaWorkerRepository
 ) {
-    private val manager by lazy { WorkManager.getInstance(context) }
 
     suspend fun addTask(mangaId: Long) = withIoContext {
         if (workerRepository.task(mangaId) == null)
-            workerRepository.add(DbMangaTask(mangaId = mangaId))
+            workerRepository.save(MangaTask(mangaId = mangaId))
 
         startWorker()
     }
@@ -27,7 +25,7 @@ class UpdateMangaManager(
     suspend fun addTasks(mangaIds: List<Long>) = withIoContext {
         mangaIds.forEach {
             if (workerRepository.task(it) == null)
-                workerRepository.add(DbMangaTask(mangaId = it))
+                workerRepository.save(MangaTask(mangaId = it))
         }
 
         startWorker()

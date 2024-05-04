@@ -3,6 +3,8 @@
   <component name="JavaProjectCodeInsightSettings">
     <excluded-names>
       <name>android.widget</name>
+      <name>java.util.concurrent</name>
+      <name>org.intellij.lang.annotations</name>
       <name>org.w3c.dom</name>
     </excluded-names>
   </component>

@@ -5,12 +5,10 @@ import androidx.work.CoroutineWorker
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.Operation
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
+import com.san.kir.background.logic.di.workManager
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.db.main.dao.MainMenuDao
-import com.san.kir.data.mainMenuDao
-import com.san.kir.data.db.main.entites.DbMainMenuItem
+import com.san.kir.data.mainMenuRepository
 import com.san.kir.data.models.utils.MainMenuType
 
 class UpdateMainMenuWorker(
@@ -18,7 +16,7 @@ class UpdateMainMenuWorker(
     params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
 
-    private val mainMenuDao: MainMenuDao = ManualDI.mainMenuDao
+    private val mainMenuRepository = ManualDI.mainMenuRepository()
 
     override suspend fun doWork(): Result {
         kotlin.runCatching {
@@ -31,50 +29,48 @@ class UpdateMainMenuWorker(
 
     private suspend fun checkNewItems() {
         // Добавление новых
-        val items = mainMenuDao.items()
-        MainMenuType.values()
+        val items = mainMenuRepository.items()
+        MainMenuType.entries
             .filter { it.added }
             .filter { type ->
                 items.none { it.type == type }
             }
             .forEach {
-                mainMenuDao.insert(
-                    DbMainMenuItem(name = ctx.getString(it.stringId()), order = 100, type = it)
+                mainMenuRepository.insert(
+                    name = ctx.getString(it.stringId()), order = 100, type = it
                 )
             }
     }
 
     private suspend fun updateMenuItems() {
         // Обновление старых
-        mainMenuDao.update(*mainMenuDao
+        mainMenuRepository.insert(mainMenuRepository
             .items()
             .map { item ->
                 item.copy(name = ctx.getString(item.type.stringId()))
             }
-            .toTypedArray())
-
-
+        )
     }
 
     private suspend fun checkItemsForRemove() {
         // Удаление не нужных
-        val notNeeded = MainMenuType.values().filter { it.added.not() }
+        val notNeeded = MainMenuType.entries.filter { it.added.not() }
         if (notNeeded.isNotEmpty())
-            mainMenuDao.items().filter { type ->
+            mainMenuRepository.items().filter { type ->
                 notNeeded.any { it == type.type }
             }.forEach {
-                mainMenuDao.delete(it)
+                mainMenuRepository.delete(it)
             }
     }
 
     companion object {
         const val tag = "updateMainMenu"
 
-        fun addTask(ctx: Context): Operation {
+        fun addTask(): Operation {
             val task = OneTimeWorkRequestBuilder<UpdateMainMenuWorker>()
                 .addTag(tag)
                 .build()
-            return WorkManager.getInstance(ctx).enqueueUniqueWork(
+            return ManualDI.workManager().enqueueUniqueWork(
                 tag + "Unique",
                 ExistingWorkPolicy.KEEP,
                 task

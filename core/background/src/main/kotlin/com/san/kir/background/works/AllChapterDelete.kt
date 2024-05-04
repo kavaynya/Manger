@@ -5,53 +5,55 @@ import androidx.work.WorkerParameters
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.shortPath
-import com.san.kir.data.chapterDao
-import com.san.kir.data.db.main.dao.ChapterDao
-import com.san.kir.data.db.main.dao.MangaDao
-import com.san.kir.data.db.main.dao.StorageDao
-import com.san.kir.data.mangaDao
-import com.san.kir.data.db.main.entites.DbManga
-import com.san.kir.data.db.main.entites.getSizeAndIsNew
-import com.san.kir.data.storageDao
+import com.san.kir.data.chapterRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.data.models.main.Manga
+import com.san.kir.data.models.main.getSizes
+import com.san.kir.data.storageRepository
+import timber.log.Timber
 
 class AllChapterDelete(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : ChapterDeleteWorker(appContext, workerParams) {
 
-    private val mangaDao: MangaDao = ManualDI.mangaDao
-    private val chapterDao: ChapterDao = ManualDI.chapterDao
-    private val storageDao: StorageDao = ManualDI.storageDao
+    private val mangaRepository = ManualDI.mangaRepository()
+    private val chaptersRepository = ManualDI.chapterRepository()
+    private val storageRepository = ManualDI.storageRepository()
 
     override suspend fun doWork(): Result {
         val mangaId = inputData.getLong("id", -1)
 
         return kotlin.runCatching {
-            val manga = mangaDao.itemById(mangaId)
-            deleteAllChapters(manga)
-            updateStorageItem(manga)
+            val manga = mangaRepository.item(mangaId)
+            if (manga != null) {
+                deleteAllChapters(manga)
+                updateStorageItem(manga)
+            } else {
+                Timber.tag("AllChapterDelete").e("Не найдена манга с id -> $mangaId")
+            }
         }.fold(
             onSuccess = {
                 Result.success()
             },
             onFailure = {
-                it.printStackTrace()
+                Timber.tag("AllChapterDelete").e(it)
                 Result.failure()
             }
         )
     }
 
-    private fun deleteAllChapters(manga: DbManga) {
+    private fun deleteAllChapters(manga: Manga) {
         getFullPath(manga.path).deleteRecursively()
     }
 
-    private suspend fun updateStorageItem(manga: DbManga) {
-        val storageItem = storageDao.items().first { it.path == getFullPath(manga.path).shortPath }
+    private suspend fun updateStorageItem(manga: Manga) {
+        val storageItem = storageRepository.items().first { it.path == getFullPath(manga.path).shortPath }
 
         val file = getFullPath(storageItem.path)
 
-        storageDao.update(
-            storageItem.getSizeAndIsNew(file, false, chapterDao.itemsByMangaId(manga.id))
+        storageRepository.save(
+            storageItem.getSizes(file, chaptersRepository.allItems(manga.id))
         )
     }
 }

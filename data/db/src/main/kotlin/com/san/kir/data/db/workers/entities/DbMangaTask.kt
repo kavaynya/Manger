@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import com.san.kir.data.models.utils.DownloadState
 
 @Entity(tableName = "manga_task")
-data class DbMangaTask(
+internal data class DbMangaTask(
     @PrimaryKey(autoGenerate = true)
     @ColumnInfo(name = "id") val id: Long = 0L,
     @ColumnInfo(name = "manga_id") val mangaId: Long = 0L,

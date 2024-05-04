@@ -25,7 +25,9 @@ private val ManualDI.appDatabase: RoomDB
 
 fun ManualDI.accountMangaRepository() = AccountsMangaRepository(appDatabase.accountMangaDao())
 fun ManualDI.accountsRepository() = AccountRepository(appDatabase.accountDao())
-fun ManualDI.categoryRepository() = CategoryRepository(appDatabase.categoryDao())
+fun ManualDI.categoryRepository() =
+    CategoryRepository(lazy { application }, appDatabase.categoryDao())
+
 fun ManualDI.chapterRepository() = ChapterRepository(appDatabase.chapterDao())
 fun ManualDI.mainMenuRepository() = MainMenuRepository(appDatabase.mainMenuDao())
 fun ManualDI.mangaRepository() = MangaRepository(appDatabase.mangaDao())
@@ -44,11 +46,6 @@ fun ManualDI.catalogsRepository() = CatalogsRepository(::catalogDatabase)
 /** Database for task managers */
 private fun ManualDI.workerDatabase(): WorkersDb = WorkersDb.getDatabase(application)
 
-val ManualDI.mangaWorkerRepository: MangaWorkerRepository
-    get() = MangaWorkerRepository(workerDatabase().mangasDao)
-
-val ManualDI.chapterWorkerRepository: ChapterWorkerRepository
-    get() = ChapterWorkerRepository(workerDatabase().chaptersDao)
-
-val ManualDI.catalogWorkerRepository: CatalogWorkerRepository
-    get() = CatalogWorkerRepository(workerDatabase().catalogDao)
+fun ManualDI.mangaWorkerRepository() = MangaWorkerRepository(workerDatabase().mangasDao)
+fun ManualDI.chapterWorkerRepository() = ChapterWorkerRepository(workerDatabase().chaptersDao)
+fun ManualDI.catalogWorkerRepository() = CatalogWorkerRepository(workerDatabase().catalogDao)

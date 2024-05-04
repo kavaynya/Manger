@@ -1,15 +1,14 @@
 package com.san.kir.background.logic
 
-import com.san.kir.background.logic.repo.ChapterRepository
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.convertImagesToPng
 import com.san.kir.core.utils.coroutines.ioLaunch
-import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isOkPng
-import com.san.kir.data.db.main.entites.DbChapter
-import com.san.kir.data.db.main.entites.preparedPath
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.main.repo.StatisticsRepository
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.parsing.SiteCatalogsManager
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.joinAll
@@ -22,13 +21,14 @@ import java.io.File
 import java.net.SocketException
 
 class ChapterDownloader(
-    private var chapter: DbChapter,
+    private var chapter: Chapter,
     private val chapterRepository: ChapterRepository,
+    private val statisticsRepository: StatisticsRepository,
     private val connectManager: ConnectManager,
     private val siteCatalogsManager: SiteCatalogsManager,
     concurrent: Int,
     private val checkNetwork: suspend () -> Boolean,
-    private val onProgress: suspend (DbChapter) -> Unit,
+    private val onProgress: suspend (Chapter) -> Unit,
 ) {
     private val semaphore = Semaphore(concurrent)
     private val lock = Mutex()
@@ -45,7 +45,7 @@ class ChapterDownloader(
                 downloadTime = downloadTime,
                 status = state
             )
-            chapterRepository.update(chapter)
+            chapterRepository.save(chapter)
         }
     }
 
@@ -54,12 +54,12 @@ class ChapterDownloader(
         updateChapter(DownloadState.QUEUED)
         onProgress(chapter)
 
-        return runCatching {
+        return runCatching<ChapterDownloader, Unit> {
             downloadChapter()
         }.onSuccess {
             downloadTime = System.currentTimeMillis() - startTime
             updateChapter(DownloadState.COMPLETED)
-            chapterRepository.updateStatistic(chapter)
+            statisticsRepository.updateByChapter(chapter)
             onProgress(chapter)
         }.onFailure {
             Timber.e(it)
@@ -69,8 +69,8 @@ class ChapterDownloader(
     }
 
     private suspend fun downloadChapter() = coroutineScope {
-        val downloadPath = getFullPath(chapter.preparedPath)
-        val pages = withIoContext { chapterRepository.pages(chapter) }
+        val downloadPath = getFullPath(chapter.path)
+        val pages = siteCatalogsManager.pages(chapter)
 
         // Если новополученные странницы не пустые, то испольльзуем их, иначе те что были в главе
         val currentPages =
@@ -168,7 +168,4 @@ class ChapterDownloader(
             downloadPages++
         }
     }
-
-    private suspend inline fun update(chapter: DbChapter) =
-        chapter.also { chapterRepository.update(it) }
 }

@@ -6,25 +6,20 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.san.kir.background.R
-import com.san.kir.background.logic.UpdateCatalogManager
-import com.san.kir.background.logic.UpdateMangaManager
 import com.san.kir.background.logic.di.updateCatalogManager
 import com.san.kir.background.logic.di.updateMangaManager
+import com.san.kir.background.logic.di.workManager
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.longToast
-import com.san.kir.data.categoryDao
-import com.san.kir.data.db.main.dao.CategoryDao
-import com.san.kir.data.db.main.dao.MangaDao
-import com.san.kir.data.db.main.dao.PlannedDao
-import com.san.kir.data.mangaDao
+import com.san.kir.data.categoryRepository
+import com.san.kir.data.mangaRepository
 import com.san.kir.data.models.base.PlannedTaskBase
 import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
-import com.san.kir.data.plannedDao
+import com.san.kir.data.plannedRepository
 import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -34,50 +29,49 @@ class ScheduleWorker(
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
 
-    private val plannedDao: PlannedDao = ManualDI.plannedDao
-    private val mangaDao: MangaDao = ManualDI.mangaDao
-    private val categoryDao: CategoryDao = ManualDI.categoryDao
-    private val updateCatalogManager: UpdateCatalogManager = ManualDI.updateCatalogManager
-    private val updateMangaManager: UpdateMangaManager = ManualDI.updateMangaManager
+    private val plannedRepository = ManualDI.plannedRepository()
+    private val mangaRepository = ManualDI.mangaRepository()
+    private val categoriesRepository = ManualDI.categoryRepository()
+    private val updateCatalogManager = ManualDI.updateCatalogManager()
+    private val updateMangaManager = ManualDI.updateMangaManager()
 
     override suspend fun doWork(): Result {
         val id = inputData.getLong("planned_task", -1L)
         if (id == -1L) return Result.retry()
 
         kotlin.runCatching {
-            val task = plannedDao.itemById(id) ?: return Result.failure()
+            val task = plannedRepository.item(id) ?: return Result.failure()
             Timber.v("task $task")
 
             when (task.type) {
                 PlannedType.MANGA -> {
-                    val manga = mangaDao.itemById(task.mangaId)
-                    updateMangaManager.addTask(manga.id)
+                    val manga = mangaRepository.item(task.mangaId)
+                    if (manga != null) {
+                        updateMangaManager.addTask(manga.id)
+                    } else {
+                        Timber.tag("ScheduleWorker").e("Не найдена манга с id -> ${task.mangaId}")
+                    }
                 }
 
                 PlannedType.GROUP -> {
                     if (task.groupContent.isNotEmpty())
-                        updateMangaManager.addTasks(mangaDao.itemIdsByNames(task.groupContent))
+                        updateMangaManager.addTasks(mangaRepository.idsByNames(task.groupContent))
                     else if (task.mangas.isNotEmpty())
                         updateMangaManager.addTasks(task.mangas)
                     else Unit
                 }
 
                 PlannedType.CATEGORY -> {
-                    val defaultCategory = categoryDao.defaultCategory(applicationContext)
+                    val defaultCategory = categoriesRepository.defaultCategory()
 
                     val mangas =
-                        if (defaultCategory.id == task.categoryId) mangaDao.itemIds()
-                        else mangaDao.itemIdsByCategoryId(task.categoryId)
+                        if (defaultCategory.id == task.categoryId) mangaRepository.ids()
+                        else mangaRepository.idsByCategoryId(task.categoryId)
                     updateMangaManager.addTasks(mangas)
                 }
 
-                PlannedType.CATALOG -> {
-                    updateCatalogManager.addTask(task.catalog)
-                }
-
-                PlannedType.APP -> {
-                    AppUpdateWorker.addTask(applicationContext)
-                }
+                PlannedType.CATALOG -> updateCatalogManager.addTask(task.catalog)
+                PlannedType.APP -> AppUpdateWorker.addTask()
             }
         }.fold(
             onSuccess = { return Result.success() },
@@ -93,19 +87,19 @@ class ScheduleWorker(
         private const val dayPeriod = AlarmManager.INTERVAL_DAY
         private const val weekPeriod = dayPeriod * 7
 
-        fun addTaskNow(context: Context, item: PlannedTaskBase) {
+        fun addTaskNow(item: PlannedTaskBase) {
             val oneTask = OneTimeWorkRequestBuilder<ScheduleWorker>()
                 .addTag(tag + item.id)
                 .setInputData(workDataOf("planned_task" to item.id))
                 .build()
-            WorkManager.getInstance(context).enqueue(oneTask)
+            ManualDI.workManager().enqueue(oneTask)
         }
 
-        fun addTask(ctx: Context, item: PlannedTaskBase) {
+        fun addTask(item: PlannedTaskBase) {
             val delay = getDelay(item)
             Timber.v("delay $delay ")
 
-            WorkManager.getInstance(ctx)
+            ManualDI.workManager()
                 .cancelAllWorkByTag(tag + item.id)
                 .result
                 .addListener(
@@ -125,46 +119,46 @@ class ScheduleWorker(
                             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                             .build()
 
-                        WorkManager.getInstance(ctx).enqueue(listOf(oneTask, perTask))
-                    }, ContextCompat.getMainExecutor(ctx)
+                        ManualDI.workManager().enqueue(listOf(oneTask, perTask))
+                    }, ContextCompat.getMainExecutor(ManualDI.application)
                 )
         }
 
-        fun cancelTask(ctx: Context, item: PlannedTaskBase) {
-            WorkManager.getInstance(ctx)
+        fun cancelTask(item: PlannedTaskBase) {
+            ManualDI.workManager()
                 .cancelAllWorkByTag(tag + item.id)
                 .result
                 .addListener(
                     {
                         when (item.type) {
                             PlannedType.MANGA ->
-                                ctx.longToast(
+                                ManualDI.application.longToast(
                                     R.string.manga_updating_was_canceled_format,
                                     item.manga
                                 )
 
                             PlannedType.CATEGORY ->
-                                ctx.longToast(
+                                ManualDI.application.longToast(
                                     R.string.category_updating_was_canceled_format,
                                     item.category
                                 )
 
                             PlannedType.GROUP ->
-                                ctx.longToast(
+                                ManualDI.application.longToast(
                                     R.string.group_updating_was_canceled_format,
                                     item.groupName
                                 )
 
                             PlannedType.CATALOG ->
-                                ctx.longToast(
+                                ManualDI.application.longToast(
                                     R.string.catalog_updating_was_canceled_format,
                                     item.catalog
                                 )
 
                             PlannedType.APP ->
-                                ctx.longToast(R.string.app_updating_was_canceled)
+                                ManualDI.application.longToast(R.string.app_updating_was_canceled)
                         }
-                    }, ContextCompat.getMainExecutor(ctx)
+                    }, ContextCompat.getMainExecutor(ManualDI.application)
                 )
 
         }

@@ -20,8 +20,8 @@ class ChapterRepository internal constructor(private val chapterDao: ChapterDao)
         .toModels()
 
     fun items(mangaId: Long) = chapterDao.loadSimpleItemsByMangaId(mangaId).toModels()
-    suspend fun insert(item: Chapter) = withIoContext { chapterDao.insert(item.toEntity()) }
-    suspend fun insert(items: List<Chapter>) =
+    suspend fun save(item: Chapter) = withIoContext { chapterDao.insert(item.toEntity()) }
+    suspend fun save(items: List<Chapter>) =
         withIoContext { chapterDao.insert(items.toEntities()) }
 
     suspend fun updateIsRead(ids: List<Long>, isRead: Boolean) =

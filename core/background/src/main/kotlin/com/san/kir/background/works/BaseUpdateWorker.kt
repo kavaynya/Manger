@@ -6,8 +6,8 @@ import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.san.kir.background.logic.Command
 import com.san.kir.background.logic.WorkComplete
-import com.san.kir.background.logic.repo.BaseWorkerRepository
 import com.san.kir.background.util.tryCreateNotificationChannel
+import com.san.kir.data.db.workers.repo.BaseWorkerRepository
 import com.san.kir.data.models.base.BaseTask
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -117,7 +117,8 @@ open class BaseUpdateWorker<T : BaseTask<T>>(
         if (currentJob != null
             && currentTask != null
             && currentJob?.isActive == true
-            && queue.isNotEmpty()) return
+            && queue.isNotEmpty()
+        ) return
 
         currentJob = scope.launch {
             currentTask = queue.first()

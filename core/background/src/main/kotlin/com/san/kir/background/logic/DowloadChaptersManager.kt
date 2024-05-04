@@ -1,28 +1,25 @@
 package com.san.kir.background.logic
 
-import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
-import com.san.kir.background.logic.repo.ChapterRepository
-import com.san.kir.background.logic.repo.ChapterWorkerRepository
 import com.san.kir.background.works.DownloadChaptersWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.workers.entities.DbChapterTask
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.workers.repo.ChapterWorkerRepository
+import com.san.kir.data.models.workers.ChapterTask
 import kotlinx.coroutines.flow.first
 import java.util.UUID
 
 class DownloadChaptersManager(
-    context: Context,
+    private val manager: WorkManager,
     private val workerRepository: ChapterWorkerRepository,
     private val chapterRepository: ChapterRepository,
 ) {
-    private val manager by lazy { WorkManager.getInstance(context) }
-
     suspend fun addTask(chapterId: Long) = withIoContext {
         if (workerRepository.task(chapterId) == null) {
-            workerRepository.add(DbChapterTask(chapterId = chapterId))
+            workerRepository.save(ChapterTask(chapterId = chapterId))
             chapterRepository.addToQueue(chapterId)
         }
 
@@ -32,7 +29,7 @@ class DownloadChaptersManager(
     suspend fun addTasks(chapterIds: List<Long>) = withIoContext {
         chapterIds.forEach { chapterId ->
             if (workerRepository.task(chapterId) == null) {
-                workerRepository.add(DbChapterTask(chapterId = chapterId))
+                workerRepository.save(ChapterTask(chapterId = chapterId))
                 chapterRepository.addToQueue(chapterId)
             }
         }

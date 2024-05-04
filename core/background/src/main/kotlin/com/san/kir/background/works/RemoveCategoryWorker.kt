@@ -3,16 +3,14 @@ package com.san.kir.background.works
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
+import com.san.kir.background.logic.di.workManager
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withDefaultContext
-import com.san.kir.data.categoryDao
-import com.san.kir.data.db.main.dao.CategoryDao
-import com.san.kir.data.db.main.dao.MangaDao
-import com.san.kir.data.mangaDao
-import com.san.kir.data.db.main.entites.DbCategory
+import com.san.kir.data.categoryRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.data.models.main.Category
 
 /*
     Worker для удаления категории,
@@ -24,8 +22,8 @@ class RemoveCategoryWorker(
     workerParameters: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParameters) {
 
-    private val categoryDao: CategoryDao = ManualDI.categoryDao
-    private val mangaDao: MangaDao = ManualDI.mangaDao
+    private val categoryRepository = ManualDI.categoryRepository()
+    private val mangaRepository = ManualDI.mangaRepository()
 
     override suspend fun doWork(): Result {
         val categoryId = inputData.getLong(CAT, -1L)
@@ -33,18 +31,18 @@ class RemoveCategoryWorker(
         if (categoryId != -1L) {
             // Получение удаляемой категории
             val category = withDefaultContext {
-                categoryDao.itemById(categoryId)
+                categoryRepository.item(categoryId)
             }
 
             // Получение категории "Все"
             val categoryAll = withDefaultContext {
-                categoryDao.defaultCategory(applicationContext)
+                categoryRepository.defaultCategory()
             }
 
             kotlin.runCatching {
                 withDefaultContext {
-                    mangaDao.update(
-                        mangaDao
+                    mangaRepository.save(
+                        mangaRepository
                             // Получение всей манги, которая связана с удаляемой категорией
                             .itemsByCategoryId(category.id)
                             .map {
@@ -52,7 +50,7 @@ class RemoveCategoryWorker(
                                 it.copy(categoryId = categoryAll.id)
                             }
                     )
-                    categoryDao.delete(category)
+                    categoryRepository.delete(category)
                 }
             }.fold(
                 onSuccess = {
@@ -72,13 +70,13 @@ class RemoveCategoryWorker(
         const val TAG = "removeCategory"
         const val CAT = "category_id"
 
-        fun addTask(ctx: Context, category: DbCategory) {
+        fun addTask(category: Category) {
             val data = workDataOf(CAT to category.id)
             val task = OneTimeWorkRequestBuilder<RemoveCategoryWorker>()
                 .addTag(TAG)
                 .setInputData(data)
                 .build()
-            WorkManager.getInstance(ctx).enqueue(task)
+            ManualDI.workManager().enqueue(task)
         }
     }
 }

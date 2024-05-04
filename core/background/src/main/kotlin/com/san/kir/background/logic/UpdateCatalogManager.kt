@@ -1,25 +1,23 @@
 package com.san.kir.background.logic
 
-import android.content.Context
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
-import com.san.kir.background.logic.repo.CatalogWorkerRepository
 import com.san.kir.background.works.UpdateCatalogWorker
 import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.workers.entities.DbCatalogTask
+import com.san.kir.data.db.workers.repo.CatalogWorkerRepository
+import com.san.kir.data.models.workers.CatalogTask
 import java.util.UUID
 
 class UpdateCatalogManager(
-    context: Context,
+    private val manager: WorkManager,
     private val workerRepository: CatalogWorkerRepository,
 ) {
-    private val manager by lazy { WorkManager.getInstance(context) }
 
     suspend fun addTask(name: String) = withIoContext {
         if (workerRepository.task(name) == null)
-            workerRepository.add(DbCatalogTask(name = name))
+            workerRepository.save(CatalogTask(name = name))
 
         startWorker()
     }

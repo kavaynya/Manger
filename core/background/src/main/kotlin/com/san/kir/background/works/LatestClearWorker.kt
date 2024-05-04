@@ -1,41 +1,35 @@
 package com.san.kir.background.works
 
-import android.content.Context
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
+import com.san.kir.background.logic.di.workManager
+import com.san.kir.core.utils.ManualDI
 
 
 object LatestClearWorkers {
     const val TAG = "cleanLatest"
 
-    fun clearAll(ctx: Context) {
+    fun clearAll() {
         val task = OneTimeWorkRequestBuilder<AllLatestClearWorker>()
             .addTag(TAG)
             .build()
 
-        WorkManager
-            .getInstance(ctx)
-            .enqueue(task)
+        ManualDI.workManager().enqueue(task)
     }
 
-    fun clearDownloaded(ctx: Context) {
+    fun clearDownloaded() {
         val task = OneTimeWorkRequestBuilder<DownloadedLatestClearWorker>()
             .addTag(TAG)
             .build()
 
-        WorkManager
-            .getInstance(ctx)
-            .enqueue(task)
+        ManualDI.workManager().enqueue(task)
     }
 
-    fun clearReaded(ctx: Context) {
+    fun clearReaded() {
         val task = OneTimeWorkRequestBuilder<ReadLatestClearWorker>()
             .addTag(TAG)
             .build()
 
-        WorkManager
-            .getInstance(ctx)
-            .enqueue(task)
+        ManualDI.workManager().enqueue(task)
     }
 }
 

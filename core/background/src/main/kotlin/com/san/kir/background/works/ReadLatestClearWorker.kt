@@ -4,30 +4,29 @@ import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.chapterDao
-import com.san.kir.data.db.main.dao.ChapterDao
+import com.san.kir.data.chapterRepository
+import timber.log.Timber
 
 class ReadLatestClearWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
 
-    private val chapterDao: ChapterDao = ManualDI.chapterDao
+    private val chaptersRepository = ManualDI.chapterRepository()
 
     override suspend fun doWork(): Result {
         kotlin.runCatching {
-            chapterDao.update(
-                *chapterDao.items()
+            chaptersRepository.save(
+                chaptersRepository.allItems()
                     .filter { it.isInUpdate && it.isRead }
                     .map { it.copy(isInUpdate = false) }
-                    .toTypedArray()
             )
         }.fold(
             onSuccess = {
                 return Result.success()
             },
             onFailure = {
-                it.printStackTrace()
+                Timber.tag("ReadLatestClearWorker").e(it)
                 return Result.failure()
             }
         )

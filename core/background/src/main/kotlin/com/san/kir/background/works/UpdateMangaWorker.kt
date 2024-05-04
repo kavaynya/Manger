@@ -9,17 +9,16 @@ import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
 import com.san.kir.background.logic.WorkComplete
-import com.san.kir.background.logic.di.mangaRepository
-import com.san.kir.background.logic.di.mangaWorkerRepository
-import com.san.kir.background.logic.repo.MangaRepository
-import com.san.kir.background.logic.repo.MangaWorkerRepository
 import com.san.kir.background.util.cancelAction
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.fuzzy
-import com.san.kir.data.db.main.entites.DbChapter
-import com.san.kir.data.db.workers.entities.DbMangaTask
+import com.san.kir.data.chapterRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.data.mangaWorkerRepository
+import com.san.kir.data.models.main.Chapter
 import com.san.kir.data.models.utils.DownloadState
+import com.san.kir.data.models.workers.MangaTask
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.CancellationException
@@ -29,19 +28,20 @@ import java.util.regex.Pattern
 class UpdateMangaWorker(
     context: Context,
     params: WorkerParameters,
-) : BaseUpdateWorker<DbMangaTask>(context, params) {
+) : BaseUpdateWorker<MangaTask>(context, params) {
 
-    private val mangaRepository: MangaRepository = ManualDI.mangaRepository
+    private val mangaRepository = ManualDI.mangaRepository()
+    private val chaptersRepository = ManualDI.chapterRepository()
     private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager()
 
-    override val workerRepository: MangaWorkerRepository = ManualDI.mangaWorkerRepository
+    override val workerRepository = ManualDI.mangaWorkerRepository()
     override val TAG = "Chapter Finder"
 
     private val reg = Pattern.compile("\\d+")
-    private var successfuled = listOf<DbMangaTask>()
+    private var successfuled = listOf<MangaTask>()
 
-    override suspend fun prepareTasks(new: List<DbMangaTask>): List<Long> {
-        val unicsTasks = new.fold(listOf<DbMangaTask>()) { list, item ->
+    override suspend fun prepareTasks(new: List<MangaTask>): List<Long> {
+        val unicsTasks = new.fold(listOf<MangaTask>()) { list, item ->
             if (item.mangaId in list.map { it.mangaId }) list else list + item
         }
 
@@ -50,41 +50,41 @@ class UpdateMangaWorker(
         return super.prepareTasks(unicsTasks)
     }
 
-    override suspend fun work(task: DbMangaTask) {
+    override suspend fun work(task: MangaTask) {
 
         kotlin.runCatching {
-            val mangaDb = mangaRepository.manga(task.mangaId)
-            if (mangaDb.isUpdate.not()) return
+            val mangaDb = mangaRepository.item(task.mangaId)
+            if (mangaDb == null || mangaDb.isUpdate.not()) return
 
             updateCurrentTask { copy(state = DownloadState.LOADING, mangaName = mangaDb.name) }
             notify()
 
-            val dbChapters = mangaRepository.chapters(mangaDb)
+            val dbChapters = chaptersRepository.allItems(mangaDb.id)
             val siteChapters = manager.chapters(mangaDb)
 
             val result = compare(dbChapters, siteChapters.asReversed())
             /** Все главы из списка оставшихся удаляем из БД */
-            if (result.remains.isNotEmpty()) mangaRepository.delete(result.remains)
+            if (result.remains.isNotEmpty()) chaptersRepository.delete(result.remains.map { it.id })
 
             /** Находим первую главу из новых */
             val firstNew = result.prepared.indexOfFirst { it.isNew }
 
             /** Все главы до первой новой, обновляем в БД */
             if (firstNew == -1) {
-                mangaRepository.update(result.prepared.map { it.ch })
+                chaptersRepository.save(result.prepared.map { it.ch })
             } else {
                 val take = result.prepared.take(firstNew)
-                mangaRepository.update(take.map { it.ch })
+                chaptersRepository.save(take.map { it.ch })
 
                 /** Все главы, что остались */
                 val new = result.prepared.subList(firstNew, result.prepared.size)
 
                 /** Находим и удаляем главы, которые были в БД, чтобы не нарушать порядок добавления */
                 val oldInNew = new.filter { it.isNew.not() }
-                if (oldInNew.isNotEmpty()) mangaRepository.deleteByIds(oldInNew.map { it.ch.id })
+                if (oldInNew.isNotEmpty()) chaptersRepository.delete(oldInNew.map { it.ch.id })
 
                 /** Сохраняем все оставшиеся главы в БД */
-                mangaRepository.add(new.map { it.ch.copy(id = 0) })
+                chaptersRepository.save(new.map { it.ch.copy(id = 0) })
 
                 updateCurrentTask { copy(newChapters = new.size - oldInNew.size) }
             }
@@ -95,17 +95,17 @@ class UpdateMangaWorker(
             withCurrentTask { task ->
                 Timber.v("manga = ${task.mangaName}")
                 errored = errored + task
-                workerRepository.update(task.copy(state = DownloadState.UNKNOWN))
+                workerRepository.save(task.copy(state = DownloadState.UNKNOWN))
             }
         }.onSuccess {
             withCurrentTask { task ->
                 successfuled = successfuled + task
-                workerRepository.update(task.copy(state = DownloadState.COMPLETED))
+                workerRepository.save(task.copy(state = DownloadState.COMPLETED))
             }
         }
     }
 
-    override suspend fun onNotify(task: DbMangaTask?) {
+    override suspend fun onNotify(task: MangaTask?) {
         with(NotificationCompat.Builder(applicationContext, channelId)) {
             setSmallIcon(R.drawable.ic_notification_update)
 
@@ -136,7 +136,7 @@ class UpdateMangaWorker(
                 else
                     setProgress(0, 0, true)
 
-                workerRepository.update(task)
+                workerRepository.save(task)
 
                 setSubText(messageToGo)
             } ?: kotlin.run {
@@ -212,7 +212,7 @@ class UpdateMangaWorker(
      *
      * @return Результат слияния
      * */
-    private fun compare(old: List<DbChapter>, new: List<DbChapter>): ChaptersContainer {
+    private fun compare(old: List<Chapter>, new: List<Chapter>): ChaptersContainer {
         val oldRemovable = old.toMutableList()
 
         val prepared = new.map { newChapter ->
@@ -235,7 +235,7 @@ class UpdateMangaWorker(
             /** Если глова была найдена, то обновляем ее значениями из новой главы, иначе используем новую */
             val chapter = oldChapter?.copy(
                 link = newChapter.link,
-                path = newChapter.path,
+                _path = newChapter.path,
                 name = newChapter.name,
                 date = newChapter.date,
             ) ?: newChapter.copy(isInUpdate = true)
@@ -263,8 +263,8 @@ class UpdateMangaWorker(
 
         private var actionToLatest: PendingIntent? = null
 
-        fun setLatestDeepLink(ctx: Context, deepLinkIntent: Intent) {
-            actionToLatest = TaskStackBuilder.create(ctx).run {
+        fun setLatestDeepLink(deepLinkIntent: Intent) {
+            actionToLatest = TaskStackBuilder.create(ManualDI.application).run {
                 addNextIntentWithParentStack(deepLinkIntent)
                 getPendingIntent(
                     0,
@@ -277,7 +277,7 @@ class UpdateMangaWorker(
 
 private data class ChaptersContainer(
     val prepared: List<ChapterContainer>,
-    val remains: List<DbChapter>,
+    val remains: List<Chapter>,
 )
 
-private data class ChapterContainer(val ch: DbChapter, val isNew: Boolean)
+private data class ChapterContainer(val ch: Chapter, val isNew: Boolean)

@@ -1,6 +1,6 @@
 package com.san.kir.data.db.main.repo
 
-import com.san.kir.core.utils.ManualDI
+import android.content.Context
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.db.main.dao.CategoryDao
 import com.san.kir.data.db.main.entites.DbCategory
@@ -13,7 +13,10 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Collections
 
-class CategoryRepository internal constructor(private val categoryDao: CategoryDao) {
+class CategoryRepository internal constructor(
+    private val context: Lazy<Context>,
+    private val categoryDao: CategoryDao
+) {
     val count = categoryDao.loadItemsCount()
     val items = categoryDao.loadItems().toModels()
     val names = categoryDao.loadNames()
@@ -39,7 +42,7 @@ class CategoryRepository internal constructor(private val categoryDao: CategoryD
     suspend fun item(id: Long) =
         withIoContext { categoryDao.itemById(id).toModel() }
 
-    suspend fun defaultCategory() = item(ManualDI.application.CATEGORY_ALL)
+    suspend fun defaultCategory() = item(context.value.CATEGORY_ALL)
 
     suspend fun delete(item: Category) =
         withIoContext { categoryDao.delete(item.toEntity()) }

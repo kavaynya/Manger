@@ -9,9 +9,9 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
 import androidx.work.ForegroundInfo
 import androidx.work.OneTimeWorkRequestBuilder
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
+import com.san.kir.background.logic.di.workManager
 import com.san.kir.background.util.cancelAction
 import com.san.kir.background.util.tryCreateNotificationChannel
 import com.san.kir.core.internet.ConnectManager
@@ -74,7 +74,7 @@ class AppUpdateWorker(
         }.onSuccess {
             return Result.success()
         }.onFailure { ex ->
-            ex.printStackTrace()
+            Timber.tag("AppUpdateWorker").e(ex)
 
             with(NotificationCompat.Builder(applicationContext, channelId)) {
                 setSmallIcon(R.drawable.ic_notification_update)
@@ -120,9 +120,9 @@ class AppUpdateWorker(
         private val notifyId = ID.generate()
         private const val URL = "http://4pda.to/forum/index.php?showtopic=772886&st=0#entry53336845"
         private const val TAG = "App Update Finder"
-        fun addTask(ctx: Context = ManualDI.context) {
+        fun addTask() {
             val deleteManga = OneTimeWorkRequestBuilder<AppUpdateWorker>().build()
-            WorkManager.getInstance(ctx).enqueue(deleteManga)
+            ManualDI.workManager().enqueue(deleteManga)
         }
     }
 }

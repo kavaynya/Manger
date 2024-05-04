@@ -4,6 +4,7 @@ import android.content.Context
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.utils.DIR
 import com.san.kir.core.utils.coroutines.withDefaultContext
+import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.data.models.catalog.SiteCatalogElement
 import com.san.kir.data.models.main.Chapter
@@ -63,7 +64,7 @@ class SiteCatalogsManager(
         }
 
     // Получение страниц
-    suspend fun pages(item: Chapter) = catalog(item.link).pages(item)
+    suspend fun pages(item: Chapter) = withIoContext { catalog(item.link).pages(item) }
 
     suspend fun elementByUrl(url: String): SiteCatalogElement? =
         withDefaultContext {

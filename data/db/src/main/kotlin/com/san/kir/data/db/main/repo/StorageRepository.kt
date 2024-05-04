@@ -23,7 +23,7 @@ class StorageRepository internal constructor(private val storageDao: StorageDao)
         withIoContext { storageDao.itemByPath(getFullPath(path).shortPath)?.toModel() }
 
     suspend fun items() = withIoContext { storageDao.items().toModels() }
-    suspend fun insert(item: Storage) = withIoContext { storageDao.insert(item.toEntity()) }
+    suspend fun save(item: Storage) = withIoContext { storageDao.insert(item.toEntity()) }
     suspend fun delete(item: Storage) = withIoContext { storageDao.delete(item.toEntity()) }
     suspend fun delete(items: List<Storage>) =
         withIoContext { storageDao.delete(items.toEntities()) }
