@@ -18,20 +18,4 @@ dependencies {
     implementation(libs.okhttp.loging)
 
     api(libs.bundles.ktor)
-
-    implementation(libs.compose.runtime)
-    implementation(libs.timber)
-
-//        testImplementation(JUNIT)
-//        androidTestImplementation(TEST_CORE)
-//        androidTestImplementation(TEST_RULES)
-    androidTestImplementation(libs.test.junit)
-//        androidTestImplementation(TEST_RUNNER)
-//        androidTestImplementation(TRUTH)
-//        androidTestImplementation(BENCHMARK_JUNIT)
-//        androidTestImplementation(COMPOSE_JUNIT)
-//        androidTestImplementation(KAKAOCUP)
-//        androidTestImplementation(ESPRESSO)
-//        androidTestImplementation(NAVIGATION)
-//        debugImplementation(COMPOSE_MANIFEST)
 }

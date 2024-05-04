@@ -1,7 +1,7 @@
 [versions]
 # Kotlin
 kotlin = "1.9.20"
-coroutines = "1.7.1"
+coroutines = "1.7.3"
 ksp = "1.9.20-1.0.14"
 serialization = "1.6.3"
 datetime = "0.6.0-RC.2"
@@ -51,7 +51,7 @@ timber = "5.0.1"
 
 # For Internet
 jsoup = "1.15.2"
-okio = "3.2.0"
+okio = "3.4.0"
 okhttp = "4.10.0"
 ktor = "2.1.1"
 
@@ -157,7 +157,7 @@ espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "esp
 
 [bundles]
 coroutines = ["coroutines_core", "coroutines_android"]
-room = ["room_ktx", "room_paging"]
+room = ["room_ktx", "room_paging", "room_runtime"]
 compose = ["compose_ui", "compose_ui_tooling", "compose_ui_tooling_preview", "compose_runtime", "compose_animation", "compose_foundation", "compose_foundation_layout", "compose_material_icons", "compose_material_icons_ext", "compose_material3"]
 accompanist = ["flowlayout", "permissions", "systemuicontroller", "webview"]
 work = ["work_runtime", "work_gcm", "work_multiprocess"]

@@ -1,6 +1,6 @@
 package com.san.kir.core.internet
 
-import android.content.Context
+import android.app.Application
 import android.graphics.BitmapFactory
 import com.san.kir.core.utils.coroutines.withIoContext
 import io.ktor.client.HttpClient
@@ -17,6 +17,7 @@ import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.Parameters
 import io.ktor.http.contentLength
+import io.ktor.util.StringValues
 import io.ktor.util.StringValuesBuilderImpl
 import kotlinx.coroutines.delay
 import okhttp3.Cache
@@ -64,7 +65,6 @@ class ConnectManager(context: Application) {
             }
 
             BrowserUserAgent()
-
         }
     }
 
@@ -77,36 +77,35 @@ class ConnectManager(context: Application) {
     suspend fun getDocument(
         url: String = "",
         formParams: Parameters? = null,
-    ): Document =
-        withIoContext {
-            val response =
-                formParams
-                    ?.let { defaultClient.submitForm(url.prepare(), it) }
-                    ?: defaultClient.get(url.prepare())
+    ): Document = withIoContext {
+        val response =
+            formParams
+                ?.let { defaultClient.submitForm(url.prepare(), it) }
+                ?: defaultClient.get(url.prepare())
 
-            Timber.d("url $url\nresponce -> ${response.status}")
-            when (response.status) {
-                HttpStatusCode.TooManyRequests -> {
-                    val toMultimap = response.headers
-                    val timeOut = toMultimap[retryKey]?.first()?.code?.toLong()
-                    if (timeOut != null) {
-                        Timber.v("delay $timeOut seconds")
-                        delay(timeOut.seconds)
-                    } else {
-                        delay(10.seconds)
-                    }
-                }
-
-                HttpStatusCode.NotFound -> {
-                    throw PageNotFoundException()
-                }
-
-                else -> {
-                    return@withIoContext Jsoup.parse(response.bodyAsText(), url)
+        Timber.d("url $url\nresponce -> ${response.status}")
+        when (response.status) {
+            HttpStatusCode.TooManyRequests -> {
+                val toMultimap = response.headers
+                val timeOut = toMultimap[retryKey]?.first()?.code?.toLong()
+                if (timeOut != null) {
+                    Timber.v("delay $timeOut seconds")
+                    delay(timeOut.seconds)
+                } else {
+                    delay(10.seconds)
                 }
             }
-            Document("")
+
+            HttpStatusCode.NotFound -> {
+                throw PageNotFoundException()
+            }
+
+            else -> {
+                return@withIoContext Jsoup.parse(response.bodyAsText(), url)
+            }
         }
+        Document("")
+    }
 
     fun nameFromUrl(url: String): String {
         val pat = Pattern.compile("[\\w.-]+\\.[a-z]{3,4}")
