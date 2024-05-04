@@ -20,11 +20,6 @@ dependencies {
     implementation(project(Modules.Data.models))
     implementation(project(Modules.Core.utils))
 
-//    ksp(libs.room.compiler)
-    api(libs.room.runtime)
+    ksp(libs.room.compiler)
     implementation(libs.bundles.room)
-
-    implementation(libs.compose.runtime)
-
-    implementation(libs.timber)
 }

@@ -9,8 +9,7 @@ android {
 dependencies {
     implementation(project(Modules.Core.internet))
     implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Data.db))
+    implementation(project(Modules.Data.models))
 
     implementation(libs.coroutines.core)
-    implementation(libs.timber)
 }
