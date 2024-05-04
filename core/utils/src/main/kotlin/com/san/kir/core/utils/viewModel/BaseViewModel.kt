@@ -1,6 +1,12 @@
 package com.san.kir.core.utils.viewModel
 
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisallowComposableCalls
+import androidx.compose.runtime.remember
+import com.arkivanov.decompose.ComponentContext
+import com.arkivanov.essenty.instancekeeper.getOrCreate
 import com.san.kir.core.utils.coroutines.defaultDispatcher
+import com.san.kir.core.utils.navigation.rememberLambda
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -13,6 +19,23 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
+
+
+@Composable
+inline fun <reified VM : StateHolder<*>> stateHolder(
+    componentContext: ComponentContext = checkNotNull(LocalComponentContext.current) {
+        "No ComponentContext was provided via LocalComponentContext"
+    },
+    crossinline creator: @DisallowComposableCalls () -> VM,
+): VM {
+    val key = VM::class.java.simpleName
+    return remember(key) { componentContext.instanceKeeper.getOrCreate(key) { creator() } }
+}
+
+@Composable
+fun StateHolder<*>.rememberSendEvent(event: Action): () -> Unit {
+    return rememberLambda { sendAction(event) }
+}
 
 abstract class ViewModel<S : ScreenState>(eventBus: EventBus = EventBusImpl()) :
     StateHolder<S>, EventBus by eventBus, CoroutineScope {
