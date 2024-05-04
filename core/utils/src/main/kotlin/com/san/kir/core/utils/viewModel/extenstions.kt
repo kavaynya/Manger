@@ -5,6 +5,7 @@ import androidx.compose.runtime.DisallowComposableCalls
 import androidx.compose.runtime.remember
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.instancekeeper.getOrCreate
+import com.san.kir.core.utils.navigation.rememberLambda
 
 @Composable
 inline fun <reified VM : StateHolder<*>> stateHolder(
@@ -19,5 +20,5 @@ inline fun <reified VM : StateHolder<*>> stateHolder(
 
 @Composable
 fun StateHolder<*>.rememberSendEvent(event: Action): () -> Unit {
-    return remember { { sendAction(event) } }
+    return rememberLambda { sendAction(event) }
 }
