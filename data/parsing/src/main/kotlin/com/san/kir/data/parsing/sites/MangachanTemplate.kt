@@ -1,9 +1,9 @@
 package com.san.kir.data.parsing.sites
 
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.Manga
 import com.san.kir.data.parsing.SiteCatalogClassic
 import com.san.kir.data.parsing.Status
 import com.san.kir.data.parsing.Translate
@@ -166,7 +166,7 @@ abstract class MangachanTemplate(private val connectManager: ConnectManager) :
                     name = name,
                     date = element.select(".date").text(),
                     link = host + element.select("a").attr("href"),
-                    path = "${manga.path}/$name"
+                    _path = "${manga.path}/$name"
                 )
             }
 

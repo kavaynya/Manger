@@ -2,9 +2,9 @@ package com.san.kir.data.parsing.sites
 
 import com.google.gson.GsonBuilder
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.Manga
 import com.san.kir.data.parsing.SiteCatalogClassic
 import com.san.kir.data.parsing.Translate
 import io.ktor.http.Parameters
@@ -161,7 +161,7 @@ class ComX(private val connectManager: ConnectManager) : SiteCatalogClassic() {
                 mangaId = manga.id,
                 name = chapter.title,
                 link = "$host/readcomix/${jsonData.news_id}/${chapter.id}.html",
-                path = "${manga.path}/${chapter.title}",
+                _path = "${manga.path}/${chapter.title}",
             )
         }
     }

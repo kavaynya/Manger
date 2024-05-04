@@ -1,9 +1,9 @@
 package com.san.kir.data.parsing
 
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.Manga
 import io.ktor.util.StringValues
 import kotlinx.coroutines.flow.Flow
 import timber.log.Timber

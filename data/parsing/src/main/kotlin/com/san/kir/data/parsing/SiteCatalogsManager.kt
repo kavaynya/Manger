@@ -5,9 +5,9 @@ import com.san.kir.core.internet.ConnectManager
 import com.san.kir.core.utils.DIR
 import com.san.kir.core.utils.coroutines.withDefaultContext
 import com.san.kir.core.utils.getFullPath
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.Manga
 import com.san.kir.data.parsing.sites.Acomics
 import com.san.kir.data.parsing.sites.Allhentai
 import com.san.kir.data.parsing.sites.Mangachan

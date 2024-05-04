@@ -1,9 +1,9 @@
 package com.san.kir.data.parsing.sites
 
 import com.san.kir.core.internet.ConnectManager
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.Manga
 import com.san.kir.data.parsing.SiteCatalogAlternative
 import com.san.kir.data.parsing.Status
 import com.san.kir.data.parsing.Translate
@@ -143,7 +143,7 @@ class Acomics(private val connectManager: ConnectManager) : SiteCatalogAlternati
                 mangaId = manga.id,
                 name = manga.name,
                 link = host + manga.shortLink,
-                path = manga.path + "/" + manga.name
+                _path = manga.path + "/" + manga.name
             )
         )
     }
