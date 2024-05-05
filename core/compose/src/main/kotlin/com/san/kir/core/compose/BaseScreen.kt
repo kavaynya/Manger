@@ -1,217 +1,284 @@
-@file:OptIn(ExperimentalMaterialApi::class)
-
 package com.san.kir.core.compose
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.layout.*
+import androidx.compose.animation.core.spring
+import androidx.compose.foundation.background
+import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.windowInsetsBottomHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.ScaffoldState
-import androidx.compose.material3.pullrefresh.PullRefreshIndicator
-import androidx.compose.material3.pullrefresh.pullRefresh
-import androidx.compose.material3.pullrefresh.rememberPullRefreshState
-import androidx.compose.material3.rememberScaffoldState
-import androidx.compose.runtime.*
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import com.san.kir.core.compose.animation.rememberNestedScrollConnection
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
+import com.san.kir.core.utils.LocalContainerColor
+import com.san.kir.core.utils.navigation.BackHandler
+import com.san.kir.core.utils.navigation.DialogState
+import com.san.kir.core.utils.navigation.EmptyDialogData
+import com.san.kir.core.utils.navigation.rememberDialogState
 
+private val DropdownMenuVerticalPadding = 8.dp
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun BaseScreen(
-    modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState? = null,
-    additionalPadding: Dp = Dimensions.default,
-    enableCollapsingBars: Boolean = false,
-    topBar: @Composable (Dp) -> Unit,
-    onRefresh: (() -> Unit)? = null,
-    listContent: (LazyListScope.() -> Unit)? = null,
-    bottomBar: @Composable (Dp) -> Unit = {},
+    drawerState: DrawerState? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
+    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
-    paddingContent: @Composable ((PaddingValues) -> Unit)? = null,
-    fab: @Composable (() -> Unit)? = null,
-    content: @Composable (ColumnScope.() -> Unit)? = null,
+    content: @Composable BoxScope.() -> Unit,
 ) {
-    val density = LocalDensity.current
-    val pixelValue = with(density) { Dimensions.appBarHeight.toPx() }
-    val (height, heightChanger) = remember { mutableFloatStateOf(pixelValue) }
-    val scope = rememberCoroutineScope()
-    var refreshing by remember { mutableStateOf(false) }
+    val menuState = rememberDialogState<EmptyDialogData>(false)
 
-    val animatedHeight by animateDpAsState(targetValue = with(density) { height.toDp() },
-        label = ""
-    )
-
-    fun refresh() = scope.launch {
-        refreshing = true
-        onRefresh?.invoke()
-        delay(1500)
-        refreshing = false
-    }
-
-    val refreshState = onRefresh?.let {
-        rememberPullRefreshState(refreshing = refreshing, onRefresh = ::refresh)
-    }
-
-
-    Scaffold(
-        modifier = modifier
-            .nestedScroll(
-                rememberNestedScrollConnection(
-                    onHeightChanged = heightChanger,
-                    maxHeight = pixelValue,
-                    enable = enableCollapsingBars,
-                )
-            ),
-        scaffoldState = scaffoldState ?: rememberScaffoldState(),
-        drawerContent = drawerContent,
-        drawerGesturesEnabled = true,
-        bottomBar = { bottomBar(animatedHeight) },
-        topBar = { topBar(animatedHeight) },
-        floatingActionButton = fab ?: {},
-    ) { contentPadding ->
-
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .then(
-                    if (refreshState == null) Modifier
-                    else Modifier.pullRefresh(refreshState)
-                )
+    if (drawerContent == null) {
+        CompositionLocalProvider(
+            LocalContentColor provides contentColor,
+            LocalContainerColor provides containerColor,
         ) {
-            paddingContent?.invoke(contentPadding)
+            ContentWrapper(
+                scrollBehavior = scrollBehavior,
+                contentColor = contentColor,
+                containerColor = containerColor,
+                topBar = { behavior -> topBar(behavior, menuState) },
+                content = content
+            )
+        }
+    } else {
+        val drawerState = drawerState ?: rememberDrawerState(DrawerValue.Closed)
 
-            content?.let { con ->
-                Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(
-                            PaddingValues(
-                                top = contentPadding.calculateTopPadding(),
-                                bottom = contentPadding.calculateBottomPadding(),
-                                start = additionalPadding, end = additionalPadding
-                            )
-                        )
-                        .imePadding()
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Spacer(modifier = Modifier.height(additionalPadding))
-                    con()
-                    if (WindowInsets.ime.getBottom(LocalDensity.current) <= 0 && additionalPadding > 0.dp)
-                        Spacer(
-                            modifier = Modifier.windowInsetsBottomHeight(
-                                WindowInsets.navigationBars.add(
-                                    WindowInsets(top = additionalPadding)
-                                )
-                            )
-                        )
-                    else
-                        Spacer(
-                            modifier = Modifier
-                                .height(additionalPadding)
-                                .bottomInsetsPadding()
-                        )
-                }
+        ModalNavigationDrawer(
+            drawerState = drawerState,
+            drawerContent = { ModalDrawerSheet { drawerContent.invoke(this) } },
+        ) {
+            ContentWrapper(
+                scrollBehavior = scrollBehavior,
+                contentColor = contentColor,
+                containerColor = containerColor,
+                topBar = { behavior -> topBar(behavior, menuState) },
+                content = content
+            )
+        }
+
+        BackHandler(drawerState.isOpen) {
+            drawerState.close()
+        }
+    }
+
+    if (menuActions != null) {
+        TopEndSheets(
+            dialogState = menuState,
+            modifier = Modifier.topInsetsPadding(),
+            animationSpec = spring(0.85f, 1000f)
+        ) {
+            Column(
+                modifier = Modifier
+                    .padding(vertical = DropdownMenuVerticalPadding)
+                    .width(IntrinsicSize.Max)
+                    .verticalScroll(rememberScrollState())
+                    .endInsetsPadding(),
+            ) {
+                val scope = remember { ExpandedMenuScope(menuState::dismiss) }
+                scope.menuActions()
             }
-
-            listContent?.let { listCon ->
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(top = contentPadding.calculateTopPadding())
-                        .imePadding(),
-                    contentPadding = PaddingValues(
-                        top = additionalPadding,
-                        bottom = systemBarBottomPadding(additionalPadding).calculateBottomPadding()
-                    ),
-                ) {
-                    listCon()
-                }
-            }
-
-            if (refreshState != null)
-                PullRefreshIndicator(
-                    refreshing = refreshing,
-                    state = refreshState,
-                    modifier.align(Alignment.TopCenter)
-                )
         }
     }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenPadding(
-    modifier: Modifier = Modifier,
-    additionalPadding: Dp = Dimensions.default,
-    enableCollapsingBars: Boolean = false,
-    onRefresh: (() -> Unit)? = null,
-    topBar: @Composable (Dp) -> Unit,
+private fun ContentWrapper(
+    scrollBehavior: TopAppBarScrollBehavior?,
+    containerColor: Color,
+    contentColor: Color,
+    topBar: (TopAppBarScrollBehavior?) -> Unit,
+    content: @Composable BoxScope.() -> Unit,
+) {
+    val focusManager = LocalFocusManager.current
+    CompositionLocalProvider(
+        LocalContentColor provides contentColor,
+        LocalContainerColor provides containerColor,
+    ) {
+        Box(
+            modifier = Modifier
+                .background(containerColor)
+                .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
+        ) {
+            Column(modifier = Modifier.fillMaxSize()) {
+                topBar.invoke(scrollBehavior)
+                Box(modifier = Modifier.fillMaxSize()) {
+                    content.invoke(this)
+                }
+            }
+        }
+    }
+}
+
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ScreenClear(
+    drawerState: DrawerState? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
-    fab: @Composable (() -> Unit)? = null,
-    content: @Composable (PaddingValues) -> Unit,
+    content: @Composable BoxScope.() -> Unit,
 ) {
     BaseScreen(
-        modifier = modifier,
-        topBar = topBar,
-        paddingContent = content,
-        drawerContent = drawerContent,
-        additionalPadding = additionalPadding,
-        enableCollapsingBars = enableCollapsingBars,
-        fab = fab,
-        onRefresh = onRefresh
+        drawerState, scrollBehavior, containerColor, contentColor, menuActions, topBar,
+        drawerContent, content
     )
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenContent(
-    modifier: Modifier = Modifier,
-    scaffoldState: ScaffoldState? = null,
-    additionalPadding: Dp = Dimensions.default,
-    enableCollapsingBars: Boolean = false,
-    topBar: @Composable (Dp) -> Unit,
+    drawerState: DrawerState? = null,
+    scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+    additionalPadding: Dp = Dimensions.zero,
+    canScroll: Boolean = false,
+    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
-    content: @Composable (ColumnScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit,
 ) {
+    val density = LocalDensity.current
+    val scrollState = rememberScrollState()
+    val canScroll by remember { derivedStateOf { canScroll || scrollState.maxValue > 0 } }
+
     BaseScreen(
-        modifier = modifier,
+        drawerState = drawerState,
+        scrollBehavior = scrollBehavior,
+        menuActions = menuActions,
         topBar = topBar,
-        content = content,
-        scaffoldState = scaffoldState,
         drawerContent = drawerContent,
-        additionalPadding = additionalPadding,
-        enableCollapsingBars = enableCollapsingBars
-    )
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = additionalPadding)
+                .imePadding()
+                .verticalScroll(scrollState, canScroll)
+        ) {
+            Spacer(modifier = Modifier.size(additionalPadding))
+
+            content()
+
+            if (WindowInsets.ime.getBottom(density) < 0) {
+                Spacer(
+                    modifier = Modifier
+                        .height(additionalPadding)
+                        .bottomInsetsPadding()
+                )
+            }
+
+            if (additionalPadding > Dimensions.zero) {
+                Spacer(
+                    modifier = Modifier.windowInsetsBottomHeight(
+                        WindowInsets.navigationBars.add(WindowInsets(bottom = additionalPadding))
+                    )
+                )
+            }
+        }
+    }
 }
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScreenList(
-    modifier: Modifier = Modifier,
     additionalPadding: Dp = Dimensions.default,
-    scaffoldState: ScaffoldState? = null,
-    enableCollapsingBars: Boolean = false,
-    onRefresh: (() -> Unit)? = null,
-    topBar: @Composable (Dp) -> Unit,
-    bottomBar: @Composable (Dp) -> Unit = {},
+    contentPadding: PaddingValues = bottomInsetsPadding(bottom = additionalPadding),
+    drawerState: DrawerState? = null,
+    state: LazyListState = rememberLazyListState(),
+    scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
+    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
+    bottomContent: (@Composable BoxScope.() -> Unit) = {},
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
-    listContent: (LazyListScope.() -> Unit)? = null,
+    content: LazyListScope.() -> Unit,
 ) {
+    val canScroll by remember {
+        derivedStateOf {
+            val layoutInfo = state.layoutInfo
+            if (layoutInfo.totalItemsCount != 0) {
+                val visibleItemsInfo = layoutInfo.visibleItemsInfo
+                val firstVisibleItem = visibleItemsInfo.first()
+                val lastVisibleItem = visibleItemsInfo.last()
+                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
+                if (firstVisibleItem.index != 0
+                    || firstVisibleItem.offset != 0
+                    || lastVisibleItem.index + 1 != layoutInfo.totalItemsCount
+                    || lastVisibleItem.offset + lastVisibleItem.size > viewportHeight
+                ) {
+                    return@derivedStateOf true
+                }
+            }
+            false
+        }
+    }
+
     BaseScreen(
-        modifier = modifier,
-        additionalPadding = additionalPadding,
+        drawerState = drawerState,
+        scrollBehavior = scrollBehavior,
+        menuActions = menuActions,
         topBar = topBar,
-        scaffoldState = scaffoldState,
         drawerContent = drawerContent,
-        bottomBar = bottomBar,
-        listContent = listContent,
-        enableCollapsingBars = enableCollapsingBars,
-        onRefresh = onRefresh,
-    )
+    ) {
+        LazyColumn(
+            modifier = Modifier
+                .fillMaxSize()
+                .imePadding(),
+            state = state,
+            contentPadding = contentPadding,
+            userScrollEnabled = canScroll,
+            content = content
+        )
+
+        Box(modifier = Modifier.align(Alignment.BottomEnd), content = bottomContent)
+    }
 }

@@ -73,7 +73,7 @@ import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.systemBarBottomPadding
 import com.san.kir.core.compose.systemBarStartPadding
-import com.san.kir.core.compose.systemBarTopPadding
+import com.san.kir.core.compose.topInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.extend.MiniCatalogItem
@@ -311,7 +311,7 @@ private fun DrawerContent(filters: List<Filter>, sendEvent: (CatalogEvent) -> Un
         ) { pageIndex ->
             val currentFilter = filters[pageIndex]
 
-            LazyColumn(contentPadding = systemBarTopPadding()) {
+            LazyColumn(contentPadding = topInsetsPadding()) {
                 itemsIndexed(currentFilter.items, key = { i, _ -> i }) { index, item ->
                     // Строка списка
                     Row(

@@ -19,12 +19,14 @@ class ExpandedMenuScope internal constructor(
         modifier: Modifier = Modifier,
         onClick: () -> Unit,
     ) {
-        DropdownMenuItem(onClick = {
-            onClick()
-            onCloseMenu()
-        }, modifier = modifier) {
-            Text(text = text)
-        }
+        DropdownMenuItem(
+            onClick = {
+                onClick()
+                onCloseMenu()
+            },
+            modifier = modifier,
+            text = { Text(text = text) }
+        )
     }
 
     @Composable
@@ -37,17 +39,20 @@ class ExpandedMenuScope internal constructor(
         checked: Boolean,
         onClick: () -> Unit,
     ) {
-        DropdownMenuItem(onClick) {
-            Checkbox(
-                checked,
-                {
-                    onClick()
-                    onCloseMenu()
-                },
-                modifier = Modifier.padding(end = Dimensions.quarter)
-            )
-            Text(stringResource(id))
-        }
+        DropdownMenuItem(
+            onClick = onClick,
+            text = { Text(stringResource(id)) },
+            trailingIcon = {
+                Checkbox(
+                    checked,
+                    {
+                        onClick()
+                        onCloseMenu()
+                    },
+                    modifier = Modifier.padding(end = Dimensions.quarter)
+                )
+            }
+        )
     }
 }
 

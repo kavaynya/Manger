@@ -1,6 +1,5 @@
 package com.san.kir.core.compose
 
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
@@ -8,76 +7,168 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.only
 import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.union
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.composed
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun systemBarsHorizontalPadding(all: Dp = Dimensions.zero): PaddingValues =
-    WindowInsets.systemBars
-        .only(WindowInsetsSides.Horizontal)
-        .add(WindowInsets(all, all, all, all))
-        .asPaddingValues()
-
-@Composable
-fun systemBarStartPadding(additional: Dp = Dimensions.zero): PaddingValues =
-    WindowInsets.systemBars
-        .only(WindowInsetsSides.Start)
-        .add(WindowInsets(left = additional))
-        .asPaddingValues()
-
-@Composable
-fun systemBarEndPadding(additional: Dp = Dimensions.zero): PaddingValues =
-    WindowInsets.systemBars
-        .only(WindowInsetsSides.End)
-        .add(WindowInsets(right = additional))
-        .asPaddingValues()
-
-@Composable
-fun systemBarBottomPadding(additional: Dp = Dimensions.zero): PaddingValues =
-    WindowInsets.systemBars
-        .only(WindowInsetsSides.Bottom)
-        .add(WindowInsets(bottom = additional))
-        .asPaddingValues()
-
-@Composable
-fun systemBarTopPadding(additional: Dp = Dimensions.zero): PaddingValues =
-    WindowInsets.systemBars
+fun topInsets(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+): WindowInsets {
+    return WindowInsets.displayCutout
         .only(WindowInsetsSides.Top)
-        .add(WindowInsets(top = additional))
-        .asPaddingValues()
+        .union(WindowInsets.systemBars.only(WindowInsetsSides.Top))
+        .add(WindowInsets(left, top, right, bottom))
+}
 
 @Composable
-private fun horizontalInsets() =
-    WindowInsets.displayCutout.only(WindowInsetsSides.Horizontal)
-        .add(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+fun topInsetsPadding(top: Dp = Dimensions.zero) = topInsets(top = top).asPaddingValues()
 
 @Composable
-private fun bottomInsets() =
-    WindowInsets.displayCutout.only(WindowInsetsSides.Bottom)
-        .add(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
+fun Modifier.topInsetsPadding(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+) = windowInsetsPadding(topInsets(left, top, right, bottom))
 
 @Composable
-private fun startInsets() =
-    WindowInsets.displayCutout.only(WindowInsetsSides.Start)
-        .add(WindowInsets.systemBars.only(WindowInsetsSides.Start))
+fun Modifier.topInsetsPadding(
+    horizontal: Dp = Dimensions.zero,
+    vertical: Dp = Dimensions.zero,
+) = windowInsetsPadding(topInsets(horizontal, vertical, horizontal, vertical))
+
+
+//////////////////////////////////////////
+
 
 @Composable
-private fun endInsets() =
-    WindowInsets.displayCutout.only(WindowInsetsSides.End)
-        .add(WindowInsets.systemBars.only(WindowInsetsSides.End))
-
-fun Modifier.horizontalInsetsPadding() = composed { windowInsetsPadding(horizontalInsets()) }
-fun Modifier.startInsetsPadding() = composed { windowInsetsPadding(startInsets()) }
-fun Modifier.bottomInsetsPadding() = composed { windowInsetsPadding(bottomInsets()) }
-fun Modifier.endInsetsPadding() = composed { windowInsetsPadding(endInsets()) }
+fun bottomInsets(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+): WindowInsets {
+    return WindowInsets.displayCutout
+        .only(WindowInsetsSides.Bottom)
+        .union(WindowInsets.systemBars.only(WindowInsetsSides.Bottom))
+        .add(WindowInsets(left, top, right, bottom))
+}
 
 @Composable
-fun horizontalAndBottomInsetsPadding() = horizontalInsets().add(bottomInsets()).asPaddingValues()
+fun bottomInsetsPadding(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+) = bottomInsets(left, top, right, bottom).asPaddingValues()
+
 @Composable
-fun bottomInsetsPadding() = bottomInsets().asPaddingValues()
+fun bottomInsetsPadding(all: Dp = Dimensions.zero) =
+    bottomInsets(all, all, all, all).asPaddingValues()
+
+@Composable
+fun Modifier.bottomInsetsPadding(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+) = windowInsetsPadding(bottomInsets(left, top, right, bottom))
 
 
+///////////////////////////////////////
 
+
+@Composable
+fun horizontalInsets(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+): WindowInsets {
+    return WindowInsets.displayCutout
+        .only(WindowInsetsSides.Horizontal)
+        .union(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+        .add(WindowInsets(left, top, right, bottom))
+}
+
+@Composable
+fun horizontalInsetsPadding(all: Dp = Dimensions.zero) =
+    horizontalInsets(all, all, all, all).asPaddingValues()
+
+@Composable
+fun Modifier.horizontalInsetsPadding(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+) = windowInsetsPadding(horizontalInsets(left, top, right, bottom))
+
+@Composable
+fun Modifier.horizontalInsets(
+    horizontal: Dp = Dimensions.zero,
+    vertical: Dp = Dimensions.zero,
+) = windowInsetsPadding(horizontalInsets(horizontal, vertical, horizontal, vertical))
+
+
+/////////////////////////////////////
+
+
+@Composable
+fun startInsets(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+): WindowInsets {
+    return WindowInsets.displayCutout
+        .only(WindowInsetsSides.Start)
+        .union(WindowInsets.systemBars.only(WindowInsetsSides.Start))
+        .add(WindowInsets(left, top, right, bottom))
+}
+
+@Composable
+fun Modifier.startInsetsPadding(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+) = windowInsetsPadding(startInsets(left, top, right, bottom))
+
+
+////////////////////////////////////
+
+
+@Composable
+fun endInsets(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+): WindowInsets {
+    return WindowInsets.displayCutout
+        .only(WindowInsetsSides.End)
+        .union(WindowInsets.systemBars.only(WindowInsetsSides.End))
+        .add(WindowInsets(left, top, right, bottom))
+}
+
+@Composable
+fun Modifier.endInsetsPadding(
+    left: Dp = Dimensions.zero,
+    top: Dp = Dimensions.zero,
+    right: Dp = Dimensions.zero,
+    bottom: Dp = Dimensions.zero
+) = windowInsetsPadding(endInsets(left, top, right, bottom))
+
+
+//////////////////////////////////
+
+
+@Composable
+fun horizontalAndBottomInsetsPadding() =
+    horizontalInsets().add(bottomInsets()).asPaddingValues()

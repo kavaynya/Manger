@@ -16,5 +16,4 @@ dependencies {
 
     implementation(libs.serialization)
     implementation(libs.core)
-    implementation(libs.timber)
 }

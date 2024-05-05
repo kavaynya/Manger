@@ -7,6 +7,7 @@ import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.setValue
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
+import kotlinx.parcelize.Parcelize
 
 class DialogState<T : Parcelable>(
     private val componentContext: ComponentContext,
@@ -67,3 +68,6 @@ class DialogState<T : Parcelable>(
         )
     }
 }
+
+@Parcelize
+object EmptyDialogData : Parcelable
