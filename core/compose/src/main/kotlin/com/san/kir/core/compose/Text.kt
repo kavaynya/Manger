@@ -14,6 +14,9 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -22,10 +25,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -33,6 +34,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -46,8 +48,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun LabelText(idRes: Int) {
     Text(
-        text = stringResource(id = idRes),
-        fontSize = 15.sp,
+        text = stringResource(idRes),
+        fontSize = 16.sp,
         fontStyle = FontStyle.Italic
     )
 }
@@ -57,7 +59,7 @@ fun DialogText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
-    onClick: (() -> Unit) = {}
+    onClick: () -> Unit = {}
 ) {
     Text(
         text = text,
@@ -103,13 +105,12 @@ fun DropDownTextField(
             // Выпадающее меню для выбора категории
             valuesList.forEach { value ->
                 DropdownMenuItem(
+                    text = { Text(value) },
                     onClick = {
                         field = value
                         dropDownList = false
                     }
-                ) {
-                    Text(text = value)
-                }
+                )
             }
         }
     }
@@ -126,7 +127,7 @@ fun CheckBoxText(
         state = state,
         onChange = onChange,
         firstText = stringResource(firstTextId),
-        secondText = if (secondTextId != -1) stringResource(id = secondTextId) else ""
+        secondText = if (secondTextId != -1) stringResource(secondTextId) else ""
     )
 }
 
@@ -141,6 +142,7 @@ fun CheckBoxText(
     Row(
         modifier = Modifier
             .fillMaxWidth()
+            .clip(RoundedCornerShape(Dimensions.default))
             .clickable { onChange(state.not()) },
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -154,13 +156,7 @@ fun CheckBoxText(
         if (secondText.isEmpty())
             Text(text = firstText)
         else
-            Text(
-                text = if (state)
-                    firstText
-                else
-                    secondText
-
-            )
+            Text(text = if (state) firstText else secondText)
     }
 }
 
@@ -175,6 +171,8 @@ fun SearchTextField(
         mutableStateOf(initialValue)
     }
 
+    val canClearText by remember { derivedStateOf { searchText.isNotEmpty() } }
+
     TextField(
         value = searchText,
         onValueChange = {
@@ -183,16 +181,9 @@ fun SearchTextField(
                 onChangeValue(it)
             }
         },
-        leadingIcon = {
-            Icon(
-                Icons.Default.Search,
-                "search",
-                modifier = Modifier.startInsetsPadding(),
-            )
-        },
+        leadingIcon = { Icon(Icons.Default.Search, "search") },
         trailingIcon = {
             IconButton(
-                modifier = Modifier.endInsetsPadding(),
                 onClick = {
                     searchText = ""
                     onChangeValue("")
@@ -203,6 +194,8 @@ fun SearchTextField(
         },
         modifier = Modifier
             .fillMaxWidth()
+            .horizontalInsetsPadding(horizontal = Dimensions.half),
+        shape = RoundedCornerShape(50),
     )
 }
 
@@ -213,11 +206,10 @@ fun TextWithFirstWordBold(
     textAlign: TextAlign? = null,
     maxLines: Int = Int.MAX_VALUE,
 ) {
-    val wordEndIndex = text.indexOf(":")
     Text(
         AnnotatedString(
             text,
-            spanStyles = Fonts.Annotated.bold(wordEndIndex)
+            spanStyles = Fonts.Annotated.bold(text.indexOf(":"))
         ),
         textAlign = textAlign,
         maxLines = maxLines,

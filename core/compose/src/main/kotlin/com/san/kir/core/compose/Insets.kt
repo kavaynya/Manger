@@ -110,7 +110,7 @@ fun Modifier.horizontalInsetsPadding(
 ) = windowInsetsPadding(horizontalInsets(left, top, right, bottom))
 
 @Composable
-fun Modifier.horizontalInsets(
+fun Modifier.horizontalInsetsPadding(
     horizontal: Dp = Dimensions.zero,
     vertical: Dp = Dimensions.zero,
 ) = windowInsetsPadding(horizontalInsets(horizontal, vertical, horizontal, vertical))

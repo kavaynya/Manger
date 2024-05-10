@@ -1,40 +1,43 @@
 package com.san.kir.core.compose
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.WindowInsetsSides
-import androidx.compose.foundation.layout.only
-import androidx.compose.foundation.layout.systemBars
-import androidx.compose.foundation.layout.windowInsetsPadding
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.pager.PagerState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ScrollableTabRow
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabPosition
 import androidx.compose.material3.TabRow
-import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.material3.Text
-import androidx.compose.material3.primarySurface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.pager.PagerState
-import androidx.compose.ui.layout.layout
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.lerp
 import com.san.kir.core.utils.TestTags
-
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
+private val TabItemShape = RoundedCornerShape(70)
+
 @OptIn(ExperimentalFoundationApi::class)
-private fun indicator(pagerState: PagerState): @Composable (tabPositions: List<TabPosition>) -> Unit =
+private fun indicator(pagerState: PagerState): @Composable (List<TabPosition>) -> Unit =
     { tabPositions ->
-        TabRowDefaults.Indicator(
-            Modifier.pagerTabIndicatorOffset(pagerState, tabPositions)
+        val tab = tabPositions.getOrNull(pagerState.currentPage) ?: tabPositions.first()
+
+        Box(
+            modifier = Modifier
+                .tabIndicatorOffset(tab)
+                .fillMaxSize()
+                .padding(Dimensions.quarter)
+                .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.3f), TabItemShape)
         )
     }
 
@@ -53,14 +56,19 @@ fun ScrollableTabs(
         selectedTabIndex = pagerState.currentPage,
         indicator = indicator(pagerState),
         divider = {},
-        modifier = modifier.background(MaterialTheme.colorScheme.primarySurface)
+        modifier = modifier.horizontalInsetsPadding(),
+        edgePadding = Dimensions.default,
     ) {
         items.forEachIndexed { index, item ->
             Tab(
-                modifier = Modifier.testTag(TestTags.Library.tab),
+                modifier = Modifier
+                    .testTag(TestTags.Library.tab)
+                    .clip(TabItemShape),
                 selected = pagerState.currentPage == index,
-                text = { Text(text = item) },
-                onClick = { tabClicker(index) }
+                text = { Text(item) },
+                onClick = { tabClicker(index) },
+                selectedContentColor = MaterialTheme.colorScheme.onSurface,
+                unselectedContentColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             )
         }
     }
@@ -79,86 +87,17 @@ fun Tabs(
     TabRow(
         selectedTabIndex = pagerState.currentPage,
         indicator = indicator(pagerState),
-        modifier = Modifier
-            .windowInsetsPadding(WindowInsets.systemBars.only(WindowInsetsSides.Horizontal))
+        divider = {},
+        modifier = Modifier.horizontalInsetsPadding()
     ) {
         items.forEachIndexed { index, item ->
             Tab(
                 selected = pagerState.currentPage == index,
-                text = { Text(text = stringResource(id = item)) },
-                onClick = { tabClicker(index) }
+                text = { Text(stringResource(item)) },
+                onClick = { tabClicker(index) },
+                selectedContentColor = MaterialTheme.colorScheme.primary,
+                unselectedContentColor = MaterialTheme.colorScheme.inversePrimary,
             )
         }
     }
-}
-
-/**
- * This indicator syncs up a [TabRow] or [ScrollableTabRow] tab indicator with a
- * [androidx.compose.foundation.pager.HorizontalPager] or
- * [androidx.compose.foundation.pager.VerticalPager].
- */
-@OptIn(ExperimentalFoundationApi::class)
-fun Modifier.pagerTabIndicatorOffset(
-    pagerState: PagerState,
-    tabPositions: List<TabPosition>,
-    pageIndexMapping: (Int) -> Int = { it },
-): Modifier {
-    val stateBridge = object : PagerStateBridge {
-        override val currentPage: Int
-            get() = pagerState.currentPage
-        override val currentPageOffset: Float
-            get() = pagerState.currentPageOffsetFraction
-    }
-
-    return pagerTabIndicatorOffset(stateBridge, tabPositions, pageIndexMapping)
-}
-
-private fun Modifier.pagerTabIndicatorOffset(
-    pagerState: PagerStateBridge,
-    tabPositions: List<TabPosition>,
-    pageIndexMapping: (Int) -> Int = { it },
-): Modifier = layout { measurable, constraints ->
-    if (tabPositions.isEmpty()) {
-        // If there are no pages, nothing to show
-        layout(constraints.maxWidth, 0) {}
-    } else {
-        val currentPage = minOf(tabPositions.lastIndex, pageIndexMapping(pagerState.currentPage))
-        val currentTab = tabPositions[currentPage]
-        val previousTab = tabPositions.getOrNull(currentPage - 1)
-        val nextTab = tabPositions.getOrNull(currentPage + 1)
-        val fraction = pagerState.currentPageOffset
-        val indicatorWidth = if (fraction > 0 && nextTab != null) {
-            lerp(currentTab.width, nextTab.width, fraction).roundToPx()
-        } else if (fraction < 0 && previousTab != null) {
-            lerp(currentTab.width, previousTab.width, -fraction).roundToPx()
-        } else {
-            currentTab.width.roundToPx()
-        }
-        val indicatorOffset = if (fraction > 0 && nextTab != null) {
-            lerp(currentTab.left, nextTab.left, fraction).roundToPx()
-        } else if (fraction < 0 && previousTab != null) {
-            lerp(currentTab.left, previousTab.left, -fraction).roundToPx()
-        } else {
-            currentTab.left.roundToPx()
-        }
-        val placeable = measurable.measure(
-            Constraints(
-                minWidth = indicatorWidth,
-                maxWidth = indicatorWidth,
-                minHeight = 0,
-                maxHeight = constraints.maxHeight
-            )
-        )
-        layout(constraints.maxWidth, maxOf(placeable.height, constraints.minHeight)) {
-            placeable.placeRelative(
-                indicatorOffset,
-                maxOf(constraints.minHeight - placeable.height, 0)
-            )
-        }
-    }
-}
-
-internal interface PagerStateBridge {
-    val currentPage: Int
-    val currentPageOffset: Float
 }

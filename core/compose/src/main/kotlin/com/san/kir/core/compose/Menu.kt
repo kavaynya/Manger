@@ -14,24 +14,20 @@ class ExpandedMenuScope internal constructor(
 ) {
 
     @Composable
-    fun MenuText(
-        text: String,
-        modifier: Modifier = Modifier,
-        onClick: () -> Unit,
-    ) {
+    fun MenuText(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
         DropdownMenuItem(
             onClick = {
                 onClick()
                 onCloseMenu()
             },
             modifier = modifier,
-            text = { Text(text = text) }
+            text = { Text(text) }
         )
     }
 
     @Composable
     fun MenuText(id: Int, modifier: Modifier = Modifier, onClick: () -> Unit) =
-        MenuText(stringResource(id = id), modifier, onClick)
+        MenuText(stringResource(id), modifier, onClick)
 
     @Composable
     fun CheckedMenuText(
@@ -51,7 +47,7 @@ class ExpandedMenuScope internal constructor(
                     },
                     modifier = Modifier.padding(end = Dimensions.quarter)
                 )
-            }
+            },
         )
     }
 }
@@ -64,8 +60,6 @@ fun ExpandedMenu(
     actions: @Composable ExpandedMenuScope.() -> Unit,
 ) {
     DropdownMenu(expanded = expanded, onDismissRequest = onCloseMenu, modifier = modifier) {
-
         ExpandedMenuScope(onCloseMenu).actions()
-
     }
 }

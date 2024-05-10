@@ -31,7 +31,7 @@ class SquareMaxSizeModifier : LayoutModifier {
 
 }
 
-fun Modifier.holdPress(onDown: () -> Unit, onUp: () -> Unit) =
+fun Modifier.holdPress(onDown: () -> Unit, onUp: () -> Unit) = then(
     pointerInput(Unit) {
         awaitEachGesture {
             awaitFirstDown()
@@ -44,3 +44,4 @@ fun Modifier.holdPress(onDown: () -> Unit, onUp: () -> Unit) =
             onUp()
         }
     }
+)

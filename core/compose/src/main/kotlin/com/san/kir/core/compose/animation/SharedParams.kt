@@ -50,5 +50,5 @@ fun rememberSharedParams(
 }
 
 @Stable
-inline fun Modifier.saveParams(params: SharedParams) =
+fun Modifier.saveParams(params: SharedParams) =
     onGloballyPositioned { params.bounds = it.boundsInWindow() }
