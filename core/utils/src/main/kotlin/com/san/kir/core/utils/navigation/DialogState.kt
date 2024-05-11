@@ -69,5 +69,7 @@ class DialogState<T : Parcelable>(
     }
 }
 
+fun DialogState<EmptyDialogData>.show() = show(EmptyDialogData)
+
 @Parcelize
 object EmptyDialogData : Parcelable

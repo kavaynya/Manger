@@ -1,141 +1,185 @@
 package com.san.kir.core.compose
 
-import androidx.compose.animation.animateColorAsState
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
-import androidx.compose.material3.LocalContentAlpha
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.ScaffoldState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material3.primarySurface
+import androidx.compose.material3.DrawerState
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
+import androidx.compose.ui.graphics.painter.BitmapPainter
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.testTag
-import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.TextStyle
+import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.FromStartToStartAnimContent
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
+import com.san.kir.core.compose.animation.TopEndAnimatedVisibility
 import com.san.kir.core.utils.TestTags
+import com.san.kir.core.utils.navigation.DialogState
+import com.san.kir.core.utils.navigation.EmptyDialogData
+import com.san.kir.core.utils.navigation.show
 import kotlinx.coroutines.launch
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun PreparedTopBar(
-    titleContent: @Composable ColumnScope.() -> Unit,
-    subtitleContent: @Composable (() -> Unit)? = null,
-    subtitle: String = "",
-    height: Dp = Dimensions.appBarHeight,
-    navigationIcon: @Composable () -> Unit,
+fun topBar(
+    title: String? = null,
+    subtitle: String? = null,
     actions: @Composable TopBarActions.() -> Unit = {},
-    backgroundColor: Color = MaterialTheme.colorScheme.primarySurface,
-) {
+    additionalContent: @Composable (ColumnScope.() -> Unit)? = null,
+    onSearchTextChange: ((String) -> Unit)? = null,
+    navigationButton: NavigationButton,
+    initSearchText: String = "",
+    hasAction: Boolean = false,
+    progressAction: Float? = null,
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    contentColor: Color = MaterialTheme.colorScheme.onSurface,
+    titleTextStyle: TextStyle = MaterialTheme.typography.headlineLarge,
+): @Composable (TopAppBarScrollBehavior?, MenuDialogState) -> Unit = { behavior, dialogState ->
+    val topBarActions = remember { TopBarActions(dialogState) }
 
-    val topBarActions = remember { TopBarActions() }
-    val color by animateColorAsState(targetValue = backgroundColor, label = "")
-
-    TopAppBar(
-        title = {
-            Column {
-                titleContent()
-
-                ProvideTextStyle(value = MaterialTheme.typography.subtitle2) {
-                    if (subtitleContent != null) {
-                        subtitleContent()
-                    } else
-                        if (subtitle.isNotEmpty()) {
-                            Text(
-                                text = subtitle,
-                                maxLines = 1
-                            )
-                        }
-                }
-            }
-        },
-        navigationIcon = navigationIcon,
+    TopBarLayout(
         modifier = Modifier
             .statusBarsPadding()
-            .fillMaxWidth()
-            .height(height),
+            .fillMaxWidth(),
+        title = title?.let(::AnnotatedString),
+        subtitle = subtitle?.let(::AnnotatedString),
+        expandedTitleStyle = titleTextStyle,
+        navigationIcon = { NavigationIcon(navigationButton) },
         actions = {
             Row(modifier = Modifier.endInsetsPadding()) {
                 topBarActions.actions()
             }
         },
-        backgroundColor = color,
+        additional = {
+            Column(Modifier.fillMaxWidth()) {
+                additionalContent?.invoke(this)
+                TopAnimatedVisibility(
+                    visible = onSearchTextChange != null,
+                    modifier = Modifier.padding(vertical = Dimensions.quarter)
+                ) {
+                    SearchTextField(initialValue = initSearchText) {
+                        onSearchTextChange?.invoke(it)
+                    }
+                }
+
+                BottomAnimatedVisibility(
+                    visible = hasAction,
+                    modifier = Modifier.padding(vertical = Dimensions.smallest)
+                ) {
+                    if (progressAction == null) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth(),
+                            strokeCap = StrokeCap.Round
+                        )
+                    } else {
+                        LinearProgressIndicator(
+                            progress = { progressAction },
+                            modifier = Modifier.fillMaxWidth(),
+                            strokeCap = StrokeCap.Round
+                        )
+                    }
+                }
+            }
+        },
+        scrollBehavior = behavior,
+        containerColor = containerColor,
+        contentColor = contentColor,
     )
 }
 
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun topBar(
-    title: String = "",
-    titleContent: @Composable ColumnScope.() -> Unit = {
-        Text(
-            text = title,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
-    },
-    subtitle: String = "",
-    subtitleContent: @Composable (() -> Unit)? = null,
+    title: AnnotatedString? = null,
+    subtitle: AnnotatedString? = null,
     actions: @Composable TopBarActions.() -> Unit = {},
+    additionalContent: @Composable (ColumnScope.() -> Unit)? = null,
+    onSearchTextChange: ((String) -> Unit)? = null,
     navigationButton: NavigationButton,
     initSearchText: String = "",
-    onSearchTextChange: ((String) -> Unit)? = null,
     hasAction: Boolean = false,
     progressAction: Float? = null,
-    backgroundColor: Color = MaterialTheme.colorScheme.primarySurface,
-): @Composable (Dp) -> Unit = {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        PreparedTopBar(
-            titleContent = titleContent,
-            subtitleContent = subtitleContent,
-            subtitle = subtitle,
-            height = it,
-            actions = actions,
-            backgroundColor = backgroundColor,
-            navigationIcon = { NavigationIcon(state = navigationButton) }
-        )
+    containerColor: Color = MaterialTheme.colorScheme.surface,
+    titleTextStyle: TextStyle = MaterialTheme.typography.headlineLarge,
+): @Composable (TopAppBarScrollBehavior?, MenuDialogState) -> Unit = { behavior, dialogState ->
+    val topBarActions = remember { TopBarActions(dialogState) }
 
-        TopAnimatedVisibility(visible = onSearchTextChange != null) {
-            SearchTextField(
-                initialValue = initSearchText,
-                onChangeValue = onSearchTextChange ?: {}
-            )
-        }
-
-        TopAnimatedVisibility(visible = hasAction) {
-            if (progressAction != null) {
-                LinearProgressIndicator(
-                    progress = progressAction,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                LinearProgressIndicator(modifier = Modifier.fillMaxWidth())
+    TopBarLayout(
+        modifier = Modifier
+            .statusBarsPadding()
+            .fillMaxWidth(),
+        title = title,
+        subtitle = subtitle,
+        expandedTitleStyle = titleTextStyle,
+        navigationIcon = { NavigationIcon(navigationButton) },
+        actions = {
+            Row(modifier = Modifier.endInsetsPadding()) {
+                topBarActions.actions()
             }
-        }
-    }
+        },
+        additional = {
+            Column(Modifier.fillMaxWidth()) {
+                additionalContent?.invoke(this)
+                TopAnimatedVisibility(
+                    visible = onSearchTextChange != null,
+                    modifier = Modifier.padding(vertical = Dimensions.quarter)
+                ) {
+                    SearchTextField(initialValue = initSearchText) {
+                        onSearchTextChange?.invoke(it)
+                    }
+                }
+
+                BottomAnimatedVisibility(
+                    visible = hasAction,
+                    modifier = Modifier.padding(vertical = Dimensions.smallest)
+                ) {
+                    if (progressAction == null) {
+                        LinearProgressIndicator(
+                            modifier = Modifier.fillMaxWidth(),
+                            strokeCap = StrokeCap.Round
+                        )
+                    } else {
+                        LinearProgressIndicator(
+                            progress = { progressAction },
+                            modifier = Modifier.fillMaxWidth(),
+                            strokeCap = StrokeCap.Round
+                        )
+                    }
+                }
+            }
+        },
+        scrollBehavior = behavior,
+        containerColor = containerColor,
+    )
 }
 
 @Composable
@@ -151,7 +195,7 @@ private fun NavigationIcon(state: NavigationButton) {
                 IconButton(
                     modifier = Modifier.testTag(TestTags.Drawer.nav_back),
                     onClick = { it.onClick() }
-                ) { Icon(Icons.Default.ArrowBack, "") }
+                ) { Icon(Icons.AutoMirrored.Filled.ArrowBack, "") }
 
             is NavigationButton.Close ->
                 IconButton(onClick = it.onClick) {
@@ -159,55 +203,83 @@ private fun NavigationIcon(state: NavigationButton) {
                 }
 
             is NavigationButton.Scaffold ->
-                IconButton(
-                    modifier = Modifier.testTag(TestTags.Drawer.drawer_open),
-                    onClick = {
-                        coroutineScope.launch { it.state.drawerState.open() }
-                    }) { Icon(Icons.Default.Menu, "") }
+                Box {
+                    IconButton(
+                        modifier = Modifier.testTag(TestTags.Drawer.drawer_open),
+                        onClick = { coroutineScope.launch { it.state.open() } }
+                    ) { Icon(Icons.Default.Menu, "") }
+                    if (it.hasNotify) {
+                        NotifyIcon()
+                    }
+                }
         }
     }
 }
 
+@Composable
+private fun BoxScope.NotifyIcon() {
+    Box(
+        Modifier
+            .align(Alignment.TopEnd)
+            .padding(top = Dimensions.half, end = Dimensions.half)
+            .size(Dimensions.half)
+            .background(MaterialTheme.colorScheme.primary, RoundedCornerShape(50))
+    )
+}
 
-class TopBarActions internal constructor() {
+
+typealias MenuDialogState = DialogState<EmptyDialogData>
+
+class TopBarActions internal constructor(private val menuState: MenuDialogState) {
 
     @Composable
     fun MenuIcon(
         icon: ImageVector,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
-        tint: Color = LocalContentColor.current.copy(alpha = LocalContentAlpha.current),
+        hasNotify: Boolean = false,
+        tint: Color = LocalContentColor.current,
         onClick: () -> Unit,
     ) {
-        IconButton(onClick = onClick, modifier = modifier, enabled = enabled) {
-            Icon(icon, "", tint = tint)
+        Box {
+            IconButton(onClick = onClick, modifier = modifier, enabled = enabled) {
+                Icon(icon, "", tint = tint)
+            }
+
+            TopEndAnimatedVisibility(hasNotify, Modifier.align(Alignment.TopEnd)) {
+                NotifyIcon()
+            }
+        }
+    }
+
+
+    @Composable
+    fun MenuIcon(
+        icon: BitmapPainter,
+        modifier: Modifier = Modifier,
+        enabled: Boolean = true,
+        hasNotify: Boolean = false,
+        onClick: () -> Unit,
+    ) {
+        Box {
+            IconButton(onClick = onClick, modifier = modifier, enabled = enabled) {
+                Icon(icon, "")
+            }
+
+            TopEndAnimatedVisibility(hasNotify, Modifier.align(Alignment.TopEnd)) {
+                NotifyIcon()
+            }
         }
     }
 
     @Composable
-    fun ExpandedMenu(
-        actions: @Composable ExpandedMenuScope.() -> Unit,
-    ) {
-        var expanded by remember { mutableStateOf(false) }
-
-        MenuIcon(icon = Icons.Default.MoreVert) {
-            expanded = true
-        }
-
-        ExpandedMenu(
-            expanded = expanded,
-            onCloseMenu = {
-                expanded = false
-            },
-            actions = actions,
-        )
-    }
+    fun ExpandedMenu() = MenuIcon(icon = Icons.Default.MoreVert, onClick = menuState::show)
 }
 
 @Stable
 sealed interface NavigationButton {
     @Stable
-    data class Scaffold(val state: ScaffoldState) : NavigationButton
+    data class Scaffold(val state: DrawerState, val hasNotify: Boolean) : NavigationButton
 
     @Stable
     data class Back(val onClick: () -> Unit) : NavigationButton

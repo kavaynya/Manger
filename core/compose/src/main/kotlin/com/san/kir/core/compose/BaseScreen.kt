@@ -52,8 +52,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.utils.LocalContainerColor
 import com.san.kir.core.utils.navigation.BackHandler
-import com.san.kir.core.utils.navigation.DialogState
-import com.san.kir.core.utils.navigation.EmptyDialogData
 import com.san.kir.core.utils.navigation.rememberDialogState
 
 private val DropdownMenuVerticalPadding = 8.dp
@@ -66,11 +64,11 @@ internal fun BaseScreen(
     containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
     menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
-    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    topBar: (TopAppBarScrollBehavior?, MenuDialogState) -> Unit = { _, _ -> },
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
 ) {
-    val menuState = rememberDialogState<EmptyDialogData>(false)
+    val menuState: MenuDialogState = rememberDialogState(false)
 
     if (drawerContent == null) {
         CompositionLocalProvider(
@@ -163,7 +161,7 @@ fun ScreenClear(
     scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
     containerColor: Color = MaterialTheme.colorScheme.surface,
     contentColor: Color = MaterialTheme.colorScheme.onSurface,
-    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    topBar: (TopAppBarScrollBehavior?, MenuDialogState) -> Unit = { _, _ -> },
     menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable BoxScope.() -> Unit,
@@ -182,7 +180,7 @@ fun ScreenContent(
     scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
     additionalPadding: Dp = Dimensions.zero,
     canScroll: Boolean = false,
-    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    topBar: (TopAppBarScrollBehavior?, MenuDialogState) -> Unit = { _, _ -> },
     menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     content: @Composable ColumnScope.() -> Unit,
@@ -236,7 +234,7 @@ fun ScreenList(
     drawerState: DrawerState? = null,
     state: LazyListState = rememberLazyListState(),
     scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
-    topBar: (TopAppBarScrollBehavior?, DialogState<*>) -> Unit = { _, _ -> },
+    topBar: (TopAppBarScrollBehavior?, MenuDialogState) -> Unit = { _, _ -> },
     menuActions: (@Composable ExpandedMenuScope.() -> Unit)? = null,
     bottomContent: (@Composable BoxScope.() -> Unit) = {},
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,

@@ -23,9 +23,13 @@ object Fonts {
     }
 
     object Annotated {
-        fun bold(end: Int) = listOf(AnnotatedString.Range(SpanStyle(fontWeight = FontWeight.Bold),
-            start = 0,
-            end = end))
+        fun bold(end: Int) = listOf(
+            AnnotatedString.Range(
+                SpanStyle(fontWeight = FontWeight.Bold),
+                start = 0,
+                end = end
+            )
+        )
 
     }
 }
