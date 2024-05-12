@@ -6,4 +6,7 @@
 
     <string name="ready">Готово</string>
     <string name="clear">Очистить</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+
 </resources>
