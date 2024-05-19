@@ -33,9 +33,11 @@ inline fun <reified VM : StateHolder<*>> stateHolder(
 }
 
 @Composable
-fun StateHolder<*>.rememberSendEvent(event: Action): () -> Unit {
-    return rememberLambda { sendAction(event) }
-}
+fun StateHolder<*>.rememberSendAction(event: Action) = rememberLambda { sendAction(event) }
+
+@Composable
+fun StateHolder<*>.rememberSendAction() = rememberLambda(::sendAction)
+
 
 abstract class ViewModel<S : ScreenState>(eventBus: EventBus = EventBusImpl()) :
     StateHolder<S>, EventBus by eventBus, CoroutineScope {
