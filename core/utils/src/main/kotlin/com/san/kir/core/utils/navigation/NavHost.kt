@@ -4,10 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.decompose.FaultyDecomposeApi
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimation
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.animation.isFront
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.LocalComponentContext
 
@@ -18,10 +17,7 @@ private val defaultAnimations: StackAnimation<NavConfig, NavContainer> =
         else frontAnimation(target.configuration)
     }
 
-private fun frontAnimation(config: NavConfig): StackAnimator {
-    val navAnimation = ManualDI.navAnimation(config)
-    return navAnimation ?: EmptyStackAnimator
-}
+private fun frontAnimation(config: NavConfig) = ManualDI.navAnimation(config) ?: EmptyStackAnimator
 
 @Composable
 fun NavHost(

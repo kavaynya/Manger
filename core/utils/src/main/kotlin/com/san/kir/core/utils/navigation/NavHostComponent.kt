@@ -3,8 +3,8 @@ package com.san.kir.core.utils.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.Children
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimation
+import com.arkivanov.decompose.extensions.compose.stack.Children
+import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
@@ -26,6 +26,7 @@ internal class NavHostComponent(
     private val navigation = StackNavigation<NavConfig>()
     private val childStack = childStack(
         source = navigation,
+        serializer = NavConfig.serializer(),
         initialConfiguration = startConfig,
         handleBackButton = true,
         childFactory = ::createChild
@@ -67,17 +68,10 @@ internal class NavHostComponent(
         return rememberLambda { p1, p2, p3 -> navigation.push(function3(p1, p2, p3)) }
     }
 
-    override fun backPress() {
-        navigation.pop()
-    }
-
-    override fun register(callback: BackCallback) {
-        backHandler.register(callback)
-    }
-
-    override fun unregister(callback: BackCallback) {
-        backHandler.unregister(callback)
-    }
+    override fun isRegistered(callback: BackCallback) = backHandler.isRegistered(callback)
+    override fun backPress() = navigation.pop()
+    override fun register(callback: BackCallback) = backHandler.register(callback)
+    override fun unregister(callback: BackCallback) = backHandler.unregister(callback)
 
     @Composable
     fun Show() {

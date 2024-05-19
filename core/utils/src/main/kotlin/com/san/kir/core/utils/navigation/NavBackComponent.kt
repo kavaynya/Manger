@@ -10,15 +10,8 @@ class NavBackComponent(
     private val navigation: StackNavigation<NavConfig>
 ) : ComponentContext by componentContext, NavBackHandler {
 
-    override fun backPress() {
-        navigation.pop()
-    }
-
-    override fun register(callback: BackCallback) {
-        backHandler.register(callback)
-    }
-
-    override fun unregister(callback: BackCallback) {
-        backHandler.unregister(callback)
-    }
+    override fun backPress() = navigation.pop()
+    override fun isRegistered(callback: BackCallback) = backHandler.isRegistered(callback)
+    override fun register(callback: BackCallback) = backHandler.register(callback)
+    override fun unregister(callback: BackCallback) = backHandler.unregister(callback)
 }

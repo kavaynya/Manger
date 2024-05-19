@@ -1,8 +1,7 @@
 package com.san.kir.core.utils
 
 import android.app.Application
-import android.content.Context
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
+import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator
 import com.san.kir.core.utils.navigation.NavComponent
 import com.san.kir.core.utils.navigation.NavConfig
 import kotlinx.serialization.ExperimentalSerializationApi

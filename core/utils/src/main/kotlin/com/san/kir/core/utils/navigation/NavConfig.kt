@@ -1,5 +1,6 @@
 package com.san.kir.core.utils.navigation
 
-import android.os.Parcelable
+import kotlinx.serialization.Serializable
 
-interface NavConfig : Parcelable
+@Serializable
+abstract class NavConfig

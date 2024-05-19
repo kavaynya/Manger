@@ -10,10 +10,8 @@ android {
 dependencies {
     implementation(project(Modules.Core.utils))
     implementation(project(Modules.Core.internet))
+    implementation(libs.core)
 
     api(libs.bundles.compose)
     api(libs.bundles.accompanist)
-
-    implementation(libs.serialization)
-    implementation(libs.core)
 }

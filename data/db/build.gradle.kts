@@ -1,7 +1,7 @@
 plugins {
     id("base.library")
     alias(libs.plugins.kotlin.ksp)
-    id(Plugins.parcelize)
+    `kotlin-parcelize`
 }
 
 android {

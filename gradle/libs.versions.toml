@@ -1,34 +1,33 @@
 [versions]
 # Kotlin
 kotlin = "1.9.20"
-coroutines = "1.7.3"
+coroutines = "1.8.0"
 ksp = "1.9.20-1.0.14"
 serialization = "1.6.3"
 datetime = "0.6.0-RC.2"
 
 # decompose
-decompose = "2.2.2"
+decompose = "3.0.0"
 
 # AndroidX
 activity = "1.9.0"
 appcompat = "1.6.1"
 constraintlayout = "2.1.4"
-core = "1.13.0"
-datastore = "1.1.0"
-fragment = "1.6.2"
-lifecycle = "2.7.0"
-paging = "3.2.1"
+core = "1.13.1"
+datastore = "1.1.1"
+fragment = "1.7.1"
+lifecycle = "2.8.0"
 room = "2.6.1"
-vectordrawable = "1.2.0-beta01"
+vectordrawable = "1.2.0"
 workmanager = "2.9.0"
 
 # Compose
-compose = "1.6.6"
+compose = "1.6.7"
 material3 = "1.2.1"
 compose_compiler = "1.5.10" # Don`t forget change field in Version.kt in buildSrc
 
 # Google
-material = "1.11.0"
+material = "1.12.0"
 accompanist = "0.30.0"
 
 # Test
@@ -73,7 +72,7 @@ datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "d
 
 # decompose
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }
-decompose-extensions = { module = "com.arkivanov.decompose:extensions-compose-jetpack", version.ref = "decompose" }
+decompose-extensions = { module = "com.arkivanov.decompose:extensions-compose", version.ref = "decompose" }
 
 # Room
 room_runtime = { module = "androidx.room:room-runtime", version.ref = "room" }
@@ -99,7 +98,6 @@ fragment = { module = "androidx.fragment:fragment-ktx", version.ref = "fragment"
 appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 vectordrawable = { module = "androidx.vectordrawable:vectordrawable", version.ref = "vectordrawable" }
 constraintlayout = { module = "androidx.constraintlayout:constraintlayout", version.ref = "constraintlayout" }
-paging = { module = "androidx.paging:paging-common-ktx", version.ref = "paging" }
 material = { module = "com.google.android.material:material", version.ref = "material" }
 
 subsampling = { module = "com.davemorrissey.labs:subsampling-scale-image-view-androidx", version.ref = "subsampling" }
@@ -168,9 +166,6 @@ decompose = ["decompose", "decompose-extensions"]
 
 [plugins]
 kotlin-ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "serialization" }
-
-parcelize = { id = "org.jetbrains.kotlin.plugin.parcelize" }
 
 graphfity = { id = "com.github.ivancarras.graphfity", version.ref = "graphfity" }
 serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }

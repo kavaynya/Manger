@@ -1,6 +1,5 @@
 plugins {
     id("base.library")
-    id(Plugins.kotlin)
     alias(libs.plugins.serialization)
 }
 
@@ -12,12 +11,11 @@ dependencies {
     implementation(libs.compose.runtime)
     implementation(libs.compose.runtime.saveable)
     implementation(libs.compose.ui)
-    implementation(libs.serialization)
+    implementation(libs.stdlib)
 
+    api(libs.serialization)
     api(libs.bundles.coroutines)
     api(libs.decompose)
     api(libs.decompose.extensions)
     api(libs.timber)
-
-    implementation(libs.stdlib)
 }
