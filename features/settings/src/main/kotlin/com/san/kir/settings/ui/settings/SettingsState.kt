@@ -1,7 +1,7 @@
 package com.san.kir.settings.ui.settings
 
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.models.base.Settings
+import com.san.kir.data.models.main.Settings
 
 
 internal data class SettingsState(

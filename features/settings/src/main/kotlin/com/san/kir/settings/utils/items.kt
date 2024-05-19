@@ -9,15 +9,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.ContentAlpha
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalContentAlpha
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
 import androidx.compose.runtime.mutableStateOf
@@ -29,7 +26,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.CheckBoxText
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.RadioGroup
@@ -37,7 +33,6 @@ import com.san.kir.core.compose.SmallestSpacer
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.settings.R
-
 
 
 @Composable
@@ -56,8 +51,7 @@ private fun TemplatePreferenceItem(
             .padding(vertical = Dimensions.half),
     ) {
         Row(
-            modifier = Modifier
-                .weight(1f),
+            modifier = Modifier.weight(1f),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
@@ -67,9 +61,7 @@ private fun TemplatePreferenceItem(
                 contentAlignment = Alignment.Center,
             ) {
                 if (icon != null) {
-                    CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                        Icon(icon, contentDescription = "")
-                    }
+                    Icon(icon, contentDescription = "")
                 }
             }
 
@@ -77,19 +69,16 @@ private fun TemplatePreferenceItem(
                 modifier = Modifier.weight(1f),
                 verticalArrangement = Arrangement.Center,
             ) {
-                Text(stringResource(title), style = MaterialTheme.typography.subtitle1)
-
+                Text(stringResource(title), style = MaterialTheme.typography.titleMedium)
                 SmallestSpacer()
-
-                CompositionLocalProvider(LocalContentAlpha provides ContentAlpha.medium) {
-                    Text(stringResource(subtitle), style = MaterialTheme.typography.caption)
-                }
+                Text(stringResource(subtitle), style = MaterialTheme.typography.bodySmall)
             }
         }
 
         Box(
             modifier = Modifier
                 .endInsetsPadding()
+                .padding(end = Dimensions.half)
                 .size(Dimensions.Image.bigger),
             contentAlignment = Alignment.Center,
         ) {
@@ -114,7 +103,6 @@ internal fun PreferenceTitle(id: Int) {
         ) {
             Text(
                 text = stringResource(id),
-//                fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.secondary,
                 fontWeight = FontWeight.Medium,
                 modifier = Modifier
@@ -141,6 +129,17 @@ internal fun <T> ListPreferenceItem(
     if (dialog) {
         AlertDialog(
             onDismissRequest = { dialog = false },
+            confirmButton = {
+                TextButton(
+                    onClick = { dialog = false },
+                    modifier = Modifier.padding(
+                        end = Dimensions.default,
+                        bottom = Dimensions.default
+                    )
+                ) {
+                    Text(text = "CANCEL")
+                }
+            },
             title = {
                 Text(stringResource(title))
             },
@@ -152,18 +151,9 @@ internal fun <T> ListPreferenceItem(
                         dialog = false
                     },
                     stateList = entryValues,
-                    textList = stringArrayResource(entries).toList().toImmutableList(),
+                    textList = stringArrayResource(entries).toList(),
                 )
             },
-            buttons = {
-                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                    TextButton(
-                        modifier = Modifier.padding(bottom = 16.dp, end = 16.dp),
-                        onClick = { dialog = false }) {
-                        Text("CANCEL")
-                    }
-                }
-            }
         )
     }
 }
@@ -201,8 +191,8 @@ internal fun MultiSelectListPreferenceItem(
     onValueChange: (List<Boolean>) -> Unit
 ) {
     val items = remember(initialValue) { mutableStateListOf(*initialValue.toTypedArray()) }
-
     var dialog by remember { mutableStateOf(false) }
+
     TemplatePreferenceItem(title = title, subtitle = subtitle, icon = icon) {
         dialog = true
     }
@@ -210,6 +200,20 @@ internal fun MultiSelectListPreferenceItem(
     if (dialog) {
         AlertDialog(
             onDismissRequest = { dialog = false },
+            confirmButton = {
+                TextButton(
+                    modifier = Modifier.padding(
+                        bottom = Dimensions.default,
+                        end = Dimensions.default
+                    ),
+                    onClick = {
+                        onValueChange(items)
+                        dialog = false
+                    }
+                ) {
+                    Text(stringResource(R.string.close))
+                }
+            },
             title = {
                 Text(stringResource(title))
             },
@@ -227,22 +231,6 @@ internal fun MultiSelectListPreferenceItem(
                     }
                 }
             },
-            buttons = {
-                Row(horizontalArrangement = Arrangement.End, modifier = Modifier.fillMaxWidth()) {
-                    TextButton(
-                        modifier = Modifier.padding(
-                            bottom = Dimensions.default,
-                            end = Dimensions.default
-                        ),
-                        onClick = {
-                            onValueChange(items)
-                            dialog = false
-                        }
-                    ) {
-                        Text(stringResource(R.string.close))
-                    }
-                }
-            }
         )
     }
 }

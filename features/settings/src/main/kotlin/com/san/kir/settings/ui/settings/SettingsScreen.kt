@@ -2,8 +2,8 @@ package com.san.kir.settings.ui.settings
 
 import android.os.Build
 import androidx.compose.foundation.layout.Column
-import androidx.compose.material3.Divider
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.CompareArrows
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.ContentCut
 import androidx.compose.material.icons.filled.CropLandscape
@@ -14,8 +14,9 @@ import androidx.compose.material.icons.filled.FitScreen
 import androidx.compose.material.icons.filled.Title
 import androidx.compose.material.icons.filled.VideogameAsset
 import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,8 +25,11 @@ import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
+import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
-import com.san.kir.data.models.base.Settings
+import com.san.kir.data.models.main.Settings
+import com.san.kir.data.models.utils.Orientation
 import com.san.kir.settings.R
 import com.san.kir.settings.utils.ListPreferenceItem
 import com.san.kir.settings.utils.MultiSelectListPreferenceItem
@@ -33,12 +37,14 @@ import com.san.kir.settings.utils.PreferenceTitle
 import com.san.kir.settings.utils.TogglePreferenceItem
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsScreen(
     navigateUp: () -> Unit,
 ) {
-    val viewModel: SettingsStateHolder = stateHolder { SettingsViewModel() }
-    val state by viewModel.state.collectAsState()
+    val holder: SettingsStateHolder = stateHolder { SettingsViewModel() }
+    val state by holder.state.collectAsStateWithLifecycle()
+    val sendAction = holder.rememberSendAction()
 
     ScreenContent(
         topBar = topBar(
@@ -48,38 +54,31 @@ fun SettingsScreen(
         additionalPadding = Dimensions.zero
     ) {
         Column(modifier = Modifier.bottomInsetsPadding()) {
-            Main(state.main, viewModel::sendAction)
-            Divider()
+            Main(state.main, sendAction)
+            HorizontalDivider()
 
-            Chapters(state.chapters, viewModel::sendAction)
-            Divider()
+            Chapters(state.chapters, sendAction)
+            HorizontalDivider()
 
-            Viewer(state.viewer, viewModel::sendAction)
-            Divider()
+            Viewer(state.viewer, sendAction)
+            HorizontalDivider()
 
-            Download(state.download, viewModel::sendAction)
+            Download(state.download, sendAction)
         }
     }
 }
 
 @Composable
-private fun Main(main: Settings.Main, sendEvent: (SettingsEvent.SaveMain) -> Unit) {
+private fun Main(main: Settings.Main, sendAction: (SettingsAction.SaveMain) -> Unit) {
     TogglePreferenceItem(
         title = R.string.settings_app_dark_theme_title,
         subtitle = R.string.settings_app_dark_theme_summary,
         icon = Icons.Default.DarkMode,
         initialValue = main.theme,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveMain(main.copy(theme = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveMain(main.copy(theme = it))) }
     )
 
-    TogglePreferenceItem(
-        title = R.string.settings_app_edit_menu_title,
-        subtitle = R.string.settings_app_edit_menu_summary,
-        initialValue = main.editMenu,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveMain(main.copy(editMenu = it))) }
-    )
-
-    Divider()
+    HorizontalDivider()
 
     PreferenceTitle(R.string.settings_library_title)
 
@@ -88,12 +87,12 @@ private fun Main(main: Settings.Main, sendEvent: (SettingsEvent.SaveMain) -> Uni
         subtitle = R.string.settings_library_show_category_summary,
         icon = Icons.Default.Category,
         initialValue = main.isShowCategory,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveMain(main.copy(isShowCategory = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveMain(main.copy(isShowCategory = it))) }
     )
 }
 
 @Composable
-private fun Chapters(chapters: Settings.Chapters, sendEvent: (SettingsEvent.SaveChapters) -> Unit) {
+private fun Chapters(chapters: Settings.Chapters, sendAction: (SettingsAction.SaveChapters) -> Unit) {
     PreferenceTitle(R.string.settings_list_chapter_title)
 
     TogglePreferenceItem(
@@ -101,7 +100,7 @@ private fun Chapters(chapters: Settings.Chapters, sendEvent: (SettingsEvent.Save
         subtitle = R.string.settings_list_chapter_filter_summary,
         icon = Icons.Default.FilterList,
         initialValue = chapters.isIndividual,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveChapters(chapters.copy(isIndividual = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveChapters(chapters.copy(isIndividual = it))) }
     )
 
     TogglePreferenceItem(
@@ -109,12 +108,12 @@ private fun Chapters(chapters: Settings.Chapters, sendEvent: (SettingsEvent.Save
         subtitle = R.string.settings_list_chapter_title_summary,
         icon = Icons.Default.Title,
         initialValue = chapters.isTitle,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveChapters(chapters.copy(isTitle = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveChapters(chapters.copy(isTitle = it))) }
     )
 }
 
 @Composable
-private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer) -> Unit) {
+private fun Viewer(viewer: Settings.Viewer, sendAction: (SettingsAction.SaveViewer) -> Unit) {
     PreferenceTitle(R.string.settings_viewer_title)
 
     ListPreferenceItem(
@@ -122,9 +121,9 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
         subtitle = R.string.settings_viewer_orientation_summary,
         icon = Icons.Default.CropLandscape,
         entries = R.array.settings_viewer_orientation_array,
-        entryValues = Settings.Viewer.Orientation.values().toList().toPersistentList(),
+        entryValues = Orientation.entries,
         initialValue = viewer.orientation,
-        onValueChange = { sendEvent(SettingsEvent.SaveViewer(viewer.copy(orientation = it))) }
+        onValueChange = { sendAction(SettingsAction.SaveViewer(viewer.copy(orientation = it))) }
     )
 
     MultiSelectListPreferenceItem(
@@ -134,7 +133,7 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
         entries = R.array.settings_viewer_control_array,
         initialValue = viewer.controls,
         onValueChange = {
-            sendEvent(SettingsEvent.SaveViewer(viewer.copy(control = viewer.controls(it))))
+            sendAction(SettingsAction.SaveViewer(viewer.copy(control = viewer.controls(it))))
         }
     )
 
@@ -144,7 +143,7 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
             subtitle = R.string.settings_viewer_cutout_summary,
             icon = Icons.Default.ContentCut,
             initialValue = viewer.cutOut,
-            onCheckedChange = { sendEvent(SettingsEvent.SaveViewer(viewer.copy(cutOut = it))) }
+            onCheckedChange = { sendAction(SettingsAction.SaveViewer(viewer.copy(cutOut = it))) }
         )
 
     TogglePreferenceItem(
@@ -152,7 +151,7 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
         subtitle = R.string.settings_viewer_without_summary,
         //            icon = Icons.Default.ContentCut,
         initialValue = viewer.withoutSaveFiles,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveViewer(viewer.copy(withoutSaveFiles = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveViewer(viewer.copy(withoutSaveFiles = it))) }
     )
 
     TogglePreferenceItem(
@@ -160,21 +159,21 @@ private fun Viewer(viewer: Settings.Viewer, sendEvent: (SettingsEvent.SaveViewer
         subtitle = R.string.settings_viewer_scrollbars_summary,
         icon = Icons.Default.FitScreen,
         initialValue = viewer.useScrollbars,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveViewer(viewer.copy(useScrollbars = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveViewer(viewer.copy(useScrollbars = it))) }
     )
 
 }
 
 @Composable
-private fun Download(download: Settings.Download, sendEvent: (SettingsEvent.SaveDownload) -> Unit) {
+private fun Download(download: Settings.Download, sendAction: (SettingsAction.SaveDownload) -> Unit) {
     PreferenceTitle(R.string.settings_downloader_title)
 
     TogglePreferenceItem(
         title = R.string.settings_downloader_parallel_title,
         subtitle = R.string.settings_downloader_parallel_summary,
-        icon = Icons.Default.CompareArrows,
+        icon = Icons.AutoMirrored.Filled.CompareArrows,
         initialValue = download.concurrent,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveDownload(download.copy(concurrent = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveDownload(download.copy(concurrent = it))) }
     )
 
     TogglePreferenceItem(
@@ -182,7 +181,7 @@ private fun Download(download: Settings.Download, sendEvent: (SettingsEvent.Save
         subtitle = R.string.settings_downloader_retry_summary,
         icon = Icons.Default.ErrorOutline,
         initialValue = download.retry,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveDownload(download.copy(retry = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveDownload(download.copy(retry = it))) }
     )
 
     TogglePreferenceItem(
@@ -190,6 +189,6 @@ private fun Download(download: Settings.Download, sendEvent: (SettingsEvent.Save
         subtitle = R.string.settings_downloader_wifi_only_summary,
         icon = Icons.Default.Wifi,
         initialValue = download.wifi,
-        onCheckedChange = { sendEvent(SettingsEvent.SaveDownload(download.copy(wifi = it))) }
+        onCheckedChange = { sendAction(SettingsAction.SaveDownload(download.copy(wifi = it))) }
     )
 }

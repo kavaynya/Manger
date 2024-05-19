@@ -2,6 +2,7 @@ package com.san.kir.core.utils.navigation
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator
 
 @Composable
 fun rememberLambda(block: () -> Unit) = remember { block }
@@ -19,7 +20,11 @@ fun <C : NavConfig> navCreator(
     block: @Composable NavComponentScope.(C) -> Unit,
 ): (C) -> NavComponent<C> = { navComponent(it, block) }
 
-fun <C : NavConfig> navComponent(
+fun <C : NavConfig> navAnimation(
+    block: (C) -> StackAnimator
+): (C) -> StackAnimator = { block(it) }
+
+internal fun <C : NavConfig> navComponent(
     config: C,
     block: @Composable NavComponentScope.(C) -> Unit,
 ): NavComponent<C> = object : NavComponent<C> {
