@@ -24,3 +24,4 @@ include(":features:accounts")
 
 include(":sample:testshikimori")
 include(":sample:test_compose")
+include(":ksp")

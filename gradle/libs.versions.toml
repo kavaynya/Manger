@@ -1,8 +1,8 @@
 [versions]
 # Kotlin
-kotlin = "1.9.20"
+kotlin = "1.9.24"
 coroutines = "1.8.0"
-ksp = "1.9.20-1.0.14"
+ksp = "1.9.24-1.0.20"
 serialization = "1.6.3"
 datetime = "0.6.0-RC.2"
 
@@ -24,7 +24,7 @@ workmanager = "2.9.0"
 # Compose
 compose = "1.6.7"
 material3 = "1.2.1"
-compose_compiler = "1.5.10" # Don`t forget change field in Version.kt in buildSrc
+compose_compiler = "1.5.14" # Don`t forget change field in Version.kt in buildSrc
 
 # Google
 material = "1.12.0"
@@ -69,6 +69,7 @@ coroutines_core = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-core", ve
 coroutines_android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutines" }
 serialization = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "datetime" }
+ksp = { module = "com.google.devtools.ksp:symbol-processing-api", version.ref = "ksp" }
 
 # decompose
 decompose = { module = "com.arkivanov.decompose:decompose", version.ref = "decompose" }

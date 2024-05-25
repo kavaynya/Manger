@@ -39,7 +39,7 @@ import com.san.kir.settings.utils.TogglePreferenceItem
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SettingsScreen(
+internal fun SettingsScreen(
     navigateUp: () -> Unit,
 ) {
     val holder: SettingsStateHolder = stateHolder { SettingsViewModel() }

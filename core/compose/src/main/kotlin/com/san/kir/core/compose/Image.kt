@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toBitmap
+import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.internet.connectManager
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withDefaultContext

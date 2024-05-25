@@ -22,8 +22,8 @@ internal interface AccountDao : BaseDao<DbAccount> {
     suspend fun item(itemId: Long): DbAccount?
 
     @Query("UPDATE accounts SET data = :data WHERE id = :itemId")
-    suspend fun update(itemId: Long, data: String): Long
+    suspend fun update(itemId: Long, data: String): Int
 
     @Query("DELETE FROM accounts WHERE id = :itemId")
-    suspend fun delete(itemId: Long): Long
+    suspend fun delete(itemId: Long): Int
 }

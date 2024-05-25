@@ -43,5 +43,13 @@ android {
 
     kotlin {
         jvmToolchain(17)
+
+        buildTypes.onEach { variant ->
+            sourceSets {
+                getByName(variant.name) {
+                    kotlin.srcDir(layout.buildDirectory.dir("/generated/ksp/${variant.name}/kotlin"))
+                }
+            }
+        }
     }
 }

@@ -1,8 +1,5 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package com.san.kir.core.compose.animation
 
-import android.os.Parcelable
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
 import androidx.compose.runtime.remember
@@ -13,14 +10,14 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 data class SharedParams(
     private var boundsContainer: RectContainer = RectContainer.Zero,
     var cornerRadius: Float = 0F,
     var fromCenter: Boolean = false
-) : Parcelable {
+) {
     var bounds: Rect
         get() = boundsContainer.toRect()
         set(value) {
@@ -28,8 +25,8 @@ data class SharedParams(
         }
 }
 
-@Parcelize
-data class RectContainer(val l: Float, val t: Float, val r: Float, val b: Float) : Parcelable {
+@Serializable
+data class RectContainer(val l: Float, val t: Float, val r: Float, val b: Float) {
     fun toRect() = Rect(l, t, r, b)
 
     companion object {

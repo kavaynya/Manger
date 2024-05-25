@@ -14,9 +14,10 @@ object ManualDI {
     const val TAG: String = "MANUAL DI"
 
     private var app: Application? = null
-    private val navigationCreators: MutableMap<KClass<NavConfig>, (NavConfig) -> NavComponent<*>> =
+    private val navigationCreators: MutableMap<KClass<out NavConfig>, (NavConfig) -> NavComponent<*>> =
         hashMapOf()
-    private val navigationAnimations: MutableMap<KClass<NavConfig>, (NavConfig) -> StackAnimator> =
+
+    private val navigationAnimations: MutableMap<KClass<out NavConfig>, (NavConfig) -> StackAnimator> =
         hashMapOf()
 
     fun init(application: Application) {
@@ -35,16 +36,19 @@ object ManualDI {
         }
     }
 
-    fun addNavigationCreator(key: KClass<NavConfig>, creator: (NavConfig) -> NavComponent<*>) {
-        navigationCreators[key] = creator
+    fun <T : NavConfig> addNavigationCreator(
+        key: KClass<T>,
+        creator: (T) -> NavComponent<T>
+    ) {
+        navigationCreators[key] = creator as (NavConfig) -> NavComponent<*>
     }
 
     internal fun navComponent(config: NavConfig): NavComponent<*>? {
         return navigationCreators[config::class]?.invoke(config)
     }
 
-    fun addNavigationAnimation(key: KClass<NavConfig>, creator: (NavConfig) -> StackAnimator) {
-        navigationAnimations[key] = creator
+    fun <T : NavConfig> addNavigationAnimation(key: KClass<T>, creator: (T) -> StackAnimator) {
+        navigationAnimations[key] = creator as (NavConfig) -> StackAnimator
     }
 
     internal fun navAnimation(config: NavConfig): StackAnimator? {

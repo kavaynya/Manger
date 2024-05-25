@@ -4,13 +4,13 @@ import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
-inline fun CoroutineScope.mainLaunch(noinline block: suspend CoroutineScope.() -> Unit) =
+fun CoroutineScope.mainLaunch(block: suspend CoroutineScope.() -> Unit) =
     launch(mainDispatcher, block = block)
 
-inline fun CoroutineScope.defaultLaunch(noinline block: suspend CoroutineScope.() -> Unit) =
+fun CoroutineScope.defaultLaunch(block: suspend CoroutineScope.() -> Unit) =
     launch(defaultDispatcher, block = block)
 
-inline fun CoroutineScope.ioLaunch(noinline block: suspend CoroutineScope.() -> Unit) =
+fun CoroutineScope.ioLaunch(block: suspend CoroutineScope.() -> Unit) =
     launch(ioDispatcher, block = block)
 
 fun CoroutineScope.defaultExcLaunch(

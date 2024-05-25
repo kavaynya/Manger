@@ -1,5 +1,6 @@
 package com.san.kir.settings
 
+import NavEntry
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
@@ -8,6 +9,11 @@ import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.settings.ui.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
+fun settingsNavigationCreators() {
+    AddNavigationCreators
+}
+
+@NavEntry
 @Serializable
 object Settings : NavConfig() {
    internal val creator = navCreator<Settings> {

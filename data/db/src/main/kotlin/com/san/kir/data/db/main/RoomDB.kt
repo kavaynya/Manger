@@ -34,6 +34,7 @@ import com.san.kir.data.db.main.entites.DbStorage
 import com.san.kir.data.db.main.migrations.From58to59
 import com.san.kir.data.db.main.migrations.From59to60
 import com.san.kir.data.db.main.migrations.From62to63
+import com.san.kir.data.db.main.migrations.From63to64
 import com.san.kir.data.db.main.migrations.migrations
 import com.san.kir.data.db.main.typeConverters.FileConverter
 import com.san.kir.data.db.main.typeConverters.ListLongConverter
@@ -87,7 +88,7 @@ import timber.log.Timber
         AutoMigration(from = 59, to = 60, spec = From59to60::class), // remove field from Manga
         AutoMigration(from = 60, to = 61), // update SimplifiedManga view
         AutoMigration(from = 62, to = 63, spec = From62to63::class), // remove unused fields from Chapters
-        AutoMigration(from = 63, to = 64), //
+        AutoMigration(from = 63, to = 64, spec = From63to64::class), //
     ]
 )
 @TypeConverters(

@@ -25,5 +25,5 @@ internal data class DbManga(
     @ColumnInfo("shortLink") val shortLink: String = "",
     @ColumnInfo("authors") val authorsList: List<String> = listOf(),
     @ColumnInfo("genres") val genresList: List<String> = listOf(),
-    @ColumnInfo("lastUpdateError") val lastUpdateError: String = ""
+    @ColumnInfo("lastUpdateError", defaultValue = "") val lastUpdateError: String = ""
 )

@@ -1,6 +1,6 @@
 package com.san.kir.data.models.catalog
 
-import com.arkivanov.essenty.parcelable.Parcelable
+import android.os.Parcelable
 import com.san.kir.data.models.main.Manga
 import kotlinx.parcelize.Parcelize
 

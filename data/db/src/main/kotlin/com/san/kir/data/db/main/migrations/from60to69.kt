@@ -1,6 +1,7 @@
 package com.san.kir.data.db.main.migrations
 
 import androidx.room.DeleteColumn
+import androidx.room.DeleteTable
 import androidx.room.migration.AutoMigrationSpec
 
 /*
@@ -64,11 +65,29 @@ internal val from61to62 = migrate {
 Удаление полей error, totalSize, totalPages, manga
 */
 @DeleteColumn.Entries(
-    value = [
-        DeleteColumn(tableName = "chapters", columnName = "error"),
-        DeleteColumn(tableName = "chapters", columnName = "totalSize"),
-        DeleteColumn(tableName = "chapters", columnName = "totalPages"),
-        DeleteColumn(tableName = "chapters", columnName = "manga"),
-    ]
+    DeleteColumn(tableName = "chapters", columnName = "error"),
+    DeleteColumn(tableName = "chapters", columnName = "totalSize"),
+    DeleteColumn(tableName = "chapters", columnName = "totalPages"),
+    DeleteColumn(tableName = "chapters", columnName = "manga"),
 )
 internal class From62to63 : AutoMigrationSpec
+
+
+@DeleteColumn.Entries(
+    DeleteColumn(tableName = "categories", columnName = "isListPortrait"),
+    DeleteColumn(tableName = "categories", columnName = "isListLandscape"),
+    DeleteColumn(tableName = "settings", columnName = "isLogin"),
+    DeleteColumn(tableName = "settings", columnName = "access_token"),
+    DeleteColumn(tableName = "settings", columnName = "token_type"),
+    DeleteColumn(tableName = "settings", columnName = "expires_in"),
+    DeleteColumn(tableName = "settings", columnName = "refresh_token"),
+    DeleteColumn(tableName = "settings", columnName = "scope"),
+    DeleteColumn(tableName = "settings", columnName = "created_at"),
+    DeleteColumn(tableName = "settings", columnName = "shikimori_whoami_id"),
+    DeleteColumn(tableName = "settings", columnName = "nickname"),
+    DeleteColumn(tableName = "settings", columnName = "avatar"),
+)
+@DeleteTable.Entries(
+    DeleteTable(tableName = "shikimori")
+)
+internal class From63to64 : AutoMigrationSpec

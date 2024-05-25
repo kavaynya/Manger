@@ -1,5 +1,6 @@
 plugins {
-    id("base.library")
+    id("compose.library")
+    `kotlin-parcelize`
     alias(libs.plugins.serialization)
 }
 

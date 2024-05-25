@@ -3,6 +3,7 @@ open class NestedModule(private val base: String) {
 }
 
 object Modules {
+    const val ksp = ":ksp"
     object Features : NestedModule("features") {
         val viewer = module("viewer")
         val shikimori = module("shikimori")

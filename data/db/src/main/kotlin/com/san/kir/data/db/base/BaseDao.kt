@@ -11,8 +11,8 @@ interface BaseDao<in T> {
     suspend fun insert(items: List<T>): List<Long>
 
     @Delete
-    suspend fun delete(vararg item: T?): Int
+    suspend fun delete(vararg item: T): Int
 
     @Delete
-    suspend fun delete(items: List<T?>): Int
+    suspend fun delete(items: List<T>): Int
 }
