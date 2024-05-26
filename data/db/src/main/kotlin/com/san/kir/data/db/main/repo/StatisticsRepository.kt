@@ -17,9 +17,9 @@ class StatisticsRepository internal constructor(private val statisticDao: Statis
 
     suspend fun itemById(id: Long) = withIoContext { statisticDao.itemById(id)?.toModel() }
 
-    fun item(itemId: Long?, mangaId: Long?): Flow<Statistic?> {
-        if (itemId != null) return statisticDao.loadItemById(itemId).toModel()
-        if (mangaId != null) return statisticDao.loadItemByMangaId(mangaId).toModel()
+    fun item(itemId: Long = -1, mangaId: Long = -1): Flow<Statistic?> {
+        if (itemId != -1L) return statisticDao.loadItemById(itemId).toModel()
+        if (mangaId != -1L) return statisticDao.loadItemByMangaId(mangaId).toModel()
         return flowOf<Statistic?>(null)
     }
 
