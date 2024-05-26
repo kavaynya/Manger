@@ -104,7 +104,7 @@ fun SwipeToDelete(
 
     LaunchedEffect(pressed) {
         access.stop()
-        if (pressed) {
+        if (!pressed) {
             access.fastAnimateTo(0f)
         } else {
             access.animateToDelayed(1f, duration = durationDismissConfirmation)
@@ -112,9 +112,7 @@ fun SwipeToDelete(
     }
 
     LaunchedEffect(isSuccessDismiss) {
-        if (isSuccessDismiss) {
-            onSuccessDismiss()
-        }
+        if (isSuccessDismiss) onSuccessDismiss()
     }
 
     SwipeToDismissBox(

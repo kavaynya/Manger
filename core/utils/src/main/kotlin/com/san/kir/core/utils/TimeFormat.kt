@@ -2,8 +2,8 @@ package com.san.kir.core.utils
 
 import android.content.Context
 
-fun Long.formatTime(context: Context): String {
-    return TimeFormat(this).toString(context)
+fun Long.formatTime(): String {
+    return TimeFormat(this).toString()
 }
 
 @Suppress("unused", "MemberVisibilityCanBePrivate")
@@ -33,7 +33,7 @@ class TimeFormat(seconds: Long) {
     fun isMinutes() = hours == 0L && isHours()
     fun isHours() = days == 0L
 
-    fun toString(context: Context): String {
+    fun toString(context: Context = ManualDI.application): String {
         if (days == 0L && hours == 0L && minutes == 0L && seconds == 0L)
             return context.getString(R.string.time_format_seconds, 0)
 

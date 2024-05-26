@@ -2,40 +2,51 @@
 <resources>
     <string name="main_menu_statistic">Статистика</string>
 
-    <string name="statistic_delete">Сбросить</string>
-    <string name="statistic_cancel">Отмена</string>
-    <string name="statistic_subtitle">За: %s</string>
-    <string name="statistic_item_time">Время чтения: %s</string>
-    <string name="statistic_item_full_last_session">Последняя сессия</string>
-    <string name="statistic_item_full_all">Общее</string>
-    <string name="statistic_item_full_max_speed">Максимальная скорость чтения %1$d %2$s в минуту</string>
-    <string name="statistic_item_full_download_data">Загруженно %1$s МБ за %2$s</string>
-    <string name="statistic_item_full_reading_times">Читали %1$d %2$s</string>
-    <string name="statistic_item_full_for_time_nothing">За %s ничего не прочитано</string>
-    <string name="statistic_item_full_for_time_with_pages">За %1$s прочитано %2$d %3$s</string>
-    <string name="statistic_item_full_for_time_with_pages_chapters">За %1$s прочитано %2$d %3$s в %4$d %5$s</string>
-    <string name="statistic_item_full_speed_reading">Скорость чтения %1$d %2$s в минуту</string>
-    <string name="statistic_item_full_speed_nothing">Скорость чтения никакая</string>
-    <string name="statistic_item_full_average_speed_reading">Средняя скорость чтения %1$d %2$s в минуту</string>
-    <string name="statistic_item_full_average_speed_nothing">Средняя скорость чтения никакая</string>
-    <string name="statistic_item_full_session_time_pages">Каждая сессия чтения длится в среднем %1$s по %2$d %3$s</string>
-    <string name="statistic_item_full_session_time_pages_chapters">Каждая сессия чтения длится в среднем %1$s по %2$d %3$s в %4$d %5$s</string>
+    <string name="time_reading">Время чтения:</string>
+    <string name="yes">Да</string>
+    <string name="reset">Сбросить?</string>
+    <string name="for_f">за</string>
 
-    <plurals name="statistic_item_full_pages">
+    <string name="last_session">Последняя сессия</string>
+    <string name="all">Общее</string>
+    <string name="no_time">Вы еще даже не начали читать</string>
+    <string name="time_nothing">За %s ничего не прочитано</string>
+    <string name="time_with_pages">За %1$s прочитано %2$d %3$s</string>
+    <string name="time_with_pages_chapters">За %1$s прочитано %2$d %3$s в %4$d %5$s</string>
+    <string name="speed_nothing">Скорость чтения никакая</string>
+    <string name="speed_reading">Скорость чтения %1$d %2$s в минуту</string>
+    <string name="average_speed_nothing">Средняя скорость чтения никакая</string>
+    <string name="average_speed_reading">Средняя скорость чтения %1$d %2$s в минуту</string>
+    <string name="max_speed">Максимальная скорость чтения %1$d %2$s в минуту</string>
+    <string name="download_data">Загруженно %1$s МБ за %2$s</string>
+    <string name="session_time_pages">Каждая сессия чтения длится в среднем %1$s по %2$d %3$s</string>
+    <string name="nothing">никакая</string>
+    <string name="opening_times">Переходили в мангу %1$d %2$s</string>
+
+    <plurals name="manga">
+        <item quantity="one">манга</item>
+        <item quantity="few">манги</item>
+        <item quantity="many">манг</item>
+        <item quantity="other">манг</item>
+    </plurals>
+
+    <plurals name="pages">
         <item quantity="one">страница</item>
+        <item quantity="two">страницы</item>
         <item quantity="few">страницы</item>
         <item quantity="many">страниц</item>
         <item quantity="other">страниц</item>
     </plurals>
 
-    <plurals name="statistic_item_full_chapters">
-        <item quantity="one">главе</item>
-        <item quantity="few">главах</item>
-        <item quantity="many">главах</item>
-        <item quantity="other">главах</item>
+    <plurals name="chapters">
+        <item quantity="zero">глав</item>
+        <item quantity="one">главу</item>
+        <item quantity="few">главы</item>
+        <item quantity="many">глав</item>
+        <item quantity="other">глав.</item>
     </plurals>
 
-    <plurals name="statistic_item_full_times">
+    <plurals name="times">
         <item quantity="one">раз</item>
         <item quantity="few">раза</item>
         <item quantity="many">раз</item>

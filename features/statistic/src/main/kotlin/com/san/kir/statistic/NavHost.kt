@@ -1,67 +1,48 @@
 package com.san.kir.statistic
 
-import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
-import com.san.kir.core.compose.animation.EmptyStackAnimator
+import NavEntry
 import com.san.kir.core.compose.animation.SharedParams
-import com.san.kir.core.compose.animation.shapeAnimator
+import com.san.kir.core.compose.animation.horizontalSlide
+import com.san.kir.core.compose.animation.itemShapeAnimator
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
-import com.san.kir.core.utils.navigation.NavContainer
-import com.san.kir.core.utils.navigation.NavHost
+import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.statistic.ui.statistic.StatisticScreen
 import com.san.kir.statistic.ui.statistics.StatisticsScreen
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
-private class Main : NavConfig {
-    companion object {
-        val creator = navCreator<Main> {
-            StatisticsScreen(
-                navigateUp = backPressed(),
-                navigateToItem = add(::Statistic),
-            )
-        }
-    }
+
+fun statisticsNavigationCreators() {
+    AddNavigationCreators
 }
 
-@Parcelize
-class Statistic(val itemId: Long, val params: SharedParams) : NavConfig {
+@NavEntry
+@Serializable
+object Statistics : NavConfig() {
+    internal val creator = navCreator<Statistics> {
+        StatisticsScreen(
+            navigateUp = backPressed(),
+            navigateToItem = add { id, params -> Statistic(itemId = id, params = params) },
+        )
+    }
+
+    internal val animation = navAnimation<Statistics> { horizontalSlide() }
+}
+
+@NavEntry
+@Serializable
+class Statistic(val itemId: Long = -1, val mangaId: Long = -1, val params: SharedParams) :
+    NavConfig() {
     companion object {
         val creator = navCreator<Statistic> { config ->
             StatisticScreen(
                 navigateUp = backPressed(),
                 itemId = config.itemId,
+                mangaId = config.mangaId,
             )
         }
-    }
-}
 
-@Composable
-fun StatisticNavHost() {
-    NavHost(
-        startConfig = Main(),
-        animation = animation,
-    ) { config ->
-        when (config) {
-            is Main -> Main.creator(config)
-            is Statistic -> Statistic.creator(config)
-            else -> null
-        }
-    }
-}
-
-private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
-    if (direction.isFront) frontAnimation(initial.configuration)
-    else frontAnimation(target.configuration)
-}
-
-private fun frontAnimation(initial: NavConfig): StackAnimator {
-    return when (initial) {
-        is Statistic -> shapeAnimator(initial.params)
-        else -> EmptyStackAnimator
+        val animation = navAnimation<Statistic> { itemShapeAnimator(it.params, 0.1f) }
     }
 }
