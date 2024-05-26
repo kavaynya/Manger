@@ -45,7 +45,7 @@ class NavConfigProcessor(
 ) : SymbolProcessor {
     private val file: OutputStream? = null
     private fun emit(s: String) {
-        logger.warn(s)
+        logger.info(s)
         file?.write((s + "\n").toByteArray(Charsets.UTF_8))
     }
 
@@ -60,14 +60,14 @@ class NavConfigProcessor(
                 declaration.annotations
                     .filter { it.shortName.asString() == NAME }
                     .forEach { annotation ->
-                        annotation.arguments.forEach {
-                            if (it.name?.asString() == CREATOR_PARAMETER_NAME) {
-                                val creatorArgument = it.value as? String
+                        annotation.arguments.forEach { creator ->
+                            if (creator.name?.asString() == CREATOR_PARAMETER_NAME) {
+                                val creatorArgument = creator.value as? String
                                 val creatorName =
                                     if (creatorArgument.isNullOrEmpty()) CREATOR_DEFAULT_VALUE else creatorArgument
-                                annotation.arguments.forEach {
-                                    if (it.name?.asString() == ANIMATION_PARAMETER_NAME) {
-                                        val animationArgument = it.value as? String
+                                annotation.arguments.forEach { animator ->
+                                    if (animator.name?.asString() == ANIMATION_PARAMETER_NAME) {
+                                        val animationArgument = animator.value as? String
                                         return@mapNotNull ParamsContainer(
                                             declaration,
                                             creatorName,
@@ -82,10 +82,14 @@ class NavConfigProcessor(
                 return@mapNotNull null
             }
             .filter { params ->
-                val declarations = params.declaration
+                val validated = params.declaration
                     .declarations
                     .filter { it.validate() }
-                    .filterIsInstance<KSPropertyDeclaration>()
+                val declarations = (
+                        validated
+                            .filterIsInstance<KSClassDeclaration>()
+                            .flatMap { it.declarations } + validated
+                        ).filterIsInstance<KSPropertyDeclaration>()
 
                 val hasCreator = declarations.any { it.simpleName.asString() == params.creator }
 
