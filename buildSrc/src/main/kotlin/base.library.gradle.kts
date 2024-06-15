@@ -1,7 +1,14 @@
+import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
+
 plugins {
     id("com.android.library")
     kotlin("android")
 }
+
+kotlin {
+    explicitApi = ExplicitApiMode.Strict
+}
+
 
 android {
     compileSdk = Versions.App.COMPILE_SDK

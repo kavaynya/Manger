@@ -3,6 +3,8 @@ package com.san.kir.background.works
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import com.san.kir.background.logic.di.workManager
 import com.san.kir.core.utils.DIR
@@ -14,11 +16,12 @@ import com.san.kir.data.mangaRepository
 import com.san.kir.data.models.main.Storage
 import com.san.kir.data.models.main.getSizes
 import com.san.kir.data.storageRepository
+import kotlinx.coroutines.flow.Flow
 
 /*
     Worker для обновления данных о занимаемом месте
 */
-class StoragesUpdateWorker(
+public class StoragesUpdateWorker(
     appContext: Context,
     workerParameters: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParameters) {
@@ -68,14 +71,19 @@ class StoragesUpdateWorker(
         )
     }
 
-    companion object {
-        const val tag = "updateStorages"
+    public companion object {
+        private const val TAG: String = "updateStorages"
 
-        fun runTask() {
+        public fun runTask() {
             val task = OneTimeWorkRequestBuilder<StoragesUpdateWorker>()
-                .addTag(tag)
+                .addTag(TAG)
                 .build()
             ManualDI.workManager().enqueue(task)
         }
+
+        public fun workInfos(): Flow<MutableList<WorkInfo>> =
+            WorkManager
+                .getInstance(ManualDI.application)
+                .getWorkInfosByTagFlow(TAG)
     }
 }

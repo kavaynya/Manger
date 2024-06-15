@@ -1,6 +1,7 @@
 package com.san.kir.features.catalogs.allhen.ui.accountScreen
 
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -13,8 +14,9 @@ import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.parsing.sites.Allhentai
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun AccountScreen(
+public fun AccountScreen(
     navigateUp: () -> Unit,
     url: String?,
 ) {

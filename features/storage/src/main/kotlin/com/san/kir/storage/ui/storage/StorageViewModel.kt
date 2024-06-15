@@ -1,7 +1,6 @@
 package com.san.kir.storage.ui.storage
 
 import android.content.Context
-import androidx.work.WorkManager
 import com.san.kir.background.logic.di.workManager
 import com.san.kir.background.util.asFlow
 import com.san.kir.background.works.AllChapterDelete
@@ -83,7 +82,7 @@ internal class StorageViewModel(
 
         combine(
             ManualDI.workManager()
-                .getWorkInfosByTagLiveData(StoragesUpdateWorker.tag)
+                .getWorkInfosByTagLiveData(StoragesUpdateWorker.TAG)
                 .asFlow(),
             ManualDI.workManager()
                 .getWorkInfosByTagLiveData(ChapterDeleteWorker.TAG)

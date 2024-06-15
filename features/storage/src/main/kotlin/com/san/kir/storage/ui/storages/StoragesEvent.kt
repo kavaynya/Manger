@@ -1,8 +1,12 @@
 package com.san.kir.storage.ui.storages
 
-import com.san.kir.core.utils.viewModel.Action
-import com.san.kir.data.db.main.entites.DbStorage
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.utils.viewModel.Event
 
-internal sealed interface StoragesEvent : Action {
-    data class Delete(val item: Storage) : StoragesEvent
+internal sealed interface StoragesEvent : Event {
+    data class ToStorage(
+        val id: Long,
+        val params: SharedParams,
+        val hasUpdate: Boolean,
+    ) : StoragesEvent
 }

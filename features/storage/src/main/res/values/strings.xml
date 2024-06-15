@@ -25,5 +25,9 @@
     <string name="library_popupmenu_delete_read_chapters_ok">Да</string>
     <string name="library_popupmenu_delete_read_chapters_no">Не, не</string>
 
+    <string name="clear">Очистить</string>
+    <string name="yes">Да</string>
+    <string name="hold_yes_for_clear">Удерживайте \"Да\"</string>
+    <string name="folder_format">Папка: %s</string>
 
 </resources>

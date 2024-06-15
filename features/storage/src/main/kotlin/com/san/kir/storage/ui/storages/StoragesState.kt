@@ -1,18 +1,20 @@
 package com.san.kir.storage.ui.storages
 
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.db.main.entites.DbStorage
-import com.san.kir.data.db.main.custom.DbMinimalStorageManga
+import com.san.kir.data.models.main.MangaLogo
+import com.san.kir.data.models.main.Storage
 
 internal data class StoragesState(
-    val items: List<DbStorage> = emptyList(),
-    val mangas: List<DbMinimalStorageManga?> = emptyList(),
-    val background: BackgroundState = BackgroundState.Load,
-    val size: Double = items.sumOf { it.sizeFull },
-    val count: Int = items.count(),
+    val background: BackgroundState = BackgroundState(),
+    val size: Double = 0.0,
+    val count: Int = 0,
 ) : ScreenState
 
-internal sealed interface BackgroundState {
-    data object Load : BackgroundState
-    data object None : BackgroundState
+internal data class BackgroundState(val load: Boolean = true, val deleting: Int = 0) {
+    val current = load || deleting > 0
 }
+
+internal data class StorageContainer(
+    val storage: Storage,
+    val mangaLogo: MangaLogo?,
+)

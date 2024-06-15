@@ -155,7 +155,7 @@ private fun ContentWrapper(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenClear(
+public fun ScreenClear(
     drawerState: DrawerState? = null,
     scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
     containerColor: Color = MaterialTheme.colorScheme.surface,
@@ -174,7 +174,7 @@ fun ScreenClear(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenContent(
+public fun ScreenContent(
     drawerState: DrawerState? = null,
     scrollBehavior: TopAppBarScrollBehavior? = TopAppBarDefaults.exitUntilCollapsedScrollBehavior(),
     additionalPadding: Dp = Dimensions.zero,
@@ -227,7 +227,7 @@ fun ScreenContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ScreenList(
+public fun ScreenList(
     additionalPadding: Dp = Dimensions.default,
     contentPadding: PaddingValues = bottomInsetsPadding(bottom = additionalPadding),
     drawerState: DrawerState? = null,

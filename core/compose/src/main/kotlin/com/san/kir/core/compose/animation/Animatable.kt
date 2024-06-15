@@ -2,6 +2,7 @@ package com.san.kir.core.compose.animation
 
 import androidx.compose.animation.VectorConverter
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationResult
 import androidx.compose.animation.core.AnimationVector
 import androidx.compose.animation.core.AnimationVector1D
 import androidx.compose.animation.core.AnimationVector2D
@@ -67,39 +68,44 @@ private val SizeSaver: Saver<Animatable<Size, AnimationVector2D>, *> = Saver(
     restore = { Animatable(it, Size.VectorConverter) }
 )
 
-suspend fun <Value, Vector : AnimationVector> Animatable<Value, Vector>.animateToDelayed(
-    value: Value, delay: Int = 0, duration: Int = ValueAnimationDuration,
-) = animateTo(value, TweenSpec(duration, delay, LinearEasing))
+public suspend fun <Value, Vector : AnimationVector> Animatable<Value, Vector>.animateToDelayed(
+    value: Value,
+    delay: Int = 0,
+    duration: Int = ValueAnimationDuration,
+): AnimationResult<Value, Vector> =
+    animateTo(value, TweenSpec(duration, delay, LinearEasing))
 
-suspend fun <Value, Vector : AnimationVector> Animatable<Value, Vector>.fastAnimateTo(value: Value) =
+public suspend fun <Value, Vector : AnimationVector> Animatable<Value, Vector>.fastAnimateTo(
+    value: Value
+): AnimationResult<Value, Vector> =
     animateTo(value, TweenSpec(FastValueAnimationDuration, 0, LinearEasing))
 
 @Composable
-fun rememberDoubleAnimatable(initialValue: Double = 0.0): Animatable<Double, AnimationVector1D> =
+public fun rememberDoubleAnimatable(initialValue: Double = 0.0): Animatable<Double, AnimationVector1D> =
     rememberSaveable(saver = DoubleSaver) { Animatable(initialValue, DoubleToVector) }
 
 @Composable
-fun rememberFloatAnimatable(initialValue: Float = 0f): Animatable<Float, AnimationVector1D> =
+public fun rememberFloatAnimatable(initialValue: Float = 0f): Animatable<Float, AnimationVector1D> =
     rememberSaveable(saver = FloatSaver) { Animatable(initialValue, Float.VectorConverter) }
 
 @Composable
-fun rememberIntAnimatable(initialValue: Int = 0): Animatable<Int, AnimationVector1D> =
+public fun rememberIntAnimatable(initialValue: Int = 0): Animatable<Int, AnimationVector1D> =
     rememberSaveable(saver = IntSaver) { Animatable(initialValue, Int.VectorConverter) }
 
 @Composable
-fun rememberLongAnimatable(initialValue: Long = 0): Animatable<Long, AnimationVector1D> =
+public fun rememberLongAnimatable(initialValue: Long = 0): Animatable<Long, AnimationVector1D> =
     rememberSaveable(saver = LongSaver) { Animatable(initialValue, LongToVector) }
 
 @Composable
-fun rememberDpAnimatable(initialValue: Dp = 0.dp): Animatable<Dp, AnimationVector1D> =
+public fun rememberDpAnimatable(initialValue: Dp = 0.dp): Animatable<Dp, AnimationVector1D> =
     rememberSaveable(saver = DpSaver) { Animatable(initialValue, Dp.VectorConverter) }
 
 @Composable
-fun rememberColorAnimatable(initialValue: Color = Color.Unspecified): Animatable<Color, AnimationVector4D> =
+public fun rememberColorAnimatable(initialValue: Color = Color.Unspecified): Animatable<Color, AnimationVector4D> =
     rememberSaveable(saver = ColorSaver) {
         Animatable(initialValue, Color.VectorConverter(initialValue.colorSpace))
     }
 
 @Composable
-fun rememberSizeAnimatable(initialValue: Size = Size.Unspecified): Animatable<Size, AnimationVector2D> =
+public fun rememberSizeAnimatable(initialValue: Size = Size.Unspecified): Animatable<Size, AnimationVector2D> =
     rememberSaveable(saver = SizeSaver) { Animatable(initialValue, Size.VectorConverter) }

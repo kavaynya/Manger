@@ -3,16 +3,13 @@ plugins {
 }
 
 android {
-    namespace="com.san.kir.storage"
+    namespace = "com.san.kir.storage"
 }
 
 dependencies {
-    implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.background))
-    implementation(project(Modules.Data.db))
-
-    implementation(libs.timber)
-
-    implementation(libs.lifecycle.livedata)
+    implementation(projects.core.compose)
+    implementation(projects.core.utils)
+    implementation(projects.core.background)
+    implementation(projects.data.db)
+    implementation(projects.data.models)
 }

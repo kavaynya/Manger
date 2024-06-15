@@ -55,7 +55,7 @@ import kotlinx.coroutines.launch
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3Api::class)
-fun createDismissStates(
+public fun createDismissStates(
     size: Int,
     density: Density,
     scope: CoroutineScope
@@ -83,7 +83,7 @@ fun createDismissStates(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SwipeToDelete(
+public fun SwipeToDelete(
     state: SwipeToDismissBoxState,
     resetText: Int,
     agreeText: Int,
@@ -202,21 +202,21 @@ fun SwipeToDelete(
                     }
                     IntOffset.Zero
                 }
-                .background(MaterialTheme.colorScheme.surface),
+                .background(MaterialTheme.colorScheme.surface, SwipeToDeleteDefaults.SpecItemShape),
             content = content
         )
     }
 }
 
 
-object SwipeToDeleteDefaults {
-    val EndButtonEndPadding = Dimensions.default
-    val MainItemShape = RoundedCornerShape(50)
-    val SpecItemShape = RoundedCornerShape(49)
+public object SwipeToDeleteDefaults {
+    public val EndButtonEndPadding: Dp = Dimensions.default
+    public val MainItemShape: RoundedCornerShape = RoundedCornerShape(50)
+    public val SpecItemShape: RoundedCornerShape = RoundedCornerShape(49)
 
-    val backgroundItemContentColor: Color
+    public val backgroundItemContentColor: Color
         @Composable get() = MaterialTheme.colorScheme.onError
 
-    val backgroundItemContainerColor: Color
+    public val backgroundItemContainerColor: Color
         @Composable get() = MaterialTheme.colorScheme.error
 }

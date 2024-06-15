@@ -5,10 +5,26 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import com.san.kir.core.compose.Dimensions
+
+
+private val StorageShape: RoundedCornerShape = RoundedCornerShape(Dimensions.smaller)
+
+private val storageTrackColor: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.surfaceVariant
+
+private val storageUsedColor: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.primary
+
+private val storageReadColor: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.tertiary
 
 @Composable
 internal fun StorageProgressBar(
@@ -23,19 +39,19 @@ internal fun StorageProgressBar(
 
     Box(
         modifier = modifier
-            .background(color = Color.LightGray, shape = RoundedCornerShape(Dimensions.smaller))
+            .background(color = storageTrackColor, shape = StorageShape)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(fullPercent)
-                .background(Color(0xFFFF4081), shape = RoundedCornerShape(Dimensions.smaller))
+                .background(storageUsedColor, shape = StorageShape)
         )
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(readPercent)
-                .background(Color(0xFF222e7a), shape = RoundedCornerShape(Dimensions.smaller))
+                .background(storageReadColor, shape = StorageShape)
         )
     }
 }
