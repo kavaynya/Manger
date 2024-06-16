@@ -5,7 +5,7 @@ import androidx.compose.runtime.Composable
 import com.san.kir.core.utils.navigation.rememberLambda
 
 @Composable
-fun backPressed(): () -> Unit {
+public fun backPressed(): () -> Unit {
     val dispatcher = LocalOnBackPressedDispatcherOwner.current?.onBackPressedDispatcher
     return rememberLambda { dispatcher?.onBackPressed() }
 }

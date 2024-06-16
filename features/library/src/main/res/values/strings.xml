@@ -17,12 +17,12 @@
     <string name="library_popupmenu_delete_no">Никогда</string>
     <string name="library_popupmenu_title">Выбранная манга: %s</string>
     <string name="library_popupmenu_set_category">Сменить категорию</string>
-    <string name="library_popupmenu_delete_read_chapters">Удалить прочитанное</string>
-    <string name="library_popupmenu_delete_all">Очистить папку</string>
-    <string name="library_popupmenu_delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
+    <string name="delete_read">Удалить прочитанное</string>
+    <string name="clear_folder">Очистить папку</string>
+    <string name="delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
     <string name="library_popupmenu_delete_read_chapters_ok">Да</string>
-    <string name="library_popupmenu_delete_read_chapters_delete">Удаляю…</string>
-    <string name="library_popupmenu_delete_read_chapters_no">Не, не</string>
+    <string name="deleting">Удаляю…</string>
+    <string name="no_no">Не, не</string>
     <string name="library_no_categories">У вас скрыты все категории, вернитесь в пункт "Категории" и измените видимость у нужных</string>
     <string name="library_to_categories">Перейти в категории</string>
     <string name="library_help">Библиотека пуста.\n Перейдите в каталоги\n и добавьте новой манги</string>
@@ -47,7 +47,7 @@
     <string name="schedule">Расписание</string>
     <string name="categories">Категории</string>
     <string name="catalogs">Каталоги</string>
-    <string name="main_menu_storage_size_mb">%s Мб</string>
+    <string name="size_mb_format">%s Мб</string>
     <string name="main_menu_downloader_count">Загрузчик: %d</string>
     <string name="main_menu_latest_count">Обновления: %d</string>
     <string name="main_menu_search">Поиск</string>

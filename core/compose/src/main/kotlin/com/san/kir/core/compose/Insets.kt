@@ -1,5 +1,6 @@
 package com.san.kir.core.compose
 
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.WindowInsetsSides
 import androidx.compose.foundation.layout.add
@@ -14,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun topInsets(
+public fun topInsets(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
@@ -27,28 +28,29 @@ fun topInsets(
 }
 
 @Composable
-fun topInsetsPadding(top: Dp = Dimensions.zero) = topInsets(top = top).asPaddingValues()
+public fun topInsetsPadding(top: Dp = Dimensions.zero): PaddingValues =
+    topInsets(top = top).asPaddingValues()
 
 @Composable
-fun Modifier.topInsetsPadding(
+public fun Modifier.topInsetsPadding(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
     bottom: Dp = Dimensions.zero
-) = windowInsetsPadding(topInsets(left, top, right, bottom))
+): Modifier = windowInsetsPadding(topInsets(left, top, right, bottom))
 
 @Composable
-fun Modifier.topInsetsPadding(
+public fun Modifier.topInsetsPadding(
     horizontal: Dp = Dimensions.zero,
     vertical: Dp = Dimensions.zero,
-) = windowInsetsPadding(topInsets(horizontal, vertical, horizontal, vertical))
+): Modifier = windowInsetsPadding(topInsets(horizontal, vertical, horizontal, vertical))
 
 
 //////////////////////////////////////////
 
 
 @Composable
-fun bottomInsets(
+public fun bottomInsets(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
@@ -61,31 +63,31 @@ fun bottomInsets(
 }
 
 @Composable
-fun bottomInsetsPadding(
+public fun bottomInsetsPadding(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
     bottom: Dp = Dimensions.zero
-) = bottomInsets(left, top, right, bottom).asPaddingValues()
+): PaddingValues = bottomInsets(left, top, right, bottom).asPaddingValues()
 
 @Composable
-fun bottomInsetsPadding(all: Dp = Dimensions.zero) =
+public fun bottomInsetsPadding(all: Dp = Dimensions.zero): PaddingValues =
     bottomInsets(all, all, all, all).asPaddingValues()
 
 @Composable
-fun Modifier.bottomInsetsPadding(
+public fun Modifier.bottomInsetsPadding(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
     bottom: Dp = Dimensions.zero
-) = windowInsetsPadding(bottomInsets(left, top, right, bottom))
+): Modifier = windowInsetsPadding(bottomInsets(left, top, right, bottom))
 
 
 ///////////////////////////////////////
 
 
 @Composable
-fun horizontalInsets(
+public fun horizontalInsets(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
@@ -98,29 +100,29 @@ fun horizontalInsets(
 }
 
 @Composable
-fun horizontalInsetsPadding(all: Dp = Dimensions.zero) =
+public fun horizontalInsetsPadding(all: Dp = Dimensions.zero): PaddingValues =
     horizontalInsets(all, all, all, all).asPaddingValues()
 
 @Composable
-fun Modifier.horizontalInsetsPadding(
+public fun Modifier.horizontalInsetsPadding(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
     bottom: Dp = Dimensions.zero
-) = windowInsetsPadding(horizontalInsets(left, top, right, bottom))
+): Modifier = windowInsetsPadding(horizontalInsets(left, top, right, bottom))
 
 @Composable
-fun Modifier.horizontalInsetsPadding(
+public fun Modifier.horizontalInsetsPadding(
     horizontal: Dp = Dimensions.zero,
     vertical: Dp = Dimensions.zero,
-) = windowInsetsPadding(horizontalInsets(horizontal, vertical, horizontal, vertical))
+): Modifier = windowInsetsPadding(horizontalInsets(horizontal, vertical, horizontal, vertical))
 
 
 /////////////////////////////////////
 
 
 @Composable
-fun startInsets(
+public fun startInsets(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
@@ -133,19 +135,19 @@ fun startInsets(
 }
 
 @Composable
-fun Modifier.startInsetsPadding(
+public fun Modifier.startInsetsPadding(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
     bottom: Dp = Dimensions.zero
-) = windowInsetsPadding(startInsets(left, top, right, bottom))
+): Modifier = windowInsetsPadding(startInsets(left, top, right, bottom))
 
 
 ////////////////////////////////////
 
 
 @Composable
-fun endInsets(
+public fun endInsets(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
@@ -158,17 +160,17 @@ fun endInsets(
 }
 
 @Composable
-fun Modifier.endInsetsPadding(
+public fun Modifier.endInsetsPadding(
     left: Dp = Dimensions.zero,
     top: Dp = Dimensions.zero,
     right: Dp = Dimensions.zero,
     bottom: Dp = Dimensions.zero
-) = windowInsetsPadding(endInsets(left, top, right, bottom))
+): Modifier = windowInsetsPadding(endInsets(left, top, right, bottom))
 
 
 //////////////////////////////////
 
 
 @Composable
-fun horizontalAndBottomInsetsPadding() =
+public fun horizontalAndBottomInsetsPadding(): PaddingValues =
     horizontalInsets().add(bottomInsets()).asPaddingValues()

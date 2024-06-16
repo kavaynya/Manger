@@ -46,7 +46,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 @Composable
-fun LabelText(idRes: Int) {
+public fun LabelText(idRes: Int) {
     Text(
         text = stringResource(idRes),
         fontSize = 16.sp,
@@ -55,7 +55,7 @@ fun LabelText(idRes: Int) {
 }
 
 @Composable
-fun DialogText(
+public fun DialogText(
     text: String,
     modifier: Modifier = Modifier,
     color: Color = Color.Unspecified,
@@ -71,7 +71,7 @@ fun DialogText(
 }
 
 @Composable
-fun DropDownTextField(
+public fun DropDownTextField(
     inititalValue: String,
     valuesList: List<String>,
     onChangeValue: (String) -> Unit,
@@ -117,7 +117,7 @@ fun DropDownTextField(
 }
 
 @Composable
-fun CheckBoxText(
+public fun CheckBoxText(
     state: Boolean,
     onChange: (Boolean) -> Unit,
     @StringRes firstTextId: Int,
@@ -132,7 +132,7 @@ fun CheckBoxText(
 }
 
 @Composable
-fun CheckBoxText(
+public fun CheckBoxText(
     modifier: Modifier = Modifier,
     state: Boolean,
     onChange: (Boolean) -> Unit,
@@ -162,7 +162,7 @@ fun CheckBoxText(
 
 // Настроенное текствое поле с кнопкой очистки
 @Composable
-fun SearchTextField(
+public fun SearchTextField(
     initialValue: String,
     onChangeValue: (String) -> Unit,
 ) {
@@ -200,7 +200,7 @@ fun SearchTextField(
 }
 
 @Composable
-fun TextWithFirstWordBold(
+public fun TextWithFirstWordBold(
     text: String,
     modifier: Modifier = Modifier,
     textAlign: TextAlign? = null,

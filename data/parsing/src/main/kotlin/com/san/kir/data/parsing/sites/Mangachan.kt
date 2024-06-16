@@ -4,7 +4,7 @@ import com.san.kir.core.internet.ConnectManager
 import io.ktor.util.StringValues
 import io.ktor.util.StringValuesBuilderImpl
 
-class Mangachan(connectManager: ConnectManager) : MangachanTemplate(connectManager) {
+internal class Mangachan(connectManager: ConnectManager) : MangachanTemplate(connectManager) {
 
     override val host: String
         get() = "https://$catalogName"

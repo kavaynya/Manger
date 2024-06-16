@@ -6,12 +6,18 @@ import com.san.kir.data.db.main.mappers.toEntity
 import com.san.kir.data.db.main.mappers.toModel
 import com.san.kir.data.db.main.mappers.toModels
 import com.san.kir.data.models.main.PlannedTask
+import com.san.kir.data.models.main.SimplifiedTask
+import kotlinx.coroutines.flow.Flow
 
-class PlannedRepository internal constructor(private val plannedDao: PlannedDao) {
-    val count = plannedDao.loadItemsCount()
-    val simplifiedItems = plannedDao.loadSimpleItems().toModels()
-    suspend fun item(itemId: Long) = withIoContext { plannedDao.itemById(itemId)?.toModel() }
-    suspend fun update(id: Long, enable: Boolean) = withIoContext { plannedDao.update(id, enable) }
+public class PlannedRepository internal constructor(private val plannedDao: PlannedDao) {
+    public val count: Flow<Int> = plannedDao.loadItemsCount()
+    public val simplifiedItems: Flow<List<SimplifiedTask>> = plannedDao.loadSimpleItems().toModels()
+    public suspend fun item(itemId: Long): PlannedTask? =
+        withIoContext { plannedDao.itemById(itemId)?.toModel() }
 
-    suspend fun save(item: PlannedTask) = withIoContext { plannedDao.insert(item.toEntity()) }
+    public suspend fun update(id: Long, enable: Boolean): Unit =
+        withIoContext { plannedDao.update(id, enable) }
+
+    public suspend fun save(item: PlannedTask): List<Long> =
+        withIoContext { plannedDao.insert(item.toEntity()) }
 }

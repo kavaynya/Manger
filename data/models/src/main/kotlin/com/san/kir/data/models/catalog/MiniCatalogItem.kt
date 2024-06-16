@@ -1,6 +1,6 @@
 package com.san.kir.data.models.catalog
 
-data class MiniCatalogItem(
+public data class MiniCatalogItem(
     val id: Long = 0,
     val catalogName: String = "",
     val name: String = "",
@@ -14,14 +14,14 @@ data class MiniCatalogItem(
     val populate: Int = 0,
     val state: State = State.None
 ) {
-    sealed interface State {
-        data object Added : State
-        data object Update : State
-        data object None : State
+    public sealed interface State {
+        public data object Added : State
+        public data object Update : State
+        public data object None : State
     }
 }
 
-fun MiniCatalogItem.toFullItem(): SiteCatalogElement {
+public fun MiniCatalogItem.toFullItem(): SiteCatalogElement {
     return SiteCatalogElement(
         id = id,
         catalogName = catalogName,

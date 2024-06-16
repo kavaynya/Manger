@@ -1,9 +1,9 @@
 package com.san.kir.core.utils
 
-object ID {
+public object ID {
     private var count = 1
 
-    fun generate(): Int {
+    public fun generate(): Int {
         return count++
     }
 }

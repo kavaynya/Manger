@@ -2,21 +2,22 @@ package com.san.kir.core.utils.coroutines
 
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 
-fun CoroutineScope.mainLaunch(block: suspend CoroutineScope.() -> Unit) =
+public fun CoroutineScope.mainLaunch(block: suspend CoroutineScope.() -> Unit): Job =
     launch(mainDispatcher, block = block)
 
-fun CoroutineScope.defaultLaunch(block: suspend CoroutineScope.() -> Unit) =
+public fun CoroutineScope.defaultLaunch(block: suspend CoroutineScope.() -> Unit): Job =
     launch(defaultDispatcher, block = block)
 
-fun CoroutineScope.ioLaunch(block: suspend CoroutineScope.() -> Unit) =
+public fun CoroutineScope.ioLaunch(block: suspend CoroutineScope.() -> Unit): Job =
     launch(ioDispatcher, block = block)
 
-fun CoroutineScope.defaultExcLaunch(
+public fun CoroutineScope.defaultExcLaunch(
     onFailure: () -> Unit = {},
     block: suspend CoroutineScope.() -> Unit,
-) = launch(
+): Job = launch(
     defaultDispatcher + CoroutineExceptionHandler { _, e ->
         e.printStackTrace()
         onFailure()

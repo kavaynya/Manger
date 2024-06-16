@@ -2,11 +2,10 @@ package com.san.kir.data.models.main
 
 import android.os.Parcelable
 import com.san.kir.data.models.utils.ChapterFilter
-import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Manga(
+public data class Manga(
     val id: Long = 0,
     val host: String = "",
     val name: String = "",
@@ -28,5 +27,5 @@ data class Manga(
     val lastUpdateError: String = ""
 ) : Parcelable
 
-val Manga.authorsStr: String get() = authorsList.joinToString()
-val Manga.genresStr: String get() = genresList.joinToString()
+public val Manga.authorsStr: String get() = authorsList.joinToString()
+public val Manga.genresStr: String get() = genresList.joinToString()

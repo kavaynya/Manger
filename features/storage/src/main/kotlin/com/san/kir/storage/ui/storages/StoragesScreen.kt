@@ -80,7 +80,7 @@ internal fun StoragesScreen(
     val ctx = LocalContext.current
 
     val storageTitle = stringResource(R.string.storage)
-    val sizeTemplate = stringResource(R.string.main_menu_storage_size_mb)
+    val sizeTemplate = stringResource(R.string.size_mb_format)
 
     val holder: StoragesStateHolder = stateHolder { StoragesViewModel() }
     val state by holder.state.collectAsStateWithLifecycle()
@@ -108,7 +108,7 @@ internal fun StoragesScreen(
     }
     val subtitle by remember {
         derivedStateOf {
-            ctx.resources.getQuantityString(R.plurals.storage_subtitle, count.value, count)
+            ctx.resources.getQuantityString(R.plurals.storage_subtitle_format, count.value, count)
         }
     }
 
@@ -193,7 +193,7 @@ private fun LazyItemScope.ItemView(
                     CircleLogo(logoUrl = manga.logo, size = ImageSize)
                 } else {
                     Text(
-                        text = stringResource(R.string.storage_not_in_bd),
+                        text = stringResource(R.string.not_in_bd),
                         color = MaterialTheme.colorScheme.onSecondaryContainer,
                         fontSize = NoMangaTextSize,
                         fontWeight = FontWeight.W400,
@@ -246,7 +246,7 @@ private fun LazyItemScope.ItemView(
 private fun UsedText(sizeFull: Animatable<Double, AnimationVector1D>, storageSize: Double) {
     Text(
         stringResource(
-            R.string.storage_manga_item_size_text,
+            R.string.used_size_format,
             sizeFull.value.format(),
             if (storageSize != 0.0) (sizeFull.value / storageSize * 100).roundToInt() else 0
         ),

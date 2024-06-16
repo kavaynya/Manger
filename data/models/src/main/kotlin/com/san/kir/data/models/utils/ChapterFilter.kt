@@ -1,73 +1,73 @@
 package com.san.kir.data.models.utils
 
-enum class ChapterFilter {
+public enum class ChapterFilter {
     ALL_READ_ASC {
-        override val isAll = true
-        override val isRead = false
-        override val isNot = false
-        override val isAsc = true
-        override fun toAll() = ALL_READ_ASC
-        override fun toRead() = IS_READ_ASC
-        override fun toNot() = NOT_READ_ASC
-        override fun inverse() = ALL_READ_DESC
+        override val isAll: Boolean = true
+        override val isRead: Boolean = false
+        override val isNot: Boolean = false
+        override val isAsc: Boolean = true
+        override fun toAll(): ChapterFilter = ALL_READ_ASC
+        override fun toRead(): ChapterFilter = IS_READ_ASC
+        override fun toNot(): ChapterFilter = NOT_READ_ASC
+        override fun inverse(): ChapterFilter = ALL_READ_DESC
     },
     NOT_READ_ASC {
-        override val isAll = false
-        override val isRead = false
-        override val isNot = true
-        override val isAsc = true
-        override fun toAll() = ALL_READ_ASC
-        override fun toRead() = IS_READ_ASC
-        override fun toNot() = NOT_READ_ASC
-        override fun inverse() = NOT_READ_DESC
+        override val isAll: Boolean = false
+        override val isRead: Boolean = false
+        override val isNot: Boolean = true
+        override val isAsc: Boolean = true
+        override fun toAll(): ChapterFilter = ALL_READ_ASC
+        override fun toRead(): ChapterFilter = IS_READ_ASC
+        override fun toNot(): ChapterFilter = NOT_READ_ASC
+        override fun inverse(): ChapterFilter = NOT_READ_DESC
     },
     IS_READ_ASC {
-        override val isAll = false
-        override val isRead = true
-        override val isNot = false
-        override val isAsc = true
-        override fun toAll() = ALL_READ_ASC
-        override fun toRead() = IS_READ_ASC
-        override fun toNot() = NOT_READ_ASC
-        override fun inverse() = IS_READ_DESC
+        override val isAll: Boolean = false
+        override val isRead: Boolean = true
+        override val isNot: Boolean = false
+        override val isAsc: Boolean = true
+        override fun toAll(): ChapterFilter = ALL_READ_ASC
+        override fun toRead(): ChapterFilter = IS_READ_ASC
+        override fun toNot(): ChapterFilter = NOT_READ_ASC
+        override fun inverse(): ChapterFilter = IS_READ_DESC
     },
     ALL_READ_DESC {
-        override val isAll = true
-        override val isRead = false
-        override val isNot = false
-        override val isAsc = false
-        override fun toAll() = ALL_READ_DESC
-        override fun toRead() = IS_READ_DESC
-        override fun toNot() = NOT_READ_DESC
-        override fun inverse() = ALL_READ_ASC
+        override val isAll: Boolean = true
+        override val isRead: Boolean = false
+        override val isNot: Boolean = false
+        override val isAsc: Boolean = false
+        override fun toAll(): ChapterFilter = ALL_READ_DESC
+        override fun toRead(): ChapterFilter = IS_READ_DESC
+        override fun toNot(): ChapterFilter = NOT_READ_DESC
+        override fun inverse(): ChapterFilter = ALL_READ_ASC
     },
     NOT_READ_DESC {
-        override val isAll = false
-        override val isRead = false
-        override val isNot = true
-        override val isAsc = false
-        override fun toAll() = ALL_READ_DESC
-        override fun toRead() = IS_READ_DESC
-        override fun toNot() = NOT_READ_DESC
-        override fun inverse() = NOT_READ_ASC
+        override val isAll: Boolean = false
+        override val isRead: Boolean = false
+        override val isNot: Boolean = true
+        override val isAsc: Boolean = false
+        override fun toAll(): ChapterFilter = ALL_READ_DESC
+        override fun toRead(): ChapterFilter = IS_READ_DESC
+        override fun toNot(): ChapterFilter = NOT_READ_DESC
+        override fun inverse(): ChapterFilter = NOT_READ_ASC
     },
     IS_READ_DESC {
-        override val isAll = false
-        override val isRead = true
-        override val isNot = false
-        override val isAsc = false
-        override fun toAll() = ALL_READ_DESC
-        override fun toRead() = IS_READ_DESC
-        override fun toNot() = NOT_READ_DESC
-        override fun inverse() = IS_READ_ASC
+        override val isAll: Boolean = false
+        override val isRead: Boolean = true
+        override val isNot: Boolean = false
+        override val isAsc: Boolean = false
+        override fun toAll(): ChapterFilter = ALL_READ_DESC
+        override fun toRead(): ChapterFilter = IS_READ_DESC
+        override fun toNot(): ChapterFilter = NOT_READ_DESC
+        override fun inverse(): ChapterFilter = IS_READ_ASC
     };
 
-    abstract fun inverse(): ChapterFilter
-    abstract val isAll: Boolean
-    abstract val isRead: Boolean
-    abstract val isNot: Boolean
-    abstract val isAsc: Boolean
-    abstract fun toAll(): ChapterFilter
-    abstract fun toRead(): ChapterFilter
-    abstract fun toNot(): ChapterFilter
+    public abstract fun inverse(): ChapterFilter
+    public abstract val isAll: Boolean
+    public abstract val isRead: Boolean
+    public abstract val isNot: Boolean
+    public abstract val isAsc: Boolean
+    public abstract fun toAll(): ChapterFilter
+    public abstract fun toRead(): ChapterFilter
+    public abstract fun toNot(): ChapterFilter
 }

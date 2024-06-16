@@ -6,7 +6,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import com.san.kir.core.utils.viewModel.LocalComponentContext
 
 @Composable
-fun <T : Parcelable> rememberDialogState(
+public fun <T : Parcelable> rememberDialogState(
     dismissOnBackPressed: Boolean = true,
     onDismiss: () -> Unit = {},
     onNeutral: (T) -> Unit = {},
@@ -36,7 +36,7 @@ fun <T : Parcelable> rememberDialogState(
 }
 
 @Composable
-fun <T : Parcelable> DialogBase(
+public fun <T : Parcelable> DialogBase(
     dialogState: DialogState<T>,
     content: @Composable (T?) -> Unit
 ) {

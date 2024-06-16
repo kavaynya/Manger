@@ -6,7 +6,7 @@ import androidx.compose.ui.Modifier
 import com.arkivanov.decompose.extensions.compose.stack.animation.Direction
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator
 
-object EmptyStackAnimator : StackAnimator {
+public object EmptyStackAnimator : StackAnimator {
 
     @Composable
     override operator fun invoke(

@@ -13,7 +13,7 @@ import com.san.kir.data.models.main.getSizes
 import com.san.kir.data.storageRepository
 import timber.log.Timber
 
-class ReadChapterDelete(
+public class ReadChapterDelete(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : ChapterDeleteWorker(appContext, workerParams) {

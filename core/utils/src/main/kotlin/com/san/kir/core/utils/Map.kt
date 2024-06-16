@@ -6,5 +6,5 @@ private inline fun <K, V> Map<K, V>.mutate(mutation: MutableMap<K, V>.() -> Unit
     return mutableMap
 }
 
-fun <K, V> Map<K, V>.put(key: K, value: V) = mutate { put(key, value) }
-fun <K, V> Map<K, V>.remove(key: K) = mutate { remove(key) }
+public fun <K, V> Map<K, V>.put(key: K, value: V): Map<K, V> = mutate { put(key, value) }
+public fun <K, V> Map<K, V>.remove(key: K): Map<K, V> = mutate { remove(key) }

@@ -9,13 +9,16 @@ import com.san.kir.data.db.workers.mappers.toModels
 import com.san.kir.data.models.workers.MangaTask
 import kotlinx.coroutines.flow.Flow
 
-class MangaWorkerRepository internal constructor(
+public class MangaWorkerRepository internal constructor(
     private val dao: MangaTaskDao
 ) : BaseWorkerRepository<MangaTask>(dao) {
-    override val catalog = dao.loadItems().toModels()
-    suspend fun remove(ids: List<Long>) = withIoContext { dao.removeByIds(ids) }
-    fun loadTask(mangaId: Long) = dao.loadItemByMangaId(mangaId).toModel()
-    suspend fun task(mangaId: Long) = withIoContext { dao.itemByMangaId(mangaId)?.toModel() }
-    suspend fun save(item: MangaTask) = withIoContext { dao.insert(item.toEntity()) }
+    override val catalog: Flow<List<MangaTask>> = dao.loadItems().toModels()
+    public suspend fun remove(ids: List<Long>): Unit = withIoContext { dao.removeByIds(ids) }
+    public fun loadTask(mangaId: Long): Flow<MangaTask?> = dao.loadItemByMangaId(mangaId).toModel()
+    public suspend fun task(mangaId: Long): MangaTask? =
+        withIoContext { dao.itemByMangaId(mangaId)?.toModel() }
+
+    public suspend fun save(item: MangaTask): List<Long> =
+        withIoContext { dao.insert(item.toEntity()) }
 
 }

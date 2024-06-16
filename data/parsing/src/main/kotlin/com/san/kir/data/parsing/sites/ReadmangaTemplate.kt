@@ -18,7 +18,7 @@ import org.jsoup.nodes.Element
 import timber.log.Timber
 import java.util.regex.Pattern
 
-abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
+internal abstract class ReadmangaTemplate(private val connectManager: ConnectManager) :
     SiteCatalogClassic() {
 
     override val catalog

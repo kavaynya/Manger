@@ -1,9 +1,11 @@
 package com.san.kir.core.utils.coroutines
 
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.MainCoroutineDispatcher
 
-val mainDispatcher = Dispatchers.Main
+public val mainDispatcher: MainCoroutineDispatcher = Dispatchers.Main
 
-val ioDispatcher = Dispatchers.IO
+public val ioDispatcher: CoroutineDispatcher = Dispatchers.IO
 
-val defaultDispatcher = Dispatchers.Default
+public val defaultDispatcher: CoroutineDispatcher = Dispatchers.Default

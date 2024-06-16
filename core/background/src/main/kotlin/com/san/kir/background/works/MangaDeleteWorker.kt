@@ -12,7 +12,7 @@ import com.san.kir.data.chapterRepository
 import com.san.kir.data.mangaRepository
 import timber.log.Timber
 
-class MangaDeleteWorker(
+public class MangaDeleteWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
@@ -51,11 +51,11 @@ class MangaDeleteWorker(
         }
     }
 
-    companion object {
-        const val TAG = "mangaDelete"
-        const val WITH_FILES = "withFiles"
+    public companion object {
+        private const val TAG = "mangaDelete"
+        private const val WITH_FILES = "withFiles"
 
-        fun addTask(mangaId: Long, withFiles: Boolean = false) {
+        public fun addTask(mangaId: Long, withFiles: Boolean = false) {
             val data = workDataOf("id" to mangaId, WITH_FILES to withFiles)
             val deleteManga = OneTimeWorkRequestBuilder<MangaDeleteWorker>()
                 .setInputData(data)

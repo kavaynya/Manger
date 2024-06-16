@@ -2,16 +2,15 @@ package com.san.kir.core.utils
 
 import android.content.Context
 
-fun Long.formatTime(): String {
+public fun Long.formatTime(): String {
     return TimeFormat(this).toString()
 }
 
-@Suppress("unused", "MemberVisibilityCanBePrivate")
-class TimeFormat(seconds: Long) {
-    var days: Long = 0
-    var hours: Long = 0
-    var minutes: Long = 0
-    var seconds: Long = 0
+public class TimeFormat(seconds: Long) {
+    private var days: Long = 0
+    private var hours: Long = 0
+    private var minutes: Long = 0
+    private var seconds: Long = 0
 
     init {
         this.seconds = seconds % 60
@@ -29,11 +28,7 @@ class TimeFormat(seconds: Long) {
         this.days = days
     }
 
-    fun isSeconds() = minutes == 0L && isMinutes()
-    fun isMinutes() = hours == 0L && isHours()
-    fun isHours() = days == 0L
-
-    fun toString(context: Context = ManualDI.application): String {
+    public fun toString(context: Context = ManualDI.application): String {
         if (days == 0L && hours == 0L && minutes == 0L && seconds == 0L)
             return context.getString(R.string.time_format_seconds, 0)
 

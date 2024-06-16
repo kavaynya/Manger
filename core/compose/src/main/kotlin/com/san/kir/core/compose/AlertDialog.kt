@@ -43,7 +43,7 @@ private fun text(idRes: Int?): (@Composable () -> Unit)? =
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun <T : Parcelable> AlertDialog(
+public fun <T : Parcelable> AlertDialog(
     state: DialogState<T>,
     title: Int? = null,
     text: Int? = null,
@@ -76,7 +76,7 @@ fun <T : Parcelable> AlertDialog(
 }
 
 @Composable
-fun <T : Parcelable> AlertDialog(
+public fun <T : Parcelable> AlertDialog(
     state: DialogState<T>,
     iconContent: (@Composable () -> Unit)? = null,
     titleContent: (@Composable () -> Unit)? = null,
@@ -171,7 +171,7 @@ private fun AlertDialogContent(
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun AlertDialogButtonsRow(content: @Composable FlowRowScope.() -> Unit) {
+private fun AlertDialogButtonsRow(content: @Composable FlowRowScope.() -> Unit) {
     FlowRow(
         horizontalArrangement = Arrangement.spacedBy(ButtonsCrossAxisSpacing, Alignment.End),
         verticalArrangement = Arrangement.spacedBy(
@@ -182,32 +182,32 @@ fun AlertDialogButtonsRow(content: @Composable FlowRowScope.() -> Unit) {
     )
 }
 
-object DialogTokens {
-    val TonalElevation = 6.dp
-    val actionLabelTextFont: TextStyle
+public object DialogTokens {
+    public val TonalElevation: Dp = 6.dp
+    public val actionLabelTextFont: TextStyle
         @Composable get() = MaterialTheme.typography.labelLarge
 
-    val headlineFont: TextStyle
+    public val headlineFont: TextStyle
         @Composable get() = MaterialTheme.typography.headlineSmall
 
-    val supportingTextFont: TextStyle
+    public val supportingTextFont: TextStyle
         @Composable get() = MaterialTheme.typography.bodyMedium
 
-    val shape: Shape
+    public val shape: Shape
         @Composable get() = MaterialTheme.shapes.extraLarge
 
-    val containerColor: Color
+    public val containerColor: Color
         @Composable get() = MaterialTheme.colorScheme.surface
 
-    val iconContentColor: Color
+    public val iconContentColor: Color
         @Composable get() = MaterialTheme.colorScheme.secondary
 
-    val titleContentColor: Color
+    public val titleContentColor: Color
         @Composable get() = MaterialTheme.colorScheme.onSurface
 
-    val textContentColor: Color
+    public val textContentColor: Color
         @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
 
-    val buttonContentColor: Color
+    public val buttonContentColor: Color
         @Composable get() = MaterialTheme.colorScheme.primary
 }

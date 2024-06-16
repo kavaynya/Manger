@@ -21,7 +21,7 @@ import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.flow.collectIndexed
 import timber.log.Timber
 
-class UpdateCatalogWorker(
+internal class UpdateCatalogWorker(
     context: Context,
     params: WorkerParameters,
 ) : BaseUpdateWorker<CatalogTask>(context, params) {

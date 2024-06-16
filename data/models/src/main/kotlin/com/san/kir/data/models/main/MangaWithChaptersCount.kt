@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MangaWithChaptersCount(
+public data class MangaWithChaptersCount(
     val id: Long = 0,
     val name: String = "",
     val logo: String = "",

@@ -7,6 +7,7 @@ import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.FiniteAnimationSpec
 import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
@@ -36,7 +37,7 @@ import com.san.kir.core.utils.navigation.DialogBase
 import com.san.kir.core.utils.navigation.DialogState
 
 @Composable
-fun <T : Parcelable> TopSheets(
+public fun <T : Parcelable> TopSheets(
     dialogState: DialogState<T>,
     modifier: Modifier = Modifier,
     scrimColor: Color = Sheets.scrimColor,
@@ -61,7 +62,7 @@ fun <T : Parcelable> TopSheets(
 }
 
 @Composable
-fun <T : Parcelable> TopEndSheets(
+public fun <T : Parcelable> TopEndSheets(
     dialogState: DialogState<T>,
     modifier: Modifier = Modifier,
     scrimColor: Color = Sheets.scrimColor,
@@ -86,7 +87,7 @@ fun <T : Parcelable> TopEndSheets(
 }
 
 @Composable
-fun <T : Parcelable> BottomSheets(
+public fun <T : Parcelable> BottomSheets(
     dialogState: DialogState<T>,
     modifier: Modifier = Modifier,
     scrimColor: Color = Sheets.scrimColor,
@@ -111,7 +112,7 @@ fun <T : Parcelable> BottomSheets(
 }
 
 @Composable
-fun <T : Parcelable> BottomEndSheets(
+public fun <T : Parcelable> BottomEndSheets(
     dialogState: DialogState<T>,
     modifier: Modifier = Modifier,
     scrimColor: Color = Sheets.scrimColor,
@@ -136,7 +137,7 @@ fun <T : Parcelable> BottomEndSheets(
 }
 
 @Composable
-fun <T : Parcelable> CenterDialog(
+public fun <T : Parcelable> CenterDialog(
     dialogState: DialogState<T>,
     modifier: Modifier = Modifier,
     scrimColor: Color = Sheets.scrimColor,
@@ -161,7 +162,7 @@ fun <T : Parcelable> CenterDialog(
 }
 
 @Composable
-fun <T : Parcelable> Sheet(
+public fun <T : Parcelable> Sheet(
     dialogState: DialogState<T>,
     alignment: Alignment,
     enter: EnterTransition,
@@ -191,7 +192,7 @@ fun <T : Parcelable> Sheet(
 }
 
 @Composable
-fun <T : Parcelable> SheetContent(
+public fun <T : Parcelable> SheetContent(
     state: T?,
     alignment: Alignment,
     onDismiss: () -> Unit,
@@ -246,16 +247,17 @@ fun <T : Parcelable> SheetContent(
     }
 }
 
-object Sheets {
-    val Elevation = 1.dp
-    val animationSpec = spring<IntOffset>(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)
+public object Sheets {
+    public val Elevation: Dp = 1.dp
+    public val animationSpec: SpringSpec<IntOffset> =
+        spring(Spring.DampingRatioNoBouncy, Spring.StiffnessMedium)
 
-    val scrimColor: Color
+    public val scrimColor: Color
         @Composable get() = MaterialTheme.colorScheme.scrim.copy(alpha = 0.4f)
 
-    val containerColor: Color
+    public val containerColor: Color
         @Composable get() = MaterialTheme.colorScheme.surface
 
-    val shape: CornerBasedShape
+    public val shape: CornerBasedShape
         @Composable get() = MaterialTheme.shapes.extraLarge
 }

@@ -21,7 +21,7 @@ import com.san.kir.core.utils.ManualDI
 import timber.log.Timber
 import java.util.regex.Pattern
 
-class AppUpdateWorker(
+public class AppUpdateWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
@@ -116,11 +116,11 @@ class AppUpdateWorker(
             .build()
     }
 
-    companion object {
+    public companion object {
         private val notifyId = ID.generate()
         private const val URL = "http://4pda.to/forum/index.php?showtopic=772886&st=0#entry53336845"
         private const val TAG = "App Update Finder"
-        fun addTask() {
+        public fun addTask() {
             val deleteManga = OneTimeWorkRequestBuilder<AppUpdateWorker>().build()
             ManualDI.workManager().enqueue(deleteManga)
         }

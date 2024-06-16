@@ -15,7 +15,7 @@ import org.jsoup.select.Elements
 import timber.log.Timber
 import java.util.regex.Pattern
 
-abstract class MangachanTemplate(private val connectManager: ConnectManager) :
+internal abstract class MangachanTemplate(private val connectManager: ConnectManager) :
     SiteCatalogClassic() {
 
     override val catalog: String

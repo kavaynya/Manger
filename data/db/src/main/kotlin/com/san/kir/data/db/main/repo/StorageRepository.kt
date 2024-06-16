@@ -9,22 +9,27 @@ import com.san.kir.data.db.main.mappers.toEntity
 import com.san.kir.data.db.main.mappers.toModel
 import com.san.kir.data.db.main.mappers.toModels
 import com.san.kir.data.models.main.Storage
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
-class StorageRepository internal constructor(private val storageDao: StorageDao) {
-    val fullSize = storageDao.loadFullSize()
-    val fullSizeInt = fullSize.map(Double::toInt)
-    val items = storageDao.loadItems().toModels()
+public class StorageRepository internal constructor(private val storageDao: StorageDao) {
+    public val fullSize: Flow<Double> = storageDao.loadFullSize()
+    public val fullSizeInt: Flow<Int> = fullSize.map(Double::toInt)
+    public val items: Flow<List<Storage>> = storageDao.loadItems().toModels()
 
-    fun loadItemByPath(path: String) =
+    public fun loadItemByPath(path: String): Flow<Storage?> =
         storageDao.loadItemByPath(getFullPath(path).shortPath).toModel()
 
-    suspend fun itemByPath(path: String) =
+    public suspend fun itemByPath(path: String): Storage? =
         withIoContext { storageDao.itemByPath(getFullPath(path).shortPath)?.toModel() }
 
-    suspend fun items() = withIoContext { storageDao.items().toModels() }
-    suspend fun save(item: Storage) = withIoContext { storageDao.insert(item.toEntity()) }
-    suspend fun delete(item: Storage) = withIoContext { storageDao.delete(item.toEntity()) }
-    suspend fun delete(items: List<Storage>) =
+    public suspend fun items(): List<Storage> = withIoContext { storageDao.items().toModels() }
+    public suspend fun save(item: Storage): List<Long> =
+        withIoContext { storageDao.insert(item.toEntity()) }
+
+    public suspend fun delete(item: Storage): Int =
+        withIoContext { storageDao.delete(item.toEntity()) }
+
+    public suspend fun delete(items: List<Storage>): Int =
         withIoContext { storageDao.delete(items.toEntities()) }
 }

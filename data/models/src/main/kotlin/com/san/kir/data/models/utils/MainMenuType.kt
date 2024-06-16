@@ -14,65 +14,65 @@ import androidx.compose.material.icons.filled.Source
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.san.kir.data.models.R
 
-enum class MainMenuType {
+public enum class MainMenuType {
     Library {
-        override fun stringId() = R.string.library
+        override fun stringId(): Int = R.string.library
         override val icon: ImageVector
             get() = Icons.Default.LocalLibrary
     },
     Storage {
-        override fun stringId() = R.string.storage
+        override fun stringId(): Int = R.string.storage
         override val icon: ImageVector
             get() = Icons.Default.Source
     },
     Category {
-        override fun stringId() = R.string.categories
+        override fun stringId(): Int = R.string.categories
         override val icon: ImageVector
             get() = Icons.Filled.Category
     },
     Catalogs {
-        override fun stringId() = R.string.catalogs
+        override fun stringId(): Int = R.string.catalogs
         override val icon: ImageVector
             get() = Icons.AutoMirrored.Filled.FormatListBulleted
     },
     Downloader {
-        override fun stringId() = R.string.downloader
+        override fun stringId(): Int = R.string.downloader
         override val icon: ImageVector
             get() = Icons.Default.Download
     },
     Latest {
-        override fun stringId() = R.string.latest
+        override fun stringId(): Int = R.string.latest
         override val icon: ImageVector
             get() = Icons.Default.History
     },
     Settings {
-        override fun stringId() = R.string.settings
+        override fun stringId(): Int = R.string.settings
         override val icon: ImageVector
             get() = Icons.Filled.Settings
     },
     Schedule {
-        override fun stringId() = R.string.schedule
+        override fun stringId(): Int = R.string.schedule
         override val icon: ImageVector
             get() = Icons.Filled.Schedule
     },
     Statistic {
-        override fun stringId() = R.string.statistic
+        override fun stringId(): Int = R.string.statistic
         override val icon: ImageVector
             get() = Icons.Default.QueryStats
     },
     Accounts {
-        override fun stringId() = R.string.accounts
+        override fun stringId(): Int = R.string.accounts
         override val icon: ImageVector
             get() = Icons.Default.People
     },
     Default {
-        override fun stringId() = R.string.storage
+        override fun stringId(): Int = R.string.storage
         override val icon: ImageVector
             get() = Icons.Filled.Schedule
-        override val added = false
+        override val added: Boolean = false
     };
 
-    abstract fun stringId(): Int
-    abstract val icon: ImageVector
-    open val added: Boolean = true
+    public abstract fun stringId(): Int
+    public abstract val icon: ImageVector
+    public open val added: Boolean = true
 }

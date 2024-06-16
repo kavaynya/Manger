@@ -4,14 +4,14 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import timber.log.Timber
 
-interface EventBus {
+public interface EventBus {
 
-    val events: SharedFlow<Event>
-    suspend fun sendEvent(event: Event)
+    public val events: SharedFlow<Event>
+    public suspend fun sendEvent(event: Event)
 }
 
-class EventBusImpl : EventBus {
-    override val events = MutableSharedFlow<Event>()
+public class EventBusImpl : EventBus {
+    override val events: MutableSharedFlow<Event> = MutableSharedFlow()
 
     override suspend fun sendEvent(event: Event) {
         Timber.tag("EventBusImpl").i("EVENT($event)")

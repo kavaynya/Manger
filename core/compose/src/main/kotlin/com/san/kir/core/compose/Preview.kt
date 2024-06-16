@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 
 @Composable
-fun ThemedPreviewContainer(content: @Composable () -> Unit) {
+public fun ThemedPreviewContainer(content: @Composable () -> Unit) {
     MaterialTheme(if (isSystemInDarkTheme()) darkColorScheme() else lightColorScheme()) {
         Surface(modifier = Modifier.fillMaxWidth()) {
             content()

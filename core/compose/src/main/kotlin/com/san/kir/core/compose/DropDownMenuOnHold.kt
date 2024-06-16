@@ -37,7 +37,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.launch
 
 @Composable
-fun RemoveItemMenuOnHold(
+public fun RemoveItemMenuOnHold(
     removeText: String,
     cancelText: String,
     onSuccess: () -> Unit,
@@ -98,14 +98,14 @@ fun RemoveItemMenuOnHold(
     }
 }
 
-interface DropDownMenuOnHoldScope {
-    fun Modifier.onClick(onClick: () -> Unit): Modifier
-    fun showMenu()
-    fun hideMenu()
+public interface DropDownMenuOnHoldScope {
+    public fun Modifier.onClick(onClick: () -> Unit): Modifier
+    public fun showMenu()
+    public fun hideMenu()
 }
 
 @OptIn(ExperimentalFoundationApi::class)
-class DropDownMenuOnHoldScopeImpl(
+private class DropDownMenuOnHoldScopeImpl(
     private val coroutineScope: CoroutineScope,
     private val onSuccess: () -> Unit
 ) : DropDownMenuOnHoldScope {

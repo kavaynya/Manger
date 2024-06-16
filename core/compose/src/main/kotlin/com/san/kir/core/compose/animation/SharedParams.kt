@@ -13,7 +13,7 @@ import androidx.compose.ui.unit.dp
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class SharedParams(
+public data class SharedParams(
     private var boundsContainer: RectContainer = RectContainer.Zero,
     var cornerRadius: Float = 0F,
     var fromCenter: Boolean = false
@@ -26,18 +26,18 @@ data class SharedParams(
 }
 
 @Serializable
-data class RectContainer(val l: Float, val t: Float, val r: Float, val b: Float) {
-    fun toRect() = Rect(l, t, r, b)
+public data class RectContainer(val l: Float, val t: Float, val r: Float, val b: Float) {
+    internal fun toRect() = Rect(l, t, r, b)
 
-    companion object {
-        val Zero = RectContainer(0.0f, 0.0f, 0.0f, 0.0f)
+    public companion object {
+        public val Zero: RectContainer = RectContainer(0.0f, 0.0f, 0.0f, 0.0f)
     }
 }
 
-fun Rect.toContainer() = RectContainer(left, top, right, bottom)
+private fun Rect.toContainer() = RectContainer(left, top, right, bottom)
 
 @Composable
-fun rememberSharedParams(
+public fun rememberSharedParams(
     bounds: Rect = Rect.Zero,
     cornerRadius: Dp = 0.dp,
     fromCenter: Boolean = false
@@ -47,5 +47,5 @@ fun rememberSharedParams(
 }
 
 @Stable
-fun Modifier.saveParams(params: SharedParams) =
+public fun Modifier.saveParams(params: SharedParams): Modifier =
     onGloballyPositioned { params.bounds = it.boundsInWindow() }

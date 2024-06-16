@@ -17,7 +17,7 @@ import com.san.kir.data.models.main.Category
     У всей манги, которая была свазанна с удаляемой категорией,
     применяется категория по умолчанию
 */
-class RemoveCategoryWorker(
+public class RemoveCategoryWorker(
     appContext: Context,
     workerParameters: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParameters) {
@@ -66,11 +66,11 @@ class RemoveCategoryWorker(
         }
     }
 
-    companion object {
-        const val TAG = "removeCategory"
-        const val CAT = "category_id"
+    public companion object {
+        private const val TAG = "removeCategory"
+        private const val CAT = "category_id"
 
-        fun addTask(category: Category) {
+        public fun addTask(category: Category) {
             val data = workDataOf(CAT to category.id)
             val task = OneTimeWorkRequestBuilder<RemoveCategoryWorker>()
                 .addTag(TAG)

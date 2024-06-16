@@ -6,7 +6,7 @@ import java.util.Locale
 // Исходный код взят с этого проекта https://github.com/denxc/SentencesFuzzyComparison
 // Из статьи на хабре https://habr.com/ru/post/341148/
 
-infix fun String.fuzzy(that: String): Pair<Double, Boolean> {
+public infix fun String.fuzzy(that: String): Pair<Double, Boolean> {
     return FuzzyComparison().fuzzyEqual(this, that)
 }
 

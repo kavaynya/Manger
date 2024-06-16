@@ -12,17 +12,17 @@ import androidx.compose.ui.graphics.Color
 import com.san.kir.core.compose.Dimensions
 
 
-private val StorageShape: RoundedCornerShape = RoundedCornerShape(Dimensions.smaller)
+internal val StorageShape: RoundedCornerShape = RoundedCornerShape(Dimensions.smaller)
 
-private val storageTrackColor: Color
+internal val StorageTrackColor: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceVariant
 
-private val storageUsedColor: Color
+internal val StorageUsedColor: Color
     @Composable
     get() = MaterialTheme.colorScheme.primary
 
-private val storageReadColor: Color
+internal val StorageReadColor: Color
     @Composable
     get() = MaterialTheme.colorScheme.tertiary
 
@@ -39,19 +39,19 @@ internal fun StorageProgressBar(
 
     Box(
         modifier = modifier
-            .background(color = storageTrackColor, shape = StorageShape)
+            .background(color = StorageTrackColor, shape = StorageShape)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(fullPercent)
-                .background(storageUsedColor, shape = StorageShape)
+                .background(StorageUsedColor, shape = StorageShape)
         )
         Box(
             modifier = Modifier
                 .fillMaxHeight()
                 .fillMaxWidth(readPercent)
-                .background(storageReadColor, shape = StorageShape)
+                .background(StorageReadColor, shape = StorageShape)
         )
     }
 }

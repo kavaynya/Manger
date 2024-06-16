@@ -52,10 +52,11 @@ internal interface IDataHelper<ValueT> {
     val value: ValueT
 }
 
-data class DataIconHelper<ValueT>(val content: ImageVector, override val value: ValueT) :
+public data class DataIconHelper<ValueT>(val content: ImageVector, override val value: ValueT) :
     IDataHelper<ValueT>
 
-data class DataTextHelper<ValueT>(val title: Int, override val value: ValueT) : IDataHelper<ValueT>
+public data class DataTextHelper<ValueT>(val title: Int, override val value: ValueT) :
+    IDataHelper<ValueT>
 
 internal interface IHandledDataHelper<ValueT> {
     val value: ValueT
@@ -76,7 +77,7 @@ internal class HandledDataIconHelper<ValueT>(
 
 
 @Composable
-fun <ValueT> VerticalRadioGroup(
+public fun <ValueT> VerticalRadioGroup(
     dataHelpers: List<DataTextHelper<ValueT>>,
     initialValue: ValueT,
     onChange: (ValueT) -> Unit
@@ -139,7 +140,7 @@ fun <ValueT> VerticalRadioGroup(
 }
 
 @Composable
-fun <ValueT, DataHelper : IDataHelper<ValueT>, HandledDataHelper : IHandledDataHelper<ValueT>> HorizontalRadioGroup(
+public fun <ValueT, DataHelper : IDataHelper<ValueT>, HandledDataHelper : IHandledDataHelper<ValueT>> HorizontalRadioGroup(
     dataHelpers: List<DataHelper>,
     initialValue: ValueT,
     onChange: (ValueT) -> Unit,
@@ -204,7 +205,7 @@ fun <ValueT, DataHelper : IDataHelper<ValueT>, HandledDataHelper : IHandledDataH
 }
 
 @Composable
-fun <ValueT> HorizontalTextRadioGroup(
+public fun <ValueT> HorizontalTextRadioGroup(
     dataHelpers: List<DataTextHelper<ValueT>>,
     initialValue: ValueT,
     modifier: Modifier = Modifier,
@@ -238,7 +239,7 @@ fun <ValueT> HorizontalTextRadioGroup(
 }
 
 @Composable
-fun <ValueT> HorizontalIconRadioGroup(
+public fun <ValueT> HorizontalIconRadioGroup(
     dataHelpers: List<DataIconHelper<ValueT>>,
     initialValue: ValueT,
     modifier: Modifier = Modifier,

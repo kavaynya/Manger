@@ -10,10 +10,13 @@ import com.san.kir.data.chapterRepository
 import com.san.kir.data.chapterWorkerRepository
 import com.san.kir.data.mangaWorkerRepository
 
-fun ManualDI.updateMangaManager() = UpdateMangaManager(workManager(), mangaWorkerRepository())
-fun ManualDI.updateCatalogManager() = UpdateCatalogManager(workManager(), catalogWorkerRepository())
+public fun ManualDI.updateMangaManager(): UpdateMangaManager =
+    UpdateMangaManager(workManager(), mangaWorkerRepository())
 
-fun ManualDI.downloadChaptersManager() =
+public fun ManualDI.updateCatalogManager(): UpdateCatalogManager =
+    UpdateCatalogManager(workManager(), catalogWorkerRepository())
+
+public fun ManualDI.downloadChaptersManager(): DownloadChaptersManager =
     DownloadChaptersManager(workManager(), chapterWorkerRepository(), chapterRepository())
 
 internal fun ManualDI.workManager() = WorkManager.getInstance(application)

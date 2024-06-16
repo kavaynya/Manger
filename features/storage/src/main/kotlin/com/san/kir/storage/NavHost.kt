@@ -1,76 +1,51 @@
 package com.san.kir.storage
 
-import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
-import com.san.kir.core.compose.animation.EmptyStackAnimator
+import NavEntry
+import androidx.compose.runtime.remember
 import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
-import com.san.kir.core.utils.navigation.NavContainer
-import com.san.kir.core.utils.navigation.NavHost
+import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.storage.ui.storage.StorageScreen
 import com.san.kir.storage.ui.storages.StoragesScreen
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
-private class Main : NavConfig {
-    companion object {
-        val creator = navCreator<Main> {
-            StoragesScreen(
-                navigateUp = backPressed(),
-                navigateToItem = add(::Storage)
-            )
-        }
-    }
+public fun storageNavigationCreators() {
+    AddNavigationCreators
 }
 
-@Parcelize
-class Storage(
-    val mangaId: Long,
-    val params: SharedParams,
-    val hasUpdate: Boolean = false,
-) : NavConfig {
-    companion object {
-        val creator = navCreator<Storage> { config ->
+@NavEntry
+@Serializable
+public object Storages : NavConfig() {
+    internal val creator = navCreator<Storages> {
+        StoragesScreen(
+            navigateUp = backPressed(),
+            navigateToItem = add(::Storage)
+        )
+    }
+
+    internal val animation = navAnimation<Storages> { horizontalSlide() }
+}
+
+@NavEntry
+@Serializable
+public class Storage(
+    internal val mangaId: Long,
+    internal val params: SharedParams,
+    internal val hasUpdate: Boolean = false,
+) : NavConfig() {
+    internal companion object {
+        internal val creator = navCreator<Storage> { config ->
             StorageScreen(
                 navigateUp = backPressed(),
-                mangaId = config.mangaId,
-                hasUpdate = config.hasUpdate
+                mangaId = remember { config.mangaId },
+                hasUpdate = remember { config.hasUpdate },
             )
         }
-    }
-}
 
-@Composable
-fun StorageNavHost(
-    mangaId: Long? = null,
-    params: SharedParams? = null,
-    hasUpdate: Boolean = false,
-) {
-    NavHost(
-        startConfig = mangaId?.let { params?.let { p -> Storage(it, p, hasUpdate) } } ?: Main(),
-        animation = animation,
-    ) { config ->
-        when (config) {
-            is Main -> Main.creator(config)
-            is Storage -> Storage.creator(config)
-            else -> null
-        }
-    }
-}
-
-private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
-    if (direction.isFront) frontAnimation(initial.configuration)
-    else frontAnimation(target.configuration)
-}
-
-private fun frontAnimation(initial: NavConfig): StackAnimator {
-    return when (initial) {
-        is Storage -> shapeAnimator(initial.params)
-        else -> EmptyStackAnimator
+        internal val animation = navAnimation<Storage> { shapeAnimator(it.params) }
     }
 }

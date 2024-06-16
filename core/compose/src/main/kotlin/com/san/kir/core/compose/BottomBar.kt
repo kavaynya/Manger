@@ -20,14 +20,15 @@ private val containerColor: Color
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
 @Composable
-fun DefaultBottomBar(
+public fun DefaultBottomBar(
     modifier: Modifier = Modifier,
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
         modifier = Modifier
             .bottomInsetsPadding(BarPadding)
-            .background(containerColor, DefaultRoundedShape),
+            .background(containerColor, DefaultRoundedShape)
+            .then(modifier),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         content()

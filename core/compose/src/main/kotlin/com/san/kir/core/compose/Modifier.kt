@@ -10,9 +10,9 @@ import androidx.compose.ui.layout.MeasureResult
 import androidx.compose.ui.layout.MeasureScope
 import androidx.compose.ui.unit.Constraints
 
-fun Modifier.squareMaxSize() = this.then(SquareMaxSizeModifier())
+public fun Modifier.squareMaxSize(): Modifier = this.then(SquareMaxSizeModifier())
 
-class SquareMaxSizeModifier : LayoutModifier {
+private class SquareMaxSizeModifier : LayoutModifier {
     override fun MeasureScope.measure(
         measurable: Measurable,
         constraints: Constraints
@@ -31,7 +31,7 @@ class SquareMaxSizeModifier : LayoutModifier {
 
 }
 
-fun Modifier.holdPress(onDown: () -> Unit, onUp: () -> Unit) = then(
+internal fun Modifier.holdPress(onDown: () -> Unit, onUp: () -> Unit) = then(
     pointerInput(Unit) {
         awaitEachGesture {
             awaitFirstDown()

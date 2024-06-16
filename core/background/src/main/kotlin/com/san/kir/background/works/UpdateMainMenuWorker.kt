@@ -11,7 +11,7 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.mainMenuRepository
 import com.san.kir.data.models.utils.MainMenuType
 
-class UpdateMainMenuWorker(
+public class UpdateMainMenuWorker(
     private val ctx: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(ctx, params) {
@@ -63,15 +63,15 @@ class UpdateMainMenuWorker(
             }
     }
 
-    companion object {
-        const val tag = "updateMainMenu"
+    public companion object {
+        private const val TAG = "updateMainMenu"
 
-        fun addTask(): Operation {
+        public fun addTask(): Operation {
             val task = OneTimeWorkRequestBuilder<UpdateMainMenuWorker>()
-                .addTag(tag)
+                .addTag(TAG)
                 .build()
             return ManualDI.workManager().enqueueUniqueWork(
-                tag + "Unique",
+                TAG + "Unique",
                 ExistingWorkPolicy.KEEP,
                 task
             )

@@ -6,10 +6,10 @@ import androidx.compose.runtime.remember
 import com.san.kir.core.compose.BuildConfig
 import timber.log.Timber
 
-class Ref(var value: Int)
+public class Ref(public var value: Int)
 
 @Composable
-inline fun LogCompositions(msg: String) {
+public inline fun LogCompositions(msg: String) {
     if (BuildConfig.DEBUG) {
         val ref = remember { Ref(0) }
         SideEffect { ref.value++ }

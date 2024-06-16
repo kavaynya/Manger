@@ -8,47 +8,50 @@ import com.san.kir.data.db.main.mappers.toEntity
 import com.san.kir.data.db.main.mappers.toModel
 import com.san.kir.data.db.main.mappers.toModels
 import com.san.kir.data.models.main.Category
+import com.san.kir.data.models.main.NameAndId
 import com.san.kir.data.models.utils.CATEGORY_ALL
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import java.util.Collections
 
-class CategoryRepository internal constructor(
+public class CategoryRepository internal constructor(
     private val context: Lazy<Context>,
     private val categoryDao: CategoryDao
 ) {
-    val count = categoryDao.loadItemsCount()
-    val items = categoryDao.loadItems().toModels()
-    val names = categoryDao.loadNames()
-    val namesAndIds = categoryDao.loadNamesAndIds().toModels()
-    suspend fun names() = withIoContext { categoryDao.names() }
-    fun categoryName(categoryId: Long) = categoryDao.loadItemById(categoryId).map { it.name }
+    public val count: Flow<Int> = categoryDao.loadItemsCount()
+    public val items: Flow<List<Category>> = categoryDao.loadItems().toModels()
+    public val names: Flow<List<String>> = categoryDao.loadNames()
+    public val namesAndIds: Flow<List<NameAndId>> = categoryDao.loadNamesAndIds().toModels()
+    public suspend fun names(): List<String> = withIoContext { categoryDao.names() }
+    public fun categoryName(categoryId: Long): Flow<String> =
+        categoryDao.loadItemById(categoryId).map { it.name }
 
-    suspend fun swap(from: Int, to: Int) = withIoContext {
+    public suspend fun swap(from: Int, to: Int): List<Long> = withIoContext {
         val items = categoryDao.items().toMutableList()
         Collections.swap(items, from, to)
         categoryDao.insert(items.mapIndexed { i, m -> m.copy(order = i) })
     }
 
-    suspend fun insert(category: Category) =
+    public suspend fun insert(category: Category): List<Long> =
         withIoContext { categoryDao.insert(category.toEntity()) }
 
-    suspend fun insert(name: String) =
+    public suspend fun insert(name: String): List<Long> =
         withIoContext { categoryDao.insert(DbCategory(name = name)) }
 
-    suspend fun item(categoryName: String) =
+    public suspend fun item(categoryName: String): Category =
         withIoContext { categoryDao.itemByName(categoryName).toModel() }
 
-    suspend fun item(id: Long) =
+    public suspend fun item(id: Long): Category =
         withIoContext { categoryDao.itemById(id).toModel() }
 
-    suspend fun defaultCategory() = item(context.value.CATEGORY_ALL)
+    public suspend fun defaultCategory(): Category = item(context.value.CATEGORY_ALL)
 
-    suspend fun delete(item: Category) =
+    public suspend fun delete(item: Category): Int =
         withIoContext { categoryDao.delete(item.toEntity()) }
 
-    suspend fun idByName(name: String) =
+    public suspend fun idByName(name: String): Long =
         withIoContext { categoryDao.itemByName(name).id }
 
-    suspend fun createNewCategory() = Category(order = count.first() + 1)
+    public suspend fun createNewCategory(): Category = Category(order = count.first() + 1)
 }

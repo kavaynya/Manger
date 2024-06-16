@@ -1,5 +1,5 @@
 package com.san.kir.core.utils.viewModel
 
-interface Event
+public interface Event
 
-data object UpdateEvent : Event
+public data object UpdateEvent : Event

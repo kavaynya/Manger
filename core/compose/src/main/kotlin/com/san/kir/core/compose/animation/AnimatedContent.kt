@@ -28,14 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.IntOffset
 
-const val DEFAULT_DURATION = 300
+private const val DEFAULT_DURATION = 300
 
 @Composable
-inline fun <S> FromTopToTopAnimContent(
+public fun <S> FromTopToTopAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -56,11 +56,11 @@ inline fun <S> FromTopToTopAnimContent(
 }
 
 @Composable
-inline fun <S> FromTopToBottomAnimContent(
+public fun <S> FromTopToBottomAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -81,11 +81,11 @@ inline fun <S> FromTopToBottomAnimContent(
 }
 
 @Composable
-inline fun <S> FromBottomToBottomAnimContent(
+public fun <S> FromBottomToBottomAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -106,11 +106,11 @@ inline fun <S> FromBottomToBottomAnimContent(
 }
 
 @Composable
-inline fun <S> FromBottomToTopAnimContent(
+public fun <S> FromBottomToTopAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -131,12 +131,12 @@ inline fun <S> FromBottomToTopAnimContent(
 }
 
 @Composable
-inline fun <S> FromStartToStartAnimContent(
+public fun <S> FromStartToStartAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     animationSpec: FiniteAnimationSpec<IntOffset> = tween(DEFAULT_DURATION),
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -157,12 +157,12 @@ inline fun <S> FromStartToStartAnimContent(
 }
 
 @Composable
-inline fun <S> FromStartToEndAnimContent(
+public fun <S> FromStartToEndAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     animationSpec: FiniteAnimationSpec<IntOffset> = tween(DEFAULT_DURATION),
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -183,12 +183,12 @@ inline fun <S> FromStartToEndAnimContent(
 }
 
 @Composable
-inline fun <S> FromEndToStartAnimContent(
+public fun <S> FromEndToStartAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     animationSpec: FiniteAnimationSpec<IntOffset> = tween(DEFAULT_DURATION),
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -209,12 +209,12 @@ inline fun <S> FromEndToStartAnimContent(
 }
 
 @Composable
-inline fun <S> FromEndToEndAnimContent(
+public fun <S> FromEndToEndAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
     animationSpec: FiniteAnimationSpec<IntOffset> = tween(DEFAULT_DURATION),
-    noinline content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
+    content: @Composable AnimatedVisibilityScope.(targetState: S) -> Unit,
 ) {
     AnimatedContent(
         targetState = targetState,
@@ -235,7 +235,7 @@ inline fun <S> FromEndToEndAnimContent(
 }
 
 @Composable
-fun <S> FromBottomEndToBottomEndAnimContent(
+public fun <S> FromBottomEndToBottomEndAnimContent(
     targetState: S,
     modifier: Modifier = Modifier,
     contentAlignment: Alignment = Alignment.TopStart,
@@ -261,7 +261,7 @@ fun <S> FromBottomEndToBottomEndAnimContent(
 }
 
 @Composable
-fun BottomAnimatedVisibility(
+public fun BottomAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -276,7 +276,7 @@ fun BottomAnimatedVisibility(
 }
 
 @Composable
-fun TopEndAnimatedVisibility(
+public fun TopEndAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -291,7 +291,7 @@ fun TopEndAnimatedVisibility(
 }
 
 @Composable
-fun TopAnimatedVisibility(
+public fun TopAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -306,7 +306,7 @@ fun TopAnimatedVisibility(
 }
 
 @Composable
-fun EndAnimatedVisibility(
+public fun EndAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -321,7 +321,7 @@ fun EndAnimatedVisibility(
 }
 
 @Composable
-fun StartAnimatedVisibility(
+public fun StartAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -336,7 +336,7 @@ fun StartAnimatedVisibility(
 }
 
 @Composable
-fun ColumnScope.BottomAnimatedVisibility(
+public fun ColumnScope.BottomAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -351,7 +351,7 @@ fun ColumnScope.BottomAnimatedVisibility(
 }
 
 @Composable
-fun ColumnScope.TopAnimatedVisibility(
+public fun ColumnScope.TopAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,
@@ -366,7 +366,7 @@ fun ColumnScope.TopAnimatedVisibility(
 }
 
 @Composable
-fun RowScope.TopAnimatedVisibility(
+public fun RowScope.TopAnimatedVisibility(
     visible: Boolean,
     modifier: Modifier = Modifier,
     content: @Composable AnimatedVisibilityScope.() -> Unit,

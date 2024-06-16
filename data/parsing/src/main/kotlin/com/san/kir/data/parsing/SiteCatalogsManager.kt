@@ -18,7 +18,7 @@ import com.san.kir.data.parsing.sites.Selfmanga
 import com.san.kir.data.parsing.sites.Unicomics
 import com.san.kir.data.parsing.sites.Yaoichan
 
-class SiteCatalogsManager(
+public class SiteCatalogsManager(
     context: Context,
     connectManager: ConnectManager,
 ) {
@@ -28,7 +28,7 @@ class SiteCatalogsManager(
         Translate.init(context)
     }
 
-    val catalog by lazy {
+    public val catalog: List<SiteCatalog> by lazy {
         listOf(
             Mangachan(connectManager),
             Readmanga(connectManager),
@@ -42,31 +42,31 @@ class SiteCatalogsManager(
         )
     }
 
-    fun catalog(link: String): SiteCatalog {
+    public fun catalog(link: String): SiteCatalog {
         return catalog.first { siteCatalog ->
             siteCatalog.allCatalogName.any { link.contains(it) }
                     || siteCatalog.servers.any { link.contains(it) }
         }
     }
 
-    fun catalogByName(catalogName: String): SiteCatalog {
+    private fun catalogByName(catalogName: String): SiteCatalog {
         return catalog.firstOrNull { it.name == catalogName }
             ?: catalog.first { it.catalogName == catalogName }
     }
 
-    suspend fun chapters(manga: Manga) = catalog(manga.host).chapters(manga)
+    public suspend fun chapters(manga: Manga): List<Chapter> = catalog(manga.host).chapters(manga)
 
     // Загрузка полной информации для элемента в каталоге
-    suspend fun getFullElement(simpleElement: SiteCatalogElement) =
+    public suspend fun getFullElement(simpleElement: SiteCatalogElement): SiteCatalogElement =
         withDefaultContext {
             catalog.first { it.allCatalogName.any { s -> s == simpleElement.catalogName } }
                 .fullElement(simpleElement)
         }
 
     // Получение страниц
-    suspend fun pages(item: Chapter) = withIoContext { catalog(item.link).pages(item) }
+    public suspend fun pages(item: Chapter): List<String> = withIoContext { catalog(item.link).pages(item) }
 
-    suspend fun elementByUrl(url: String): SiteCatalogElement? =
+    public suspend fun elementByUrl(url: String): SiteCatalogElement? =
         withDefaultContext {
             var lUrl = url
 
@@ -77,7 +77,7 @@ class SiteCatalogsManager(
             catalog(lUrl).elementByUrl(lUrl)
         }
 
-    fun catalogName(siteName: String): String {
+    public fun catalogName(siteName: String): String {
         val first = catalogByName(siteName)
         var catName = first.catalogName
         first.allCatalogName

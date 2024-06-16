@@ -2,7 +2,7 @@ package com.san.kir.data.parsing.sites
 
 import com.san.kir.core.internet.ConnectManager
 
-class Readmanga(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
+internal class Readmanga(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
     override val host: String
         get() = "https://$catalogName"
 

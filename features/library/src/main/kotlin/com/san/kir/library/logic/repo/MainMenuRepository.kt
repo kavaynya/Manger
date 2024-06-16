@@ -9,7 +9,6 @@ import com.san.kir.data.db.main.dao.MainMenuDao
 import com.san.kir.data.db.main.dao.MangaDao
 import com.san.kir.data.db.main.dao.PlannedDao
 import com.san.kir.data.db.main.dao.StorageDao
-import com.san.kir.data.db.main.entites.DbMainMenuItem
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.library.R
 import com.san.kir.library.ui.drawer.MenuItem
@@ -67,7 +66,7 @@ internal class MainMenuRepository(
             MainMenuType.Storage -> {
                 MenuItem(
                     it,
-                    context.getString(R.string.main_menu_storage_size_mb, transition.storageSize)
+                    context.getString(R.string.size_mb_format, transition.storageSize)
                 )
             }
         }

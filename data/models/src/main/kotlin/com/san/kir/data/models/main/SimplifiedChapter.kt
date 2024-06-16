@@ -3,7 +3,7 @@ package com.san.kir.data.models.main
 import com.san.kir.data.models.base.BaseChapter
 import com.san.kir.data.models.utils.DownloadState
 
-data class SimplifiedChapter(
+public data class SimplifiedChapter(
     override val id: Long = 0,
     val status: DownloadState,
     override val name: String,

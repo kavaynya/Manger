@@ -12,7 +12,7 @@ import com.san.kir.core.utils.coroutines.mainLaunch
 import com.san.kir.core.utils.viewModel.LocalComponentContext
 
 @Composable
-fun BackHandler(enabled: Boolean, onBack: suspend NavBackHandler.() -> Unit) {
+public fun BackHandler(enabled: Boolean, onBack: suspend NavBackHandler.() -> Unit) {
     val currentOnBack by rememberUpdatedState(onBack)
     val backHandler = LocalComponentContext.current
     require(backHandler is NavBackHandler) {

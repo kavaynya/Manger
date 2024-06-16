@@ -44,7 +44,7 @@ private val IconButtonPaddings =
 private val FabButtonHeight = 72.dp
 
 @Composable
-fun <T> LazyRadioGroup(
+public fun <T> LazyRadioGroup(
     state: T,
     onSelected: (T) -> Unit,
     stateList: List<T>,
@@ -69,7 +69,7 @@ fun <T> LazyRadioGroup(
 }
 
 @Composable
-fun <T> RadioGroup(
+public fun <T> RadioGroup(
     state: T,
     onSelected: (T) -> Unit,
     stateList: List<T>,
@@ -102,7 +102,7 @@ fun <T> RadioGroup(
 }
 
 @Composable
-fun OutlinedButton(
+public fun OutlinedButton(
     text: String,
     modifier: Modifier = Modifier,
     borderColor: Color = MaterialTheme.colorScheme.primary
@@ -128,7 +128,7 @@ fun OutlinedButton(
 }
 
 @Composable
-fun RotateToggleButton(icon: ImageVector, state: Boolean, onClick: () -> Unit) {
+public fun RotateToggleButton(icon: ImageVector, state: Boolean, onClick: () -> Unit) {
     val reverseRotate = animateFloatAsState(if (state) 0f else 540f, label = "")
 
     Icon(
@@ -147,7 +147,7 @@ fun RotateToggleButton(icon: ImageVector, state: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-fun FabButton(
+public fun FabButton(
     modifier: Modifier = Modifier,
     image: ImageVector = Icons.Default.Add,
     onClick: (SharedParams) -> Unit

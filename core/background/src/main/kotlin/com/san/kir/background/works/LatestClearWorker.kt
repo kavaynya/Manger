@@ -5,10 +5,10 @@ import com.san.kir.background.logic.di.workManager
 import com.san.kir.core.utils.ManualDI
 
 
-object LatestClearWorkers {
-    const val TAG = "cleanLatest"
+public object LatestClearWorkers {
+    public const val TAG: String = "cleanLatest"
 
-    fun clearAll() {
+    public fun clearAll() {
         val task = OneTimeWorkRequestBuilder<AllLatestClearWorker>()
             .addTag(TAG)
             .build()
@@ -16,7 +16,7 @@ object LatestClearWorkers {
         ManualDI.workManager().enqueue(task)
     }
 
-    fun clearDownloaded() {
+    public fun clearDownloaded() {
         val task = OneTimeWorkRequestBuilder<DownloadedLatestClearWorker>()
             .addTag(TAG)
             .build()
@@ -24,7 +24,7 @@ object LatestClearWorkers {
         ManualDI.workManager().enqueue(task)
     }
 
-    fun clearReaded() {
+    public fun clearRead() {
         val task = OneTimeWorkRequestBuilder<ReadLatestClearWorker>()
             .addTag(TAG)
             .build()

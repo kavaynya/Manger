@@ -7,7 +7,7 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.chapterRepository
 import timber.log.Timber
 
-class ReadLatestClearWorker(
+internal class ReadLatestClearWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {

@@ -12,7 +12,7 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.unit.Dp
 
 @Composable
-fun ToolbarProgress() {
+public fun ToolbarProgress() {
     CircularProgressIndicator(
         color = MaterialTheme.colorScheme.onSurface,
         modifier = Modifier
@@ -22,7 +22,7 @@ fun ToolbarProgress() {
 }
 
 @Composable
-fun TextProgress() {
+public fun TextProgress() {
     CircularProgressIndicator(
         modifier = Modifier
             .size(Dimensions.ProgressBar.default)
@@ -32,7 +32,7 @@ fun TextProgress() {
 }
 
 @Composable
-fun LinearProgress(modifier: Modifier = Modifier, height: Dp = Dimensions.half) {
+public fun LinearProgress(modifier: Modifier = Modifier, height: Dp = Dimensions.half) {
     LinearProgressIndicator(
         modifier = modifier
             .size(height)
@@ -42,7 +42,7 @@ fun LinearProgress(modifier: Modifier = Modifier, height: Dp = Dimensions.half) 
 }
 
 @Composable
-fun LinearProgress(
+public fun LinearProgress(
     progress: () -> Float,
     modifier: Modifier = Modifier,
     height: Dp = Dimensions.half

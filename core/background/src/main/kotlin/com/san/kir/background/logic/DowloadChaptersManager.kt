@@ -2,6 +2,7 @@ package com.san.kir.background.logic
 
 import androidx.work.ExistingWorkPolicy
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
 import androidx.work.OutOfQuotaPolicy
 import androidx.work.WorkManager
 import com.san.kir.background.works.DownloadChaptersWorker
@@ -12,12 +13,12 @@ import com.san.kir.data.models.workers.ChapterTask
 import kotlinx.coroutines.flow.first
 import java.util.UUID
 
-class DownloadChaptersManager(
+public class DownloadChaptersManager(
     private val manager: WorkManager,
     private val workerRepository: ChapterWorkerRepository,
     private val chapterRepository: ChapterRepository,
 ) {
-    suspend fun addTask(chapterId: Long) = withIoContext {
+    public suspend fun addTask(chapterId: Long): Operation = withIoContext {
         if (workerRepository.task(chapterId) == null) {
             workerRepository.save(ChapterTask(chapterId = chapterId))
             chapterRepository.addToQueue(chapterId)
@@ -26,7 +27,7 @@ class DownloadChaptersManager(
         startWorker()
     }
 
-    suspend fun addTasks(chapterIds: List<Long>) = withIoContext {
+    public suspend fun addTasks(chapterIds: List<Long>): Operation = withIoContext {
         chapterIds.forEach { chapterId ->
             if (workerRepository.task(chapterId) == null) {
                 workerRepository.save(ChapterTask(chapterId = chapterId))
@@ -37,18 +38,18 @@ class DownloadChaptersManager(
         startWorker()
     }
 
-    suspend fun removeTask(chapterId: Long) {
+    public suspend fun removeTask(chapterId: Long) {
         workerRepository.task(chapterId)?.let {
             workerRepository.remove(it)
         }
         chapterRepository.pauseChapters(listOf(chapterId))
     }
 
-    suspend fun addPausedTasks() {
+    public suspend fun addPausedTasks() {
         addTasks(chapterRepository.pausedChapters().map { it.id })
     }
 
-    suspend fun removeAllTasks() {
+    public suspend fun removeAllTasks() {
         val currentTasks = workerRepository.catalog.first()
         workerRepository.remove(currentTasks)
         chapterRepository.pauseChapters(currentTasks.map { it.chapterId })
@@ -57,7 +58,7 @@ class DownloadChaptersManager(
     private fun startWorker() =
         manager.enqueueUniqueWork(unique, ExistingWorkPolicy.KEEP, task)
 
-    companion object {
+    private companion object {
         private val taskId by lazy { UUID.randomUUID() }
         private val unique = "${DownloadChaptersWorker::class.simpleName}UniqueName"
         private val task by lazy {

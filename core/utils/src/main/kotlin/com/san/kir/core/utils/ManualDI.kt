@@ -10,8 +10,8 @@ import kotlinx.serialization.json.Json
 import timber.log.Timber
 import kotlin.reflect.KClass
 
-object ManualDI {
-    const val TAG: String = "MANUAL DI"
+public object ManualDI {
+    public const val TAG: String = "MANUAL DI"
 
     private var app: Application? = null
     private val navigationCreators: MutableMap<KClass<out NavConfig>, (NavConfig) -> NavComponent<*>> =
@@ -20,15 +20,15 @@ object ManualDI {
     private val navigationAnimations: MutableMap<KClass<out NavConfig>, (NavConfig) -> StackAnimator> =
         hashMapOf()
 
-    fun init(application: Application) {
+    public fun init(application: Application) {
         app = application
     }
 
-    val application: Application
+    public val application: Application
         get() = requireNotNull(app) { "call init before use" }
 
     @OptIn(ExperimentalSerializationApi::class)
-    val json: Json by lazy {
+    public val json: Json by lazy {
         Json {
             ignoreUnknownKeys = true
             isLenient = true
@@ -36,7 +36,7 @@ object ManualDI {
         }
     }
 
-    fun <T : NavConfig> addNavigationCreator(
+    public fun <T : NavConfig> addNavigationCreator(
         key: KClass<T>,
         creator: (T) -> NavComponent<T>
     ) {
@@ -47,7 +47,10 @@ object ManualDI {
         return navigationCreators[config::class]?.invoke(config)
     }
 
-    fun <T : NavConfig> addNavigationAnimation(key: KClass<T>, creator: (T) -> StackAnimator) {
+    public fun <T : NavConfig> addNavigationAnimation(
+        key: KClass<T>,
+        creator: (T) -> StackAnimator
+    ) {
         navigationAnimations[key] = creator as (NavConfig) -> StackAnimator
     }
 
@@ -55,11 +58,11 @@ object ManualDI {
         return navigationAnimations[config::class]?.invoke(config)
     }
 
-    inline fun <reified Data> jsonToString(data: Data): String {
+    public inline fun <reified Data> jsonToString(data: Data): String {
         return json.encodeToString(data)
     }
 
-    inline fun <reified Data> stringToJson(data: String): Data? {
+    public inline fun <reified Data> stringToJson(data: String): Data? {
         return runCatching {
             json.decodeFromString<Data>(data)
         }.onFailure {

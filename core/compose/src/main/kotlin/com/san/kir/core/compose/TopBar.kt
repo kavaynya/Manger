@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar(
+public fun topBar(
     title: String? = null,
     subtitle: String? = null,
     actions: @Composable TopBarActions.() -> Unit = {},
@@ -118,7 +118,7 @@ fun topBar(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun topBar(
+public fun topBar(
     title: AnnotatedString? = null,
     subtitle: AnnotatedString? = null,
     actions: @Composable TopBarActions.() -> Unit = {},
@@ -228,12 +228,12 @@ private fun BoxScope.NotifyIcon() {
 }
 
 
-typealias MenuDialogState = DialogState<EmptyDialogData>
+internal typealias MenuDialogState = DialogState<EmptyDialogData>
 
-class TopBarActions internal constructor(private val menuState: MenuDialogState) {
+public class TopBarActions internal constructor(private val menuState: MenuDialogState) {
 
     @Composable
-    fun MenuIcon(
+    public fun MenuIcon(
         icon: ImageVector,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
@@ -254,7 +254,7 @@ class TopBarActions internal constructor(private val menuState: MenuDialogState)
 
 
     @Composable
-    fun MenuIcon(
+    public fun MenuIcon(
         icon: BitmapPainter,
         modifier: Modifier = Modifier,
         enabled: Boolean = true,
@@ -273,17 +273,18 @@ class TopBarActions internal constructor(private val menuState: MenuDialogState)
     }
 
     @Composable
-    fun ExpandedMenu() = MenuIcon(icon = Icons.Default.MoreVert, onClick = menuState::show)
+    public fun ExpandedMenu(): Unit =
+        MenuIcon(icon = Icons.Default.MoreVert, onClick = menuState::show)
 }
 
 @Stable
-sealed interface NavigationButton {
+public sealed interface NavigationButton {
     @Stable
-    data class Scaffold(val state: DrawerState, val hasNotify: Boolean) : NavigationButton
+    public data class Scaffold(val state: DrawerState, val hasNotify: Boolean) : NavigationButton
 
     @Stable
-    data class Back(val onClick: () -> Unit) : NavigationButton
+    public data class Back(val onClick: () -> Unit) : NavigationButton
 
     @Stable
-    data class Close(val onClick: () -> Unit) : NavigationButton
+    public data class Close(val onClick: () -> Unit) : NavigationButton
 }

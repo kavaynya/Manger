@@ -15,7 +15,7 @@ import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
 import timber.log.Timber
 
-class ComX(private val connectManager: ConnectManager) : SiteCatalogClassic() {
+internal class ComX(private val connectManager: ConnectManager) : SiteCatalogClassic() {
     override val name = SITE_NAME
     override val catalogName = HOST_NAME
     override val host = "https://$catalogName"

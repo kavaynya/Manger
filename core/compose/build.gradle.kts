@@ -12,8 +12,8 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.internet))
+    implementation(projects.core.utils)
+    implementation(projects.core.internet)
     implementation(libs.activity)
 
     api(libs.bundles.compose)

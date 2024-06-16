@@ -11,7 +11,7 @@ import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.navigation.rememberLambda
 
 @Composable
-inline fun <reified VM : StateHolder<*>> stateHolder(
+public inline fun <reified VM : StateHolder<*>> stateHolder(
     key: Any = VM::class.java.simpleName,
     componentContext: ComponentContext = checkNotNull(LocalComponentContext.current) {
         "No ComponentContext was provided via LocalComponentContext"
@@ -23,7 +23,7 @@ inline fun <reified VM : StateHolder<*>> stateHolder(
 }
 
 @Composable
-inline fun <reified VM : StateHolder<*>> stateHolder(
+public inline fun <reified VM : StateHolder<*>> stateHolder(
     key: Any = VM::class.java.simpleName,
     componentContext: ComponentContext = checkNotNull(LocalComponentContext.current) {
         "No ComponentContext was provided via LocalComponentContext"
@@ -31,17 +31,18 @@ inline fun <reified VM : StateHolder<*>> stateHolder(
 ): VM = remember(key) { componentContext.instanceKeeper.get(key) as VM }
 
 @Composable
-fun StateHolder<*>.rememberSendAction(event: Action) = rememberLambda { sendAction(event) }
+public fun StateHolder<*>.rememberSendAction(event: Action): () -> Unit =
+    rememberLambda { sendAction(event) }
 
 @Composable
-fun StateHolder<*>.rememberSendAction() = rememberLambda(::sendAction)
+public fun StateHolder<*>.rememberSendAction(): (Action) -> Unit = rememberLambda(::sendAction)
 
 @Composable
-fun rememberSendEvent(): (Event) -> Unit {
+public fun rememberSendEvent(): (Event) -> Unit {
     val eventBus = LocalEventBus.current
     val scope = rememberCoroutineScope()
 
-   return rememberLambda { event ->
+    return rememberLambda { event ->
         scope.defaultLaunch {
             eventBus.sendEvent(event)
         }
@@ -49,13 +50,13 @@ fun rememberSendEvent(): (Event) -> Unit {
 }
 
 @Composable
-fun EventBus.OnEvent(handle: (Event) -> Unit) {
+public fun EventBus.OnEvent(handle: (Event) -> Unit) {
     LaunchedEffect(Unit) {
         events.collect(handle)
     }
 }
 
 @Composable
-fun OnGlobalEvent(handle: (Event) -> Unit) {
+public fun OnGlobalEvent(handle: (Event) -> Unit) {
     LocalEventBus.current.OnEvent(handle)
 }

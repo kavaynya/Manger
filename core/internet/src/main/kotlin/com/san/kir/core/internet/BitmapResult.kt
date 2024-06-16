@@ -2,13 +2,13 @@ package com.san.kir.core.internet
 
 import android.graphics.Bitmap
 
-data class BitmapResult(
+public data class BitmapResult(
     val bitmap: Bitmap,
     val size: Long,
     val time: Long,
 )
 
-data class DownloadResult(
+public data class DownloadResult(
     val source: ByteArray,
     val contentLength: Long,
     val time: Long,

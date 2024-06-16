@@ -3,7 +3,7 @@ package com.san.kir.data.db.base
 import androidx.room.Delete
 import androidx.room.Upsert
 
-interface BaseDao<in T> {
+internal interface BaseDao<in T> {
     @Upsert
     suspend fun insert(vararg item: T): List<Long>
 

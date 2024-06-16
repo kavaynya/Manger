@@ -13,7 +13,7 @@ import org.jsoup.nodes.Element
 import timber.log.Timber
 import java.util.regex.Pattern
 
-class Unicomics(private val connectManager: ConnectManager) : SiteCatalogClassic() {
+internal class Unicomics(private val connectManager: ConnectManager) : SiteCatalogClassic() {
 
     override val host: String
         get() = "https://$catalogName"

@@ -9,7 +9,7 @@ import java.io.File
 
 @Stable
 @Parcelize
-data class Storage(
+public data class Storage(
     var id: Long = 0,
     val name: String = "",
     val path: String = "",
@@ -18,7 +18,7 @@ data class Storage(
     val catalogName: String = "",
 ) : Parcelable
 
-fun Storage.getSizes(file: File, chapters: List<Chapter>?): Storage {
+public fun Storage.getSizes(file: File, chapters: List<Chapter>?): Storage {
     return copy(
         sizeFull = file.lengthMb,
         sizeRead = chapters?.filter { it.isRead }?.sumOf { getFullPath(it.path).lengthMb } ?: 0.0

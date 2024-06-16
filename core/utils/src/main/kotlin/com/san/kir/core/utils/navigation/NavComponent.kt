@@ -2,9 +2,9 @@ package com.san.kir.core.utils.navigation
 
 import androidx.compose.runtime.Composable
 
-interface NavComponent<C : NavConfig> {
+public interface NavComponent<C : NavConfig> {
     @Composable
-    fun NavComponentScope.Render()
+    public fun NavComponentScope.Render()
 
-    val config: C
+    public val config: C
 }

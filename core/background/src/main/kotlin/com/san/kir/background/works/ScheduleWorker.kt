@@ -24,7 +24,7 @@ import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
 
-class ScheduleWorker(
+public class ScheduleWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {
@@ -82,25 +82,25 @@ class ScheduleWorker(
         )
     }
 
-    companion object {
-        const val tag = "scheduleWork"
-        private const val dayPeriod = AlarmManager.INTERVAL_DAY
-        private const val weekPeriod = dayPeriod * 7
+    public companion object {
+       private const val TAG = "scheduleWork"
+        private const val DAY_PERIOD = AlarmManager.INTERVAL_DAY
+        private const val WEEK_PERIOD = DAY_PERIOD * 7
 
-        fun addTaskNow(item: PlannedTaskBase) {
+        public fun addTaskNow(item: PlannedTaskBase) {
             val oneTask = OneTimeWorkRequestBuilder<ScheduleWorker>()
-                .addTag(tag + item.id)
+                .addTag(TAG + item.id)
                 .setInputData(workDataOf("planned_task" to item.id))
                 .build()
             ManualDI.workManager().enqueue(oneTask)
         }
 
-        fun addTask(item: PlannedTaskBase) {
+        public fun addTask(item: PlannedTaskBase) {
             val delay = getDelay(item)
             Timber.v("delay $delay ")
 
             ManualDI.workManager()
-                .cancelAllWorkByTag(tag + item.id)
+                .cancelAllWorkByTag(TAG + item.id)
                 .result
                 .addListener(
                     {
@@ -108,13 +108,13 @@ class ScheduleWorker(
                             if (item.period == PlannedPeriod.DAY) 1L else 7L, TimeUnit.DAYS,
                             1L, TimeUnit.MINUTES,
                         )
-                            .addTag(tag + item.id)
+                            .addTag(TAG + item.id)
                             .setInputData(workDataOf("planned_task" to item.id))
                             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                             .build()
 
                         val oneTask = OneTimeWorkRequestBuilder<ScheduleWorker>()
-                            .addTag(tag + item.id)
+                            .addTag(TAG + item.id)
                             .setInputData(workDataOf("planned_task" to item.id))
                             .setInitialDelay(delay, TimeUnit.MILLISECONDS)
                             .build()
@@ -124,9 +124,9 @@ class ScheduleWorker(
                 )
         }
 
-        fun cancelTask(item: PlannedTaskBase) {
+        public fun cancelTask(item: PlannedTaskBase) {
             ManualDI.workManager()
-                .cancelAllWorkByTag(tag + item.id)
+                .cancelAllWorkByTag(TAG + item.id)
                 .result
                 .addListener(
                     {
@@ -172,12 +172,12 @@ class ScheduleWorker(
             if (item.period == PlannedPeriod.WEEK) {
                 calendar.set(Calendar.DAY_OF_WEEK, item.dayOfWeek.order)
                 if (calendar.timeInMillis < System.currentTimeMillis()) {
-                    calendar.timeInMillis += weekPeriod
+                    calendar.timeInMillis += WEEK_PERIOD
                 }
             }
 
             return if (calendar.timeInMillis < System.currentTimeMillis()) {
-                calendar.timeInMillis + dayPeriod - System.currentTimeMillis()
+                calendar.timeInMillis + DAY_PERIOD - System.currentTimeMillis()
             } else {
                 calendar.timeInMillis - System.currentTimeMillis()
             }

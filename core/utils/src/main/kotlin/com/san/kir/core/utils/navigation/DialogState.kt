@@ -9,7 +9,7 @@ import com.arkivanov.decompose.ComponentContext
 import com.arkivanov.essenty.backhandler.BackCallback
 import kotlinx.parcelize.Parcelize
 
-class DialogState<T : Parcelable>(
+public class DialogState<T : Parcelable>(
     private val componentContext: ComponentContext,
     private val dismissOnBackPressed: Boolean,
     private val onSuccess: (T) -> Unit,
@@ -20,40 +20,40 @@ class DialogState<T : Parcelable>(
     private val backHandler = BackCallback(onBack = ::dismiss)
     internal var state by mutableStateOf<T?>(initialValue)
 
-    val isShow: Boolean
+    public val isShow: Boolean
         get() = state != null
 
-    fun show(t: T) {
+    public fun show(t: T) {
         state = t
         if (this.dismissOnBackPressed) {
             componentContext.backHandler.register(this.backHandler)
         }
     }
 
-    fun success() {
+    public fun success() {
         state?.let(onSuccess)
         dismiss()
     }
 
-    fun neutral() {
+    public fun neutral() {
         state?.let(onNeutral)
         dismiss()
     }
 
-    fun dismiss() {
+    public fun dismiss() {
         state = null
         runCatching { componentContext.backHandler.unregister(backHandler) }
         onDismiss.invoke()
     }
 
-    companion object {
-        fun <T : Parcelable> Saver(
+    public companion object {
+        public fun <T : Parcelable> Saver(
             componentContext: ComponentContext,
             dismissOnBackPressed: Boolean,
             onSuccess: Function1<T, Unit>,
             onDismiss: Function0<Unit>,
             onNeutral: Function1<T, Unit>,
-        ) = Saver(
+        ): Saver<DialogState<T>, T> = Saver(
             save = { original: DialogState<T> -> original.state },
             restore = { saveable ->
                 DialogState(
@@ -69,7 +69,7 @@ class DialogState<T : Parcelable>(
     }
 }
 
-fun DialogState<EmptyDialogData>.show() = show(EmptyDialogData)
+public fun DialogState<EmptyDialogData>.show(): Unit = show(EmptyDialogData)
 
 @Parcelize
-object EmptyDialogData : Parcelable
+public object EmptyDialogData : Parcelable

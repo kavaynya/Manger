@@ -23,29 +23,49 @@ import com.san.kir.data.db.workers.repo.MangaWorkerRepository
 private val ManualDI.appDatabase: RoomDB
     get() = RoomDB.getDatabase(application)
 
-fun ManualDI.accountMangaRepository() = AccountsMangaRepository(appDatabase.accountMangaDao())
-fun ManualDI.accountsRepository() = AccountRepository(appDatabase.accountDao())
-fun ManualDI.categoryRepository() =
+public fun ManualDI.accountMangaRepository(): AccountsMangaRepository =
+    AccountsMangaRepository(appDatabase.accountMangaDao())
+
+public fun ManualDI.accountsRepository(): AccountRepository =
+    AccountRepository(appDatabase.accountDao())
+
+public fun ManualDI.categoryRepository(): CategoryRepository =
     CategoryRepository(lazy { application }, appDatabase.categoryDao())
 
-fun ManualDI.chapterRepository() = ChapterRepository(appDatabase.chapterDao())
-fun ManualDI.mainMenuRepository() = MainMenuRepository(appDatabase.mainMenuDao())
-fun ManualDI.mangaRepository() = MangaRepository(appDatabase.mangaDao())
-fun ManualDI.plannedRepository() = PlannedRepository(appDatabase.plannedDao())
-fun ManualDI.settingsRepository() = SettingsRepository(appDatabase.settingsDao())
-fun ManualDI.statisticsRepository() = StatisticsRepository(appDatabase.statisticDao())
-fun ManualDI.storageRepository() = StorageRepository(appDatabase.storageDao())
+public fun ManualDI.chapterRepository(): ChapterRepository =
+    ChapterRepository(appDatabase.chapterDao())
+
+public fun ManualDI.mainMenuRepository(): MainMenuRepository =
+    MainMenuRepository(appDatabase.mainMenuDao())
+
+public fun ManualDI.mangaRepository(): MangaRepository = MangaRepository(appDatabase.mangaDao())
+public fun ManualDI.plannedRepository(): PlannedRepository =
+    PlannedRepository(appDatabase.plannedDao())
+
+public fun ManualDI.settingsRepository(): SettingsRepository =
+    SettingsRepository(appDatabase.settingsDao())
+
+public fun ManualDI.statisticsRepository(): StatisticsRepository =
+    StatisticsRepository(appDatabase.statisticDao())
+
+public fun ManualDI.storageRepository(): StorageRepository =
+    StorageRepository(appDatabase.storageDao())
 
 
 /** Database for catalogs*/
 private fun ManualDI.catalogDatabase(catalogName: String) =
     CatalogDb.getDatabase(application, catalogName)
 
-fun ManualDI.catalogsRepository() = CatalogsRepository(::catalogDatabase)
+public fun ManualDI.catalogsRepository(): CatalogsRepository = CatalogsRepository(::catalogDatabase)
 
 /** Database for task managers */
 private fun ManualDI.workerDatabase(): WorkersDb = WorkersDb.getDatabase(application)
 
-fun ManualDI.mangaWorkerRepository() = MangaWorkerRepository(workerDatabase().mangasDao)
-fun ManualDI.chapterWorkerRepository() = ChapterWorkerRepository(workerDatabase().chaptersDao)
-fun ManualDI.catalogWorkerRepository() = CatalogWorkerRepository(workerDatabase().catalogDao)
+public fun ManualDI.mangaWorkerRepository(): MangaWorkerRepository =
+    MangaWorkerRepository(workerDatabase().mangasDao)
+
+public fun ManualDI.chapterWorkerRepository(): ChapterWorkerRepository =
+    ChapterWorkerRepository(workerDatabase().chaptersDao)
+
+public fun ManualDI.catalogWorkerRepository(): CatalogWorkerRepository =
+    CatalogWorkerRepository(workerDatabase().catalogDao)

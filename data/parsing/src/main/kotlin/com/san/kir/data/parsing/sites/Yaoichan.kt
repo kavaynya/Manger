@@ -2,7 +2,7 @@ package com.san.kir.data.parsing.sites
 
 import com.san.kir.core.internet.ConnectManager
 
-class Yaoichan(connectManager: ConnectManager) :
+internal class Yaoichan(connectManager: ConnectManager) :
     MangachanTemplate(connectManager) {
 
     override val host: String

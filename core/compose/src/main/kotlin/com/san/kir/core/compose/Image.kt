@@ -32,7 +32,7 @@ import timber.log.Timber
 import java.io.File
 
 @Composable
-fun ImageWithStatus(url: String?, modifier: Modifier = Modifier) {
+public fun ImageWithStatus(url: String?, modifier: Modifier = Modifier) {
     var statusLogo by remember { mutableStateOf(StatusLogo.Init) }
     var logo by remember { mutableStateOf(ImageBitmap(60, 60)) }
 
@@ -70,7 +70,7 @@ fun ImageWithStatus(url: String?, modifier: Modifier = Modifier) {
 }
 
 @Composable
-fun rememberImage(url: String?): BitmapPainter {
+public fun rememberImage(url: String?): BitmapPainter {
     val context = LocalContext.current
     var logo by remember { mutableStateOf(BitmapPainter(ImageBitmap(2, 2))) }
 
@@ -104,12 +104,12 @@ fun rememberImage(url: String?): BitmapPainter {
     return logo
 }
 
-enum class StatusLogo {
+private enum class StatusLogo {
     Init, Complete, Error, None
 }
 
 @Composable
-fun CircleLogo(
+public fun CircleLogo(
     logoUrl: String,
     modifier: Modifier = Modifier,
     size: Dp = Dimensions.Image.bigger

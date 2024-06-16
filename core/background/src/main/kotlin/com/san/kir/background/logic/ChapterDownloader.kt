@@ -20,7 +20,7 @@ import timber.log.Timber
 import java.io.File
 import java.net.SocketException
 
-class ChapterDownloader(
+public class ChapterDownloader(
     private var chapter: Chapter,
     private val chapterRepository: ChapterRepository,
     private val statisticsRepository: StatisticsRepository,
@@ -49,7 +49,7 @@ class ChapterDownloader(
         }
     }
 
-    suspend fun run(): Result<Unit> {
+    internal suspend fun run(): Result<Unit> {
         val startTime = System.currentTimeMillis()
         updateChapter(DownloadState.QUEUED)
         onProgress(chapter)

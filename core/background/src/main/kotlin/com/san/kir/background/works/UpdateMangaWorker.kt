@@ -25,7 +25,7 @@ import kotlinx.coroutines.CancellationException
 import timber.log.Timber
 import java.util.regex.Pattern
 
-class UpdateMangaWorker(
+internal class UpdateMangaWorker(
     context: Context,
     params: WorkerParameters,
 ) : BaseUpdateWorker<MangaTask>(context, params) {

@@ -27,8 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 
 
-val LocalContainerColor = compositionLocalOf { Color.White }
-
+internal val LocalContainerColor = compositionLocalOf { Color.White }
 private val HBarHeight = 50.dp
 private val SVBarHeight = 90.dp
 private val SelectorThickness = 3.dp
@@ -38,11 +37,11 @@ private val saver =
 
 
 @Composable
-fun rememberColorPickerState(initialColor: Color) =
+public fun rememberColorPickerState(initialColor: Color): ColorPickerState =
     rememberSaveable(saver = ColorPickerState.Saver) { ColorPickerState(initialColor) }
 
 @Composable
-fun ColorPicker(state: ColorPickerState, modifier: Modifier = Modifier) {
+public fun ColorPicker(state: ColorPickerState, modifier: Modifier = Modifier) {
     Column(modifier) {
         val circleColor = MaterialTheme.colorScheme.onSurface
 

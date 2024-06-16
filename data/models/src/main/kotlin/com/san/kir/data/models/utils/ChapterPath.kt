@@ -1,6 +1,6 @@
 package com.san.kir.data.models.utils
 
-fun String.preparePath(): String {
+public fun String.preparePath(): String {
     var path = this
     if (contains("://")) {
         val parts = split("://")

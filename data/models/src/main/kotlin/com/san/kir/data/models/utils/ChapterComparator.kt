@@ -5,8 +5,8 @@ import java.util.regex.Pattern
 
 private val reg by lazy { Pattern.compile("\\d+") }
 
-class ChapterComparator : Comparator<BaseChapter> {
-    override fun compare(o1: BaseChapter, o2: BaseChapter) = compareChapterNames(o1.name, o2.name)
+public class ChapterComparator : Comparator<BaseChapter> {
+    override fun compare(o1: BaseChapter, o2: BaseChapter): Int = compareChapterNames(o1.name, o2.name)
 }
 
 internal fun compareChapterNames(o1: String, o2: String) = findNumber(o1) - findNumber(o2)

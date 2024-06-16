@@ -7,31 +7,37 @@ import com.san.kir.data.db.main.mappers.toEntity
 import com.san.kir.data.db.main.mappers.toModel
 import com.san.kir.data.db.main.mappers.toModels
 import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.SimplifiedStatistic
 import com.san.kir.data.models.main.Statistic
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flowOf
 
-class StatisticsRepository internal constructor(private val statisticDao: StatisticDao) {
-    val allTime = statisticDao.loadAllTime()
-    val simplifiedItems = statisticDao.loadSimpleItems().toModels()
+public class StatisticsRepository internal constructor(private val statisticDao: StatisticDao) {
+    public val allTime: Flow<Long> = statisticDao.loadAllTime()
+    public val simplifiedItems: Flow<List<SimplifiedStatistic>> =
+        statisticDao.loadSimpleItems().toModels()
 
-    suspend fun itemById(id: Long) = withIoContext { statisticDao.itemById(id)?.toModel() }
+    public suspend fun itemById(id: Long): Statistic? =
+        withIoContext { statisticDao.itemById(id)?.toModel() }
 
-    fun item(itemId: Long = -1, mangaId: Long = -1): Flow<Statistic?> {
+    public fun item(itemId: Long = -1, mangaId: Long = -1): Flow<Statistic?> {
         if (itemId != -1L) return statisticDao.loadItemById(itemId).toModel()
         if (mangaId != -1L) return statisticDao.loadItemByMangaId(mangaId).toModel()
         return flowOf<Statistic?>(null)
     }
 
-    suspend fun insert(item: Statistic) = withIoContext { statisticDao.insert(item.toEntity()) }
+    public suspend fun insert(item: Statistic): List<Long> =
+        withIoContext { statisticDao.insert(item.toEntity()) }
 
-    suspend fun insert(mangaId: Long) =
+    public suspend fun insert(mangaId: Long): List<Long> =
         withIoContext { statisticDao.insert(DbStatistic(mangaId = mangaId)) }
 
-    suspend fun idByMangaId(mangaId: Long) = withIoContext { statisticDao.idByMangaId(mangaId) }
-    suspend fun delete(itemId: Long) = withIoContext { statisticDao.delete(itemId) }
+    public suspend fun idByMangaId(mangaId: Long): Long? =
+        withIoContext { statisticDao.idByMangaId(mangaId) }
 
-    suspend fun updateByChapter(chapter: Chapter) = withIoContext {
+    public suspend fun delete(itemId: Long): Unit = withIoContext { statisticDao.delete(itemId) }
+
+    public suspend fun updateByChapter(chapter: Chapter): Unit = withIoContext {
         val item = statisticDao.itemByMangaId(chapter.mangaId) ?: return@withIoContext
         statisticDao.insert(
             item.copy(

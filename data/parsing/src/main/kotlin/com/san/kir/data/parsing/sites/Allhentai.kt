@@ -5,7 +5,7 @@ import com.san.kir.data.parsing.LoginAvatar
 import com.san.kir.data.parsing.SiteConstants
 import org.jsoup.nodes.Document
 
-class Allhentai(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
+internal class Allhentai(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
     override val name = SITE_NAME
     override val catalogName = HOST_NAME
     override var volume = 0

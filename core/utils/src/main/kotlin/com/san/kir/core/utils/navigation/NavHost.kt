@@ -20,7 +20,7 @@ private val defaultAnimations: StackAnimation<NavConfig, NavContainer> =
 private fun frontAnimation(config: NavConfig) = ManualDI.navAnimation(config) ?: EmptyStackAnimator
 
 @Composable
-fun NavHost(
+public fun NavHost(
     componentContext: ComponentContext,
     startConfig: NavConfig,
     stackAnimation: StackAnimation<NavConfig, NavContainer> = defaultAnimations,
@@ -32,7 +32,7 @@ fun NavHost(
 }
 
 @Composable
-fun NavHost(
+public fun NavHost(
     startConfig: NavConfig,
     stackAnimation: StackAnimation<NavConfig, NavContainer> = defaultAnimations,
-) = NavHost(LocalComponentContext.current, startConfig, stackAnimation)
+): Unit = NavHost(LocalComponentContext.current, startConfig, stackAnimation)

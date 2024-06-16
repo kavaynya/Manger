@@ -9,7 +9,7 @@ import com.san.kir.data.models.main.action
 import com.san.kir.data.models.utils.ChapterStatus
 import timber.log.Timber
 
-class DownloadedLatestClearWorker(
+internal class DownloadedLatestClearWorker(
     appContext: Context,
     workerParams: WorkerParameters,
 ) : CoroutineWorker(appContext, workerParams) {

@@ -22,7 +22,7 @@ import kotlinx.coroutines.sync.Mutex
 import kotlinx.coroutines.sync.withLock
 import timber.log.Timber
 
-open class BaseUpdateWorker<T : BaseTask<T>>(
+internal open class BaseUpdateWorker<T : BaseTask<T>>(
     context: Context,
     params: WorkerParameters,
 ) : CoroutineWorker(context, params) {

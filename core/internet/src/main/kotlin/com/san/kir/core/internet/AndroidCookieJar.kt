@@ -5,7 +5,7 @@ import okhttp3.Cookie
 import okhttp3.CookieJar
 import okhttp3.HttpUrl
 
-class AndroidCookieJar : CookieJar {
+public class AndroidCookieJar : CookieJar {
 
     private val manager = CookieManager.getInstance()
 
@@ -18,7 +18,7 @@ class AndroidCookieJar : CookieJar {
         return get(url)
     }
 
-    fun get(url: HttpUrl): List<Cookie> {
+    public fun get(url: HttpUrl): List<Cookie> {
         val cookies = manager.getCookie(url.toString())
 
         return if (cookies != null && cookies.isNotEmpty()) {

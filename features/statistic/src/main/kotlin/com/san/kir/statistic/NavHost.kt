@@ -1,6 +1,7 @@
 package com.san.kir.statistic
 
 import NavEntry
+import androidx.compose.runtime.remember
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.itemShapeAnimator
@@ -13,13 +14,13 @@ import com.san.kir.statistic.ui.statistics.StatisticsScreen
 import kotlinx.serialization.Serializable
 
 
-fun statisticsNavigationCreators() {
+public fun statisticsNavigationCreators() {
     AddNavigationCreators
 }
 
 @NavEntry
 @Serializable
-object Statistics : NavConfig() {
+public object Statistics : NavConfig() {
     internal val creator = navCreator<Statistics> {
         StatisticsScreen(
             navigateUp = backPressed(),
@@ -32,17 +33,20 @@ object Statistics : NavConfig() {
 
 @NavEntry
 @Serializable
-class Statistic(val itemId: Long = -1, val mangaId: Long = -1, val params: SharedParams) :
-    NavConfig() {
-    companion object {
-        val creator = navCreator<Statistic> { config ->
+public class Statistic(
+    internal val itemId: Long = -1,
+    internal val mangaId: Long = -1,
+    internal val params: SharedParams
+) : NavConfig() {
+    internal companion object {
+        internal val creator = navCreator<Statistic> { config ->
             StatisticScreen(
                 navigateUp = backPressed(),
-                itemId = config.itemId,
-                mangaId = config.mangaId,
+                itemId = remember { config.itemId },
+                mangaId = remember { config.mangaId },
             )
         }
 
-        val animation = navAnimation<Statistic> { itemShapeAnimator(it.params, 0.1f) }
+        internal val animation = navAnimation<Statistic> { itemShapeAnimator(it.params, 0.1f) }
     }
 }

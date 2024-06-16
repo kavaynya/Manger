@@ -8,7 +8,7 @@ import com.san.kir.data.models.utils.PlannedWeek
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class PlannedTask(
+public data class PlannedTask(
     override val id: Long = 0L,
     val mangaId: Long = -1L,
     override val groupName: String = "",
@@ -28,6 +28,6 @@ data class PlannedTask(
     override val category: String = "",
 ) : Parcelable, PlannedTaskBase
 
-fun PlannedTask.toBase(mangaName: String, categoryName: String): PlannedTaskBase {
+public fun PlannedTask.toBase(mangaName: String, categoryName: String): PlannedTaskBase {
     return copy(manga = mangaName, category = categoryName)
 }

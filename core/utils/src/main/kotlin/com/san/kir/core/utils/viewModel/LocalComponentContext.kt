@@ -5,17 +5,17 @@ import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.staticCompositionLocalOf
 import com.arkivanov.decompose.ComponentContext
 
-object LocalComponentContext {
+public object LocalComponentContext {
     private val LocalComponentContext =
         staticCompositionLocalOf<ComponentContext> {
             error("No ComponentContext was provided via LocalComponentContext")
         }
 
-    val current: ComponentContext
+    public val current: ComponentContext
         @Composable
         get() = LocalComponentContext.current
 
-    infix fun provides(componentContext: ComponentContext): ProvidedValue<ComponentContext> {
+    public infix fun provides(componentContext: ComponentContext): ProvidedValue<ComponentContext> {
         return LocalComponentContext.provides(componentContext)
     }
 }

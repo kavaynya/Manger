@@ -5,7 +5,7 @@ import com.san.kir.data.models.main.Manga
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class SiteCatalogElement(
+public data class SiteCatalogElement(
     val id: Long = 0,
     val host: String = "",
     val catalogName: String = "",
@@ -25,7 +25,7 @@ data class SiteCatalogElement(
     val isFull: Boolean = false,
 ) : Parcelable
 
-fun SiteCatalogElement.toManga(categoryId: Long, path: String): Manga {
+public fun SiteCatalogElement.toManga(categoryId: Long, path: String): Manga {
     return Manga(
         name = name,
         host = host,
@@ -40,6 +40,4 @@ fun SiteCatalogElement.toManga(categoryId: Long, path: String): Manga {
     )
 }
 
-fun String.toLinkOfFullElement(): SiteCatalogElement {
-    return SiteCatalogElement(link = this)
-}
+public fun String.toLinkOfFullElement(): SiteCatalogElement = SiteCatalogElement(link = this)

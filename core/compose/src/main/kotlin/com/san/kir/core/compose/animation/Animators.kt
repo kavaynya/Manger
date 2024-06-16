@@ -1,8 +1,5 @@
-@file:Suppress("NOTHING_TO_INLINE")
-
 package com.san.kir.core.compose.animation
 
-import android.annotation.SuppressLint
 import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.AnimationState
 import androidx.compose.animation.core.FiniteAnimationSpec
@@ -11,7 +8,6 @@ import androidx.compose.animation.core.isFinished
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.GenericShape
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -31,50 +27,31 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.isFront
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimator
 import kotlin.math.hypot
 
-const val ANIMATION_DURATION = 600
+public const val ANIMATION_DURATION: Int = 600
 
-object EmptyStackAnimator : StackAnimator {
-
-    @SuppressLint("ComposableNaming")
-    @Composable
-    override fun invoke(
-        direction: Direction,
-        isInitial: Boolean,
-        onFinished: () -> Unit,
-        content: @Composable (Modifier) -> Unit,
-    ) {
-        content(Modifier)
-
-        DisposableEffect(direction, isInitial) {
-            onFinished()
-            onDispose {}
-        }
-    }
-}
-
-inline fun shapeAnimator(
+public fun shapeAnimator(
     params: SharedParams,
     maxFactorForItem: Float = 0.2F,
     animationSpec: AnimationSpec<Float> = tween(ANIMATION_DURATION),
-) =
+): StackAnimator =
     if (params.fromCenter) circleShapeAnimator(params, animationSpec)
     else itemShapeAnimator(params, maxFactorForItem, animationSpec)
 
 
-fun circleShapeAnimator(
+public fun circleShapeAnimator(
     params: SharedParams,
     animationSpec: AnimationSpec<Float> = tween(ANIMATION_DURATION),
-) = shapeAnimator(animationSpec) { factor ->
+): StackAnimator = shapeAnimator(animationSpec) { factor ->
     GenericShape { size, _ ->
         addOval(Rect(params.bounds.center, hypot(size.width, size.height) * factor))
     }
 }
 
-fun itemShapeAnimator(
+public fun itemShapeAnimator(
     params: SharedParams,
     maxFactorForItem: Float = 0.2F,
     animationSpec: AnimationSpec<Float> = tween(ANIMATION_DURATION),
-) = shapeAnimator(animationSpec) { factor ->
+): StackAnimator = shapeAnimator(animationSpec) { factor ->
     val bounds = params.bounds
     GenericShape { size, _ ->
         if (factor <= maxFactorForItem) {
@@ -100,26 +77,24 @@ fun itemShapeAnimator(
     }
 }
 
-fun horizontalSlide(
+public fun horizontalSlide(
     animationSpec: FiniteAnimationSpec<Float> = tween(ANIMATION_DURATION),
     toRight: Boolean = true,
-): StackAnimator =
-    stackAnimator(animationSpec = animationSpec) { factor, _, content ->
-        content(Modifier.offsetXFactor(factor = if (toRight) -factor else factor))
-    }
+): StackAnimator = stackAnimator(animationSpec = animationSpec) { factor, _, content ->
+    content(Modifier.offsetXFactor(factor = if (toRight) -factor else factor))
+}
 
-fun verticalSlide(
+public fun verticalSlide(
     animationSpec: FiniteAnimationSpec<Float> = tween(ANIMATION_DURATION),
     toBottom: Boolean = true,
-): StackAnimator =
-    stackAnimator(animationSpec = animationSpec) { factor, _, content ->
-        content(Modifier.offsetYFactor(factor = if (toBottom) -factor else factor))
-    }
+): StackAnimator = stackAnimator(animationSpec = animationSpec) { factor, _, content ->
+    content(Modifier.offsetYFactor(factor = if (toBottom) -factor else factor))
+}
 
-inline fun shapeAnimator(
+public fun shapeAnimator(
     animationSpec: AnimationSpec<Float>,
-    crossinline shape: @Composable (factor: Float) -> Shape,
-) = StackAnimator { direction, isInitial, onFinished, content ->
+    shape: @Composable (factor: Float) -> Shape,
+): StackAnimator = StackAnimator { direction, isInitial, onFinished, content ->
     val animationState = remember(direction, isInitial) {
         AnimationState(initialValue = if (isInitial) 0F else 1F)
     }

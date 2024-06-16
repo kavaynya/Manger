@@ -7,43 +7,35 @@ import java.io.File
 import java.io.FileOutputStream
 import java.util.Locale
 
-val externalDir: File = android.os.Environment.getExternalStorageDirectory()
+public val externalDir: File = android.os.Environment.getExternalStorageDirectory()
 
-fun getFullPath(path: String): File = File(externalDir, path)
+public fun getFullPath(path: String): File = File(externalDir, path)
 
-val File.shortPath: String
+public val File.shortPath: String
     get() = if (path.isNotEmpty()) Regex("/${DIR.ROOT}.+").find(path)!!.value else path
 
-val File.lengthMb: Double
-    get() = bytesToMb(folderSize(this))
+public val File.lengthMb: Double
+    get() = bytesToMb(walkTopDown().filter(File::isFile).sumOf(File::length))
 
-fun bytesToMb(value: Long): Double = value.toDouble() / (1024.0 * 1024.0)
+public fun bytesToMb(value: Long): Double = value.toDouble() / (1024.0 * 1024.0)
 
-fun folderSize(directory: File): Long {
-    var length = 0L
-    directory.listFiles()?.forEach { file ->
-        length += if (file.isFile) file.length() else folderSize(file)
-    }
-    return length
-}
-
-fun getCountPagesForChapterInMemory(shortPath: String): Int {
+public fun getCountPagesForChapterInMemory(shortPath: String): Int {
     return getFullPath(shortPath)
         .ifExists
         ?.listFiles { _, s -> checkExtension(s) }
         ?.size ?: 0
 }
 
-val File.ifExists: File?
+private val File.ifExists: File?
     get() = if (this.exists()) this else null
 
-val imageExtensions = listOf("png", "jpg", "webp", "gif")
+private val imageExtensions: List<String> = listOf("png", "jpg", "webp", "gif")
 
-fun checkExtension(fileName: String): Boolean {
+private fun checkExtension(fileName: String): Boolean {
     return imageExtensions.any { fileName.lowercase(Locale.ROOT).endsWith(it) }
 }
 
-val File.isEmptyDirectory: Boolean
+public val File.isEmptyDirectory: Boolean
     get() =
         if (exists() and isDirectory) {
             var isOk = false
@@ -52,17 +44,15 @@ val File.isEmptyDirectory: Boolean
                     if (it.isEmpty())
                         isOk = true
                 }
-            } catch (ex: NullPointerException) {
+            } catch (_: NullPointerException) {
             }
             isOk
         } else
             true
 
-fun delChapters(chapters: List<String>): ResultDeleting {
-    return delFiles(chapters)
-}
+public fun delChapters(chapters: List<String>): ResultDeleting = delFiles(chapters)
 
-fun delFiles(filesPath: List<String>): ResultDeleting {
+public fun delFiles(filesPath: List<String>): ResultDeleting {
     var acc = 0
     filesPath.forEach { path ->
         getFullPath(path).apply { if (exists() && deleteRecursively()) acc++ }
@@ -71,7 +61,7 @@ fun delFiles(filesPath: List<String>): ResultDeleting {
 }
 
 // Проверка, что файл является корректным изображением формата PNG
-fun File.isOkPng(): Boolean {
+public fun File.isOkPng(): Boolean {
     kotlin.runCatching {
         val bytes = this.readBytes()
         if (bytes.size < 4) return false
@@ -88,7 +78,7 @@ fun File.isOkPng(): Boolean {
 private const val DEFAULT_COMPRESS_QUALITY = 90
 
 @Suppress("BlockingMethodInNonBlockingContext")
-suspend fun convertImagesToPng(image: File): File = withIoContext {
+public suspend fun convertImagesToPng(image: File): File = withIoContext {
     val b = BitmapFactory.decodeFile(image.path)
 
     val png = File(

@@ -13,7 +13,7 @@ import kotlinx.coroutines.sync.withLock
 import kotlinx.coroutines.withContext
 import kotlin.coroutines.resume
 
-suspend fun Lifecycle.repeatOnLifecycle(
+public suspend fun Lifecycle.repeatOnLifecycle(
     state: Lifecycle.State,
     block: suspend CoroutineScope.() -> Unit,
 ) {

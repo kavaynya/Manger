@@ -20,7 +20,7 @@ import org.jsoup.select.Elements
 import timber.log.Timber
 import java.util.concurrent.Executors
 
-class Acomics(private val connectManager: ConnectManager) : SiteCatalogAlternative() {
+internal class Acomics(private val connectManager: ConnectManager) : SiteCatalogAlternative() {
     override val name: String = "Авторский комикс"
     override val catalogName: String = "acomics.ru"
     override val host: String

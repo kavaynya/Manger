@@ -43,7 +43,7 @@ private fun indicator(pagerState: PagerState): @Composable (List<TabPosition>) -
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun ScrollableTabs(
+public fun ScrollableTabs(
     pagerState: PagerState,
     items: List<String>,
     modifier: Modifier = Modifier,
@@ -76,7 +76,7 @@ fun ScrollableTabs(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun Tabs(
+public fun Tabs(
     pagerState: PagerState,
     items: List<Int>,
     onTabClick: suspend (index: Int) -> Unit = { pagerState.animateScrollToPage(it) },

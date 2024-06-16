@@ -2,7 +2,7 @@ package com.san.kir.data.parsing
 
 import android.content.Context
 
-object Status {
+internal object Status {
     fun init(context: Context) {
         COMPLETE = context.getString(R.string.status_complete)
         NOT_COMPLETE = context.getString(R.string.status_not_complete)
@@ -20,7 +20,7 @@ object Status {
         private set
 }
 
-object Translate {
+internal object Translate {
     fun init(context: Context) {
         COMPLETE = context.getString(R.string.translate_complete)
         NOT_COMPLETE = context.getString(R.string.translate_not_complete)

@@ -4,7 +4,7 @@ import com.san.kir.core.internet.ConnectManager
 import com.san.kir.data.parsing.LoginAvatar
 import com.san.kir.data.parsing.SiteConstants
 
-class Mintmanga(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
+internal class Mintmanga(connectManager: ConnectManager) : ReadmangaTemplate(connectManager) {
 
     override val host: String
         get() = "https://$catalogName"

@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.Layout
-import androidx.compose.ui.layout.MeasurePolicy
 import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.TextStyle
@@ -59,7 +58,7 @@ private val MinCollapsedHeight = 64.dp
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun TopBarLayout(
+internal fun TopBarLayout(
     modifier: Modifier,
     title: AnnotatedString? = null,
     subtitle: AnnotatedString? = null,
@@ -193,7 +192,7 @@ fun TopBarLayout(
             modifier = modifier
                 .heightIn(MinCollapsedHeight)
                 .windowInsetsPadding(windowInsets),
-            measurePolicy = MeasurePolicy { measurables, constraints ->
+            measurePolicy = { measurables, constraints ->
                 val expandedTitleBottomPaddingPx = ExpandedTitleBottomPadding.toPx()
 
                 val navigationIconPlaceable = measurables
@@ -243,14 +242,14 @@ fun TopBarLayout(
                 var collapsingSubtitleX = 0
                 var collapsingSubtitleY = 0
                 var additionalY: Int = MinCollapsedHeight.toPx().roundToInt()
-                var fullyExpandedTitleX: Float
+                val fullyExpandedTitleX: Float
 
                 if (expandedTitlePlaceable == null || collapsedTitlePlaceable == null) {
                     scrollBehavior?.state?.heightOffsetLimit = -1.0f
                     fullyExpandedTitleX = layoutHeightPx
                 } else {
                     val additionalHeight = additionalPlaceable?.height ?: 0
-                    var heightOffsetLimitPx = expandedTitlePlaceable.height +
+                    val heightOffsetLimitPx = expandedTitlePlaceable.height +
                             expandedTitleBottomPaddingPx +
                             additionalHeight +
                             (expandedSubtitlePlaceable?.height ?: 0)

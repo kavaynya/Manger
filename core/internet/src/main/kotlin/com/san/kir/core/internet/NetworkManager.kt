@@ -1,6 +1,5 @@
 package com.san.kir.core.internet
 
-import android.app.Application
 import android.content.Context
 import android.net.ConnectivityManager
 import android.net.Network
@@ -8,25 +7,23 @@ import android.net.NetworkCapabilities
 import android.net.NetworkRequest
 import com.san.kir.core.utils.connectivityManager
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-enum class NetworkState {
+public enum class NetworkState {
     NOT_WIFI, NOT_CELLURAR, OK
 }
 
-internal class CellularNetwork(context: Application) : NetworkManager(
-    context, NetworkCapabilities.TRANSPORT_CELLULAR
-)
+public interface INetworkManager {
+    public val state: StateFlow<Boolean>
+    public fun stop()
+}
 
-internal class WifiNetwork(context: Application) : NetworkManager(
-    context, NetworkCapabilities.TRANSPORT_WIFI,
-)
-
-abstract class NetworkManager(
+internal class NetworkManager(
     private val context: Context,
     networkTransport: Int,
-) : ConnectivityManager.NetworkCallback() {
+) : ConnectivityManager.NetworkCallback(), INetworkManager {
 
     private val request =
         NetworkRequest
@@ -36,13 +33,13 @@ abstract class NetworkManager(
             .build()
 
     private val _state = MutableStateFlow(false)
-    val state = _state.asStateFlow()
+    override val state = _state.asStateFlow()
 
     init {
         context.connectivityManager.registerNetworkCallback(request, this)
     }
 
-    fun stop() {
+    override fun stop() {
         context.connectivityManager.unregisterNetworkCallback(this)
     }
 

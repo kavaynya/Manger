@@ -7,14 +7,14 @@ import kotlinx.coroutines.launch
 import kotlin.properties.ReadWriteProperty
 import kotlin.reflect.KProperty
 
-class CustomMutableStateDelegate<T>(
+public class CustomMutableStateDelegate<T>(
     private val scope: CoroutineScope,
     defaultValue: T,
     private val onChange: suspend (T) -> Unit
 ) : ReadWriteProperty<Any, T> {
     private val state: MutableState<T> = mutableStateOf(defaultValue)
 
-    override fun getValue(thisRef: Any, property: KProperty<*>) = state.value
+    override fun getValue(thisRef: Any, property: KProperty<*>): T = state.value
 
     override fun setValue(thisRef: Any, property: KProperty<*>, value: T) {
         if (state.value != value) {

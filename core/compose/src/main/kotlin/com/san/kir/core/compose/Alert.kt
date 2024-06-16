@@ -15,7 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 
 @Composable
-fun <T> SingleChoiceList(
+public fun <T> SingleChoiceList(
     title: Int = -1,
     initialValue: T,
     stateList: List<T>,
@@ -38,7 +38,7 @@ fun <T> SingleChoiceList(
 }
 
 @Composable
-fun <T> MultiChoiceList(
+public fun <T> MultiChoiceList(
     title: Int = -1,
     items: List<T>,
     stateList: List<T>,

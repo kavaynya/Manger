@@ -5,7 +5,7 @@ import com.san.kir.data.models.utils.MainMenuType
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class MainMenuItem (
+public data class MainMenuItem (
     val id: Long = 0L,
     val name: String = "",
     val isVisible: Boolean = true,

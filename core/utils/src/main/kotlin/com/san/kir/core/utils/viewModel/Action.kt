@@ -1,9 +1,9 @@
 package com.san.kir.core.utils.viewModel
 
-interface Action
+public interface Action
 
-data class ReturnEvents(val events: List<Event>) : Action
+public data class ReturnEvents(val events: List<Event>) : Action
 
-fun ReturnEvents(vararg events: Event): ReturnEvents {
+public fun ReturnEvents(vararg events: Event): ReturnEvents {
     return ReturnEvents(events.toList())
 }

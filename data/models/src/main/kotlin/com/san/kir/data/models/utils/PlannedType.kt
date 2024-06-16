@@ -3,9 +3,9 @@ package com.san.kir.data.models.utils
 import com.san.kir.data.models.R
 import java.util.Calendar
 
-enum class PlannedType(
-    val order: Int,
-    val text: Int,
+public enum class PlannedType(
+    public val order: Int,
+    public val text: Int,
 ) {
     MANGA(1, R.string.manga),
     GROUP(2, R.string.group),
@@ -14,19 +14,19 @@ enum class PlannedType(
     APP(5, R.string.app)
 }
 
-enum class PlannedPeriod(
-    val order: Int,
-    val text: Int,
-    val dayText: Int,
+public enum class PlannedPeriod(
+    public val order: Int,
+    public val text: Int,
+    public val dayText: Int,
 ) {
     DAY(1, R.string.day, R.string.once_by_day),
     WEEK(2, R.string.week, -1)
 }
 
-enum class PlannedWeek(
-    val order: Int,
-    val text: Int,
-    val dayText: Int,
+public enum class PlannedWeek(
+    public val order: Int,
+    public val text: Int,
+    public val dayText: Int,
 ) {
     MONDAY(Calendar.MONDAY, R.string.mon, R.string.every_monday),
     TUESDAY(Calendar.TUESDAY, R.string.tue, R.string.every_tuesday),

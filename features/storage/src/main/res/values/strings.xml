@@ -1,29 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="storage">Хранилище</string>
-    <string name="main_menu_storage_size_mb">%s Мб</string>
+    <string name="size_mb_format">%s Мб</string>
 
-    <plurals name="storage_subtitle">
+    <plurals name="storage_subtitle_format">
         <item quantity="one">В %d папке</item>
         <item quantity="few">В %d папках</item>
         <item quantity="many">В %d папках</item>
         <item quantity="other">В %d папках</item>
     </plurals>
 
-    <string name="storage_not_in_bd">Нет в базе</string>
-    <string name="storage_item_all_size">Всего занято: %s Мб</string>
-    <string name="storage_item_manga_size">Занято этой мангой: %s Мб</string>
-    <string name="storage_item_read_size">Прочитанное в этой манге: %s Мб</string>
-    <string name="storage_item_menu_full_delete">Очистить</string>
-    <string name="storage_item_menu_cancel">Оставить</string>
-    <string name="storage_manga_item_size_text">Использовано: %1$s Мб или %2$d %%</string>
+    <string name="not_in_bd">Нет в базе</string>
+    <string name="all_size_format">Всего занято: %s Мб</string>
+    <string name="manga_size_format">Занято этой мангой: %s Мб</string>
+    <string name="read_size_format">Прочитанное в этой манге: %s Мб</string>
+    <string name="used_size_format">Использовано: %1$s Мб или %2$d %%</string>
 
-    <string name="library_popupmenu_delete_read_chapters">Удалить прочитанное</string>
-    <string name="library_popupmenu_delete_all">Очистить папку</string>
-    <string name="library_popupmenu_delete_read_chapters_delete">Удаляю…</string>
-    <string name="library_popupmenu_delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
-    <string name="library_popupmenu_delete_read_chapters_ok">Да</string>
-    <string name="library_popupmenu_delete_read_chapters_no">Не, не</string>
+    <string name="delete_read">Удалить прочитанное</string>
+    <string name="clear_folder">Очистить папку</string>
+    <string name="deleting">Удаляю…</string>
+    <string name="delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
+    <string name="no_no">Не, не</string>
 
     <string name="clear">Очистить</string>
     <string name="yes">Да</string>

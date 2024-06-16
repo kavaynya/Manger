@@ -4,7 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Statistic(
+public data class Statistic(
     val id: Long = 0L,
     val mangaId: Long = 0L,
     val allChapters: Int = 0,

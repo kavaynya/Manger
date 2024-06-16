@@ -12,6 +12,7 @@ import io.ktor.client.plugins.onDownload
 import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
+import io.ktor.client.statement.HttpResponse
 import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpStatusCode
@@ -31,7 +32,7 @@ import java.util.concurrent.TimeUnit
 import java.util.regex.Pattern
 import kotlin.time.Duration.Companion.seconds
 
-class ConnectManager(context: Application) {
+public class ConnectManager(context: Application) {
     private val defaultCacheDirectory = File(context.cacheDir, "http_cache")
 
     private val defaultCache = Cache(
@@ -70,11 +71,11 @@ class ConnectManager(context: Application) {
 
     private val retryKey = "Retry-After"
 
-    suspend fun getText(url: String = ""): String = getDocument(url = url).body().wholeText()
+    public suspend fun getText(url: String = ""): String = getDocument(url = url).body().wholeText()
 
-    suspend fun url(url: String) = defaultClient.get(url.prepare())
+    public suspend fun url(url: String): HttpResponse = defaultClient.get(url.prepare())
 
-    suspend fun getDocument(
+    public suspend fun getDocument(
         url: String = "",
         formParams: Parameters? = null,
     ): Document = withIoContext {
@@ -107,7 +108,7 @@ class ConnectManager(context: Application) {
         Document("")
     }
 
-    fun nameFromUrl(url: String): String {
+    public fun nameFromUrl(url: String): String {
         val pat = Pattern.compile("[\\w.-]+\\.[a-z]{3,4}")
             .matcher(prepareUrl(url))
         var name = ""
@@ -116,11 +117,11 @@ class ConnectManager(context: Application) {
         return name
     }
 
-    fun nameFromUrl2(url: String): String {
+    public fun nameFromUrl2(url: String): String {
         return url.split("/").last()
     }
 
-    suspend fun downloadBitmap(
+    public suspend fun downloadBitmap(
         url: String,
         headers: StringValues? = null,
         onProgress: (percent: Float) -> Unit = {},
@@ -135,7 +136,7 @@ class ConnectManager(context: Application) {
         }
     }
 
-    suspend fun downloadFile(
+    public suspend fun downloadFile(
         file: File,
         url: String,
         headers: StringValues? = null,
@@ -152,7 +153,7 @@ class ConnectManager(context: Application) {
         }.onFailure { file.delete() }
     }
 
-    fun prepareUrl(url: String) = url.removeSurrounding("\"", "\"")
+    public fun prepareUrl(url: String): String = url.removeSurrounding("\"", "\"")
 
     private fun String.prepare(): String {
         val prepare = trim().removeSurrounding("\"", "\"").trim()
@@ -187,8 +188,8 @@ class ConnectManager(context: Application) {
         )
     }
 
-    companion object {
-        val defaultHeaders = StringValuesBuilderImpl(true, 4).apply {
+    internal companion object {
+        private val defaultHeaders = StringValuesBuilderImpl(true, 4).apply {
             append(
                 HttpHeaders.Accept,
                 "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8"
@@ -198,8 +199,9 @@ class ConnectManager(context: Application) {
             append("Upgrade-Insecure-Requests", "1")
         }.build()
 
-        val defaultCacheControl = CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build()
-        val noCacheControl = CacheControl.Builder().noCache().noStore().build()
+        private val defaultCacheControl =
+            CacheControl.Builder().maxAge(10, TimeUnit.MINUTES).build()
+        private val noCacheControl = CacheControl.Builder().noCache().noStore().build()
     }
 }
 

@@ -5,7 +5,7 @@ import com.san.kir.data.models.utils.SortLibraryUtil
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Category(
+public data class Category(
     val id: Long = 0L,
     val name: String = "",
     val order: Int = 0,

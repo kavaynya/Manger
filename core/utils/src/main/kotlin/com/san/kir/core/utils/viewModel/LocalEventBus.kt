@@ -4,15 +4,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ProvidedValue
 import androidx.compose.runtime.staticCompositionLocalOf
 
-object LocalEventBus {
+public object LocalEventBus {
     private val LocalEventBus =
         staticCompositionLocalOf<EventBus> { error("EventBus was not provided") }
 
-    val current: EventBus
+    public val current: EventBus
         @Composable
         get() = LocalEventBus.current
 
-    infix fun provides(componentContext: EventBus): ProvidedValue<EventBus> {
+    public infix fun provides(componentContext: EventBus): ProvidedValue<EventBus> {
         return LocalEventBus.provides(componentContext)
     }
 }

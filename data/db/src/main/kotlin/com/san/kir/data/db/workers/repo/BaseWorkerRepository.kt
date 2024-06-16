@@ -5,11 +5,11 @@ import com.san.kir.data.db.workers.dao.BaseTaskDao
 import com.san.kir.data.models.base.BaseTask
 import kotlinx.coroutines.flow.Flow
 
-abstract class BaseWorkerRepository<OUT : BaseTask<OUT>>(
+public abstract class BaseWorkerRepository<OUT : BaseTask<OUT>> internal constructor(
     private val dao: BaseTaskDao<*>,
 ) {
-   abstract val catalog: Flow<List<OUT>>
-    suspend fun remove(item: OUT) = withIoContext { dao.removeById(item.id) }
-    suspend fun clear() = withIoContext { dao.clear() }
+    public abstract val catalog: Flow<List<OUT>>
+    public suspend fun remove(item: OUT): Unit = withIoContext { dao.removeById(item.id) }
+    public suspend fun clear(): Unit = withIoContext { dao.clear() }
 
 }

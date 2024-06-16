@@ -9,12 +9,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 
-class ExpandedMenuScope internal constructor(
+public class ExpandedMenuScope internal constructor(
     private val onCloseMenu: () -> Unit,
 ) {
 
     @Composable
-    fun MenuText(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+    public fun MenuText(text: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
         DropdownMenuItem(
             onClick = {
                 onClick()
@@ -26,11 +26,11 @@ class ExpandedMenuScope internal constructor(
     }
 
     @Composable
-    fun MenuText(id: Int, modifier: Modifier = Modifier, onClick: () -> Unit) =
+    public fun MenuText(id: Int, modifier: Modifier = Modifier, onClick: () -> Unit): Unit =
         MenuText(stringResource(id), modifier, onClick)
 
     @Composable
-    fun CheckedMenuText(
+    public fun CheckedMenuText(
         id: Int,
         checked: Boolean,
         onClick: () -> Unit,
@@ -53,7 +53,7 @@ class ExpandedMenuScope internal constructor(
 }
 
 @Composable
-fun ExpandedMenu(
+public fun ExpandedMenu(
     modifier: Modifier = Modifier,
     expanded: Boolean,
     onCloseMenu: () -> Unit,

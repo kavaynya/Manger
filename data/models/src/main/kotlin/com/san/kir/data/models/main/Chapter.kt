@@ -11,7 +11,7 @@ import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
-data class Chapter(
+public data class Chapter(
     override val id: Long = 0,
     val mangaId: Long = 0,
     override val name: String = "",
@@ -33,7 +33,7 @@ data class Chapter(
     override val path: String = _path.preparePath()
 }
 
-val Chapter.action: Int
+public val Chapter.action: Int
     get() {  // Определение доступного действия для главы
         getFullPath(path).apply {
             when {

@@ -1,20 +1,20 @@
 package com.san.kir.core.utils
 
-object TestTags {
-    object Library {
+public object TestTags {
+    public object Library {
         private const val base = "Library_"
-        const val tab = base + "tab"
-        const val empty_view = base + "empty_view"
-        const val page = base + "page"
-        const val item = base + "item"
+        public const val tab: String = base + "tab"
+        public const val empty_view: String = base + "empty_view"
+        public const val page: String = base + "page"
+        public const val item: String = base + "item"
 
     }
 
-    object Drawer {
+    public object Drawer {
         private const val base = "Base_"
-        const val drawer_open = base + "drawer_open"
-        const val nav_back = base + "nav_back"
-        const val item = base + "item"
+        public const val drawer_open: String = base + "drawer_open"
+        public const val nav_back: String = base + "nav_back"
+        public const val item: String = base + "item"
 
     }
 }

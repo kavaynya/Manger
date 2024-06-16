@@ -4,10 +4,10 @@ import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 
-fun findInGoogle(name: String) =
+public fun findInGoogle(name: String): String =
     "https://www.google.com/s2/favicons?domain=$name"
 
-fun Text.text(context: Context): CharSequence {
+public fun Text.text(context: Context): CharSequence {
     return when (this) {
         is Text.Resource -> context.getString(id)
         is Text.Simple -> text
@@ -15,7 +15,7 @@ fun Text.text(context: Context): CharSequence {
 }
 
 @Composable
-fun Text.text(): CharSequence {
+public fun Text.text(): CharSequence {
     val context = LocalContext.current
     return text(context)
 }

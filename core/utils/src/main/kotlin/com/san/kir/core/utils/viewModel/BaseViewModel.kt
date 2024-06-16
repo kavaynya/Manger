@@ -13,16 +13,17 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.coroutines.CoroutineContext
 
-abstract class ViewModel<S : ScreenState>(eventBus: EventBus = EventBusImpl()) :
+public abstract class ViewModel<S : ScreenState>(eventBus: EventBus = EventBusImpl()) :
     StateHolder<S>, EventBus by eventBus, CoroutineScope {
 
     protected abstract val tempState: Flow<S>
     protected abstract val defaultState: S
 
-    override val coroutineContext = SupervisorJob() + Dispatchers.Main.immediate
+    override val coroutineContext: CoroutineContext = SupervisorJob() + Dispatchers.Main.immediate
 
-    override val state by lazy {
+    override val state: StateFlow<S> by lazy {
         tempState
             .onEach { Timber.tag("ViewModel").i("NEW STATE $it") }
             .flowOn(defaultDispatcher)
@@ -45,11 +46,11 @@ abstract class ViewModel<S : ScreenState>(eventBus: EventBus = EventBusImpl()) :
         cancel()
     }
 
-    fun <T> Flow<T>.stateInSubscribed(defaultValue: T): StateFlow<T> {
+    public fun <T> Flow<T>.stateInSubscribed(defaultValue: T): StateFlow<T> {
         return stateIn(this@ViewModel, SharingStarted.WhileSubscribed(), defaultValue)
     }
 
-    fun <T> Flow<T>.stateInEagerly(defaultValue: T): StateFlow<T> {
+    public fun <T> Flow<T>.stateInEagerly(defaultValue: T): StateFlow<T> {
         return stateIn(this@ViewModel, SharingStarted.Eagerly, defaultValue)
     }
 }

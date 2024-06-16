@@ -5,7 +5,7 @@ import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.data.models.utils.PlannedWeek
 
-data class SimplifiedTask(
+public data class SimplifiedTask(
     override val id: Long = 0L,
     override val manga: String = "",
     override val groupName: String = "",

@@ -19,7 +19,7 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.lerp
 
-class ColorPickerState internal constructor(private val initialColor: Color) {
+public class ColorPickerState internal constructor(private val initialColor: Color) {
     private val currentColor by derivedStateOf {
         val hValue = hValue
         val sValue = sValue
@@ -97,18 +97,15 @@ class ColorPickerState internal constructor(private val initialColor: Color) {
     private var hasGesture = false
     internal var svPosition by mutableStateOf(Offset.Zero)
     internal var svSize by mutableStateOf(Size.Zero)
-    var hValue by mutableFloatStateOf(0.0f)
-        private set
-    var sValue by mutableFloatStateOf(0.0f)
-        private set
-    var vValue by mutableFloatStateOf(0.0f)
-        private set
+    private var hValue: Float by mutableFloatStateOf(0.0f)
+    private var sValue: Float by mutableFloatStateOf(0.0f)
+    private var vValue: Float by mutableFloatStateOf(0.0f)
 
     init {
         initHSV(this.initialColor)
     }
 
-    fun reset() {
+    public fun reset() {
         initHSV(this.initialColor)
         hPosition = hSize.width / 360.0f * hValue
         svPosition = Offset(
@@ -117,13 +114,13 @@ class ColorPickerState internal constructor(private val initialColor: Color) {
         )
     }
 
-    fun updateHPosition(x: Float, width: Int) {
+    public fun updateHPosition(x: Float, width: Int) {
         hasGesture = true
         hPosition = x.coerceIn(0f, width.toFloat())
         hValue = ((hPosition * 360.0f) / width).coerceIn(0.0f, 360.0f)
     }
 
-    fun updateSVPosition(position: Offset, size: IntSize) {
+    public fun updateSVPosition(position: Offset, size: IntSize) {
         hasGesture = true
 
         svPosition = position.copy(
@@ -172,7 +169,7 @@ class ColorPickerState internal constructor(private val initialColor: Color) {
         return (value - min) / (max - min)
     }
 
-    companion object {
+    internal companion object {
         private const val MAX_SATURATION = 1f
         private const val MAX_VALUE = 1f
         private const val MIN_SATURATION = 0.15f

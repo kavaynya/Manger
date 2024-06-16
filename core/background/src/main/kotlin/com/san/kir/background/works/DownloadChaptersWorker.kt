@@ -18,9 +18,10 @@ import com.san.kir.core.internet.wifiNetwork
 import com.san.kir.core.utils.ID
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.bytesToMb
-import com.san.kir.core.utils.formatDouble
+import com.san.kir.core.utils.format
 import com.san.kir.data.chapterRepository
 import com.san.kir.data.chapterWorkerRepository
+import com.san.kir.data.db.workers.repo.ChapterWorkerRepository
 import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.models.workers.ChapterTask
 import com.san.kir.data.parsing.siteCatalogsManager
@@ -33,12 +34,12 @@ import kotlinx.coroutines.flow.takeWhile
 import kotlin.time.Duration.Companion.minutes
 import kotlin.time.Duration.Companion.seconds
 
-class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
+internal class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
     BaseUpdateWorker<ChapterTask>(context, params) {
 
-    override val TAG = "Chapter Downloader"
+    override val TAG: String = "Chapter Downloader"
 
-    override val workerRepository get() = ManualDI.chapterWorkerRepository()
+    override val workerRepository: ChapterWorkerRepository get() = ManualDI.chapterWorkerRepository()
     private val chaptersRepository = ManualDI.chapterRepository()
     private val settingsRepository = ManualDI.settingsRepository()
     private val statisticsRepository = ManualDI.statisticsRepository()
@@ -206,12 +207,12 @@ class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
         val minutes = successfuled.sumOf { it.time } / 1.minutes.inWholeMilliseconds
         return if (minutes < 1)
             applicationContext.getString(
-                R.string.download_mb, formatDouble(bytesToMb(successfuled.sumOf { it.size })),
+                R.string.download_mb, bytesToMb(successfuled.sumOf { it.size }).format(),
             )
         else
             applicationContext.getString(
                 R.string.download_mb_by_min,
-                formatDouble(bytesToMb(successfuled.sumOf { it.size })),
+                bytesToMb(successfuled.sumOf { it.size }).format(),
                 minutes
             )
     }
@@ -251,12 +252,12 @@ class DownloadChaptersWorker(context: Context, params: WorkerParameters) :
         return true
     }
 
-    companion object {
+    public companion object {
         private val notifyId = ID.generate()
 
         private var actionToDownloads: PendingIntent? = null
 
-        fun setDownloadDeepLink(ctx: Context, deepLinkIntent: Intent) {
+        public fun setDownloadDeepLink(ctx: Context, deepLinkIntent: Intent) {
             actionToDownloads = TaskStackBuilder.create(ctx).run {
                 addNextIntentWithParentStack(deepLinkIntent)
                 getPendingIntent(

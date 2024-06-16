@@ -5,22 +5,23 @@ import androidx.compose.runtime.remember
 import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator
 
 @Composable
-fun rememberLambda(block: () -> Unit) = remember { block }
+public fun rememberLambda(block: () -> Unit): () -> Unit = remember { block }
 
 @Composable
-fun <P1> rememberLambda(block: (P1) -> Unit) = remember { block }
+public fun <P1> rememberLambda(block: (P1) -> Unit): (P1) -> Unit = remember { block }
 
 @Composable
-fun <P1, P2> rememberLambda(block: (P1, P2) -> Unit) = remember { block }
+public fun <P1, P2> rememberLambda(block: (P1, P2) -> Unit): (P1, P2) -> Unit = remember { block }
 
 @Composable
-fun <P1, P2, P3> rememberLambda(block: (P1, P2, P3) -> Unit) = remember { block }
+public fun <P1, P2, P3> rememberLambda(block: (P1, P2, P3) -> Unit): (P1, P2, P3) -> Unit =
+    remember { block }
 
-fun <C : NavConfig> navCreator(
+public fun <C : NavConfig> navCreator(
     block: @Composable NavComponentScope.(C) -> Unit,
 ): (C) -> NavComponent<C> = { navComponent(it, block) }
 
-fun <C : NavConfig> navAnimation(
+public fun <C : NavConfig> navAnimation(
     block: (C) -> StackAnimator
 ): (C) -> StackAnimator = { block(it) }
 
