@@ -31,6 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.animation.SharedParams
@@ -41,7 +42,7 @@ private val DefaultRoundedShape = RoundedCornerShape(50)
 private val IconSize = DpSize(24.dp + Dimensions.default * 2, 24.dp + Dimensions.half * 2)
 private val IconButtonPaddings =
     PaddingValues.Absolute(Dimensions.default, Dimensions.half, Dimensions.default, Dimensions.half)
-private val FabButtonHeight = 72.dp
+public val FabButtonHeight: Dp = 72.dp
 
 @Composable
 public fun <T> LazyRadioGroup(

@@ -16,11 +16,11 @@ internal sealed class SchedulePages(
 internal fun pages() = remember { listOf(PlannedPage, UpdatePages) }
 
 internal data object PlannedPage : SchedulePages(
-    nameId = R.string.planned_task_name,
+    nameId = R.string.scheduled_tasks,
     content = { nav -> TasksScreen(nav) }
 )
 
 internal data object UpdatePages : SchedulePages(
-    nameId = R.string.available_update_name,
+    nameId = R.string.allowed_for_update,
     content = { UpdatesScreen() }
 )

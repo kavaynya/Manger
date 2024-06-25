@@ -6,6 +6,8 @@ import androidx.core.content.ContextCompat
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.PeriodicWorkRequestBuilder
+import androidx.work.WorkInfo
+import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.san.kir.background.R
@@ -20,6 +22,7 @@ import com.san.kir.data.models.base.PlannedTaskBase
 import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.data.plannedRepository
+import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 import java.util.Calendar
 import java.util.concurrent.TimeUnit
@@ -83,7 +86,7 @@ public class ScheduleWorker(
     }
 
     public companion object {
-       private const val TAG = "scheduleWork"
+        private const val TAG = "scheduleWork"
         private const val DAY_PERIOD = AlarmManager.INTERVAL_DAY
         private const val WEEK_PERIOD = DAY_PERIOD * 7
 
@@ -163,6 +166,10 @@ public class ScheduleWorker(
 
         }
 
+        public fun workInfos(itemId: Long): Flow<List<WorkInfo>> = WorkManager
+            .getInstance(ManualDI.application)
+            .getWorkInfosByTagFlow(TAG + itemId)
+
         private fun getDelay(item: PlannedTaskBase): Long {
             val calendar = Calendar.getInstance()
             calendar.timeInMillis = System.currentTimeMillis()
@@ -182,7 +189,6 @@ public class ScheduleWorker(
                 calendar.timeInMillis - System.currentTimeMillis()
             }
         }
-
 
     }
 }

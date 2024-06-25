@@ -32,7 +32,7 @@ internal fun ItemContent(
             .clickable(enabled = onClick != null) { onClick?.invoke(params) }
             .fillMaxWidth()
             .saveParams(params)
-            .padding(vertical = Dimensions.smaller, horizontal = Dimensions.half),
+            .padding(vertical = Dimensions.half, horizontal = Dimensions.default),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Column(
@@ -44,7 +44,7 @@ internal fun ItemContent(
             Text(
                 subTitle,
                 maxLines = 1,
-                style = MaterialTheme.typography.subtitle2
+                style = MaterialTheme.typography.titleSmall
             )
         }
         Switch(

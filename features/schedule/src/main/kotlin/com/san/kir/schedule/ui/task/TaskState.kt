@@ -1,11 +1,11 @@
 package com.san.kir.schedule.ui.task
 
 import androidx.compose.runtime.Stable
+import com.san.kir.core.utils.viewModel.ScreenState
+import com.san.kir.data.models.main.PlannedTask
 import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.data.models.utils.PlannedWeek
-import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.db.main.entites.DbPlannedTask
 
 @Stable
 internal data class TaskState(
@@ -19,11 +19,12 @@ internal data class TaskState(
     val mangaIds: List<Long> = emptyList(),
     val mangaNames: List<String> = emptyList(),
     val availableAction: AvailableAction = AvailableAction.None,
+    val backgroundWork: BackgroundWork = BackgroundWork()
 ) : ScreenState {
     companion object {
-        val weeks = emptyList(*com.san.kir.data.models.utils.PlannedWeek.values())
-        val periods = emptyList(*com.san.kir.data.models.utils.PlannedPeriod.values())
-        val types = emptyList(*com.san.kir.data.models.utils.PlannedType.values())
+        val weeks = PlannedWeek.entries
+        val periods = PlannedPeriod.entries
+        val types = PlannedType.entries
     }
 }
 
@@ -33,3 +34,6 @@ internal sealed interface AvailableAction {
     data object None : AvailableAction
 }
 
+internal data class BackgroundWork(val hasWork: Boolean = false, val hasAction: Boolean = true) {
+    val hasBackgrounds = hasWork || hasAction
+}

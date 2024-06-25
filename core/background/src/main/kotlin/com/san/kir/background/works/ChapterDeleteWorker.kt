@@ -30,7 +30,7 @@ public abstract class ChapterDeleteWorker(appContext: Context, workerParams: Wor
             ManualDI.workManager().enqueue(task)
         }
 
-        public fun workInfos(): Flow<MutableList<WorkInfo>> =
+        public fun workInfos(): Flow<List<WorkInfo>> =
             WorkManager
                 .getInstance(ManualDI.application)
                 .getWorkInfosByTagFlow(TAG)

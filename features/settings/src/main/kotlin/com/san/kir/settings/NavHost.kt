@@ -9,13 +9,13 @@ import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.settings.ui.settings.SettingsScreen
 import kotlinx.serialization.Serializable
 
-fun settingsNavigationCreators() {
+public fun settingsNavigationCreators() {
     AddNavigationCreators
 }
 
 @NavEntry
 @Serializable
-object Settings : NavConfig() {
+public object Settings : NavConfig() {
    internal val creator = navCreator<Settings> {
         SettingsScreen(backPressed())
     }

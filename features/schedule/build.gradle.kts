@@ -1,5 +1,7 @@
 plugins {
     id("compose.library")
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -7,11 +9,15 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.background))
-    implementation(project(Modules.Data.db))
-    implementation(project(Modules.Data.parsing))
+    implementation(projects.core.compose)
+    implementation(projects.core.utils)
+    implementation(projects.core.background)
+    implementation(projects.data.db)
+    implementation(projects.data.models)
+    implementation(projects.data.parsing)
 
-    implementation(libs.timber)
+    implementation(libs.activity)
+
+    implementation(project(Modules.ksp))
+    ksp(project(Modules.ksp))
 }

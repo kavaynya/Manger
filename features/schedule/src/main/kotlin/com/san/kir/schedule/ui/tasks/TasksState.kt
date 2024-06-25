@@ -2,10 +2,8 @@ package com.san.kir.schedule.ui.tasks
 
 import com.san.kir.core.utils.viewModel.ScreenState
 
-
-
 internal data class TasksState(
-    val items: List<Task>
+    val items: List<Task> = emptyList()
 ) : ScreenState
 
 internal data class Task(

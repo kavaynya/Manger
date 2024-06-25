@@ -3,19 +3,20 @@ package com.san.kir.schedule.ui.updates
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.schedule.logic.repo.UpdatesRepository
-import com.san.kir.schedule.logic.repo.updatesRepository
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.data.mangaRepository
 import kotlinx.coroutines.flow.map
 
 internal class UpdatesViewModel(
-    private val updatesRepository: UpdatesRepository = ManualDI.updatesRepository,
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
 ) : ViewModel<UpdatesState>(), UpdatesStateHolder {
-    override val tempState = updatesRepository.items.map { UpdatesState(it) }
-    override val defaultState = UpdatesState(emptyList())
+    override val tempState = mangaRepository.miniItems.map { UpdatesState(it) }
+    override val defaultState = UpdatesState()
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            is UpdatesEvent.Update -> updatesRepository.update(event.itemId, event.updateState)
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            is UpdatesAction.Update ->
+                mangaRepository.changeIsUpdate(action.itemId, action.updateState)
         }
     }
 }
