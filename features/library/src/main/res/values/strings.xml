@@ -34,10 +34,10 @@
     <string name="library_menu_reload_all">Обновить все</string>
     <string name="library_menu_update">Поиск обновлений приложения</string>
     <string name="library_page_item_size">%s Мб</string>
-    <string name="library_add_manga_title">Добавление новой манги</string>
-    <string name="library_add_manga_hint">Введите ссылку на мангу</string>
-    <string name="library_add_manga_add_btn">Добавить</string>
-    <string name="library_add_manga_cancel_btn">Отменить</string>
+    <string name="adding_new_manga">Добавление новой манги</string>
+    <string name="enter_manga_link">Введите ссылку на мангу</string>
+    <string name="add">Добавить</string>
+    <string name="cancel">Отменить</string>
     <string name="library_add_manga_error">Ошибка в ссылке или нет интернета</string>
 
     <!-- MainMenu -->
@@ -50,7 +50,7 @@
     <string name="size_mb_format">%s Мб</string>
     <string name="main_menu_downloader_count">Загрузчик: %d</string>
     <string name="main_menu_latest_count">Обновления: %d</string>
-    <string name="main_menu_search">Поиск</string>
+    <string name="search">Поиск</string>
 
     <string name="manga_info_dialog_title">Информация о манге</string>
 

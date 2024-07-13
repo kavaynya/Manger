@@ -6,12 +6,14 @@ import com.san.kir.core.utils.viewModel.ScreenState
 @Stable
 internal data class AddStandartState(
     val categoryName: String = "",
-    val createNewCategory: Boolean = false,
-    val hasAllow: Boolean = false,
     val availableCategories: List<String> = emptyList(),
     val progress: Int = 0,
     val processState: ProcessState = ProcessState.None,
-) : ScreenState
+) : ScreenState {
+    val hasAllow = categoryName.length >= 3
+    val createNewCategory =
+        hasAllow && availableCategories.size != 1 || availableCategories.first() != categoryName
+}
 
 internal sealed interface ProcessState {
     data object Load : ProcessState
@@ -21,9 +23,9 @@ internal sealed interface ProcessState {
 }
 
 internal object ProcessStatus {
-    const val categoryChanged = 1
-    const val prevAndUpdateManga = 2
-    const val prevAndCreatedFolder = 3
-    const val prevAndSearchChapters = 4
-    const val allComplete = 5
+    const val CATEGORY_CHANGED = 1
+    const val PREV_AND_UPDATE_MANGA = 2
+    const val PREV_AND_CREATED_FOLDER = 3
+    const val PREV_AND_SEARCH_CHAPTERS = 4
+    const val ALL_COMPLETE = 5
 }

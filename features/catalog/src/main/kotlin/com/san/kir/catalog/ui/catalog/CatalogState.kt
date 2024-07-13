@@ -4,33 +4,29 @@ import androidx.annotation.StringRes
 import androidx.compose.runtime.Stable
 import com.san.kir.catalog.R
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.models.extend.MiniCatalogItem
 
-internal data class CatalogState(
-    val items: List<MiniCatalogItem> = emptyList(),
-    val title: String = "",
-    val search: String = "",
-    val background: BackgroundState = BackgroundState(
-        updateItems = false,
-        updateCatalogs = false,
-        progress = null
-    ),
-    val sort: SortState = SortState(),
-) : ScreenState {
-    override fun toString() =
-        "CatalogState(items = ${items.size}, title = $title, search = $search, " +
-                "background = $background, sort = $sort"
+internal class CatalogState : ScreenState
+
+internal data class SelectableItem(
+    val name: String,
+    val state: Boolean
+)
+
+@Stable
+internal data class BackgroundState(
+    val updateItems: Boolean = false,
+    val updateCatalogs: Boolean = false,
+    val progress: Float? = null,
+) {
+    val currentState: Boolean
+        get() = updateCatalogs || updateItems
 }
 
 @Stable
 internal data class SortState(
     val type: SortType = SortType.Date,
     val reverse: Boolean = false,
-)
-
-internal data class FilterState(
-    val search: String = "",
-    val selectedFilters: Map<FilterType, List<String>> = emptyMap()
+    val hasPopulateSort: Boolean = true
 )
 
 internal sealed interface SortType {
@@ -39,30 +35,22 @@ internal sealed interface SortType {
     data object Pop : SortType
 }
 
+internal data class FilterState(
+    val search: String = "",
+    val selectedFilters: Map<FilterType, List<String>> = emptyMap()
+) {
+    val hasSelectedFilters = selectedFilters.isNotEmpty()
+}
+
 @Stable
 internal data class Filter(
     val type: FilterType,
     val items: List<SelectableItem>
 )
 
-@Stable
-internal data class BackgroundState(
-    val updateItems: Boolean,
-    val updateCatalogs: Boolean,
-    val progress: Float?,
-) {
-    val currentState: Boolean
-        get() = updateCatalogs || updateItems
-}
-
-internal data class SelectableItem(
-    val name: String,
-    val state: Boolean
-)
-
 internal sealed class FilterType(@StringRes val stringId: Int) {
-    data object Genres : FilterType(R.string.catalog_fot_one_site_genres)
-    data object Types : FilterType(R.string.catalog_fot_one_site_type)
-    data object Statuses : FilterType(R.string.catalog_fot_one_site_statuses)
-    data object Authors : FilterType(R.string.catalog_fot_one_site_authors)
+    data object Genres : FilterType(R.string.genres)
+    data object Types : FilterType(R.string.manga_type)
+    data object Statuses : FilterType(R.string.manga_status)
+    data object Authors : FilterType(R.string.authors)
 }

@@ -2,17 +2,20 @@ package com.san.kir.catalog.ui.addOnline
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -22,9 +25,6 @@ import androidx.compose.ui.platform.LocalClipboardManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import com.google.accompanist.flowlayout.FlowCrossAxisAlignment
-import com.google.accompanist.flowlayout.FlowMainAxisAlignment
-import com.google.accompanist.flowlayout.FlowRow
 import com.san.kir.catalog.R
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.Fonts
@@ -35,38 +35,47 @@ import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
+import com.san.kir.core.utils.viewModel.Action
+import com.san.kir.core.utils.viewModel.OnEvent
+import com.san.kir.core.utils.viewModel.ReturnEvents
+import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun AddOnlineScreen(
     navigateUp: () -> Unit,
     navigateToNext: (String, SharedParams) -> Unit,
 ) {
     val holder: AddOnlineStateHolder = stateHolder { AddOnlineViewModel() }
-    val state by holder.state.collectAsState()
+    val state by holder.state.collectAsStateWithLifecycle()
+    val sendAction = holder.rememberSendAction()
+
+    holder.OnEvent { event ->
+        when (event) {
+            is AddOnlineEvent.ToUp -> navigateUp()
+            is AddOnlineEvent.ToNext -> navigateToNext(event.url, event.params)
+        }
+    }
 
     ScreenContent(
+        additionalPadding = Dimensions.default,
         topBar = topBar(
             navigationButton = NavigationButton.Back(navigateUp),
-            title = stringResource(R.string.library_add_manga_title),
+            title = stringResource(R.string.adding_new_manga),
             hasAction = state.isCheckingUrl
         ),
     ) {
-        Content(
-            state = state,
-            sendEvent = holder::sendAction,
-            navigateUp = navigateUp,
-            navigateToNext = navigateToNext
-        )
+        Content(state = state, sendAction = sendAction)
     }
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun ColumnScope.Content(
     state: AddOnlineState,
-    sendEvent: (AddOnlineEvent) -> Unit,
-    navigateUp: () -> Unit,
-    navigateToNext: (String, SharedParams) -> Unit,
+    sendAction: (Action) -> Unit,
 ) {
     var enteredText by remember { mutableStateOf("") }
 
@@ -75,17 +84,17 @@ private fun ColumnScope.Content(
         value = enteredText,
         onValueChange = {
             enteredText = it
-            sendEvent(AddOnlineEvent.Update(it))
+            sendAction(AddOnlineAction.Update(it))
         },
         singleLine = true,
         isError = state.isErrorAvailable,
-        placeholder = { Text(stringResource(R.string.library_add_manga_hint)) },
+        placeholder = { Text(stringResource(R.string.enter_manga_link)) },
         modifier = Modifier.fillMaxWidth(),
     )
 
     ClipboardText {
         enteredText = it
-        sendEvent(AddOnlineEvent.Update(it))
+        sendAction(AddOnlineAction.Update(it))
     }
 
     // Сообщение об ошибке
@@ -100,9 +109,9 @@ private fun ColumnScope.Content(
     // Вывод катологов, которым может соответсвтовать введенный адрес ссылки
     AnimatedVisibility(visible = state.validatesCatalogs.isNotEmpty()) {
         FlowRow(
-            modifier = Modifier.fillMaxWidth(),
-            mainAxisAlignment = FlowMainAxisAlignment.End,
-            crossAxisAlignment = FlowCrossAxisAlignment.End,
+            horizontalArrangement = Arrangement.End,
+            verticalArrangement = Arrangement.Bottom,
+            modifier = Modifier.fillMaxWidth()
         ) {
             state.validatesCatalogs.forEach { item ->
                 Card(
@@ -110,7 +119,7 @@ private fun ColumnScope.Content(
                         .padding(Dimensions.quarter)
                         .clickable {
                             enteredText = item
-                            sendEvent(AddOnlineEvent.Update(item))
+                            sendAction(AddOnlineAction.Update(item))
                         }
                 ) {
                     Text(
@@ -130,28 +139,29 @@ private fun ColumnScope.Content(
         modifier = Modifier
             .padding(top = Dimensions.default)
             .fillMaxWidth(),
-        mainAxisAlignment = FlowMainAxisAlignment.End,
-        crossAxisAlignment = FlowCrossAxisAlignment.End,
+        horizontalArrangement = Arrangement.End,
+        verticalArrangement = Arrangement.Bottom,
     ) {
-        Button(onClick = { navigateUp() }, modifier = Modifier.padding(end = Dimensions.default)) {
-            Text(stringResource(R.string.library_add_manga_cancel_btn))
+        Button(
+            onClick = { sendAction(ReturnEvents(AddOnlineEvent.ToUp)) },
+            modifier = Modifier.padding(end = Dimensions.default)
+        ) {
+            Text(stringResource(R.string.cancel))
         }
 
         val params = rememberSharedParams()
         Button(
-            onClick = { navigateToNext(enteredText, params) },
+            onClick = { sendAction(ReturnEvents(AddOnlineEvent.ToNext(enteredText, params))) },
             enabled = state.isEnableAdding,
             modifier = Modifier.saveParams(params)
         ) {
-            Text(stringResource(R.string.library_add_manga_add_btn))
+            Text(stringResource(R.string.add))
         }
     }
 }
 
 @Composable
-private fun ClipboardText(
-    onPaste: (String) -> Unit,
-) {
+private fun ClipboardText(onPaste: (String) -> Unit) {
     val clipboardText = LocalClipboardManager.current.getText()?.text
 
     Card(
@@ -165,7 +175,7 @@ private fun ClipboardText(
                 .fillMaxWidth()
         ) {
             Text(
-                stringResource(R.string.add_manga_online_clipboard),
+                stringResource(R.string.insert_from_clipboard),
                 fontSize = Fonts.Size.bigger
             )
 

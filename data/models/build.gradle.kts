@@ -1,6 +1,7 @@
 plugins {
     id("compose.library")
     `kotlin-parcelize`
+    alias(libs.plugins.serialization)
 }
 
 android {

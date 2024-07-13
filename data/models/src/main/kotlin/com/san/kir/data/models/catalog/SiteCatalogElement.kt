@@ -1,10 +1,9 @@
 package com.san.kir.data.models.catalog
 
-import android.os.Parcelable
 import com.san.kir.data.models.main.Manga
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
-@Parcelize
+@Serializable
 public data class SiteCatalogElement(
     val id: Long = 0,
     val host: String = "",
@@ -23,7 +22,7 @@ public data class SiteCatalogElement(
     val logo: String = "",
     val dateId: Int = 0,
     val isFull: Boolean = false,
-) : Parcelable
+)
 
 public fun SiteCatalogElement.toManga(categoryId: Long, path: String): Manga {
     return Manga(

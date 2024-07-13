@@ -3,10 +3,9 @@ package com.san.kir.catalog.ui.catalog
 import android.content.Context
 import com.san.kir.background.logic.UpdateCatalogManager
 import com.san.kir.background.logic.di.updateCatalogManager
-import com.san.kir.catalog.logic.di.catalogRepository
-import com.san.kir.catalog.logic.repo.CatalogRepository
+import com.san.kir.catalog.logic.linksForCatalog
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.coroutines.defaultDispatcher
+import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.longToast
 import com.san.kir.core.utils.put
@@ -14,104 +13,120 @@ import com.san.kir.core.utils.remove
 import com.san.kir.core.utils.set
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
+import com.san.kir.data.catalogsRepository
+import com.san.kir.data.db.catalog.repo.CatalogsRepository
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.data.mangaRepository
 import com.san.kir.data.models.catalog.MiniCatalogItem
 import com.san.kir.data.models.utils.DownloadState
+import com.san.kir.data.parsing.SiteCatalogsManager
+import com.san.kir.data.parsing.siteCatalogsManager
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 internal class CatalogViewModel(
-    private val context: Context = ManualDI.context,
-    private val catalogRepository: CatalogRepository = ManualDI.catalogRepository,
-    private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager,
+    catalogName: String,
+    private val context: Context = ManualDI.application,
+    private val catalogsRepository: CatalogsRepository = ManualDI.catalogsRepository(),
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
+    private val siteCatalogManager: SiteCatalogsManager = ManualDI.siteCatalogsManager(),
+    private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager(),
 ) : ViewModel<CatalogState>(), CatalogStateHolder {
     private var job: Job? = null
-    private val items = MutableStateFlow(emptyList<MiniCatalogItem>())
-    private val title = MutableStateFlow("")
-    private val background = MutableStateFlow(
-        BackgroundState(updateItems = false, updateCatalogs = false, progress = null)
-    )
-    private val sort = MutableStateFlow(SortState())
-    private val filter = MutableStateFlow(FilterState())
 
-    private val _filters = MutableStateFlow(emptyList<Filter>())
-    override val filters = _filters.asStateFlow()
+    private var catalogItems = emptyList<MiniCatalogItem>()
+    private val catalogName = siteCatalogManager.catalogName(catalogName)
+    private val siteCatalog = siteCatalogManager.catalogByName(catalogName)
 
-    override val tempState = combine(
-        items, title, filter, background, sort
-    ) { items, title, filter, background, sort ->
-        CatalogState(
-            items = items.applyFilters(filter).applySort(sort),
-            title = title,
-            search = filter.search,
-            background = background,
-            sort = sort
-        )
-    }
+    override val filterState = MutableStateFlow(FilterState())
+    override val sortState =
+        MutableStateFlow(SortState(hasPopulateSort = siteCatalog.hasPopulateSort))
+    override val filters = MutableStateFlow(emptyList<Filter>())
+    override val backgroundWork = MutableStateFlow(BackgroundState())
+
+    @OptIn(ExperimentalCoroutinesApi::class)
+    override val items = combine(
+        filterState,
+        sortState,
+        mangaRepository.items
+            .mapLatest { mangas ->
+                if (catalogItems.isEmpty()) {
+                    catalogItems = catalogsRepository.items(this.catalogName)
+                }
+
+                val mangaLinks = mangas.linksForCatalog(siteCatalog)
+
+                catalogItems.map { item ->
+                    if (mangaLinks.any { it.contains(item.shortLink) }) {
+                        item.copy(state = MiniCatalogItem.State.Update)
+                    } else {
+                        item.copy(state = MiniCatalogItem.State.Added)
+                    }
+                }
+            },
+    ) { filterState, sortState, list ->
+        backgroundWork.update { it.copy(updateItems = true) }
+
+        if (filters.value.isEmpty()) {
+            filters.update { list.initFilters() }
+        }
+        list.applyFilters(filterState).applySort(sortState)
+    }.onEach {
+        backgroundWork.update { it.copy(updateItems = false) }
+    }.stateInSubscribed(emptyList())
 
     override val defaultState = CatalogState()
+    override val tempState = MutableStateFlow(defaultState)
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            is CatalogEvent.Set -> set(event.catalogName)
-            is CatalogEvent.UpdateManga -> updateManga(event.item)
-            is CatalogEvent.ChangeFilter -> changeFilter(event.type, event.index)
-            is CatalogEvent.Search -> filter.update { it.copy(search = event.query) }
-            is CatalogEvent.ChangeSort -> sort.update { it.copy(type = event.sort) }
-            CatalogEvent.Reverse -> sort.update { it.copy(reverse = it.reverse.not()) }
-            CatalogEvent.ClearFilters -> clearFilters()
-            CatalogEvent.UpdateContent -> manager.addTask(state.value.title)
-            CatalogEvent.CancelUpdateContent -> manager.removeTask(state.value.title)
+    init {
+        manager.loadTask(this.catalogName)
+            .onEach { task ->
+                backgroundWork.update { old ->
+                    if (task == null) {
+                        old.copy(updateCatalogs = false, progress = null)
+                    } else {
+                        when (task.state) {
+                            DownloadState.LOADING -> old.copy(
+                                updateCatalogs = true, progress = task.progress,
+                            )
+
+                            DownloadState.QUEUED, DownloadState.PAUSED -> old.copy(
+                                updateCatalogs = true, progress = null
+                            )
+
+                            else -> old
+                        }
+                    }
+                }
+            }
+            .launchIn(this)
+    }
+
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            is CatalogAction.UpdateManga -> updateManga(action.item)
+            is CatalogAction.ChangeFilter -> changeFilter(action.type, action.index)
+            is CatalogAction.Search -> filterState.update { it.copy(search = action.query) }
+            is CatalogAction.ChangeSort -> sortState.update { it.copy(type = action.sort) }
+            CatalogAction.Reverse -> sortState.update { it.copy(reverse = it.reverse.not()) }
+            CatalogAction.ClearFilters -> clearFilters()
+            CatalogAction.UpdateContent -> manager.addTask(catalogName)
+            CatalogAction.CancelUpdateContent -> manager.removeTask(catalogName)
         }
     }
 
-    private suspend fun set(catalogName: String) {
-        if (job?.isActive == true) return
-
-        title.update { catalogName }
-
-        job = manager.loadTask(catalogName)
-            .onEach { task ->
-                var old = background.value
-                old = if (task == null) {
-                    old.copy(updateCatalogs = false, progress = null)
-                } else {
-                    when (task.state) {
-                        DownloadState.LOADING ->
-                            old.copy(updateCatalogs = true, progress = task.progress)
-
-                        DownloadState.QUEUED,
-                        DownloadState.PAUSED,
-                        -> old.copy(updateCatalogs = true, progress = null)
-
-                        else -> old
-                    }
-                }
-                background.update { old }
-                if (task == null) updateData(catalogName)
-            }
-            .flowOn(defaultDispatcher)
-            .launchIn(viewModelScope)
-    }
-
-    private suspend fun updateData(catalogName: String) {
-        background.update { it.copy(updateItems = true) }
-        items.update { catalogRepository.items(catalogName) }
-        _filters.update { initFilters() }
-        background.update { it.copy(updateItems = false) }
-    }
-
-    private fun initFilters(): List<Filter> {
+    private fun List<MiniCatalogItem>.initFilters(): List<Filter> {
         return listOf(
-            Filter(FilterType.Genres, items.value.flatMap { it.genres }.toSetSortedList()),
-            Filter(FilterType.Types, items.value.map { it.type }.toSetSortedList()),
-            Filter(FilterType.Statuses, items.value.map { it.statusEdition }.toSetSortedList()),
-            Filter(FilterType.Authors, items.value.flatMap { it.authors }.toSetSortedList())
+            Filter(FilterType.Genres, toSetSortedList { it.genres }),
+            Filter(FilterType.Types, toSetSortedList { listOf(it.type) }),
+            Filter(FilterType.Statuses, toSetSortedList { listOf(it.statusEdition) }),
+            Filter(FilterType.Authors, toSetSortedList { it.authors })
         ).filter { it.items.size > 1 }
     }
 
@@ -120,12 +135,12 @@ internal class CatalogViewModel(
             filter { it.name.lowercase().contains(filter.search.lowercase()) }
         } else this
 
-        filter.selectedFilters.forEach { entry ->
-            prepare = when (entry.key) {
-                FilterType.Authors -> prepare.filter { it.authors.containsAll(entry.value) }
-                FilterType.Genres -> prepare.filter { it.genres.containsAll(entry.value) }
-                FilterType.Statuses -> prepare.filter { entry.value.contains(it.statusEdition) }
-                FilterType.Types -> prepare.filter { entry.value.contains(it.type) }
+        filter.selectedFilters.forEach { (filter, items) ->
+            prepare = when (filter) {
+                FilterType.Authors -> prepare.filter { it.authors.containsAll(items) }
+                FilterType.Genres -> prepare.filter { it.genres.containsAll(items) }
+                FilterType.Statuses -> prepare.filter { items.contains(it.statusEdition) }
+                FilterType.Types -> prepare.filter { items.contains(it.type) }
             }
         }
 
@@ -143,18 +158,24 @@ internal class CatalogViewModel(
     }
 
     private fun changeFilter(type: FilterType, index: Int) {
-        val old = _filters.value
-        val indexFilter = old.indexOfFirst { it.type == type }
+        defaultLaunch {
+            val old = filters.value
+            val indexFilter = old.indexOfFirst { it.type == type }
 
-        if (indexFilter != -1) {
-            val filter = old[indexFilter]
-            val item = filter.items[index].run { copy(state = state.not()) }
-            _filters.update {
-                old.set(indexFilter, filter.copy(items = filter.items.set(index, item)))
-            }
-
-            this.filter.update {
-                it.copy(selectedFilters = it.selectedFilters.addOrRemoveSelectedFilter(type, item))
+            if (indexFilter != -1) {
+                val filter = old[indexFilter]
+                val item = filter.items[index].run { copy(state = state.not()) }
+                filters.update {
+                    old.set(indexFilter, filter.copy(items = filter.items.set(index, item)))
+                }
+                filterState.update {
+                    it.copy(
+                        selectedFilters = it.selectedFilters.addOrRemoveSelectedFilter(
+                            type,
+                            item
+                        )
+                    )
+                }
             }
         }
     }
@@ -175,8 +196,8 @@ internal class CatalogViewModel(
     }
 
     private fun clearFilters() {
-        filter.update { it.copy(selectedFilters = emptyMap()) }
-        _filters.update { old ->
+        filterState.update { it.copy(selectedFilters = emptyMap()) }
+        filters.update { old ->
             old.map { filter ->
                 filter.copy(items = filter.items.map { it.copy(state = false) })
             }
@@ -184,16 +205,21 @@ internal class CatalogViewModel(
     }
 
     private suspend fun updateManga(item: MiniCatalogItem) {
-        catalogRepository.updateMangaBy(item)
+        val element = catalogsRepository.item(catalogName, item.id) ?: return
+        val fullElement = siteCatalogManager.fullElement(element)
+        mangaRepository.updateMangaBy(fullElement)
+
         withMainContext {
             context.longToast("Информация о манге ${item.name} обновлена")
         }
     }
 
-    private fun List<String>.toSetSortedList() =
-        map(String::trim)
+    private fun List<MiniCatalogItem>.toSetSortedList(transform: (MiniCatalogItem) -> Iterable<String>): List<SelectableItem> {
+        return flatMap { transform(it) }
+            .map(String::trim)
+            .filter(String::isNotEmpty)
             .toHashSet()
             .sorted()
-            .filter(String::isNotEmpty)
-            .map { SelectableItem(it, false) }
+            .map { SelectableItem(it, false) }.toList()
+    }
 }

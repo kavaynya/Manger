@@ -1,82 +1,101 @@
 package com.san.kir.catalog
 
-import androidx.compose.runtime.Composable
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.StackAnimator
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.isFront
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
+import NavEntry
 import com.san.kir.catalog.ui.addOnline.AddOnlineScreen
 import com.san.kir.catalog.ui.addStandart.AddStandartScreen
 import com.san.kir.catalog.ui.catalog.CatalogScreen
 import com.san.kir.catalog.ui.catalogItem.CatalogItemScreen
 import com.san.kir.catalog.ui.catalogs.CatalogsScreen
 import com.san.kir.catalog.ui.search.SearchScreen
-import com.san.kir.core.compose.animation.EmptyStackAnimator
 import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.circleShapeAnimator
+import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.animation.verticalSlide
 import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
-import com.san.kir.core.utils.navigation.NavContainer
-import com.san.kir.core.utils.navigation.NavHost
+import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
-import kotlinx.parcelize.Parcelize
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import kotlinx.serialization.Serializable
 
-// hasDeepLink = true
-@Parcelize
-internal class Main : NavConfig {
-    companion object {
-        val creator = navCreator<Main> { _ ->
-            CatalogsScreen(
-                navigateUp = backPressed(),
-                navigateToSearch = add(GlobalSearch()),
-                navigateToItem = add(::Catalog)
-            )
-        }
-    }
+public fun catalogsNavigationCreators() {
+    AddNavigationCreators
+
+
 }
 
-@Parcelize
-internal class Catalog(val catalogName: String, val params: SharedParams) : NavConfig {
-    companion object {
+@NavEntry
+@Serializable
+public object Catalogs : NavConfig() {
+
+    internal val creator = navCreator<Catalogs> { _ ->
+        CatalogsScreen(
+            navigateUp = backPressed(),
+            navigateToSearch = add(GlobalSearch()),
+            navigateToItem = add(::Catalog)
+        )
+    }
+
+    internal val animation = navAnimation<Catalogs> { horizontalSlide() }
+}
+
+@NavEntry
+@Serializable
+public class Catalog(
+    internal val catalogName: String,
+    internal val params: SharedParams,
+) : NavConfig() {
+    internal companion object {
         val creator = navCreator<Catalog> { config ->
             CatalogScreen(
-                navigateUp = back(),
+                navigateUp = backPressed(),
                 navigateToInfo = add(::Info),
                 navigateToAdd = add(::AddLocal),
                 catalogName = config.catalogName
             )
         }
+
+        val animation = navAnimation<Catalog> { shapeAnimator(it.params) }
     }
 }
 
-@Parcelize
-internal class Info(val url: String, val params: SharedParams) : NavConfig {
-    companion object {
+@NavEntry
+@Serializable
+public class Info(internal val item: SiteCatalogElement, internal val params: SharedParams) :
+    NavConfig() {
+    internal companion object {
         val creator = navCreator<Info> { config ->
             CatalogItemScreen(
                 navigateUp = backPressed(),
                 navigateToAdd = add(::AddLocal),
-                url = config.url
+                item = config.item
             )
         }
+
+        val animation = navAnimation<Info> { shapeAnimator(it.params) }
     }
 }
 
-@Parcelize
-internal class AddLocal(val url: String, val params: SharedParams) : NavConfig {
-    companion object {
+@NavEntry
+@Serializable
+public class AddLocal(internal val url: String, internal val params: SharedParams) : NavConfig() {
+    internal companion object {
         val creator = navCreator<AddLocal> { config ->
             AddStandartScreen(
                 navigateUp = backPressed(),
                 url = config.url
             )
         }
+
+        val animation = navAnimation<AddLocal> { shapeAnimator(it.params) }
     }
 }
 
-@Parcelize
-class GlobalSearch(val query: String = "") : NavConfig {
-    companion object {
+@NavEntry
+@Serializable
+public class GlobalSearch(internal val query: String = "") : NavConfig() {
+    internal companion object {
         val creator = navCreator<GlobalSearch> { config ->
             SearchScreen(
                 navigateUp = backPressed(),
@@ -85,50 +104,22 @@ class GlobalSearch(val query: String = "") : NavConfig {
                 searchText = config.query
             )
         }
+
+        val animation = navAnimation<GlobalSearch> { verticalSlide() }
     }
 }
 
-@Parcelize
-class AddOnline : NavConfig {
-    companion object {
+@NavEntry
+@Serializable
+public class AddOnline(internal val params: SharedParams) : NavConfig() {
+    internal companion object {
         val creator = navCreator<AddOnline> { _ ->
             AddOnlineScreen(
                 navigateUp = backPressed(),
                 navigateToNext = add(::AddLocal),
             )
         }
-    }
-}
 
-@Composable
-fun CatalogsNavHost(startConfig: NavConfig = Main()) {
-    NavHost(
-        startConfig = startConfig,
-        animation = animation,
-    ) { config ->
-        when (config) {
-            is Main -> Main.creator(config)
-            is Catalog -> Catalog.creator(config)
-            is GlobalSearch -> GlobalSearch.creator(config)
-            is Info -> Info.creator(config)
-            is AddLocal -> AddLocal.creator(config)
-            is AddOnline -> AddOnline.creator(config)
-            else -> null
-        }
-    }
-}
-
-private val animation = stackAnimation<NavConfig, NavContainer> { initial, target, direction ->
-    if (direction.isFront) frontAnimation(initial.configuration)
-    else frontAnimation(target.configuration)
-}
-
-private fun frontAnimation(config: NavConfig): StackAnimator {
-    return when (config) {
-        is GlobalSearch -> verticalSlide()
-        is Catalog -> shapeAnimator(config.params)
-        is Info -> shapeAnimator(config.params)
-        is AddLocal -> shapeAnimator(config.params)
-        else -> EmptyStackAnimator
+        val animation = navAnimation<AddOnline> { circleShapeAnimator(it.params) }
     }
 }

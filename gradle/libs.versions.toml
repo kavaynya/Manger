@@ -1,7 +1,7 @@
 [versions]
 # Kotlin
 kotlin = "1.9.24"
-coroutines = "1.8.0"
+coroutines = "1.8.1"
 ksp = "1.9.24-1.0.20"
 serialization = "1.6.3"
 datetime = "0.6.0-RC.2"
@@ -11,18 +11,18 @@ decompose = "3.0.0"
 
 # AndroidX
 activity = "1.9.0"
-appcompat = "1.6.1"
+appcompat = "1.7.0"
 constraintlayout = "2.1.4"
 core = "1.13.1"
 datastore = "1.1.1"
-fragment = "1.7.1"
-lifecycle = "2.8.0"
+fragment = "1.8.1"
+lifecycle = "2.8.2"
 room = "2.6.1"
 vectordrawable = "1.2.0"
 workmanager = "2.9.0"
 
 # Compose
-compose = "1.6.7"
+compose = "1.6.8"
 material3 = "1.2.1"
 compose_compiler = "1.5.14" # Don`t forget change field in Version.kt in buildSrc
 
@@ -32,14 +32,14 @@ accompanist = "0.30.0"
 
 # Test
 junit = "4.13.2"
-test_core = "1.5.0"
-test_rules = "1.5.0"
-test_junit = "1.1.5"
-test_runner = "1.5.2"
+test_core = "1.6.1"
+test_rules = "1.6.1"
+test_junit = "1.2.1"
+test_runner = "1.6.1"
 truth = "1.0.1"
 benchmark_junit = "1.2.4"
 kakaocup = "0.0.2"
-espresso = "3.5.1"
+espresso = "3.6.1"
 
 #
 gradle = "8.3.2" # Don`t forget update in buildSrc
@@ -105,7 +105,6 @@ subsampling = { module = "com.davemorrissey.labs:subsampling-scale-image-view-an
 timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # Accompanist
-flowlayout = { module = "com.google.accompanist:accompanist-flowlayout", version.ref = "accompanist" }
 permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
 systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
@@ -158,7 +157,7 @@ espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "esp
 coroutines = ["coroutines_core", "coroutines_android"]
 room = ["room_ktx", "room_paging", "room_runtime"]
 compose = ["compose_ui", "compose_ui_tooling", "compose_ui_tooling_preview", "compose_runtime", "compose_animation", "compose_foundation", "compose_foundation_layout", "compose_material_icons", "compose_material_icons_ext", "compose_material3"]
-accompanist = ["flowlayout", "permissions", "systemuicontroller", "webview"]
+accompanist = ["permissions", "systemuicontroller", "webview"]
 work = ["work_runtime", "work_gcm", "work_multiprocess"]
 hyper = ["hyperion-core", "hyperion-crash"]
 tests = ["test_core", "test_rules", "test_junit", "test_runner", "compose_junit", "kakaocup", "espresso"]

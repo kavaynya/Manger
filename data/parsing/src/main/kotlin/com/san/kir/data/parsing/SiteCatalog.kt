@@ -10,15 +10,15 @@ import timber.log.Timber
 
 public abstract class SiteCatalog {
     public abstract val name: String
-    internal abstract val catalogName: String
+    public abstract val catalogName: String
 
-    internal open val host: String
+    public open val host: String
         get() = "http://$catalogName"
-    internal open val allCatalogName: List<String>
+    public open val allCatalogName: List<String>
         get() = listOf(catalogName)
 
     public open val headers: StringValues? = null
-    internal open val hasPopulateSort: Boolean = true
+    public open val hasPopulateSort: Boolean = true
     internal open val servers: List<String> = emptyList()
 
     internal abstract val catalog: String
@@ -36,7 +36,7 @@ public abstract class SiteCatalog {
 
 internal abstract class SiteCatalogClassic : SiteCatalog()
 
-internal abstract class SiteCatalogAlternative : SiteCatalog()
+public abstract class SiteCatalogAlternative : SiteCatalog()
 
 internal fun SiteCatalog.getShortLink(fullLink: String): String {
     val foundedCatalogs = allCatalogName

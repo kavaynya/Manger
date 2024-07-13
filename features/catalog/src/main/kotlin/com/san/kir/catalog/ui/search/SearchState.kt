@@ -1,10 +1,34 @@
 package com.san.kir.catalog.ui.search
 
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.models.extend.MiniCatalogItem
 
 internal data class SearchState(
-    val items: List<MiniCatalogItem> = emptyList(),
-    val background: Boolean = false
-) : ScreenState
+    val background: Boolean = false,
+    val catalog: List<SelectableCatalog> = emptyList(),
+    val hasFilterChanges: Boolean = false,
+    val addedMangaVisible: Boolean = false,
+) : ScreenState {
+    val selectedCatalogs = catalog.count { it.selected }
+}
 
+internal data class SelectableCatalog(
+    val title: String,
+    val name: String,
+    val selected: Boolean,
+)
+
+internal data class FilterState(
+    val selectedFilters: List<String> = emptyList(),
+    val addedMangaVisible: Boolean = true,
+) {
+    fun hasChanges(other: FilterState): Boolean {
+        if (addedMangaVisible == other.addedMangaVisible
+            && selectedFilters.size == other.selectedFilters.size
+        ) {
+            return selectedFilters.toTypedArray()
+                .contentEquals(other.selectedFilters.toTypedArray())
+                .not()
+        }
+        return true
+    }
+}

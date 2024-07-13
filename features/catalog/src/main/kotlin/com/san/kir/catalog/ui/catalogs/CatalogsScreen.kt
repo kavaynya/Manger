@@ -1,6 +1,5 @@
 package com.san.kir.catalog.ui.catalogs
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -13,30 +12,39 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.DeviceUnknown
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.sp
 import com.san.kir.catalog.R
+import com.san.kir.core.compose.CircleLogo
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
+import com.san.kir.core.compose.QuarterSpacer
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
+import com.san.kir.core.compose.animation.FromStartToStartAnimContent
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
-import com.san.kir.core.compose.endInsetsPadding
-import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.utils.append
 import com.san.kir.core.utils.findInGoogle
+import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
+import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun CatalogsScreen(
     navigateUp: () -> Unit,
@@ -44,31 +52,25 @@ internal fun CatalogsScreen(
     navigateToSearch: () -> Unit,
 ) {
     val holder: CatalogsStateHolder = stateHolder { CatalogsViewModel() }
-    val state by holder.state.collectAsState()
-
-    val sendEvent = remember { { event: CatalogsEvent -> holder.sendAction(event) } }
+    val state by holder.state.collectAsStateWithLifecycle()
+    val sendAction = holder.rememberSendAction()
 
     ScreenList(
         topBar = topBar(
-            navigationButton = NavigationButton.Back(navigateUp),
             title = stringResource(R.string.catalogs),
             actions = {
-                MenuIcon(
-                    icon = Icons.Default.Search,
-                    onClick = navigateToSearch,
-                )
-
-                ExpandedMenu {
-                    MenuText(
-                        id = R.string.catalog_for_one_site_update_catalog_contain,
-                        onClick = { sendEvent(CatalogsEvent.UpdateContent) },
-                    )
-                }
+                MenuIcon(icon = Icons.Default.Search, onClick = navigateToSearch)
+                ExpandedMenu()
             },
+            navigationButton = NavigationButton.Back(navigateUp),
             hasAction = state.background
         ),
+        menuActions = {
+            MenuText(R.string.update_catalog_contain) {
+                sendAction(CatalogsAction.UpdateContent)
+            }
+        },
         additionalPadding = Dimensions.half,
-        onRefresh = { sendEvent(CatalogsEvent.UpdateData) }
     ) {
         items(items = state.items, key = { it.hashCode() }) { item ->
             ItemView(item) { navigateToItem(item.name, it) }
@@ -85,83 +87,118 @@ private fun ItemView(item: CheckableSite, onClick: (SharedParams) -> Unit) {
             .fillMaxWidth()
             .clickable(onClick = { onClick(params) })
             .saveParams(params)
-            .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
+            .padding(vertical = Dimensions.half, horizontal = Dimensions.default)
     ) {
-        Image(
-            rememberImage(findInGoogle(item.host)),
-            contentDescription = "",
-            modifier = Modifier
-                .padding(end = Dimensions.half)
-                .size(Dimensions.Image.default)
-                .startInsetsPadding()
+
+        CircleLogo(
+            logoUrl = findInGoogle(item.host),
+            modifier = Modifier.startInsetsPadding(),
+            size = Dimensions.Image.default
         )
 
         Column(
             modifier = Modifier
                 .weight(1f, true)
+                .padding(start = Dimensions.default)
                 .align(Alignment.CenterVertically)
         ) {
-            Text(item.name, style = MaterialTheme.typography.body1)
-            Text(item.host, style = MaterialTheme.typography.body2)
-        }
+            Text(
+                buildAnnotatedString {
+                    val spanStyle = SpanStyle(fontSize = 16.sp, fontWeight = FontWeight.ExtraBold)
+                    append(item.name, spanStyle)
+                    append(" (", spanStyle)
+                    append(item.host, SpanStyle(fontSize = 13.sp))
+                    append(")", spanStyle)
+                },
+                overflow = TextOverflow.Ellipsis,
+            )
 
-        FromEndToEndAnimContent(
-            targetState = item.state,
-            modifier = Modifier
-                .padding(end = Dimensions.half)
-                .size(Dimensions.default)
-                .align(Alignment.CenterVertically)
-        ) {
-            when (it) {
-                SiteState.Error ->
-                    Icon(
-                        Icons.Default.DeviceUnknown, "",
-                        tint = MaterialTheme.colorScheme.error,
-                    )
+            QuarterSpacer()
 
-                SiteState.Load ->
-                    CircularProgressIndicator(strokeWidth = Dimensions.smallest)
-
-                SiteState.Ok -> {}
+            Row {
+                SiteState(item.state)
+                Text(
+                    stringResource(R.string.volume),
+                    fontWeight = FontWeight.Bold,
+                    style = MaterialTheme.typography.bodySmall,
+                )
             }
+
+            VolumeState(item.volume)
         }
+    }
+}
 
-        FromEndToEndAnimContent(
-            targetState = item.volume,
-            modifier = Modifier
-                .align(Alignment.CenterVertically)
-                .endInsetsPadding()
-        ) {
-            when (it) {
-                VolumeState.Error -> {
-                    Text(
-                        text = stringResource(R.string.site_volume_error),
-                        style = MaterialTheme.typography.caption,
-                    )
-                }
+@Composable
+private fun SiteState(state: SiteState) {
+    FromStartToStartAnimContent(targetState = state) {
+        when (it) {
+            SiteState.Error ->
+                Icon(
+                    Icons.Default.Error, "",
+                    tint = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(end = Dimensions.half)
+                )
 
-                VolumeState.Load -> {
-                    Text(
-                        text = stringResource(R.string.site_volume_load),
-                        style = MaterialTheme.typography.caption,
-                    )
-                }
+            SiteState.Load ->
+                CircularProgressIndicator(
+                    strokeWidth = Dimensions.smallest,
+                    modifier = Modifier
+                        .padding(end = Dimensions.half)
+                        .size(Dimensions.default)
+                )
 
-                is VolumeState.Ok -> {
-                    if (it.diff == 0) {
-                        Text(
-                            text = stringResource(R.string.site_volume_with_number, it.volume),
-                            style = MaterialTheme.typography.caption,
+            SiteState.Ok -> {}
+        }
+    }
+}
+
+@Composable
+private fun VolumeState(state: VolumeState) {
+    FromEndToEndAnimContent(targetState = state) {
+        when (it) {
+            VolumeState.Error ->
+                Text(
+                    text = " " + stringResource(R.string.error, SpanStyle()),
+                    style = MaterialTheme.typography.bodySmall,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.error,
+                )
+
+            VolumeState.Load -> {
+                Text(
+                    text = " " + stringResource(R.string.loading),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Bold,
+                )
+            }
+
+            is VolumeState.Ok -> {
+
+
+                Text(
+                    text = buildAnnotatedString {
+                        append(" ")
+                        append(
+                            "${it.volume}",
+                            SpanStyle(color = MaterialTheme.colorScheme.tertiary)
                         )
-                    } else {
-                        Text(
-                            text = stringResource(
-                                R.string.site_volume_with_numbers, it.diff, it.volume
-                            ),
-                            style = MaterialTheme.typography.caption,
-                        )
-                    }
-                }
+
+                        if (it.diff != 0) {
+                            append(if (it.isPositive) " + " else " - ")
+                            append(
+                                "${it.diff}",
+                                SpanStyle(color = MaterialTheme.colorScheme.secondary)
+                            )
+                        }
+
+                        stringResource(R.string.volume_format, it.volume)
+                    },
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.tertiary,
+                    fontWeight = FontWeight.Bold
+                )
             }
         }
     }

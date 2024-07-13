@@ -1,313 +1,235 @@
 package com.san.kir.catalog.ui.catalog
 
-import androidx.activity.compose.BackHandler
 import androidx.compose.animation.Crossfade
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.IntrinsicSize
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.selection.toggleable
-import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Button
-import androidx.compose.material3.Checkbox
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.IconToggleButton
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ScaffoldState
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.SortByAlpha
 import androidx.compose.material.icons.filled.ThumbsUpDown
-import androidx.compose.material.icons.filled.Update
-import androidx.compose.material3.rememberScaffoldState
+import androidx.compose.material.icons.outlined.SyncAlt
+import androidx.compose.material.icons.twotone.Cancel
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.DpSize
+import androidx.compose.ui.unit.dp
 import com.san.kir.catalog.R
 import com.san.kir.catalog.utils.ListItem
+import com.san.kir.core.compose.AlertDialog
+import com.san.kir.core.compose.DataIconHelper
+import com.san.kir.core.compose.DataTextHelper
+import com.san.kir.core.compose.DefaultBottomBar
 import com.san.kir.core.compose.Dimensions
+import com.san.kir.core.compose.HorizontalIconRadioGroup
+import com.san.kir.core.compose.HorizontalTextRadioGroup
 import com.san.kir.core.compose.NavigationButton
+import com.san.kir.core.compose.RotateToggleButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
 import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.compose.animation.StartAnimatedVisibility
+import com.san.kir.core.compose.animation.animateToDelayed
+import com.san.kir.core.compose.animation.rememberIntAnimatable
 import com.san.kir.core.compose.bottomInsetsPadding
-import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
-import com.san.kir.core.compose.systemBarBottomPadding
-import com.san.kir.core.compose.systemBarStartPadding
-import com.san.kir.core.compose.topInsetsPadding
 import com.san.kir.core.compose.topBar
+import com.san.kir.core.compose.topInsetsPadding
+import com.san.kir.core.utils.add
+import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
+import com.san.kir.core.utils.navigation.DialogState
+import com.san.kir.core.utils.navigation.EmptyDialogData
+import com.san.kir.core.utils.navigation.rememberDialogState
+import com.san.kir.core.utils.navigation.show
+import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
-import com.san.kir.data.models.extend.MiniCatalogItem
-
-import kotlinx.coroutines.launch
+import com.san.kir.data.models.catalog.SiteCatalogElement
+import com.san.kir.data.models.catalog.toFullItem
 import java.net.URLDecoder
 
+private val SortBarPadding = Dimensions.default
+private val IconSize = DpSize(
+    width = 24.dp + Dimensions.default * 2,
+    height = 24.dp + Dimensions.half * 2,
+)
+private val SortBarHeightWithPadding = IconSize.height + SortBarPadding * 4
+
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CatalogScreen(
+internal fun CatalogScreen(
     navigateUp: () -> Unit,
-    navigateToInfo: (String, SharedParams) -> Unit,
+    navigateToInfo: (SiteCatalogElement, SharedParams) -> Unit,
     navigateToAdd: (String, SharedParams) -> Unit,
     catalogName: String,
 ) {
-    val holder: CatalogStateHolder = stateHolder { CatalogViewModel() }
-    val state by holder.state.collectAsState()
-    val filters by holder.filters.collectAsState()
+    val holder: CatalogStateHolder = stateHolder { CatalogViewModel(catalogName) }
+    val filters by holder.filters.collectAsStateWithLifecycle()
+    val background by holder.backgroundWork.collectAsStateWithLifecycle()
+    val filterState by holder.filterState.collectAsStateWithLifecycle()
+    val sortState by holder.sortState.collectAsStateWithLifecycle()
+    val items by holder.items.collectAsStateWithLifecycle()
+    val sendAction = holder.rememberSendAction()
 
-    LaunchedEffect(Unit) { holder.sendAction(CatalogEvent.Set(catalogName)) }
-
-    val scaffoldState = rememberScaffoldState()
-    val coroutineScope = rememberCoroutineScope()
+    val drawerState = rememberDrawerState(DrawerValue.Closed)
+    val reloadDialog = rememberDialogState<EmptyDialogData> {
+        sendAction(CatalogAction.UpdateContent)
+    }
+    val cancelDialog = rememberDialogState<EmptyDialogData> {
+        sendAction(CatalogAction.CancelUpdateContent)
+    }
 
     var enableSearch by rememberSaveable { mutableStateOf(false) }
-    val query: ((String) -> Unit)? =
-        remember(enableSearch) {
-            if (enableSearch) {
-                { holder.sendAction(CatalogEvent.Search(it)) }
-            } else null
-        }
-    val update =
-        remember { { arg: MiniCatalogItem -> holder.sendAction(CatalogEvent.UpdateManga(arg)) } }
+    val query: ((String) -> Unit)? = remember(enableSearch) {
+        if (enableSearch) {
+            { if (it != filterState.search) sendAction(CatalogAction.Search(it)) }
+        } else null
+    }
+    val itemCount = rememberIntAnimatable()
+    LaunchedEffect(items.size) {
+        itemCount.snapTo(itemCount.value)
+        itemCount.animateToDelayed(items.size, duration = 400)
+    }
 
     ScreenList(
-        scaffoldState = scaffoldState,
-        topBar = topBar(
-            title = "${state.title}: ${state.items.size}",
-            navigationButton = navigationButtonToggle(
-                filters.isNotEmpty(), scaffoldState, navigateUp
-            ),
-            actions = { MenuIcon(Icons.Default.Search) { enableSearch = !enableSearch } },
-            onSearchTextChange = query,
-            hasAction = state.background.currentState,
-            progressAction = state.background.progress,
+        additionalPadding = Dimensions.zero,
+        contentPadding = bottomInsetsPadding(
+            top = Dimensions.half,
+            bottom = SortBarHeightWithPadding
         ),
-        drawerContent = drawerToogle(filters, holder::sendAction),
-        bottomBar = { height ->
-            BottomBar(
-                sort = state.sort,
-                background = state.background,
-                sendEvent = holder::sendAction,
-                height = height
-            )
+        drawerState = drawerState,
+        topBar = topBar(
+            title = "${catalogName}: ${itemCount.value}",
+            navigationButton =
+            if (filters.isNotEmpty()) {
+                NavigationButton.Scaffold(drawerState, filterState.hasSelectedFilters)
+            } else {
+                NavigationButton.Back(navigateUp)
+            },
+            actions = {
+                MenuIcon(
+                    icon = Icons.Default.Search,
+                    hasNotify = !enableSearch && filterState.search.isNotEmpty()
+                ) { enableSearch = !enableSearch }
+
+                FromEndToEndAnimContent(background.updateCatalogs) {
+                    if (!it) {
+                        MenuIcon(Icons.Outlined.SyncAlt, onClick = reloadDialog::show)
+                    } else {
+                        MenuIcon(Icons.TwoTone.Cancel, onClick = cancelDialog::show)
+                    }
+                }
+            },
+            onSearchTextChange = query,
+            hasAction = background.currentState,
+            progressAction = background.progress,
+            initSearchText = filterState.search
+        ),
+        drawerContent =
+        if (filters.isNotEmpty()) {
+            { DrawerContent(filters, filterState.hasSelectedFilters, sendAction) }
+        } else {
+            null
         },
-        additionalPadding = Dimensions.quarter,
-//        enableCollapsingBars = true,
+        bottomContent = { BottomBar(sortState, sendAction) },
     ) {
-        items(items = state.items, key = { item -> item.id }) { item ->
+        items(items.size, key = { index -> items[index].id }) { index ->
             ListItem(
-                item, item.statusEdition,
+                items[index],
+                items[index].statusEdition,
                 toAdd = navigateToAdd,
-                toInfo = navigateToInfo,
-                updateItem = update
+                toInfo = { item, params -> navigateToInfo(item.toFullItem(), params) },
+                updateItem = { sendAction(CatalogAction.UpdateManga(it)) }
             )
         }
     }
 
-    BackHandler {
-        if (scaffoldState.drawerState.isOpen) {
-            coroutineScope.launch { scaffoldState.drawerState.close() }
-        } else {
-            navigateUp()
-        }
-    }
+    ReloadDialog(reloadDialog)
+    CancelDialog(cancelDialog)
 }
 
 // Нижняя панель с кнопками сортировки списка
 @Composable
 private fun BottomBar(
     sort: SortState,
-    background: BackgroundState,
-    sendEvent: (CatalogEvent) -> Unit,
-    height: Dp = Dimensions.appBarHeight
+    sendAction: (CatalogAction) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    var reloadDialog by remember { mutableStateOf(false) }
-    var cancelDialog by remember { mutableStateOf(false) }
+    val dataHelpers by remember {
+        derivedStateOf {
+            val list = listOf(
+                DataIconHelper(Icons.Default.SortByAlpha, SortType.Name),
+                DataIconHelper(Icons.Default.DateRange, SortType.Date),
+            )
 
-    BottomAppBar(
-        contentPadding =
-        if (height == Dimensions.zero) PaddingValues(Dimensions.zero)
-        else systemBarBottomPadding(),
-        modifier = Modifier.height(height + systemBarBottomPadding().calculateBottomPadding())
-    ) {
-        IconToggleButton(
-            modifier = Modifier.padding(systemBarStartPadding(Dimensions.default)),
-            checked = sort.reverse,
-            onCheckedChange = { sendEvent(CatalogEvent.Reverse) },
-        ) {
-            Image(
-                Icons.AutoMirrored.Filled.Sort, "",
-                Modifier
-                    .size(Dimensions.Image.small)
-                    .graphicsLayer {
-                        rotationZ = if (sort.reverse) 0f else 180f
-                    },
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
-            )
-        }
-        Row(
-            modifier = Modifier.weight(1f, true),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            MiddleBottomBtn(
-                sort.type is SortType.Name,
-                { sendEvent(CatalogEvent.ChangeSort(SortType.Name)) },
-                Icons.Default.SortByAlpha
-            )
-            MiddleBottomBtn(
-                sort.type is SortType.Date,
-                { sendEvent(CatalogEvent.ChangeSort(SortType.Date)) },
-                Icons.Default.DateRange
-            )
-            MiddleBottomBtn(
-                sort.type is SortType.Pop,
-                { sendEvent(CatalogEvent.ChangeSort(SortType.Pop)) },
-                Icons.Default.ThumbsUpDown
-            )
-        }
-
-        FromEndToEndAnimContent(
-            targetState = background.updateCatalogs,
-            modifier = Modifier
-                .padding(Dimensions.default)
-                .endInsetsPadding()
-        ) {
-            when (it) {
-                true -> IconButton(onClick = { cancelDialog = true }) {
-                    Image(
-                        Icons.Default.Close, "",
-                        Modifier.size(Dimensions.Image.small),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
-                    )
-                }
-
-                false -> IconButton(onClick = { reloadDialog = true }) {
-                    Image(
-                        Icons.Default.Update, "",
-                        Modifier.size(Dimensions.Image.small),
-                        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.onSurface)
-                    )
-                }
+            if (sort.hasPopulateSort) {
+                list.add(DataIconHelper(Icons.Default.ThumbsUpDown, SortType.Pop))
+            } else {
+                list
             }
         }
-
     }
 
-    if (reloadDialog) ReloadDialog(sendEvent) { reloadDialog = false }
-    if (cancelDialog) CancelDialog(sendEvent) { cancelDialog = false }
+    DefaultBottomBar(modifier = modifier) {
+
+        RotateToggleButton(icon = Icons.AutoMirrored.Filled.Sort, state = sort.reverse) {
+            sendAction(CatalogAction.Reverse)
+        }
+
+        HorizontalIconRadioGroup(
+            dataHelpers = dataHelpers,
+            initialValue = sort.type,
+            modifier = Modifier.padding(Dimensions.half)
+        ) {
+            sendAction(CatalogAction.ChangeSort(it))
+        }
+    }
 }
 
-// Диалог подтверждения на обновление каталога
-@Composable
-private fun ReloadDialog(
-    sendEvent: (CatalogEvent) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text(stringResource(R.string.catalog_fot_one_site_warning)) },
-        text = { Text(stringResource(R.string.update_catalog)) },
-        confirmButton = {
-            TextButton(onClick = {
-                sendEvent(CatalogEvent.UpdateContent)
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.agree))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onDismiss() }) {
-                Text(stringResource(R.string.not_agree))
-            }
-        })
-}
-
-// Диалог отмены обновления каталога
-@Composable
-private fun CancelDialog(
-    sendEvent: (CatalogEvent) -> Unit,
-    onDismiss: () -> Unit,
-) {
-    AlertDialog(
-        onDismissRequest = { onDismiss() },
-        title = { Text(stringResource(R.string.catalog_fot_one_site_warning)) },
-        text = { Text(stringResource(R.string.cancel_update_catalog)) },
-        confirmButton = {
-            TextButton(onClick = {
-                sendEvent(CatalogEvent.CancelUpdateContent)
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.agree))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = { onDismiss() }) {
-                Text(stringResource(R.string.not_agree))
-            }
-        })
-}
-
-private fun navigationButtonToggle(
-    state: Boolean,
-    scaffoldState: ScaffoldState,
-    navigateUp: () -> Unit
-) =
-    if (state) NavigationButton.Scaffold(scaffoldState)
-    else NavigationButton.Back(navigateUp)
-
-private fun drawerToogle(filters: List<Filter>, sendEvent: (CatalogEvent) -> Unit):
-        @Composable (ColumnScope.() -> Unit)? =
-    if (filters.isNotEmpty()) {
-        { DrawerContent(filters = filters, sendEvent = sendEvent) }
-    } else null
 
 // Боковое меню
 @Composable
-private fun DrawerContent(filters: List<Filter>, sendEvent: (CatalogEvent) -> Unit) {
+private fun DrawerContent(
+    filters: List<Filter>,
+    hasSelectedFilters: Boolean,
+    sendAction: (CatalogAction) -> Unit
+) {
     var currentIndex by rememberSaveable { mutableIntStateOf(0) }
 
     // Списки фильтров
     Column {
         Crossfade(
             targetState = currentIndex,
-            modifier = Modifier.weight(1f, true), label = ""
+            modifier = Modifier.weight(1f, true),
+            label = "",
         ) { pageIndex ->
             val currentFilter = filters[pageIndex]
 
@@ -318,7 +240,7 @@ private fun DrawerContent(filters: List<Filter>, sendEvent: (CatalogEvent) -> Un
                         modifier = Modifier
                             .fillMaxWidth()
                             .clickable {
-                                sendEvent(CatalogEvent.ChangeFilter(currentFilter.type, index))
+                                sendAction(CatalogAction.ChangeFilter(currentFilter.type, index))
                             }
                             .startInsetsPadding(),
                         verticalAlignment = Alignment.CenterVertically
@@ -339,66 +261,59 @@ private fun DrawerContent(filters: List<Filter>, sendEvent: (CatalogEvent) -> Un
                 .fillMaxWidth()
                 .height(Dimensions.smallest)
                 .clip(RectangleShape)
-                .background(MaterialTheme.colorScheme.onBackground)
+                .background(Color.Blue.copy(alpha = 0.3f))
         )
 
         // Переключатели вкладок доступных фильтров
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(IntrinsicSize.Min)
-                .startInsetsPadding()
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
         ) {
-            filters.forEachIndexed { index, catalogFilter ->
-                if (catalogFilter.items.size > 1)
-                    Box(
-                        modifier = Modifier
-                            .toggleable(
-                                value = currentIndex == index,
-                                onValueChange = { currentIndex = index },
-                                role = Role.Checkbox,
-                            )
-                            .fillMaxSize()
-                            .weight(1f, true),
-                        contentAlignment = Alignment.Center,
-                    ) {
-                        Text(
-                            text = stringResource(catalogFilter.type.stringId),
-                            modifier = Modifier.padding(Dimensions.smaller),
-                            color = if (currentIndex == index)
-                                MaterialTheme.colorScheme.primary
-                            else
-                                MaterialTheme.colorScheme.onBackground,
-                            textAlign = TextAlign.Center,
-                        )
-                    }
-            }
-        }
 
-        // Кнопка очистки фильтров
-        Button(
-            onClick = { sendEvent(CatalogEvent.ClearFilters) },
-            modifier = Modifier
-                .fillMaxWidth()
-                .startInsetsPadding()
-                .bottomInsetsPadding()
-        ) {
-            Text(stringResource(R.string.clear))
+            HorizontalTextRadioGroup(
+                dataHelpers = filters.mapIndexed { index, filter ->
+                    DataTextHelper(filter.type.stringId, index)
+                },
+                initialValue = currentIndex,
+                modifier = Modifier
+                    .padding(Dimensions.default)
+                    .weight(1f)
+            ) {
+                currentIndex = it
+            }
+
+            StartAnimatedVisibility(hasSelectedFilters) {
+                FilledIconButton(
+                    onClick = { sendAction(CatalogAction.ClearFilters) },
+                    modifier = Modifier.padding(end = Dimensions.default)
+                ) {
+                    Icon(Icons.Default.Clear, null)
+                }
+            }
         }
     }
 }
 
-
-// Кнопка нижней панели
+// Диалог подтверждения на обновление каталога
 @Composable
-private fun MiddleBottomBtn(state: Boolean, onChange: () -> Unit, icon: ImageVector) {
-    IconToggleButton(
-        checked = state,
-        onCheckedChange = { if (it) onChange() }) {
-        Image(
-            icon, "",
-            Modifier.size(Dimensions.Image.small),
-            colorFilter = ColorFilter.tint(if (state) Color.Cyan else MaterialTheme.colorScheme.onSurface)
-        )
-    }
+private fun ReloadDialog(state: DialogState<EmptyDialogData>) {
+    AlertDialog(
+        state = state,
+        title = R.string.warning,
+        text = R.string.update_catalog,
+        negative = R.string.not_agree,
+        positive = R.string.agree
+    )
+}
+
+// Диалог отмены обновления каталога
+@Composable
+private fun CancelDialog(state: DialogState<EmptyDialogData>) {
+    AlertDialog(
+        state = state,
+        title = R.string.warning,
+        text = R.string.cancel_update_catalog,
+        negative = R.string.not_agree,
+        positive = R.string.agree
+    )
 }

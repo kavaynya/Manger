@@ -15,7 +15,7 @@ import kotlinx.coroutines.flow.update
 import kotlin.time.Duration.Companion.seconds
 
 internal class AddOnlineViewModel(
-    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager,
+    private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager(),
 ) : ViewModel<AddOnlineState>(), AddOnlineStateHolder {
     private val siteNames: List<String> = manager.catalog.map { it.catalogName }
     private var job: Job? = null
@@ -29,19 +29,16 @@ internal class AddOnlineViewModel(
         isCheckingUrlState,
         validatesCatalogsState,
         isErrorAvailableState,
-        isEnableAddingState
-    ) { check, validate, error, add ->
-        AddOnlineState(check, validate, error, add)
-    }
-
-    override val defaultState = AddOnlineState(
-        validatesCatalogs = siteNames,
+        isEnableAddingState,
+        ::AddOnlineState
     )
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            is AddOnlineEvent.Update -> {
-                checkUrl(event.text)
+    override val defaultState = AddOnlineState(validatesCatalogs = siteNames)
+
+    override suspend fun onAction(action    : Action) {
+        when (action) {
+            is AddOnlineAction.Update -> {
+                checkUrl(action.text)
                 isErrorAvailableState.value = false
             }
         }
@@ -50,7 +47,7 @@ internal class AddOnlineViewModel(
     private fun checkUrl(text: String) {
         job?.cancel()
         isCheckingUrlState.value = false
-        job = viewModelScope.defaultLaunch {
+        job = defaultLaunch {
 
             if (text.isNotBlank()) {
                 // список сайтов подходящий под введеный адрес

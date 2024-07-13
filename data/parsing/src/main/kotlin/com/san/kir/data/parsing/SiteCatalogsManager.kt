@@ -49,7 +49,7 @@ public class SiteCatalogsManager(
         }
     }
 
-    private fun catalogByName(catalogName: String): SiteCatalog {
+    public fun catalogByName(catalogName: String): SiteCatalog {
         return catalog.firstOrNull { it.name == catalogName }
             ?: catalog.first { it.catalogName == catalogName }
     }
@@ -57,7 +57,7 @@ public class SiteCatalogsManager(
     public suspend fun chapters(manga: Manga): List<Chapter> = catalog(manga.host).chapters(manga)
 
     // Загрузка полной информации для элемента в каталоге
-    public suspend fun getFullElement(simpleElement: SiteCatalogElement): SiteCatalogElement =
+    public suspend fun fullElement(simpleElement: SiteCatalogElement): SiteCatalogElement =
         withDefaultContext {
             catalog.first { it.allCatalogName.any { s -> s == simpleElement.catalogName } }
                 .fullElement(simpleElement)

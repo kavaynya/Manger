@@ -1,7 +1,8 @@
 package com.san.kir.catalog.ui.catalogItem
 
+import com.san.kir.catalog.R
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.models.base.SiteCatalogElement
+import com.san.kir.data.models.catalog.SiteCatalogElement
 
 
 internal data class CatalogItemState(
@@ -12,12 +13,11 @@ internal data class CatalogItemState(
 
 internal sealed interface BackgroundState {
     data object Load : BackgroundState
-    data object Error : BackgroundState
+    sealed class Error(val text: Int) : BackgroundState {
+        data object Base : Error(R.string.load_info_failed_base)
+        data object Auth : Error(R.string.load_info_failed_auth)
+    }
     data object None : BackgroundState
 }
 
-internal sealed interface ContainingInLibraryState {
-    data object Check : ContainingInLibraryState
-    data object None : ContainingInLibraryState
-    data object Ok : ContainingInLibraryState
-}
+internal enum class ContainingInLibraryState { Check, None, Ok }

@@ -140,7 +140,7 @@ public fun <ValueT> VerticalRadioGroup(
 }
 
 @Composable
-public fun <ValueT, DataHelper : IDataHelper<ValueT>, HandledDataHelper : IHandledDataHelper<ValueT>> HorizontalRadioGroup(
+public fun <ValueT, DataHelper : IDataHelper<out ValueT>, HandledDataHelper : IHandledDataHelper<ValueT>> HorizontalRadioGroup(
     dataHelpers: List<DataHelper>,
     initialValue: ValueT,
     onChange: (ValueT) -> Unit,
@@ -240,7 +240,7 @@ public fun <ValueT> HorizontalTextRadioGroup(
 
 @Composable
 public fun <ValueT> HorizontalIconRadioGroup(
-    dataHelpers: List<DataIconHelper<ValueT>>,
+    dataHelpers: List<DataIconHelper<out ValueT>>,
     initialValue: ValueT,
     modifier: Modifier = Modifier,
     onChange: (ValueT) -> Unit,

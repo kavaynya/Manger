@@ -12,7 +12,7 @@ public data class MiniCatalogItem(
     val authors: List<String> = emptyList(),
     val dateId: Int = 0,
     val populate: Int = 0,
-    val state: State = State.None
+    var state: State = State.None
 ) {
     public sealed interface State {
         public data object Added : State
