@@ -1,25 +1,25 @@
 package com.san.kir.categories.ui.categories
 
-import com.san.kir.categories.logic.di.categoryRepository
-import com.san.kir.categories.logic.repo.CategoryRepository
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
+import com.san.kir.data.categoryRepository
+import com.san.kir.data.db.main.repo.CategoryRepository
 import kotlinx.coroutines.flow.map
 
 internal class CategoriesViewModel(
-    private val categoryRepository: CategoryRepository = ManualDI.categoryRepository,
+    private val categoryRepository: CategoryRepository = ManualDI.categoryRepository(),
 ) : ViewModel<CategoriesState>(), CategoriesStateHolder {
 
-    override val tempState = categoryRepository.items.map { CategoriesState(it) }
+    override val tempState = categoryRepository.items.map(::CategoriesState)
 
-    override val defaultState = CategoriesState(emptyList())
+    override val defaultState = CategoriesState()
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            is CategoriesEvent.Reorder -> categoryRepository.swap(event.from, event.to)
-            is CategoriesEvent.ChangeVisibility -> {
-                categoryRepository.update(event.item.copy(isVisible = event.newState))
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            is CategoriesAction.Reorder -> categoryRepository.swap(action.from, action.to)
+            is CategoriesAction.ChangeVisibility -> {
+                categoryRepository.insert(action.item.copy(isVisible = action.newState))
             }
         }
     }

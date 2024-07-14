@@ -3,27 +3,20 @@
     <string name="categories">Категории</string>
 
     <!--Category-->
-    <string name="category_item_question_delete">Вы действительно хотите удалить?</string>
-    <string name="category_item_question_delete_yes">Да</string>
-    <string name="category_item_question_delete_no">Нет</string>
+    <string name="are_you_sure_want_delete">Вы действительно хотите удалить?</string>
+    <string name="category_is_visible">Категория видна</string>
+    <string name="category_is_hide">Категория скрыта</string>
 
     <!--CategoryDialog-->
-    <string name="category_dialog_span_text">Количество столбцов: %d</string>
-    <string name="category_dialog_large_cells">Крупные ячейки</string>
-    <string name="category_dialog_small_cells">Мелкие ячейки</string>
-    <string name="category_dialog_title_create">Создание категории</string>
-    <string name="category_dialog_title_edit">Настройка категории</string>
-    <string name="category_dialog_hint">Введите название</string>
-    <string name="category_dialog_validate_length">Слишком коротко</string>
-    <string name="category_dialog_validate_contain">Название занято</string>
-    <string name="category_dialog_portrait">Портретная ориентация</string>
-    <string name="category_dialog_landscape">Ландшафтная ориентация</string>
-    <string name="category_dialog_sort">Сортировка</string>
-    <string name="category_dialog_visible">Видимость вкладки</string>
+    <string name="create_category">Создание категории</string>
+    <string name="edit_category">Настройка категории</string>
+    <string name="enter_name">Введите название</string>
+    <string name="too_short">Слишком коротко</string>
+    <string name="name_taken">Название занято</string>
+    <string name="portrait_orientation">Портретная ориентация</string>
+    <string name="landscape_orientation">Ландшафтная ориентация</string>
 
-    <string name="library_sort_dialog_add">По дате добавления</string>
-    <string name="library_sort_dialog_abc">В алфавитном порядке</string>
-    <string name="library_sort_dialog_pop">По частоте использования</string>
-    <string name="library_sort_dialog_reverse">Изменить порядок?</string>
-    <string name="library_sort_dialog_visible">Скрыть ?</string>
+    <string name="by_date_added">По дате добавления</string>
+    <string name="in_alphabet_order">В алфавитном порядке</string>
+    <string name="by_frequency_of_use">По частоте использования</string>
 </resources>

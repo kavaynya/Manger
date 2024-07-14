@@ -1,15 +1,21 @@
 plugins {
     id("compose.library")
+
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
-    namespace="com.san.kir.categories"
+    namespace = "com.san.kir.categories"
 }
 
 dependencies {
-    implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.background))
-    implementation(project(Modules.Data.db))
-    implementation(project(Modules.Data.models))
+    implementation(projects.core.compose)
+    implementation(projects.core.utils)
+    implementation(projects.core.background)
+    implementation(projects.data.db)
+    implementation(projects.data.models)
+
+    implementation(projects.ksp)
+    ksp(projects.ksp)
 }

@@ -4,9 +4,9 @@
     <string name="name">Автор: Kir San</string>
 
     <string name="library_title">Библиотека</string>
-    <string name="library_sort_dialog_add">По дате добавления</string>
-    <string name="library_sort_dialog_abc">В алфавитном порядке</string>
-    <string name="library_sort_dialog_pop">По частоте использования</string>
+    <string name="by_date_added">По дате добавления</string>
+    <string name="in_alphabet_order">В алфавитном порядке</string>
+    <string name="by_frequency_of_use">По частоте использования</string>
     <string name="library_popupmenu_about">Свойства</string>
     <string name="library_popupmenu_delete">Удалить</string>
     <string name="library_popupmenu_storage">Используемая память</string>
