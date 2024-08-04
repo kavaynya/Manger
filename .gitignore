@@ -6,5 +6,6 @@
 /buildSrc/build
 /app/build
 /.idea
+/.idea/codeInsightSettings.xml
 local.properties
 composeReport2Html.jar
