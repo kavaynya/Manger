@@ -5,7 +5,6 @@ import androidx.work.CoroutineWorker
 import androidx.work.ListenableWorker
 import androidx.work.OneTimeWorkRequest
 import androidx.work.WorkInfo
-import androidx.work.WorkManager
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.san.kir.background.logic.di.workManager
@@ -31,9 +30,7 @@ public abstract class ChapterDeleteWorker(appContext: Context, workerParams: Wor
         }
 
         public fun workInfos(): Flow<List<WorkInfo>> =
-            WorkManager
-                .getInstance(ManualDI.application)
-                .getWorkInfosByTagFlow(TAG)
+            ManualDI.workManager().getWorkInfosByTagFlow(TAG)
     }
 }
 

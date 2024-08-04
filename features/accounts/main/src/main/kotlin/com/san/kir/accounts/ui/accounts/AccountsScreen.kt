@@ -11,7 +11,7 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.animation.SharedParams
-import com.san.kir.core.compose.barContainerColor
+import com.san.kir.core.compose.BarContainerColor
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.viewModel.rememberSendAction
@@ -22,7 +22,7 @@ import com.san.kir.data.parsing.sites.MintmangaConstants
 
 private val selectedBarColor: Color
     @Composable
-    get() = barContainerColor.copy(alpha = 0.95f)
+    get() = BarContainerColor.copy(alpha = 0.95f)
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

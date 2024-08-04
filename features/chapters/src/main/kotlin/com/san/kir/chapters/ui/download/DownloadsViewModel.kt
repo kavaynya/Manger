@@ -2,33 +2,31 @@ package com.san.kir.chapters.ui.download
 
 import com.san.kir.background.logic.DownloadChaptersManager
 import com.san.kir.background.logic.di.downloadChaptersManager
-import com.san.kir.chapters.logic.di.chaptersRepository
-import com.san.kir.chapters.logic.di.settingsRepository
-import com.san.kir.chapters.logic.repo.ChaptersRepository
-import com.san.kir.chapters.logic.repo.SettingsRepository
-import com.san.kir.core.internet.CellularNetwork
+import com.san.kir.core.internet.INetworkManager
 import com.san.kir.core.internet.NetworkState
-import com.san.kir.core.internet.WifiNetwork
 import com.san.kir.core.internet.cellularNetwork
 import com.san.kir.core.internet.wifiNetwork
-import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
+import com.san.kir.data.chapterRepository
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.main.repo.SettingsRepository
 import com.san.kir.data.models.utils.DownloadState
+import com.san.kir.data.settingsRepository
 
 import kotlinx.coroutines.flow.combine
 
 internal class DownloadsViewModel(
-    private val chaptersRepository: ChaptersRepository = ManualDI.chaptersRepository,
-    private val cellularNetwork: CellularNetwork = ManualDI.cellularNetwork,
-    private val wifiNetwork: WifiNetwork = ManualDI.wifiNetwork,
-    private val manager: DownloadChaptersManager = ManualDI.downloadChaptersManager,
-    settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+    private val chaptersRepository: ChapterRepository = ManualDI.chapterRepository(),
+    private val cellularNetwork: INetworkManager = ManualDI.cellularNetwork(),
+    private val wifiNetwork: INetworkManager = ManualDI.wifiNetwork(),
+    private val manager: DownloadChaptersManager = ManualDI.downloadChaptersManager(),
+    settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
 ) : ViewModel<DownloadsState>(), DownloadsStateHolder {
 
     override val tempState = combine(
-        chaptersRepository.items,
+        chaptersRepository.downloadItems,
         cellularNetwork.state,
         wifiNetwork.state,
         settingsRepository.wifi,
@@ -36,67 +34,49 @@ internal class DownloadsViewModel(
         val network = if (settingsWifi) {
             if (wifi) NetworkState.OK else NetworkState.NOT_WIFI
         } else {
-            if (cell || wifi) NetworkState.OK else NetworkState.NOT_CELLURAR
+            if (cell || wifi) NetworkState.OK else NetworkState.NOT_CELLULAR
         }
         DownloadsState(
-            items = items,
+            items = items.groupBy { it.status.groupName }
+                .map { (title, items) -> DownloadGroup(title, items) },
             network = network
         )
     }
 
     override val defaultState = DownloadsState()
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            DownloadsEvent.ClearAll -> clearAll()
-            DownloadsEvent.CompletedClear -> clearCompleted()
-            DownloadsEvent.ErrorClear -> clearError()
-            DownloadsEvent.PausedClear -> clearPaused()
-            DownloadsEvent.StartAll -> manager.addPausedTasks()
-            DownloadsEvent.StopAll -> manager.removeAllTasks()
-            is DownloadsEvent.StartDownload -> manager.addTask(event.itemId)
-            is DownloadsEvent.StopDownload -> manager.removeTask(event.itemId)
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            DownloadsAction.ClearAll -> clearAll()
+            DownloadsAction.CompletedClear -> clearCompleted()
+            DownloadsAction.ErrorClear -> clearError()
+            DownloadsAction.PausedClear -> clearPaused()
+            DownloadsAction.StartAll -> manager.addPausedTasks()
+            DownloadsAction.StopAll -> manager.removeAllTasks()
+            is DownloadsAction.StartDownload -> manager.addTask(action.itemId)
+            is DownloadsAction.StopDownload -> manager.removeTask(action.itemId)
         }
     }
 
     private suspend fun clearAll() {
-        chaptersRepository.clear(
-            state.value
-                .items
-                .filter { it.status == DownloadState.COMPLETED || it.status == DownloadState.PAUSED }
-                .map { it.id }
-        )
+        clearPaused()
+        clearCompleted()
+        clearError()
     }
 
     private suspend fun clearError() {
-        chaptersRepository.clear(
-            state.value
-                .items
-                .filter { it.status == DownloadState.ERROR }
-                .map { it.id }
-        )
+        chaptersRepository.updateFor(DownloadState.ERROR)
     }
 
     private suspend fun clearPaused() {
-        chaptersRepository.clear(
-            state.value
-                .items
-                .filter { it.status == DownloadState.PAUSED }
-                .map { it.id }
-        )
+        chaptersRepository.updateFor(DownloadState.PAUSED)
     }
 
     private suspend fun clearCompleted() {
-        chaptersRepository.clear(
-            state.value
-                .items
-                .filter { it.status == DownloadState.COMPLETED }
-                .map { it.id }
-        )
+        chaptersRepository.updateFor(DownloadState.COMPLETED)
     }
 
     override fun onDestroy() {
-        super.onDestroy()
         cellularNetwork.stop()
         wifiNetwork.stop()
     }

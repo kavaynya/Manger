@@ -2,11 +2,11 @@
   "formatVersion": 1,
   "database": {
     "version": 64,
-    "identityHash": "0bcdd19679089eb628b970647e80746f",
+    "identityHash": "1da67dd9655b5959c5b476ddfc6bf052",
     "entities": [
       {
         "tableName": "manga",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `host` TEXT NOT NULL, `name` TEXT NOT NULL, `logo` TEXT NOT NULL, `about` TEXT NOT NULL, `category_id` INTEGER NOT NULL DEFAULT 0, `path` TEXT NOT NULL, `status` TEXT NOT NULL, `color` INTEGER NOT NULL, `populate` INTEGER NOT NULL, `ordering` INTEGER NOT NULL, `isAlternativeSort` INTEGER NOT NULL, `isUpdate` INTEGER NOT NULL, `chapterFilter` TEXT NOT NULL, `isAlternativeSite` INTEGER NOT NULL, `shortLink` TEXT NOT NULL, `authors` TEXT NOT NULL, `genres` TEXT NOT NULL, `lastUpdateError` TEXT NOT NULL DEFAULT '')",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `host` TEXT NOT NULL, `name` TEXT NOT NULL, `logo` TEXT NOT NULL, `about` TEXT NOT NULL, `category_id` INTEGER NOT NULL DEFAULT 0, `path` TEXT NOT NULL, `status` TEXT NOT NULL, `color` INTEGER NOT NULL, `populate` INTEGER NOT NULL, `ordering` INTEGER NOT NULL, `isAlternativeSort` INTEGER NOT NULL, `isUpdate` INTEGER NOT NULL, `chapterFilter` TEXT NOT NULL, `isAlternativeSite` INTEGER NOT NULL, `shortLink` TEXT NOT NULL, `authors` TEXT NOT NULL, `genres` TEXT NOT NULL, `lastUpdateError` TEXT DEFAULT '')",
         "fields": [
           {
             "fieldPath": "id",
@@ -121,7 +121,7 @@
             "fieldPath": "lastUpdateError",
             "columnName": "lastUpdateError",
             "affinity": "TEXT",
-            "notNull": true,
+            "notNull": false,
             "defaultValue": "''"
           }
         ],
@@ -836,7 +836,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '0bcdd19679089eb628b970647e80746f')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1da67dd9655b5959c5b476ddfc6bf052')"
     ]
   }
 }

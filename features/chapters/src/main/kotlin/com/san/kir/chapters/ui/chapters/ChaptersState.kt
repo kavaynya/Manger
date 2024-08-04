@@ -1,40 +1,31 @@
 package com.san.kir.chapters.ui.chapters
 
-import androidx.compose.runtime.Stable
-import com.san.kir.data.models.utils.ChapterFilter
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.extend.SimplifiedChapter
-import com.san.kir.data.models.utils.compareChapterNames
+import com.san.kir.data.models.main.Manga
+import com.san.kir.data.models.main.SimplifiedChapter
+import com.san.kir.data.models.utils.ChapterFilter
+import io.ktor.http.HttpStatusCode
 
 internal data class ChaptersState(
-    val items: List<SelectableItem> = emptyList(),
     val manga: Manga = Manga(),
     val backgroundAction: Boolean = false,
     val showTitle: Boolean = true,
-    val nextChapter: NextChapter = NextChapter.None,
-    val chapterFilter: com.san.kir.data.models.utils.ChapterFilter = com.san.kir.data.models.utils.ChapterFilter.ALL_READ_ASC,
-    val selectionCount: Int = items.count { it.selected },
-    val selectionMode: Boolean = selectionCount > 0,
-    val count: Int = items.count(),
-    val readCount: Int = items.count { it.chapter.isRead },
+    val chapterFilter: ChapterFilter = ChapterFilter.ALL_READ_ASC,
 ) : ScreenState {
+
+    val error = when (manga.lastUpdateError) {
+        null -> ErrorState.None
+        HttpStatusCode.NotFound.value.toString() -> ErrorState.NotFound
+        else -> ErrorState.Other
+    }
+
     override fun toString(): String {
-        return "ChaptersState(items=${items.count()}, manga=${manga.name}, " +
-                "backgroundAction=$backgroundAction, showTitle=$showTitle, " +
-                "nextChapter=$nextChapter, chapterFilter=$chapterFilter, count=$count, " +
-                "readCount=$readCount, selectionMode=$selectionMode, selectionCount=$selectionCount)"
+        return "ChaptersState(manga=${manga.name}, backgroundAction=$backgroundAction, showTitle=$showTitle, chapterFilter=$chapterFilter)"
     }
 }
 
-@Stable
 internal data class SelectableItem(val chapter: SimplifiedChapter, val selected: Boolean)
-
-internal class SelectableItemComparator : Comparator<SelectableItem> {
-    override fun compare(o1: SelectableItem, o2: SelectableItem): Int {
-        return com.san.kir.data.models.utils.compareChapterNames(o1.chapter.name, o2.chapter.name)
-    }
-}
 
 internal data class BackgroundActions(
     val updateManga: Boolean = false,
@@ -46,17 +37,38 @@ internal data class BackgroundActions(
 
 internal data class Items(
     val items: List<SelectableItem> = emptyList(),
+    val memoryPagesCounts: Map<Long, Int> = emptyMap(),
     val count: Int = items.count(),
     val readCount: Int = items.count { it.chapter.isRead },
-)
+) {
+    val hasReadingChapters: Boolean = items.any { it.chapter.progress > 1 || it.chapter.isRead }
+}
 
-@Stable
+internal data class SelectionMode(
+    val selectionCount: Int = 0,
+    val hasReading: Boolean = false,
+    val canSetRead: Boolean = false,
+    val canSetUnread: Boolean = false,
+    val canRemovePages: Boolean = false
+) {
+    val enabled: Boolean = selectionCount > 0
+}
+
+internal enum class ErrorState { None, NotFound, Other; }
+
 internal sealed interface NextChapter {
-    @Stable
     data object None : NextChapter
 
     data object Loading : NextChapter
-
-    @Stable
-    data class Ok(val id: Long, val name: String) : NextChapter
+    sealed class Ok(val id: Long, val name: String) : NextChapter {
+        class Continue(id: Long, name: String) : Ok(id, name)
+        class First(id: Long, name: String) : Ok(id, name)
+        class Single(id: Long, name: String) : Ok(id, name)
+    }
 }
+
+internal data class BottomSortHelper(
+    val icon: ImageVector,
+    val action: () -> Unit,
+    val checkEnable: (ChapterFilter) -> Boolean
+)

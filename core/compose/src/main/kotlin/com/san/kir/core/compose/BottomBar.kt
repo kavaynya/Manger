@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 private val BarPadding = Dimensions.default
 private val DefaultRoundedShape = RoundedCornerShape(50)
 
-public val barContainerColor: Color
+public val BarContainerColor: Color
     @Composable
     get() = MaterialTheme.colorScheme.surfaceColorAtElevation(3.dp)
 
@@ -27,7 +27,7 @@ public fun DefaultBottomBar(
     Row(
         modifier = Modifier
             .bottomInsetsPadding(BarPadding)
-            .background(barContainerColor, DefaultRoundedShape)
+            .background(BarContainerColor, DefaultRoundedShape)
             .then(modifier),
         verticalAlignment = Alignment.CenterVertically,
     ) {

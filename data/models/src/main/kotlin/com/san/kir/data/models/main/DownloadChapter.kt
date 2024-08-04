@@ -18,11 +18,12 @@ public data class DownloadItem(
     val downloadPages: Int,
     val pages: List<String>,
 ) {
-    public val progress: Float = if (pages.isNotEmpty()) downloadPages.toFloat() / pages.size else 0F
+    public val progress: Float =
+        if (pages.isNotEmpty()) downloadPages.toFloat() / pages.size else 0F
 
     public val size: String = bytesToMb(downloadSize).format()
 
-    public  fun time(): String = TimeFormat(totalTime / 1000).toString(ManualDI.application)
+    public fun time(): String = TimeFormat(totalTime / 1000).toString(ManualDI.application)
 
     val needShowMangaName: Boolean = manga.fuzzy(name).second.not()
 }

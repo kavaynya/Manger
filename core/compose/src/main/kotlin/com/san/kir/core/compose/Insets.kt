@@ -117,6 +117,10 @@ public fun Modifier.horizontalInsetsPadding(
     vertical: Dp = Dimensions.zero,
 ): Modifier = windowInsetsPadding(horizontalInsets(horizontal, vertical, horizontal, vertical))
 
+@Composable
+public fun Modifier.horizontalInsetsPadding(
+    all: Dp = Dimensions.zero,
+): Modifier = windowInsetsPadding(horizontalInsets(all, all, all, all))
 
 /////////////////////////////////////
 

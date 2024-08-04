@@ -8,7 +8,7 @@ import android.util.AttributeSet
 import com.davemorrissey.labs.subscaleview.SubsamplingScaleImageView
 
 // Добавлена поддержка скроллов
-class ImageViewWithScrollbars @JvmOverloads constructor(
+internal class ImageViewWithScrollbars @JvmOverloads constructor(
     context: Context?,
     attr: AttributeSet? = null,
 ) : SubsamplingScaleImageView(context, attr) {

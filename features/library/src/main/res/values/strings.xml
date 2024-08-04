@@ -48,8 +48,8 @@
     <string name="categories">Категории</string>
     <string name="catalogs">Каталоги</string>
     <string name="size_mb_format">%s Мб</string>
-    <string name="main_menu_downloader_count">Загрузчик: %d</string>
-    <string name="main_menu_latest_count">Обновления: %d</string>
+    <string name="downloader_format">Загрузчик: %d</string>
+    <string name="updates_format">Обновления: %d</string>
     <string name="search">Поиск</string>
 
     <string name="manga_info_dialog_title">Информация о манге</string>

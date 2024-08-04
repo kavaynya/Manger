@@ -1,11 +1,11 @@
 package com.san.kir.features.viewer.logic
 
 import com.san.kir.core.utils.coroutines.withDefaultContext
-import com.san.kir.data.db.dao.ChapterDao
-import com.san.kir.data.db.dao.StatisticDao
-import com.san.kir.data.models.base.Chapter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.base.Statistic
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.main.repo.StatisticsRepository
+import com.san.kir.data.models.main.Chapter
+import com.san.kir.data.models.main.Manga
+import com.san.kir.data.models.main.Statistic
 import com.san.kir.data.models.utils.ChapterComparator
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.features.viewer.utils.Page
@@ -16,8 +16,8 @@ import timber.log.Timber
 
 // класс для управления страницами и главами
 internal class ChaptersManager(
-    private val chapterDao: ChapterDao,
-    private val statisticDao: StatisticDao,
+    private val chapterRepository: ChapterRepository,
+    private val statisticsRepository: StatisticsRepository,
     private val siteCatalogManager: SiteCatalogsManager,
 ) {
     // Вспомогательная переменная для расчета количества прочитанных страниц за сессию
@@ -49,7 +49,7 @@ internal class ChaptersManager(
         get() = state.value
 
     suspend fun init(manga: Manga, chapterId: Long) = withDefaultContext {
-        val list = chapterDao.itemsByMangaId(manga.id)
+        val list = chapterRepository.allItems(manga.id)
 
         val chapters =
             if (manga.isAlternativeSort) {
@@ -64,13 +64,13 @@ internal class ChaptersManager(
 
         staticticPosition = currentPagePosition
 
-        val statisticId = statisticDao.idByMangaId(manga.id)
+        val statisticId = statisticsRepository.idByMangaId(manga.id)
 
         statisticItem = if (statisticId == null)
-            statisticDao.itemById(
-                statisticDao.insert(Statistic(mangaId = manga.id)).first()
-            )
-        else statisticDao.itemById(statisticId)
+            statisticsRepository.itemById(
+                statisticsRepository.save(Statistic(mangaId = manga.id)).first()
+            )!!
+        else statisticsRepository.itemById(statisticId)!!
 
         statisticItem = statisticItem.copy(
             lastChapters = 0,
@@ -78,7 +78,7 @@ internal class ChaptersManager(
             lastDownloadSize = 0,
             lastDownloadTime = 0,
         )
-        statisticDao.update(statisticItem)
+        statisticsRepository.save(statisticItem)
 
         _state.update { old ->
             old.copy(
@@ -118,7 +118,7 @@ internal class ChaptersManager(
             lastChapters = statisticItem.lastChapters + 1,
             allChapters = statisticItem.allChapters + 1,
         )
-        statisticDao.update(statisticItem)
+        statisticsRepository.save(statisticItem)
     }
 
     fun prevChapter() { // переключение на предыдущию главу
@@ -168,7 +168,7 @@ internal class ChaptersManager(
             pos >= currentState.pages.size - 2 -> return // Если больше максимального значения, ничего не делать
         }
         // Обновить позицию
-        chapterDao.update(chapter.copy(progress = p))
+        chapterRepository.save(chapter.copy(progress = p))
 
         // сохрание статистики
         if (pos > staticticPosition) {
@@ -179,14 +179,14 @@ internal class ChaptersManager(
                 allPages = statisticItem.allPages + diff,
             )
             staticticPosition = pos
-            statisticDao.update(statisticItem)
+            statisticsRepository.save(statisticItem)
         }
     }
 
     // Если страницы пустые, то обновляем их
     private suspend fun Chapter.withUpdatedPages(): Chapter {
         val chapter = copy(pages = siteCatalogManager.pages(this))
-        chapterDao.update(chapter)
+        chapterRepository.save(chapter)
         return chapter
     }
 

@@ -26,10 +26,10 @@ public class StatisticsRepository internal constructor(private val statisticDao:
         return flowOf<Statistic?>(null)
     }
 
-    public suspend fun insert(item: Statistic): List<Long> =
+    public suspend fun save(item: Statistic): List<Long> =
         withIoContext { statisticDao.insert(item.toEntity()) }
 
-    public suspend fun insert(mangaId: Long): List<Long> =
+    public suspend fun save(mangaId: Long): List<Long> =
         withIoContext { statisticDao.insert(DbStatistic(mangaId = mangaId)) }
 
     public suspend fun idByMangaId(mangaId: Long): Long? =

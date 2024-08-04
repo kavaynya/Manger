@@ -2,7 +2,6 @@ package com.san.kir.features.viewer
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
-import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
@@ -27,8 +26,10 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.viewpager.widget.ViewPager
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.data.models.base.Settings
+import com.san.kir.data.models.main.Settings
+import com.san.kir.data.models.utils.Orientation
 import com.san.kir.features.viewer.databinding.MainBinding
 import com.san.kir.features.viewer.utils.Page
 import com.san.kir.features.viewer.utils.VIEW_OFFSET
@@ -39,13 +40,8 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
-object MangaViewer {
-    fun start(
-        context: Context,
-        chapterID: Long,
-    ) {
-        ViewerActivity.start(context, chapterID)
-    }
+public object MangaViewer {
+    public fun start(chapterID: Long) { ViewerActivity.start(chapterID) }
 }
 
 internal class ViewerActivity : AppCompatActivity() {
@@ -53,13 +49,10 @@ internal class ViewerActivity : AppCompatActivity() {
     companion object {
         private const val chapterKey = "chapter_key"
 
-        fun start(
-            context: Context,
-            chapterID: Long,
-        ) {
-            val intent = Intent(context, ViewerActivity::class.java)
+        fun start(chapterID: Long) {
+            val intent = Intent(ManualDI.application, ViewerActivity::class.java)
             intent.putExtra(chapterKey, chapterID)
-            context.startActivity(intent)
+            ManualDI.application.startActivity(intent)
         }
     }
 
@@ -111,15 +104,15 @@ internal class ViewerActivity : AppCompatActivity() {
         super.onResume()
         // Загрузка настроек
         lifecycleScope.launchWhenResumed {
-            viewModel.settingsRepository.viewer().collect { data: Settings.Viewer ->
+            viewModel.settingsRepository.viewer.collect { data: Settings.Viewer ->
                 requestedOrientation = when (data.orientation) {
-                    Settings.Viewer.Orientation.PORT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    Settings.Viewer.Orientation.LAND -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    Settings.Viewer.Orientation.AUTO -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                    Settings.Viewer.Orientation.PORT_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-                    Settings.Viewer.Orientation.LAND_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-                    Settings.Viewer.Orientation.AUTO_PORT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                    Settings.Viewer.Orientation.AUTO_LAND -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                    Orientation.PORT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                    Orientation.LAND -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                    Orientation.AUTO -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                    Orientation.PORT_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+                    Orientation.LAND_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                    Orientation.AUTO_PORT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                    Orientation.AUTO_LAND -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                     else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
                 }
 

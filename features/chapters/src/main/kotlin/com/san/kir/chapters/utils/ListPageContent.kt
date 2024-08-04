@@ -1,94 +1,174 @@
 package com.san.kir.chapters.utils
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.material3.BottomAppBar
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentAlpha
-import androidx.compose.material3.LocalContentColor
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
+import androidx.compose.material.icons.filled.ArrowDownward
+import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.DeleteForever
+import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.FolderDelete
+import androidx.compose.material.icons.filled.LockReset
 import androidx.compose.material.icons.filled.SelectAll
 import androidx.compose.material.icons.filled.Visibility
 import androidx.compose.material.icons.filled.VisibilityOff
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.LocalTextStyle
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.produceState
+import androidx.compose.runtime.mutableFloatStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.draw.drawWithCache
+import androidx.compose.ui.geometry.CornerRadius
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.graphics.drawscope.clipRect
+import androidx.compose.ui.layout.boundsInWindow
+import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.tooling.preview.Preview
 import com.san.kir.chapters.R
+import com.san.kir.chapters.ui.chapters.BottomSortHelper
+import com.san.kir.chapters.ui.chapters.ChaptersAction
 import com.san.kir.chapters.ui.chapters.ChaptersEvent
 import com.san.kir.chapters.ui.chapters.Filter
+import com.san.kir.chapters.ui.chapters.Items
 import com.san.kir.chapters.ui.chapters.SelectableItem
 import com.san.kir.chapters.ui.chapters.Selection
+import com.san.kir.chapters.ui.chapters.SelectionMode
+import com.san.kir.core.compose.DefaultBottomBar
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.FullWeightSpacer
+import com.san.kir.core.compose.IconButtonPaddings
+import com.san.kir.core.compose.IconSize
+import com.san.kir.core.compose.RotateToggleButton
+import com.san.kir.core.compose.Saver
 import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
+import com.san.kir.core.compose.animation.StartAnimatedVisibility
+import com.san.kir.core.compose.animation.TopAnimatedVisibility
+import com.san.kir.core.compose.animation.rememberDpAnimatable
+import com.san.kir.core.compose.animation.rememberFloatAnimatable
 import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
+import com.san.kir.core.compose.maxDistanceIn
+import com.san.kir.core.utils.viewModel.Action
+import com.san.kir.core.utils.viewModel.ReturnEvents
+import com.san.kir.data.models.base.downloadProgress
+import com.san.kir.data.models.main.SimplifiedChapter
 import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.data.models.utils.DownloadState
-import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.models.extend.countPages
+
+private val SortBarPadding = Dimensions.default
+
+private val SortSelectedContainerColor: Color
+    @Composable
+    get() = MaterialTheme.colorScheme.inverseSurface
+
+private val SortSelectedContentColor: Color
+    @Composable
+    get() = contentColorFor(SortSelectedContainerColor)
+
+private val SortBarHeightWithPadding = IconSize.height + SortBarPadding * 4
 
 
 // Страница со списком и инструментами для манипуляции с ним
 @Composable
 internal fun ListPageContent(
-    chapterFilter: com.san.kir.data.models.utils.ChapterFilter,
-    selectionMode: Boolean,
-    items: List<SelectableItem>,
-    navigateToViewer: (Long) -> Unit,
-    sendEvent: (ChaptersEvent) -> Unit,
+    chapterFilter: ChapterFilter,
+    selectionMode: SelectionMode,
+    itemsContent: Items,
+    sendAction: (Action) -> Unit,
 ) {
-    Column(modifier = Modifier.fillMaxSize()) {
+    val itemsCount by remember { derivedStateOf { itemsContent.count } }
+    var screenWidth by remember { mutableFloatStateOf(0f) }
 
-        // Обертка для корректного отображения элементов если список пустой
-        Box(modifier = Modifier.weight(1f)) {
-
-            // Список отображается только если он не пустой
-            if (items.isNotEmpty()) {
-                LazyColumn(modifier = Modifier.fillMaxSize()) {
-                    itemsIndexed(
-                        items = items,
-                        key = { _, ch -> ch.chapter.id },
-                    ) { index, chapter ->
-                        ItemContent(
-                            item = chapter,
-                            index = index,
-                            selectionMode = selectionMode,
-                            navigateToViewer = navigateToViewer,
-                            sendEvent = sendEvent
-                        )
-                    }
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned {
+                screenWidth = it.boundsInWindow().width
+            }
+    ) {
+        if (itemsContent.items.isNotEmpty()) {
+            LazyColumn(
+                modifier = Modifier.fillMaxSize(),
+                contentPadding = PaddingValues(
+                    bottom = if (selectionMode.enabled) Dimensions.zero else SortBarHeightWithPadding
+                )
+            ) {
+                itemsIndexed(
+                    items = itemsContent.items,
+                    key = { _, ch -> ch.chapter.id }
+                ) { index, chapter ->
+                    val memoryPagesCount = itemsContent.memoryPagesCounts[chapter.chapter.id] ?: 0
+                    ItemContent(
+                        item = chapter,
+                        index = index,
+                        selectionEnabled = selectionMode.enabled,
+                        memoryPagesCount = memoryPagesCount,
+                        screenWidth = screenWidth,
+                        sendAction = sendAction
+                    )
                 }
             }
         }
 
-        // Нижний бар, скрывается если включен режим выделения
-        BottomAnimatedVisibility(selectionMode.not()) {
-            BottomOrderBar(chapterFilter) { sendEvent(ChaptersEvent.ChangeFilter(it)) }
+        TopAnimatedVisibility(
+            visible = !selectionMode.enabled,
+            modifier = Modifier.align(Alignment.BottomEnd),
+        ) {
+            BottomOrderBar(chapterFilter) {
+                sendAction(ChaptersAction.ChangeFilter(it))
+            }
+        }
+
+        StartAnimatedVisibility(
+            visible = selectionMode.enabled,
+            modifier = Modifier.align(Alignment.BottomEnd),
+        ) {
+            SelectionModeBar(
+                selectionMode = selectionMode,
+                itemsCount = itemsCount,
+                sendAction = sendAction
+            )
         }
     }
 }
@@ -96,82 +176,163 @@ internal fun ListPageContent(
 // Нижний бар управления сортировкой и фильтрацией списка
 @Composable
 private fun BottomOrderBar(
-    currentFilter: com.san.kir.data.models.utils.ChapterFilter,
-    sendEvent: (Filter) -> Unit,
+    currentFilter: ChapterFilter,
+    sendAction: (Filter) -> Unit,
 ) {
-    val allColor = animatedColor(currentFilter.isAll)
-    val readColor = animatedColor(currentFilter.isRead)
-    val notColor = animatedColor(currentFilter.isNot)
-    val reverseRotate by animateFloatAsState(if (currentFilter.isAsc) 0f else 180f, label = "")
+    val selectedColor = MaterialTheme.colorScheme.inverseSurface
 
-    BottomAppBar(
-        modifier = Modifier
-            .fillMaxWidth()
-            .bottomInsetsPadding()
-    ) {
-        FullWeightSpacer()
-
-        // Смена порядка сортировки
-        IconButton(onClick = { sendEvent(Filter.Reverse) }) {
-            Icon(
-                Icons.AutoMirrored.Filled.Sort,
-                contentDescription = "reverse sort",
-                modifier = Modifier.rotate(reverseRotate)
+    val buttons = remember {
+        listOf(
+            BottomSortHelper(
+                icon = Icons.Default.SelectAll,
+                action = { sendAction(Filter.All) },
+                checkEnable = { it.isAll }
+            ),
+            BottomSortHelper(
+                icon = Icons.Default.Visibility,
+                action = { sendAction(Filter.Read) },
+                checkEnable = { it.isRead }
+            ),
+            BottomSortHelper(
+                icon = Icons.Default.VisibilityOff,
+                action = { sendAction(Filter.NotRead) },
+                checkEnable = { it.isNot }
             )
-        }
+        )
+    }
 
-        FullWeightSpacer()
+    val currentButtonIndex = buttons.indexOfFirst { it.checkEnable(currentFilter) }
+    val buttonOffset = rememberDpAnimatable(IconSize.width * currentButtonIndex)
 
-        // Кнопка включения отображения всех глав
-        IconButton(
-            onClick = { sendEvent(Filter.All) },
-            modifier = Modifier.padding(horizontal = Dimensions.half)
+    LaunchedEffect(currentButtonIndex) {
+        buttonOffset.animateTo(IconSize.width * currentButtonIndex)
+    }
+
+    DefaultBottomBar {
+        RotateToggleButton(
+            icon = Icons.AutoMirrored.Filled.Sort,
+            state = currentFilter.isAsc,
+            onClick = { sendAction(Filter.Reverse) }
+        )
+        Spacer(modifier = Modifier.width(SortBarPadding))
+        Row(
+            modifier = Modifier
+                .padding(SortBarPadding)
+                .drawBehind {
+                    drawRoundRect(
+                        color = selectedColor,
+                        topLeft = Offset(buttonOffset.value.toPx(), 0f),
+                        size = size.copy(size.width / buttons.size),
+                        cornerRadius = CornerRadius(size.height / 2)
+                    )
+                }
         ) {
-            Icon(
-                Icons.Default.SelectAll,
-                contentDescription = null,
-                tint = allColor
-            )
+            buttons.forEachIndexed { index, (icon, action) ->
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    modifier = Modifier
+                        .clip(DefaultRoundedShape)
+                        .clickable(onClick = action, enabled = index != currentButtonIndex)
+                        .size(IconSize)
+                        .padding(IconButtonPaddings),
+                    tint =
+                    if (index == currentButtonIndex) SortSelectedContentColor
+                    else LocalContentColor.current
+                )
+            }
         }
-
-        // Кнопка включения отображения только прочитанных глав
-        IconButton(
-            onClick = { sendEvent(Filter.Read) },
-            modifier = Modifier.padding(horizontal = Dimensions.half)
-        ) {
-            Icon(
-                Icons.Default.Visibility,
-                contentDescription = null,
-                tint = readColor
-            )
-        }
-
-
-        // Кнопка включения отображения только не прочитанных глав
-        IconButton(
-            onClick = { sendEvent(Filter.NotRead) },
-            modifier = Modifier.padding(horizontal = Dimensions.half)
-        ) {
-            Icon(
-                Icons.Default.VisibilityOff,
-                contentDescription = null,
-                tint = notColor
-            )
-        }
-
-        FullWeightSpacer()
     }
 }
 
-// Анимированая цветовая индикация нажатой кнопки
 @Composable
-private fun animatedColor(state: Boolean): Color {
-    val defaultIconColor = LocalContentColor.current.copy(alpha = LocalContentAlpha.current)
-    val selectedIconColor = Color(0xff36a0da)
-    return animateColorAsState(
-        targetValue = if (state) selectedIconColor else defaultIconColor,
-        label = ""
-    ).value
+internal fun SelectionModeBar(
+    selectionMode: SelectionMode,
+    itemsCount: Int,
+    sendAction: (Action) -> Unit
+) {
+    val allSelected by remember {
+        derivedStateOf { selectionMode.selectionCount == itemsCount }
+    }
+    val singleSelected by remember {
+        derivedStateOf { selectionMode.selectionCount == 1 }
+    }
+
+    Row(
+        modifier = Modifier
+            .bottomInsetsPadding()
+            .padding(bottom = Dimensions.default),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+
+        Column(
+            modifier = Modifier
+                .background(SelectedBarColor, DefaultRoundedShape)
+                .padding(SelectedBarPadding)
+        ) {
+
+            TopAnimatedVisibility(visible = singleSelected) {
+                IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Above)) }) {
+                    Icon(Icons.Default.ArrowUpward, contentDescription = "Select Above")
+                }
+            }
+
+            BottomAnimatedVisibility(visible = allSelected.not()) {
+                IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.All)) }) {
+                    Icon(Icons.Default.SelectAll, contentDescription = "Select All")
+                }
+            }
+
+            BottomAnimatedVisibility(visible = singleSelected) {
+                IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Below)) }) {
+                    Icon(Icons.Default.ArrowDownward, contentDescription = "Select Below")
+                }
+            }
+
+            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Clear)) }) {
+                Icon(Icons.Default.Close, contentDescription = "Clear Selection")
+            }
+        }
+    }
+
+    Column(
+        modifier = Modifier
+            .padding(SelectedBarPadding)
+            .background(SelectedBarColor, DefaultRoundedShape)
+            .padding(SelectedBarPadding)
+    ) {
+        IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Download)) }) {
+            Icon(Icons.Default.Download, contentDescription = "Download items")
+        }
+
+        BottomAnimatedVisibility(visible = selectionMode.canRemovePages) {
+            IconButton(onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowDeleteDialog)) }) {
+                Icon(Icons.Default.FolderDelete, contentDescription = "Delete Selection")
+            }
+        }
+
+        BottomAnimatedVisibility(visible = selectionMode.canSetRead) {
+            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.SetRead(true))) }) {
+                Icon(Icons.Default.Visibility, contentDescription = null)
+            }
+        }
+
+        BottomAnimatedVisibility(visible = selectionMode.canSetUnread) {
+            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.SetRead(false))) }) {
+                Icon(Icons.Default.VisibilityOff, contentDescription = null)
+            }
+        }
+
+        BottomAnimatedVisibility(visible = selectionMode.hasReading) {
+            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Reset)) }) {
+                Icon(Icons.Default.LockReset, contentDescription = null)
+            }
+        }
+
+        IconButton(onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowFullDeleteDialog)) }) {
+            Icon(Icons.Default.DeleteForever, contentDescription = "Download items")
+        }
+    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -179,84 +340,138 @@ private fun animatedColor(state: Boolean): Color {
 private fun LazyItemScope.ItemContent(
     item: SelectableItem,
     index: Int,
-    selectionMode: Boolean,
-    navigateToViewer: (Long) -> Unit,
-    sendEvent: (ChaptersEvent) -> Unit,
+    selectionEnabled: Boolean,
+    memoryPagesCount: Int,
+    screenWidth: Float,
+    sendAction: (Action) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
-    val countPagesInMemory by produceState(0, item) {
-        withIoContext { value = item.chapter.countPages }
+    val interactionSource = remember { MutableInteractionSource() }
+
+    var itemSize by remember { mutableStateOf(Size.Zero) }
+    var lastPressPosition by rememberSaveable(stateSaver = Offset.Saver) { mutableStateOf(Offset.Zero) }
+
+    val backgroundSize = rememberFloatAnimatable(if (item.chapter.isRead) screenWidth else 0f)
+
+    LaunchedEffect(item.chapter.isRead) {
+        backgroundSize.animateTo(if (item.chapter.isRead) screenWidth else 0f)
     }
-    val context = LocalContext.current
 
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier
-            .animateItemPlacement()
-            .background(
-                when {
-                    item.selected -> Color(0x9934b5e4)
-                    item.chapter.isRead -> Color(0xffa5a2a2)
-                    else -> Color.Transparent
-                }
-            )
-            .fillMaxWidth()
-            .combinedClickable(
-                onClick = onClickItem(
-                    context = context,
-                    selectionMode = selectionMode,
-                    chapter = item.chapter,
-                    navigateToViewer = navigateToViewer,
-                    sendEvent = { sendEvent(ChaptersEvent.WithSelected(Selection.Change(index))) }
-                ),
-                onLongClick = { sendEvent(ChaptersEvent.WithSelected(Selection.Change(index))) }
-            )
-            .horizontalInsetsPadding()
-    ) {
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(Dimensions.half)
-        ) {
-            ChapterName(item.chapter.name)
+    val selectedRadius = rememberFloatAnimatable(
+        if (item.selected) lastPressPosition.maxDistanceIn(itemSize) else 0f
+    )
 
+    LaunchedEffect(item.selected) {
+        selectedRadius.animateTo(
+            if (item.selected) lastPressPosition.maxDistanceIn(itemSize) else 0f
+        )
+    }
 
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = Dimensions.quarter),
-            ) {
-
-                StatusText(
-                    state = item.chapter.status,
-                    downloadProgress = item.chapter.downloadProgress,
-                    progress = item.chapter.progress,
-                    size = item.chapter.pages.size,
-                    localCountPages = countPagesInMemory
-                )
-
-                FullWeightSpacer()
-
-                // Дата добавления на сайт
-                Text(
-                    item.chapter.date,
-                    style = MaterialTheme.typography.body2,
-                    modifier = Modifier.alignByBaseline(),
-                )
+    LaunchedEffect(Unit) {
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Press) {
+                lastPressPosition = interaction.pressPosition
             }
         }
 
-        DownloadButton(item.chapter.status) {
-            when (it) {
-                Download.START -> sendEvent(ChaptersEvent.StartDownload(item.chapter.id))
-                Download.STOP -> sendEvent(ChaptersEvent.StopDownload(item.chapter.id))
+        interactionSource.interactions.collect { interaction ->
+            if (interaction is PressInteraction.Press && item.selected.not()) {
+                lastPressPosition = interaction.pressPosition
             }
+        }
+    }
+    val readingColor = ReadingItemContainerColor
+    val selectedColor = SelectedItemContainerColor
+
+    Row(
+        modifier = modifier
+            .drawWithCache {
+                onDrawBehind {
+                    clipRect { }
+                    itemSize = size
+
+                    drawRect(
+                        color = readingColor,
+                        size = size.copy(width = backgroundSize.value)
+                    )
+
+                    // Draw the selected circle
+                    drawCircle(
+                        color = selectedColor,
+                        radius = selectedRadius.value,
+                        center = lastPressPosition
+                    )
+                }
+            }
+            .fillMaxWidth()
+            .horizontalInsetsPadding()
+            .animateItemPlacement(),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        val indication = LocalIndication.current
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .combinedClickable(
+                    interactionSource = interactionSource, indication = indication,
+                    onLongClick = { sendAction(ChaptersAction.WithSelected(Selection.Change(index))) },
+                    onClick = onClickItem(
+                        selectionEnabled,
+                        item.chapter,
+                        { sendAction(ReturnEvents(ChaptersEvent.ToViewer(it))) },
+                        { sendAction(ChaptersAction.WithSelected(Selection.Change(index))) }
+                    ),
+                )
+                .padding(start = Dimensions.default, end = Dimensions.half)
+                .padding(vertical = Dimensions.half)
+        ) {
+            ChapterName(item.chapter.name)
+
+            CompositionLocalProvider(
+                LocalTextStyle provides MaterialTheme.typography.bodyMedium,
+                LocalContentColor provides MaterialTheme.colorScheme.onSurfaceVariant
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = Dimensions.quarter)
+                ) {
+                    StatusText(
+                        item.chapter.status,
+                        item.chapter.downloadProgress,
+                        item.chapter.progress,
+                        item.chapter.pages.size,
+                        memoryPagesCount
+                    )
+
+                    FullWeightSpacer()
+
+                    Text(
+                        text = item.chapter.date,
+                        style = MaterialTheme.typography.bodyMedium,
+                        modifier = Modifier.alignByBaseline()
+                    )
+                }
+            }
+        }
+
+        StartAnimatedVisibility(visible = !selectionEnabled) {
+            DownloadButton(
+                state = item.chapter.status,
+                sendAction = {
+                    when (it) {
+                        Download.START -> sendAction(ChaptersAction.StartDownload(item.chapter.id))
+                        Download.STOP -> sendAction(ChaptersAction.StopDownload(item.chapter.id))
+                    }
+                },
+            )
         }
     }
 }
 
 @Composable
 private fun StatusText(
-    state: com.san.kir.data.models.utils.DownloadState,
+    state: DownloadState,
     downloadProgress: Int,
     progress: Int,
     size: Int,
@@ -265,29 +480,25 @@ private fun StatusText(
     FromBottomToBottomAnimContent(targetState = state) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             when (it) {
-                com.san.kir.data.models.utils.DownloadState.LOADING -> {
+                DownloadState.LOADING -> {
                     LoadingIndicator()
                     LoadingText(downloadProgress)
                 }
 
-                com.san.kir.data.models.utils.DownloadState.QUEUED -> {
+                DownloadState.QUEUED -> {
                     LoadingIndicator()
                     WaitingText()
                 }
 
-                com.san.kir.data.models.utils.DownloadState.ERROR,
-                com.san.kir.data.models.utils.DownloadState.PAUSED,
-                com.san.kir.data.models.utils.DownloadState.COMPLETED,
-                com.san.kir.data.models.utils.DownloadState.UNKNOWN,
+                DownloadState.ERROR,
+                DownloadState.PAUSED,
+                DownloadState.COMPLETED,
+                DownloadState.UNKNOWN,
                 -> {
                     Text(
                         stringResource(
-                            R.string.list_chapters_read,
-                            progress,
-                            size,
-                            localCountPages
+                            R.string.reading_progress_format, progress, size, localCountPages
                         ),
-                        style = MaterialTheme.typography.body2,
                     )
 
                     BottomAnimatedVisibility(visible = localCountPages > 0) {
@@ -303,4 +514,88 @@ private fun StatusText(
             }
         }
     }
+}
+
+@Preview
+@Composable
+private fun PreviewSelectedModeOnListPageContent() {
+    MaterialTheme {
+        ListPageContent(
+            chapterFilter = ChapterFilter.ALL_READ_DESC,
+            selectionMode = remember {
+                SelectionMode(
+                    selectionCount = 1,
+                    hasReading = false,
+                    canSetRead = false,
+                    canSetUnread = false,
+                    canRemovePages = false
+                )
+            },
+            itemsContent = remember {
+                Items(
+                    listOf(
+                        createTestItem(1, false),
+                        createTestItem(2, false),
+                        createTestItem(3, false),
+                        createTestItem(4, false),
+                        createTestItem(5, false)
+                    )
+                )
+            },
+            sendAction = { }
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun PreviewSelectedModeOffListPageContent() {
+    MaterialTheme {
+        ListPageContent(
+            chapterFilter = ChapterFilter.ALL_READ_DESC,
+            selectionMode = SelectionMode(
+                selectionCount = 0,
+                hasReading = false,
+                canSetRead = false,
+                canSetUnread = false,
+                canRemovePages = false
+            ),
+            itemsContent = Items(
+                listOf(
+                    createTestItem(1, false),
+                    createTestItem(2, true),
+                    createTestItem(3, true),
+                    createTestItem(4, false),
+                    createTestItem(5, false)
+                )
+            ),
+            sendAction = { }
+        )
+    }
+}
+
+private fun createTestItem(
+    index: Int,
+    selected: Boolean = false,
+    progress: Int = 0,
+    isRead: Boolean = false,
+    downloadState: DownloadState = DownloadState.UNKNOWN,
+    downloadPages: Int = 0
+): SelectableItem {
+    return SelectableItem(
+        chapter = SimplifiedChapter(
+            id = index.toLong(),
+            status = downloadState,
+            name = "Тестовая глава $index",
+            progress = progress,
+            isRead = isRead,
+            downloadPages = downloadPages,
+            pages = emptyList(),
+            manga = "Тестовая манга",
+            date = "",
+            path = "",
+            addedTimestamp = 0L
+        ),
+        selected = selected
+    )
 }

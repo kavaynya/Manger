@@ -27,7 +27,7 @@ public class DownloadChaptersManager(
         startWorker()
     }
 
-    public suspend fun addTasks(chapterIds: List<Long>): Operation = withIoContext {
+    public suspend fun addTasks(chapterIds: Iterable<Long>): Operation = withIoContext {
         chapterIds.forEach { chapterId ->
             if (workerRepository.task(chapterId) == null) {
                 workerRepository.save(ChapterTask(chapterId = chapterId))

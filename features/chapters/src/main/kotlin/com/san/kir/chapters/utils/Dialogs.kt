@@ -14,22 +14,23 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.window.DialogProperties
-import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.ChapterDeleteWorker
 import com.san.kir.background.works.ReadChapterDelete
 import com.san.kir.chapters.R
+import com.san.kir.core.compose.AlertDialog
 import com.san.kir.core.compose.Dimensions
-import com.san.kir.data.models.base.Manga
+import com.san.kir.core.utils.navigation.DialogState
+import com.san.kir.core.utils.navigation.EmptyDialogData
+import com.san.kir.data.models.main.Manga
 
 private fun dismissButton(onClick: () -> Unit) = @Composable {
     TextButton(onClick) {
         Text(
-            stringResource(R.string.list_chapters_remove_no)
+            stringResource(com.san.kir.core.compose.R.string.no)
                 .toUpperCase(Locale.current)
         )
     }
@@ -43,7 +44,7 @@ private fun confirmButton(onClick: () -> Unit, onClose: () -> Unit) = @Composabl
         }
     ) {
         Text(
-            stringResource(R.string.list_chapters_remove_yes)
+            stringResource(com.san.kir.core.compose.R.string.yes)
                 .toUpperCase(Locale.current)
         )
     }
@@ -78,49 +79,43 @@ private fun PrepareAlertDialog(
 
 // Диалог подтвержедения выделенных глав из БД
 @Composable
-internal fun FullDeleteChaptersAlertDialog(
-    visible: Boolean,
-    onClose: () -> Unit,
-    onClick: () -> Unit,
-) {
-    PrepareAlertDialog(
-        visible,
-        title = R.string.action_full_delete_title,
-        text = R.string.action_full_delete_message,
-        onClose = onClose,
-        onClick = onClick
+internal fun FullDeleteChaptersAlertDialog(state: DialogState<EmptyDialogData>) {
+    AlertDialog(
+        state = state,
+        title = R.string.warning,
+        text = R.string.full_delete_message,
     )
 }
 
 // Диалог подтверждения удаления выделенных глав
 @Composable
-internal fun DeleteSelectedChaptersAlertDialog(
-    visible: Boolean,
-    onClose: () -> Unit,
-    onClick: () -> Unit,
-) {
-    PrepareAlertDialog(
-        visible,
-        title = R.string.list_chapters_remove_text,
-        onClose = onClose,
-        onClick = onClick
+internal fun DeleteSelectedChaptersAlertDialog(state: DialogState<EmptyDialogData>) {
+    AlertDialog(
+        state = state,
+        text = R.string.you_want_delete,
     )
 }
 
-// Диалог очистки памяти ото всех прочитанных глав
 @Composable
-internal fun DeleteChaptersDialog(
-    visible: Boolean,
-    onClose: () -> Unit,
-    onClick: () -> Unit,
-) {
-    PrepareAlertDialog(
-        visible,
-        text = R.string.library_popupmenu_delete_read_chapters_message,
-        onClose = onClose,
-        onClick = onClick
+internal fun FullResetAlertDialog(resetDialogState: DialogState<EmptyDialogData>) {
+    AlertDialog(
+        state = resetDialogState,
+        title = R.string.warning,
+        text = R.string.reset_reading_text,
+        negative = R.string.dismiss,
+        positive = R.string.start_again
     )
 }
+
+
+@Composable
+internal fun DeleteChaptersDialog(state: DialogState<EmptyDialogData>) {
+    AlertDialog(
+        state = state,
+        text = R.string.delete_read_chapters_message
+    )
+}
+
 
 // Диалог оповещения о процессе очистки
 @Composable
@@ -130,13 +125,12 @@ internal fun ProgressDeletingChaptersDialog(
     onClose: () -> Unit,
 ) {
     if (visible) {
-        val ctx = LocalContext.current
         // Индикатор выполнения операции
         var action by remember { mutableStateOf(true) }
         // Отображаемое сообщение в зависимости от статуса действия
         val message =
-            if (action) R.string.library_popupmenu_delete_read_chapters_delete
-            else R.string.library_popupmenu_delete_read_chapters_ready
+            if (action) R.string.deleting
+            else com.san.kir.core.compose.R.string.ready
 
 
         AlertDialog(
@@ -146,11 +140,11 @@ internal fun ProgressDeletingChaptersDialog(
                 dismissOnBackPress = false,
                 dismissOnClickOutside = false,
             ),
-            buttons = {
+            confirmButton = {
                 // Кнопка доступна после выполнения действия
                 if (action.not())
                     TextButton(onClick = onClose) {
-                        Text(stringResource(R.string.library_popupmenu_delete_read_chapters_btn_close))
+                        Text(stringResource(com.san.kir.catalog.R.string.close))
                     }
             },
             text = {
@@ -167,15 +161,10 @@ internal fun ProgressDeletingChaptersDialog(
             }
         )
 
-        LaunchedEffect(true) {
-            // Запуск работы по удалению глав
-            ChapterDeleteWorker.addTask<ReadChapterDelete>(ctx, manga)
-
-            // Подписка на выполняемую работу для изменения индикатора действия
-            collectWorkInfoByTag(ChapterDeleteWorker.TAG) { works ->
-                // Индикатор убирается если нет задач ни одной задачи
-                action = works.any { it.state.isFinished.not() }
-            }
+        LaunchedEffect(Unit) {
+            ChapterDeleteWorker.addTask<ReadChapterDelete>(manga.id)
+            ChapterDeleteWorker.workInfos()
+                .collect { works -> action = works.any { it.state.isFinished.not() } }
         }
     }
 }

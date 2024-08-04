@@ -39,8 +39,8 @@ import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
 
 private val DefaultRoundedShape = RoundedCornerShape(50)
-private val IconSize = DpSize(24.dp + Dimensions.default * 2, 24.dp + Dimensions.half * 2)
-private val IconButtonPaddings =
+public val IconSize: DpSize = DpSize(24.dp + Dimensions.default * 2, 24.dp + Dimensions.half * 2)
+public val IconButtonPaddings: PaddingValues.Absolute =
     PaddingValues.Absolute(Dimensions.default, Dimensions.half, Dimensions.default, Dimensions.half)
 public val FabButtonHeight: Dp = 72.dp
 

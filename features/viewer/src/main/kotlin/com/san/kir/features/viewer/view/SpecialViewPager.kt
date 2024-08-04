@@ -6,7 +6,7 @@ import android.view.MotionEvent
 import androidx.viewpager.widget.ViewPager
 
 // Viewpager с возможностью отключать управление свайпами
-class SpecialViewPager : ViewPager {
+internal class SpecialViewPager : ViewPager {
 
     private var isSwapable: Boolean = false
 

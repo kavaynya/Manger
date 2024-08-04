@@ -5,6 +5,6 @@
 .externalNativeBuild
 /buildSrc/build
 /app/build
-.idea
+/.idea
 local.properties
 composeReport2Html.jar

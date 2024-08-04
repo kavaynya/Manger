@@ -12,7 +12,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
 public enum class NetworkState {
-    NOT_WIFI, NOT_CELLURAR, OK
+    NOT_WIFI, NOT_CELLULAR, OK
 }
 
 public interface INetworkManager {

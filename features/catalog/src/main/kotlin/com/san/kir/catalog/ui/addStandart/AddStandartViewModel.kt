@@ -94,7 +94,7 @@ internal class AddStandartViewModel(
                 )
             ).ifEmpty { throw ArrayIndexOutOfBoundsException() }.first()
 
-            statisticRepository.insert(mangaId)
+            statisticRepository.save(mangaId)
 
             progress.update { ProcessStatus.PREV_AND_CREATED_FOLDER }
 

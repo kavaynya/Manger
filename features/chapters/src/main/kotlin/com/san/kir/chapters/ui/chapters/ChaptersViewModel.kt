@@ -6,118 +6,128 @@ import com.san.kir.background.logic.UpdateMangaManager
 import com.san.kir.background.logic.di.downloadChaptersManager
 import com.san.kir.background.logic.di.updateMangaManager
 import com.san.kir.chapters.R
-import com.san.kir.chapters.logic.di.chaptersRepository
-import com.san.kir.chapters.logic.di.settingsRepository
-import com.san.kir.chapters.logic.repo.ChaptersRepository
-import com.san.kir.chapters.logic.repo.SettingsRepository
 import com.san.kir.chapters.logic.utils.SelectionHelper
-import com.san.kir.core.support.ChapterFilter
-import com.san.kir.core.support.DownloadState
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.models.utils.ChapterFilter
-import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.coroutines.defaultDispatcher
-import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.delChapters
 import com.san.kir.core.utils.longToast
 import com.san.kir.core.utils.toast
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.data.models.base.ga
-
+import com.san.kir.data.chapterRepository
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.data.db.main.repo.SettingsRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.data.models.base.countPages
+import com.san.kir.data.models.main.Manga
+import com.san.kir.data.models.main.SimplifiedChapter
+import com.san.kir.data.models.utils.ChapterComparator
+import com.san.kir.data.models.utils.ChapterFilter
+import com.san.kir.data.models.utils.DownloadState
+import com.san.kir.data.settingsRepository
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.onStart
 import kotlinx.coroutines.flow.update
+import timber.log.Timber
 
 internal class ChaptersViewModel(
-    private val context: Context = ManualDI.context,
-    private val chaptersRepository: ChaptersRepository = ManualDI.chaptersRepository,
-    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository,
-    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager,
-    private val downloadManager: DownloadChaptersManager = ManualDI.downloadChaptersManager,
+    private val mangaId: Long,
+    private val context: Context = ManualDI.application,
+    private val chaptersRepository: ChapterRepository = ManualDI.chapterRepository(),
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
+    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
+    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager(),
+    private val downloadManager: DownloadChaptersManager = ManualDI.downloadChaptersManager(),
 ) : ViewModel<ChaptersState>(), ChaptersStateHolder {
-    private var job: Job? = null
-    private val selectableItemComparator by lazy { SelectableItemComparator() }
-    private var oneTimeFlag = true
 
+    private val chapterComparator by lazy { ChapterComparator() }
+    private var oneTimeFlag = true
     private val backgroundAction = MutableStateFlow(BackgroundActions())
-    private val manga = MutableStateFlow(Manga())
-    private val items = MutableStateFlow(Items())
+    private val manga = mangaRepository.loadItem(mangaId)
+        .filterNotNull()
+        .onEach { initFilterAndIncreasePopulate(it) }
+
     private val filter = MutableStateFlow(ChapterFilter.ALL_READ_ASC)
-    private val nextChapter = items
-        .map { items -> checkNextChapter(items.items) }
-        .onStart { emit(NextChapter.None) }
+
+    override val itemsContent = MutableStateFlow(Items())
+
+    private val items = MutableStateFlow(Items())
+    override val nextChapter = chaptersRepository
+        .items(mangaId)
+        .map { checkNextChapter(it) }
+        .stateInSubscribed(NextChapter.Loading)
+
+    override val selectionMode = itemsContent
+        .onEach {
+            backgroundAction.value =
+                BackgroundActions(updateManga = false, updateItems = false, updatePages = false)
+        }
+        .map { current ->
+            val selected = current.items.filter { it.selected }
+            SelectionMode(
+                selectionCount = selected.size,
+                hasReading = selected.any { it.chapter.progress > 1 || it.chapter.isRead },
+                canSetRead = selected.any { !it.chapter.isRead },
+                canSetUnread = selected.any { it.chapter.isRead },
+                canRemovePages = selected.any { current.memoryPagesCounts[it.chapter.id] != null }
+            )
+        }
+        .stateInSubscribed(SelectionMode())
 
     override val tempState = combine(
-        backgroundAction,
-        manga,
-        items.onEach { backgroundAction.update { it.copy(updateItems = false) } },
-        settingsRepository.showTitle,
-        filter.combine(nextChapter) { f1, f2 -> f1 to f2 }
-    ) { background, manga, items, title, filterNext ->
+        backgroundAction, manga, settingsRepository.showTitle, filter
+    ) { background, manga, title, filter ->
         ChaptersState(
             backgroundAction = background.result,
-            items = items.items,
             manga = manga,
             showTitle = title,
-            chapterFilter = filterNext.first,
-            nextChapter = filterNext.second,
-            count = items.count,
-            readCount = items.readCount,
+            chapterFilter = filter,
         )
     }
 
     override val defaultState = ChaptersState()
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            is ChaptersEvent.Set -> set(event.mangaId)
-            is ChaptersEvent.WithSelected -> withSelected(event.mode)
-            is ChaptersEvent.ChangeFilter -> changeFilter(event.mode)
-            is ChaptersEvent.StartDownload -> downloadManager.addTask(event.id)
-            is ChaptersEvent.StopDownload -> downloadManager.removeTask(event.id)
-            ChaptersEvent.ChangeIsUpdate -> changeIsUpdate()
-            ChaptersEvent.ChangeMangaSort -> changeMangaSort()
-            ChaptersEvent.DownloadAll -> downloadAll()
-            ChaptersEvent.DownloadNext -> downloadNext()
-            ChaptersEvent.DownloadNotRead -> downloadNotReads()
-            ChaptersEvent.UpdateManga -> updateManager.addTask(manga.value.id)
-        }
+    init {
+        combine(chaptersRepository.items(mangaId), filter, manga) { items, filter, manga ->
+            Timber.w("list -> " + items.size)
+            itemsContent.value = SelectionHelper.update(itemsContent.value, items, filter, manga)
+            updateMemoryCounts(items)
+        }.flowOn(defaultDispatcher).launchIn(this)
+
+        combine(settingsRepository.isIndividual, filter) { individual, filter ->
+            if (individual) {
+                settingsRepository.update(filter)
+            } else {
+                mangaRepository.save(manga.first().copy(chapterFilter = filter))
+            }
+        }.flowOn(defaultDispatcher).launchIn(this)
+
+        registerReceiver(mangaId)
     }
 
-    private fun set(mangaId: Long) {
-        if (job?.isActive == true) return
-
-        job = defaultLaunch {
-            chaptersRepository
-                .loadManga(mangaId)
-                .filterNotNull()
-                .onEach { item ->
-                    manga.update { item }
-                    initFilterAndIncreasePopulate(item)
-                }.launchIn(this)
-
-            combine(
-                chaptersRepository.items(mangaId), filter, manga
-            ) { list, filter, manga ->
-                items.update { old -> SelectionHelper.update(old, list, filter, manga) }
-            }.flowOn(defaultDispatcher).launchIn(this)
-
-            combine(settingsRepository.isIndividual, filter) { individual, filter ->
-                if (individual.not()) settingsRepository.update(filter)
-                else chaptersRepository.update(manga.value.copy(chapterFilter = filter))
-            }.flowOn(defaultDispatcher).launchIn(this)
-
-            registerReceiver(mangaId)
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            is ChaptersAction.WithSelected -> withSelected(action.mode)
+            is ChaptersAction.ChangeFilter -> changeFilter(action.mode)
+            is ChaptersAction.StartDownload -> downloadManager.addTask(action.id)
+            is ChaptersAction.StopDownload -> downloadManager.removeTask(action.id)
+            ChaptersAction.ChangeIsUpdate -> changeIsUpdate()
+            ChaptersAction.ChangeMangaSort -> changeMangaSort()
+            ChaptersAction.DownloadAll -> downloadAll()
+            ChaptersAction.DownloadNext -> downloadNext()
+            ChaptersAction.DownloadNotRead -> downloadNotReads()
+            ChaptersAction.UpdateManga -> updateManager.addTask(manga.first().id)
+            ChaptersAction.FullReset -> fullReadingReset()
+            ChaptersAction.ResetError -> resetError()
         }
     }
 
@@ -128,8 +138,9 @@ internal class ChaptersViewModel(
 
             when (task?.state) {
                 DownloadState.UNKNOWN -> withMainContext {
-                    context.longToast(R.string.list_chapters_message_error)
+                    context.longToast(R.string.update_error)
                 }
+
                 DownloadState.COMPLETED -> withMainContext {
                     if (task.newChapters <= 0) context.longToast(R.string.new_chapters_no_found)
                     else context.longToast(R.string.have_new_chapters_count, task.newChapters)
@@ -141,42 +152,42 @@ internal class ChaptersViewModel(
     }
 
     private suspend fun changeIsUpdate() {
-        with(manga.value) { chaptersRepository.update(copy(isUpdate = isUpdate.not())) }
+        with(manga.first()) { mangaRepository.save(copy(isUpdate = isUpdate.not())) }
     }
 
     private suspend fun changeMangaSort() {
-        with(manga.value) { chaptersRepository.update(copy(isAlternativeSort = isAlternativeSort.not())) }
+        with(manga.first()) { mangaRepository.save(copy(isAlternativeSort = isAlternativeSort.not())) }
     }
 
     private suspend fun downloadAll() {
-        val chapterIds = chaptersRepository.allItems(manga.value.id).map { it.id }
+        val chapterIds = chaptersRepository.allItems(manga.first().id).map { it.id }
         downloadManager.addTasks(chapterIds)
         showDownloadToast(chapterIds.size)
     }
 
     private suspend fun downloadNotReads() {
-        val chapterIds = chaptersRepository.notReadItems(manga.value.id).map { it.id }
+        val chapterIds = chaptersRepository.notReadItems(manga.first().id).map { it.id }
         downloadManager.addTasks(chapterIds)
         showDownloadToast(chapterIds.size)
     }
 
     private suspend fun downloadNext() {
-        chaptersRepository.newItem(manga.value.id)?.let { chapter ->
+        chaptersRepository.newItem(manga.first().id)?.let { chapter ->
             downloadManager.addTask(chapter.id)
         }
     }
 
     private fun showDownloadToast(count: Int) {
         if (count == 0)
-            context.toast(R.string.list_chapters_selection_load_error)
+            context.toast(R.string.all_downloaded_before)
         else
-            context.toast(context.getString(R.string.list_chapters_selection_load_ok, count))
+            context.toast(context.getString(R.string.download_chapters_format, count))
     }
 
     private suspend fun withSelected(mode: Selection) {
         backgroundAction.update { it.copy(updateItems = true) }
 
-        val selectedItems = state.value.items.filter { it.selected }
+        val selectedItems = itemsContent.value.items.filter { it.selected }
         when (mode) {
             Selection.Above -> items.update { SelectionHelper.above(it) }
             Selection.Below -> items.update { SelectionHelper.below(it) }
@@ -189,12 +200,13 @@ internal class ChaptersViewModel(
             ).apply {
                 withMainContext {
                     if (current == 0) {
-                        context.toast(R.string.list_chapters_selection_del_error)
+                        context.toast(R.string.nothing_delete)
                     } else {
-                        context.toast(R.string.list_chapters_selection_del_ok)
+                        context.toast(R.string.delete_successful)
                     }
                 }
                 items.update { SelectionHelper.clear(it) }
+                updateMemoryCounts()
             }
 
             Selection.DeleteFromDB -> chaptersRepository.delete(selectedItems.map { it.chapter.id })
@@ -205,9 +217,34 @@ internal class ChaptersViewModel(
             }
 
             is Selection.SetRead -> {
-                chaptersRepository.update(selectedItems.map { it.chapter.id }, mode.newState)
+                chaptersRepository.updateIsRead(selectedItems.map { it.chapter.id }, mode.newState)
                 items.update { SelectionHelper.clear(it) }
             }
+
+            Selection.Reset -> {
+                chaptersRepository.reset(selectedItems.map { it.chapter.id })
+                items.update { SelectionHelper.clear(it) }
+            }
+        }
+    }
+
+    private fun updateMemoryCounts(list: List<SimplifiedChapter>? = null) {
+        itemsContent.update { oldItems ->
+            val countsMap = mutableMapOf<Long, Int>()
+
+            if (list != null) {
+                list.forEach {
+                    val count = it.countPages
+                    if (count > 0) countsMap[it.id] = count
+                }
+            } else {
+                oldItems.items.forEach {
+                    val count = it.chapter.countPages
+                    if (count > 0) countsMap[it.chapter.id] = count
+                }
+            }
+
+            oldItems.copy(memoryPagesCounts = countsMap)
         }
     }
 
@@ -226,27 +263,49 @@ internal class ChaptersViewModel(
         if (oneTimeFlag) {
             oneTimeFlag = false
 
-            chaptersRepository.update(manga.copy(populate = manga.populate + 1))
+            mangaRepository.save(manga.copy(populate = manga.populate + 1))
+
             filter.update {
-                if (settingsRepository.currentChapters().isIndividual) {
+                if (settingsRepository.isIndividual()) {
                     manga.chapterFilter
                 } else {
-                    settingsRepository.currentChapters().filterStatus
+                    settingsRepository.filterStatus()
                 }
             }
         }
     }
 
-    private fun checkNextChapter(list: List<SelectableItem>): NextChapter {
+    private suspend fun checkNextChapter(list: List<SimplifiedChapter>): NextChapter {
         val newList = kotlin.runCatching {
-            if (manga.value.isAlternativeSort.not()) null
-            else list.sortedWith(selectableItemComparator)
-        }.getOrNull() ?: list.sortedBy { it.chapter.id }
+            if (manga.first().isAlternativeSort.not()) null
+            else list.sortedWith(chapterComparator)
+        }.getOrNull() ?: list.sortedBy { it.id }
 
-        val result = newList.firstOrNull { item -> item.chapter.isRead.not() }
-        return if (result != null)
-            NextChapter.Ok(result.chapter.id, result.chapter.name)
-        else
-            NextChapter.None
+        val firstUnreadChapter = newList.firstOrNull { item -> item.isRead.not() }
+        val firstChapter = newList.firstOrNull()
+
+        return when {
+            firstUnreadChapter == null -> NextChapter.None
+            newList.size == 1 -> NextChapter.Ok.Single(
+                firstUnreadChapter.id,
+                firstUnreadChapter.name
+            )
+
+            firstUnreadChapter == firstChapter -> NextChapter.Ok.First(
+                firstUnreadChapter.id,
+                firstUnreadChapter.name
+            )
+
+            else -> NextChapter.Ok.Continue(firstUnreadChapter.id, firstUnreadChapter.name)
+        }
+    }
+
+    private suspend fun fullReadingReset() {
+        backgroundAction.update { it.copy(updateItems = true) }
+        chaptersRepository.reset(mangaId)
+    }
+
+    private suspend fun resetError() {
+        mangaRepository.save(manga.first().copy(lastUpdateError = null))
     }
 }

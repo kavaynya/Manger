@@ -10,9 +10,10 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.convertImagesToPng
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.isOkPng
-import com.san.kir.data.db.main.entites.preparedPath
-import com.san.kir.features.viewer.logic.SettingsRepository
-import com.san.kir.features.viewer.logic.di.settingsRepository
+import com.san.kir.data.db.main.repo.SettingsRepository
+import com.san.kir.data.parsing.SiteCatalogsManager
+import com.san.kir.data.parsing.siteCatalogsManager
+import com.san.kir.data.settingsRepository
 import com.san.kir.features.viewer.utils.LoadState
 import com.san.kir.features.viewer.utils.Page
 import kotlinx.coroutines.CancellationException
@@ -25,8 +26,9 @@ import timber.log.Timber
 import java.io.File
 
 internal class LoadImageViewModel(
-    private val connectManager: ConnectManager = ManualDI.connectManager,
-    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+    private val connectManager: ConnectManager = ManualDI.connectManager(),
+    private val settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
+    private val siteCatalogsManager: SiteCatalogsManager = ManualDI.siteCatalogsManager(),
 ) : ViewModel() {
     private var imageLoadingJob: Job? = null
 
@@ -62,7 +64,7 @@ internal class LoadImageViewModel(
         } else {
             // получаем файл страницы
             val name = connectManager.nameFromUrl(page.pagelink)
-            val fullPath = getFullPath(page.chapter.preparedPath).absolutePath
+            val fullPath = getFullPath(page.chapter.path).absolutePath
             var file = File(fullPath, name)
             file = File(file.parentFile, "${file.nameWithoutExtension}.png")
 
@@ -82,7 +84,7 @@ internal class LoadImageViewModel(
                 }
             }
 
-            val isOnline = settingsRepository.currentViewer().withoutSaveFiles
+            val isOnline = settingsRepository.withoutSaveFiles()
 
             // Загрузка файла без сохранения в памяти смартфона
             if (isOnline) {

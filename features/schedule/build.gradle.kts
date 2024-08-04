@@ -18,6 +18,6 @@ dependencies {
 
     implementation(libs.activity)
 
-    implementation(project(Modules.ksp))
-    ksp(project(Modules.ksp))
+    implementation(projects.ksp)
+    ksp(projects.ksp)
 }

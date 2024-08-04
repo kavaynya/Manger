@@ -50,14 +50,14 @@ public val File.isEmptyDirectory: Boolean
         } else
             true
 
-public fun delChapters(chapters: List<String>): ResultDeleting = delFiles(chapters)
+public suspend fun delChapters(chapters: List<String>): ResultDeleting = delFiles(chapters)
 
-public fun delFiles(filesPath: List<String>): ResultDeleting {
+public suspend fun delFiles(filesPath: List<String>): ResultDeleting = withIoContext {
     var acc = 0
     filesPath.forEach { path ->
         getFullPath(path).apply { if (exists() && deleteRecursively()) acc++ }
     }
-    return ResultDeleting(current = acc, max = filesPath.size)
+    ResultDeleting(current = acc, max = filesPath.size)
 }
 
 // Проверка, что файл является корректным изображением формата PNG

@@ -9,7 +9,7 @@ import androidx.fragment.app.FragmentStatePagerAdapter
 import androidx.viewpager.widget.PagerAdapter
 import com.san.kir.features.viewer.utils.Page
 
-class Adapter(fragmentActivity: FragmentActivity) :
+internal class Adapter(fragmentActivity: FragmentActivity) :
     FragmentStatePagerAdapter(fragmentActivity.supportFragmentManager) {
 
     var items: List<Page> = listOf()

@@ -1,48 +1,80 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="main_menu_latest_count">Обновления: %d</string>
-    <string name="main_menu_downloader_count">Загрузчик: %d</string>
 
-    <string name="list_chapters_selection_load_error">Все было скачано раньше</string>
-    <string name="list_chapters_selection_load_ok">Качаю главы. Их всего %d</string>
-    <string name="list_chapters_open_is_download">Спокойствие, только спокойствие! Скоро скачается.</string>
-    <string name="list_chapters_read">Прочитано %1$d из %2$d (%3$d)</string>
-    <string name="list_chapters_download_progress">Загрузка %d%%</string>
-    <string name="list_chapters_queue">Ожидание…</string>
-    <string name="list_chapters_selection_del_error">Нельзя удалить то чего нет</string>
-    <string name="list_chapters_selection_del_ok">У вас нет больше этих глав</string>
-    <string name="list_chapters_message_error">Произошла ошибка при обновлении</string>
+    <!-- Latest -->
+    <string name="updates_format">Обновления: %d</string>
+    <string name="long_ago">Давно</string>
+    <string name="today">Сегодня</string>
+    <string name="yesterday">Вчера</string>
+    <string name="this_week">На этой неделе</string>
+    <string name="this_month">В этом месяце</string>
+    <string name="download_new_format">Скачать новые (%s)</string>
+    <string name="delete_all">Удалить все</string>
+    <string name="delete_downloads">Удалить скачанное</string>
+    <string name="delete_reads">Удалить прочитанное</string>
+
+
+    <!-- Downloader -->
+    <string name="downloader_format">Загрузчик: %d</string>
+    <string name="download_progress_format">Загруженно %1$d из %2$d</string>
+    <string name="size_format">%s Мб</string>
+    <string name="download_final_format">%1$s Мб за %2$s</string>
+    <string name="concat_format">%1$s  %2$s</string>
+    <string name="subtitle_format">Останов.: %1$d  Заверш.: %2$d</string>
+    <string name="clean_all">Очистить все</string>
+    <string name="clean_completed">Очистить завершенные</string>
+    <string name="clean_paused">Очистить остановленные</string>
+    <string name="clean_with_error">Очистить с ошибкой</string>
+
+
+    <!-- Chapters -->
+    <string name="all_downloaded_before">Все было скачано раньше</string>
+    <string name="download_chapters_format">Качаю главы. Их всего %d</string>
+    <string name="reading_progress_format">Прочитано %1$d из %2$d (%3$d)</string>
+    <string name="nothing_delete">Нельзя удалить то чего нет</string>
+    <string name="delete_successful">У вас нет больше этих глав</string>
+    <string name="update_error">Произошла ошибка при обновлении</string>
     <string name="new_chapters_no_found">Новых глав найти не удалось</string>
     <string name="have_new_chapters_count">Новые главы есть, их а ж %d</string>
-    <string name="list_chapters_download_next">Скачать следующую</string>
-    <string name="list_chapters_download_not_read">Скачать непрочитанное</string>
-    <string name="list_chapters_download_all">Скачать все</string>
-    <string name="list_chapters_change_sort">Изменить сортировку</string>
-    <string name="list_chapters_is_update">Разрешить обновления</string>
-    <string name="list_chapters_page_about">Описание</string>
-    <string name="list_chapters_page_list">Содержимое</string>
-    <string name="list_chapters_about_continue">"Продолжить чтение\n%s"</string>
-    <string name="list_chapters_about_not_continue">"Нет глав для чтения"</string>
-    <string name="list_chapters_about_read">"Вы прочитали %1$d %2$s из %3$d"</string>
-    <string name="list_chapters_remove_text">Вы действительно хотите удалить</string>
-    <string name="list_chapters_remove_yes">Да</string>
-    <string name="list_chapters_remove_no">Нет</string>
+    <string name="about">Описание</string>
+    <string name="content">Содержимое</string>
+    <string name="go">Перейти</string>
+    <string name="no_update_error">Последнее обновление закончилось с ошибкой. Попробуйте обновить мангу в каталогах</string>
+    <string name="ok">Понял</string>
+    <string name="last_update_error">Последнее обновление закончилось с ошибкой</string>
+    <string name="you_reading_format">Вы прочитали %1$d %2$s из %3$d</string>
+    <string name="not_continue_reading">Нет глав для чтения</string>
+    <string name="continue_reading_format">Продолжить чтение\n%s</string>
+    <string name="start_reading_format">Начать чтение\n%s</string>
+    <string name="single_reading_format">Прочитать\n%s</string>
+    <string name="download_next">Скачать следующую</string>
+    <string name="download_not_reading">Скачать непрочитанное</string>
+    <string name="download_all">Скачать все</string>
+    <string name="allow_updates">Разрешить обновления</string>
+    <string name="change_sorting">Изменить сортировку</string>
 
-    <string name="library_popupmenu_delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
-    <string name="library_popupmenu_delete_read_chapters_ok">Да</string>
-    <string name="library_popupmenu_delete_read_chapters_no">Не, не</string>
-    <string name="library_popupmenu_delete_read_chapters_delete">Удаляю…</string>
-    <string name="library_popupmenu_delete_read_chapters_btn_close">Закрыть</string>
-    <string name="library_popupmenu_delete_read_chapters_ready">Готово</string>
 
-    <string name="action_delete">Удалить</string>
-    <string name="action_set_read">Пометить прочитаными</string>
-    <string name="action_set_not_read">Пометить не прочитаными</string>
-    <string name="action_select_above">Выбрать все выше</string>
-    <string name="action_select_below">Выбрать все ниже</string>
-    <string name="action_full_delete">Удалить из базы данных</string>
-    <string name="action_full_delete_title">Внимание!!!</string>
-    <string name="action_full_delete_message">Данное действие приведет к удалению глав из базы данных. Все файлы и папки будут не тронуты, но приложение больше не будет видеть эти главы. Рекомендуется использовать это при появлении копий существующих глав.</string>
+    <!-- Item Content -->
+    <string name="open_if_is_downloading">Спокойствие, только спокойствие! Скоро скачается.</string>
+    <string name="download_format">Загрузка %d%%</string>
+    <string name="waiting">Ожидание…</string>
+
+
+    <!-- Dialogs -->
+    <string name="you_want_delete">Вы действительно хотите удалить</string>
+    <string name="delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
+    <string name="deleting">Удаляю…</string>
+    <string name="full_delete_message">Данное действие приведет к удалению глав из базы данных. Все файлы и папки будут не тронуты, но приложение больше не будет видеть эти главы. Рекомендуется использовать это при появлении копий существующих глав.</string>
+    <string name="warning">Внимание!!!</string>
+    <string name="dismiss">Нет, я передумал</string>
+    <string name="start_again">Да, я хочу начать с начала</string>
+    <string name="reset_reading_text">Данное действие сбросит прогресс чтения каждой главы и отметит все главы не прочитанными. Вы уверены, что хотите сбросить прогресс чтения данной манги?</string>
+
+
+    <plurals name="selected_format">
+        <item quantity="one">%d выбран</item>
+        <item quantity="other">%d выбрано</item>
+    </plurals>
 
     <plurals name="chapters">
         <item quantity="zero">глав</item>
@@ -52,24 +84,4 @@
         <item quantity="other">глав.</item>
     </plurals>
 
-    <plurals name="list_chapters_action_selected">
-        <item quantity="one">%d выбран</item>
-        <item quantity="other">%d выбрано</item>
-    </plurals>
-
-    <string name="latest_chapter_clean_download">Очистить скачанное</string>
-    <string name="latest_chapter_clean_read">Очистить прочитанное</string>
-    <string name="latest_chapter_clean">Очистить</string>
-    <string name="latest_chapter_download_new">Скачать новое</string>
-
-    <!--DownloadManager-->
-    <string name="download_item_progress_text">Загруженно %1$d из %2$d</string>
-    <string name="download_item_progress_size">%s Мб</string>
-    <string name="download_item_final_size_with_time">%1$s Мб за %2$s</string>
-    <string name="download_item_progress">%1$s  %2$s</string>
-    <string name="download_activity_subtitle">Останов.: %1$d  Заверш.: %2$d</string>
-    <string name="download_activity_option_submenu_clean_all">Очистить все</string>
-    <string name="download_activity_option_submenu_clean_completed">Очистить завершенные</string>
-    <string name="download_activity_option_submenu_clean_paused">Очистить приостановленные</string>
-    <string name="download_activity_option_submenu_clean_error">Очистить с ошибкой</string>
 </resources>

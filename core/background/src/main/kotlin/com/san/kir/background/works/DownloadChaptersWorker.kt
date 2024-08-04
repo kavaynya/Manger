@@ -98,7 +98,7 @@ internal class DownloadChaptersWorker(context: Context, params: WorkerParameters
 
             when (networkState) {
                 NetworkState.NOT_WIFI -> setContentText(applicationContext.getString(R.string.wifi_off))
-                NetworkState.NOT_CELLURAR -> setContentText(applicationContext.getString(R.string.internet_off))
+                NetworkState.NOT_CELLULAR -> setContentText(applicationContext.getString(R.string.internet_off))
                 NetworkState.OK -> task?.let { task ->
                     setContentTitle(
                         applicationContext.getString(R.string.queue_downloading, queue.size)
@@ -238,7 +238,7 @@ internal class DownloadChaptersWorker(context: Context, params: WorkerParameters
             }
         } else {
             if (cellularNetwork.state.value.not() || wifiNetwork.state.value.not()) {
-                networkState = NetworkState.NOT_CELLURAR
+                networkState = NetworkState.NOT_CELLULAR
                 notify()
 
                 combine(cellularNetwork.state, wifiNetwork.state) { cell, wifi -> cell || wifi }

@@ -1,22 +1,40 @@
 package com.san.kir.chapters.ui.latest
 
-import androidx.compose.runtime.Stable
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.db.main.views.ViewChapter
+import com.san.kir.data.models.main.SimplifiedChapter
 
 internal data class LatestState(
-    val items: List<SelectableItem> = emptyList(),
-    val hasNewChapters: Boolean = false,
+    val newChapters: Int = 0,
     val hasBackgroundWork: Boolean = true,
-    val selectedCount: Int = items.count { it.selected },
-    val selectionMode: Boolean = selectedCount > 0,
-) : ScreenState {
-    override fun toString(): String {
-        return "LatestState(items=${items.count()}, hasNewChapters=$hasNewChapters, " +
-                "hasBackgroundWork=$hasBackgroundWork, selectionMode=$selectionMode, " +
-                "selectedCount=$selectedCount)"
-    }
+    val itemsSize: Int = 0,
+) : ScreenState
+
+internal data class SelectionState(
+    val selections: Set<Long> = emptySet()
+) {
+    val count = selections.size
+    val enabled = count > 0
+
+    fun hasItem(id: Long): Boolean = selections.contains(id)
+    fun hasItems(ids: Collection<Long>): Boolean = selections.containsAll(ids)
 }
 
-@Stable
-internal data class SelectableItem(val chapter: SimplifiedChapter, val selected: Boolean)
+
+internal data class MangaContainer(
+    val manga: String,
+    val date: String,
+    val chapters: List<SimplifiedChapter>
+) {
+    val itemsCount: Int = chapters.size
+    val chapterIds: List<Long> = chapters.map { it.id }
+}
+
+
+internal data class DateContainer(
+    val date: String,
+    val mangas: List<MangaContainer>
+) {
+    val chaptersCount: Int = mangas.sumOf { it.itemsCount }
+    val chaptersIds: List<Long> = mangas.flatMap { it.chapterIds }
+}
+

@@ -2,22 +2,22 @@ package com.san.kir.chapters.logic.utils
 
 import com.san.kir.chapters.ui.chapters.Items
 import com.san.kir.chapters.ui.chapters.SelectableItem
+import com.san.kir.core.utils.set
+import com.san.kir.data.models.main.Manga
+import com.san.kir.data.models.main.SimplifiedChapter
+import com.san.kir.data.models.utils.ChapterComparator
 import com.san.kir.data.models.utils.ChapterFilter
-import com.san.kir.data.models.base.Manga
-import com.san.kir.data.models.extend.SimplifiedChapter
-import com.san.kir.data.models.extend.SimplifiedChapterComparator
 
 
 internal object SelectionHelper {
-    private val simplifiedChapterComparator by lazy { SimplifiedChapterComparator() }
+    private val chapterComparator by lazy { ChapterComparator() }
 
     fun above(old: Items): Items {
         val firstSelected = old.items.indexOfFirst { it.selected }
 
         val newItems = old
             .items
-            .mapIndexed { index, item -> item.copy(selected = firstSelected > index) }
-            
+            .mapIndexed { index, item -> item.copy(selected = firstSelected >= index) }
 
         return old.copy(items = newItems)
     }
@@ -27,8 +27,7 @@ internal object SelectionHelper {
 
         val newItems = old
             .items
-            .mapIndexed { index, item -> item.copy(selected = firstSelected < index) }
-            
+            .mapIndexed { index, item -> item.copy(selected = firstSelected <= index) }
 
         return old.copy(items = newItems)
     }
@@ -37,7 +36,6 @@ internal object SelectionHelper {
         val newItems = old
             .items
             .map { item -> item.copy(selected = true) }
-            
 
         return old.copy(items = newItems)
     }
@@ -46,7 +44,6 @@ internal object SelectionHelper {
         val newItems = old
             .items
             .map { item -> item.copy(selected = false) }
-            
 
         return old.copy(items = newItems)
     }
@@ -64,7 +61,7 @@ internal object SelectionHelper {
     fun update(
         old: Items,
         list: List<SimplifiedChapter>,
-        filter: com.san.kir.data.models.utils.ChapterFilter,
+        filter: ChapterFilter,
         manga: Manga
     ): Items {
         val newItems = list.applyFilter(filter, manga)
@@ -82,24 +79,25 @@ internal object SelectionHelper {
         return Items(
             items = items,
             count = list.size,
-            readCount = list.count { it.isRead })
+            readCount = list.count { it.isRead },
+        )
     }
 
     private fun List<SimplifiedChapter>.applyFilter(
-        filter: com.san.kir.data.models.utils.ChapterFilter,
+        filter: ChapterFilter,
         manga: Manga
     ): List<SimplifiedChapter> {
         var list = this
         if (manga.isAlternativeSort) {
-            list = list.sortedWith(simplifiedChapterComparator)
+            list = list.sortedWith(chapterComparator)
         }
         return when (filter) {
-            com.san.kir.data.models.utils.ChapterFilter.ALL_READ_ASC -> list
-            com.san.kir.data.models.utils.ChapterFilter.NOT_READ_ASC -> list.filterNot { it.isRead }
-            com.san.kir.data.models.utils.ChapterFilter.IS_READ_ASC -> list.filter { it.isRead }
-            com.san.kir.data.models.utils.ChapterFilter.ALL_READ_DESC -> list.reversed()
-            com.san.kir.data.models.utils.ChapterFilter.NOT_READ_DESC -> list.filterNot { it.isRead }.reversed()
-            com.san.kir.data.models.utils.ChapterFilter.IS_READ_DESC -> list.filter { it.isRead }.reversed()
+            ChapterFilter.ALL_READ_ASC -> list
+            ChapterFilter.NOT_READ_ASC -> list.filterNot { it.isRead }
+            ChapterFilter.IS_READ_ASC -> list.filter { it.isRead }
+            ChapterFilter.ALL_READ_DESC -> list.reversed()
+            ChapterFilter.NOT_READ_DESC -> list.filterNot { it.isRead }.reversed()
+            ChapterFilter.IS_READ_DESC -> list.filter { it.isRead }.reversed()
         }
     }
 }

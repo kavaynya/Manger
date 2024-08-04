@@ -24,7 +24,7 @@ public data class Manga(
     val shortLink: String = "",
     val authorsList: List<String> = listOf(),
     val genresList: List<String> = listOf(),
-    val lastUpdateError: String = ""
+    val lastUpdateError: String? = ""
 ) : Parcelable
 
 public val Manga.authorsStr: String get() = authorsList.joinToString()

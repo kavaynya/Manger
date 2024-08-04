@@ -4,22 +4,21 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
-import com.san.kir.data.chapterDao
-import com.san.kir.data.db.main.dao.ChapterDao
-import com.san.kir.data.db.main.dao.MangaDao
-import com.san.kir.data.db.main.dao.StatisticDao
-import com.san.kir.data.mangaDao
-import com.san.kir.data.models.base.Settings
-import com.san.kir.data.statisticDao
+import com.san.kir.data.chapterRepository
+import com.san.kir.data.db.main.repo.ChapterRepository
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.data.db.main.repo.SettingsRepository
+import com.san.kir.data.db.main.repo.StatisticsRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.data.models.main.Settings
+import com.san.kir.data.settingsRepository
+import com.san.kir.data.statisticsRepository
 import com.san.kir.features.viewer.logic.ChaptersManager
-import com.san.kir.features.viewer.logic.SettingsRepository
 import com.san.kir.features.viewer.logic.di.chaptersManager
-import com.san.kir.features.viewer.logic.di.settingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlin.concurrent.timer
@@ -27,11 +26,11 @@ import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class ViewerViewModel(
-    val settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+    val settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
     val chaptersManager: ChaptersManager = ManualDI.chaptersManager,
-    private val chapterDao: ChapterDao = ManualDI.chapterDao,
-    private val statisticDao: StatisticDao = ManualDI.statisticDao,
-    private val mangaDao: MangaDao = ManualDI.mangaDao,
+    private val chapterRepository: ChapterRepository = ManualDI.chapterRepository(),
+    private val statisticsRepository: StatisticsRepository = ManualDI.statisticsRepository(),
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
 ) : ViewModel() {
 
     // Переключение видимости интерфейса
@@ -43,10 +42,10 @@ internal class ViewerViewModel(
     }
 
     // Хранение способов листания глав
-    val control = settingsRepository.viewer().map { it.control }
+    val control = settingsRepository.control
         .stateIn(viewModelScope, SharingStarted.Lazily, Settings.Viewer.Control())
 
-    val hasScrollbars = settingsRepository.viewer().map { it.useScrollbars }
+    val hasScrollbars = settingsRepository.useScrollbars
         .stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // инициализация данных
@@ -55,8 +54,8 @@ internal class ViewerViewModel(
         if (isInitManager) return@defaultLaunch // единовременная инициализация
         isInitManager = true
 
-        val mangaId = chapterDao.mangaIdById(chapterId)
-        val manga = mangaDao.itemById(mangaId)
+        val mangaId = chapterRepository.mangaIdById(chapterId)
+        val manga = mangaRepository.item(mangaId)!!
 
         chaptersManager.init(manga, chapterId)
     }
@@ -71,7 +70,7 @@ internal class ViewerViewModel(
     fun setReadTime() = viewModelScope.defaultLaunch {
         val time = (System.currentTimeMillis() - _startReadTime) / 1000
         if (time > 0) {
-            statisticDao.update(
+            statisticsRepository.save(
                 chaptersManager.statisticItem.copy(
                     lastTime = time,
                     allTime = chaptersManager.statisticItem.allTime + time,

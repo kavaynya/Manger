@@ -1,14 +1,25 @@
 package com.san.kir.chapters.ui.download
 
 import com.san.kir.core.internet.NetworkState
-import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.db.main.custom.DownloadChapter
+import com.san.kir.data.models.main.DownloadItem
+import com.san.kir.data.models.utils.DownloadState
 
 internal data class DownloadsState(
     val network: NetworkState = NetworkState.OK,
-    val items: List<DownloadChapter> = emptyList(),
-    val loadingCount: Int = items.count { it.status == com.san.kir.data.models.utils.DownloadState.QUEUED || it.status == com.san.kir.data.models.utils.DownloadState.LOADING },
-    val stoppedCount: Int = items.count { it.status == com.san.kir.data.models.utils.DownloadState.PAUSED },
-    val completedCount: Int = items.count { it.status == com.san.kir.data.models.utils.DownloadState.COMPLETED },
-) : ScreenState
+    val items: List<DownloadGroup> = emptyList(),
+) : ScreenState {
+    val loadingCount: Int = items.sumOf { it.loadingCount }
+    val stoppedCount: Int = items.sumOf { it.stoppedCount }
+    val completedCount: Int = items.sumOf { it.completedCount }
+}
+
+internal data class DownloadGroup(
+    val groupName: Int,
+    val items: List<DownloadItem>
+) {
+    val itemsCount = items.size
+    val loadingCount = items.count { it.status == DownloadState.QUEUED || it.status == DownloadState.LOADING }
+    val stoppedCount = items.count { it.status == DownloadState.PAUSED }
+    val completedCount = items.count { it.status == DownloadState.COMPLETED }
+}

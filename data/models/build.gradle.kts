@@ -9,9 +9,8 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.utils))
+    implementation(projects.core.utils)
 
     implementation(libs.compose.material.icons)
     implementation(libs.compose.material.icons.ext)
-    implementation(libs.datetime)
 }
