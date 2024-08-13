@@ -7,9 +7,9 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.internet))
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Data.models))
+    implementation(projects.core.internet)
+    implementation(projects.core.utils)
+    implementation(projects.data.models)
 
     implementation(libs.coroutines.core)
 }

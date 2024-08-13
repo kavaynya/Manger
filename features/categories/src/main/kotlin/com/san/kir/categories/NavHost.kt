@@ -19,7 +19,7 @@ public fun categoryNavigationCreators() {
 
 @NavEntry
 @Serializable
-public object Categories : NavConfig() {
+public data object Categories : NavConfig() {
     internal val creator = navCreator<Categories> {
         CategoriesScreen(
             navigateUp = backPressed(),

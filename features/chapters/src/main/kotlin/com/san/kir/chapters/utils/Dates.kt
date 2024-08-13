@@ -28,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.san.kir.chapters.ui.latest.DateContainer
@@ -135,7 +134,6 @@ internal fun DateHeader(
     val density = LocalDensity.current
     val dateHeight = density.run { DateBarHeight.toPx() }
     val dateState = remember { DateState(dateHeight) }
-    val textMeasuring = rememberTextMeasurer()
     val textStyle = dateTextStyle
     val items by itemsState
 

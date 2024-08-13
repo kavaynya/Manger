@@ -23,22 +23,22 @@ import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.san.kir.core.compose.Dimensions
-import com.san.kir.core.compose.animation.SharedParams
-import com.san.kir.core.compose.endInsetsPadding
-import com.san.kir.core.compose.systemBarBottomPadding
-import com.san.kir.core.support.MainMenuType
+import com.san.kir.core.compose.bottomInsetsPadding
 import com.san.kir.core.utils.TestTags
-import com.san.kir.data.models.extend.CategoryWithMangas
+import com.san.kir.core.utils.viewModel.Action
+import com.san.kir.core.utils.viewModel.returned
+import com.san.kir.data.models.main.CategoryWithMangas
+import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.library.R
 import com.san.kir.library.ui.library.LibraryEvent
-import com.san.kir.library.ui.library.LibraryNavigation
+
+private val ContentPadding = Dimensions.quarter
 
 @Composable
 internal fun LibraryPage(
-    navigation: LibraryNavigation,
     item: CategoryWithMangas,
     showCategory: Boolean,
-    sendEvent: (LibraryEvent) -> Unit,
+    sendAction: (Action) -> Unit,
 ) {
     Box(
         modifier = Modifier
@@ -47,16 +47,9 @@ internal fun LibraryPage(
         contentAlignment = Alignment.Center
     ) {
         if (item.mangas.isEmpty()) {
-            EmptyView {
-                navigation.navigateToScreen(MainMenuType.Catalogs)
-            }
+            EmptyView { sendAction(LibraryEvent.ToScreen(MainMenuType.Catalogs).returned()) }
         } else {
-            PageView(
-                navigateToChapters = navigation.navigateToChapters,
-                item = item,
-                showCategory = showCategory,
-                sendEvent = sendEvent
-            )
+            PageView(item, showCategory, sendAction)
         }
     }
 }
@@ -64,8 +57,7 @@ internal fun LibraryPage(
 @Composable
 private fun EmptyView(navigateToCatalogs: () -> Unit) {
     Column(
-        Modifier
-            .testTag(TestTags.Library.empty_view),
+        modifier = Modifier.testTag(TestTags.Library.empty_view),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
@@ -84,58 +76,62 @@ private fun EmptyView(navigateToCatalogs: () -> Unit) {
 
 @Composable
 private fun PageView(
-    navigateToChapters: (Long, SharedParams) -> Unit,
     item: CategoryWithMangas,
     showCategory: Boolean,
-    sendEvent: (LibraryEvent) -> Unit,
+    sendAction: (Action) -> Unit,
 ) {
     val isPortrait = LocalConfiguration.current.orientation == Configuration.ORIENTATION_PORTRAIT
     val span = if (isPortrait) item.spanPortrait else item.spanLandscape
-    val isLarge = if (isPortrait) item.isLargePortrait else item.isLargeLandscape
 
-
-    if (isLarge)
+    if (span > 1) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(span),
-            modifier = Modifier
-                .fillMaxSize()
-                .endInsetsPadding(),
-            contentPadding = systemBarBottomPadding(),
+            modifier = Modifier.fillMaxSize(),
+            contentPadding = bottomInsetsPadding(ContentPadding),
         ) {
             items(item.mangas, key = { it.id }) { manga ->
                 LibraryLargeItem(
-                    onClick = navigateToChapters,
-                    onLongClick = { sendEvent(LibraryEvent.SelectManga(it)) },
+                    onClick = { id, params ->
+                        sendAction(LibraryEvent.ToChapters(id, params).returned())
+                    },
+                    onLongClick = {
+                        sendAction(LibraryEvent.ShowSelectedMangaDialog(it).returned())
+                    },
                     manga = manga,
                     cat = item.name,
                     showCategory = showCategory,
                 )
             }
         }
-    else
+    } else {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            contentPadding = systemBarBottomPadding(),
+            contentPadding = bottomInsetsPadding(ContentPadding),
         ) {
             items(items = item.mangas, key = { it.id }) { manga ->
                 LibrarySmallItem(
-                    onClick = navigateToChapters,
-                    onLongClick = { sendEvent(LibraryEvent.SelectManga(it)) },
+                    onClick = { id, params ->
+                        sendAction(LibraryEvent.ToChapters(id, params).returned())
+                    },
+                    onLongClick = {
+                        sendAction(LibraryEvent.ShowSelectedMangaDialog(it).returned())
+                    },
                     manga = manga,
                     cat = item.name,
                     showCategory = showCategory,
                 )
             }
         }
+    }
 }
 
 
 @Composable
 private fun CustomText(@StringRes stringRes: Int) {
     Text(
-        text = stringResource(id = stringRes),
+        text = stringResource(stringRes),
         textAlign = TextAlign.Center,
         color = MaterialTheme.colorScheme.onBackground,
-        style = MaterialTheme.typography.body1
+        style = MaterialTheme.typography.bodyLarge
     )
 }

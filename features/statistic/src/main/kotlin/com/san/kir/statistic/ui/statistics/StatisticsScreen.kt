@@ -46,7 +46,6 @@ import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.createDismissStates
 import com.san.kir.core.compose.topBar
-import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.formatTime
 import com.san.kir.core.utils.viewModel.Action
@@ -170,7 +169,7 @@ private fun ReadStatus(time: Long) {
 }
 
 @Composable
-fun Progress(allTime: Long, itemTime: Animatable<Long, AnimationVector1D>) {
+private fun Progress(allTime: Long, itemTime: Animatable<Long, AnimationVector1D>) {
     LinearProgressIndicator(
         modifier = Modifier
             .padding(top = Dimensions.quarter, end = Dimensions.half)

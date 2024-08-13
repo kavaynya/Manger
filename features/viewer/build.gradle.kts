@@ -12,11 +12,11 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Data.models))
-    implementation(project(Modules.Data.db))
-    implementation(project(Modules.Data.parsing))
-    implementation(project(Modules.Core.internet))
-    implementation(project(Modules.Core.utils))
+    implementation(projects.data.models)
+    implementation(projects.data.db)
+    implementation(projects.data.parsing)
+    implementation(projects.core.internet)
+    implementation(projects.core.utils)
 
     implementation(libs.subsampling)
 
@@ -30,6 +30,4 @@ dependencies {
     implementation(libs.lifecycle.common)
 
     implementation(libs.material)
-
-    implementation(libs.timber)
 }

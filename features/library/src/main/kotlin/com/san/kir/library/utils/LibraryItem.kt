@@ -16,38 +16,48 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.layout.boundsInWindow
-import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
+import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.rememberImage
 import com.san.kir.core.compose.squareMaxSize
-import com.san.kir.data.models.utils.CATEGORY_ALL
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.TestTags
-import com.san.kir.data.models.extend.SimplifiedManga
+import com.san.kir.core.utils.categoryAll
+import com.san.kir.data.models.main.SimplifiedManga
+
+private val CornerRadius = Dimensions.half
+private val BetweenItemPadding = Dimensions.quarter
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LazyGridItemScope.LibraryLargeItem(
+internal fun LazyGridItemScope.LibraryLargeItem(
     onClick: (Long, SharedParams) -> Unit,
     onLongClick: (SimplifiedManga) -> Unit,
     manga: SimplifiedManga,
@@ -57,71 +67,73 @@ fun LazyGridItemScope.LibraryLargeItem(
     val context = LocalContext.current
     val defaultColor = MaterialTheme.colorScheme.primary
     val backgroundColor = remember {
-        runCatching { if (manga.color != 0) Color(manga.color) else null }
-            .getOrNull() ?: defaultColor
+        runCatching { Color(manga.color) }.getOrDefault(defaultColor)
     }
+    val textColor = contentColorFor(backgroundColor)
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(
-        shape = RoundedCornerShape(Dimensions.half),
-        border = BorderStroke(Dimensions.quarter, backgroundColor),
-        elevation = 3.dp,
+        shape = RoundedCornerShape(CornerRadius),
+        colors = CardDefaults.cardColors(containerColor = backgroundColor),
         modifier = Modifier
             .animateItemPlacement()
             .testTag(TestTags.Library.item)
-            .padding(Dimensions.smallest)
+            .padding(BetweenItemPadding)
             .fillMaxWidth()
-            .onGloballyPositioned {
-                buttonParams.bounds = it.boundsInWindow()
-            }
+            .saveParams(buttonParams)
             .combinedClickable(
                 onLongClick = { onLongClick(manga) },
                 onClick = { onClick(manga.id, buttonParams) })
     ) {
-        Column(modifier = Modifier.fillMaxWidth()) {
-            Box(modifier = Modifier.squareMaxSize()) {
-                Image(
-                    rememberImage(manga.logo),
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = null,
-                    contentScale = ContentScale.Crop,
+        Box(modifier = Modifier.fillMaxWidth()) {
+            Column(modifier = Modifier.fillMaxWidth()) {
+                Box(modifier = Modifier.squareMaxSize()) {
+                    LogoImage(
+                        manga.logo,
+                        Modifier
+                            .padding(Dimensions.smallest)
+                            .fillMaxSize()
+                    )
+                    if (manga.hasError) {
+                        Icon(
+                            painterResource(com.san.kir.core.compose.R.drawable.unknown),
+                            contentDescription = null,
+                            modifier = Modifier.align(Alignment.BottomEnd),
+                            tint = Color.Unspecified
+                        )
+                    }
+                }
+
+                Text(
+                    text = manga.name,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 5.dp)
+                        .padding(horizontal = 6.dp),
+                    color = textColor,
+                    overflow = TextOverflow.Ellipsis
                 )
             }
-            Text(
-                text = manga.name,
-                maxLines = 1,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .background(backgroundColor)
-                    .padding(bottom = 5.dp)
-                    .padding(horizontal = 6.dp),
-                color = contentColorFor(backgroundColor),
-                overflow = TextOverflow.Ellipsis
-            )
-        }
-        Box(
-            modifier = Modifier.fillMaxWidth(),
-            contentAlignment = Alignment.TopEnd
-        ) {
-            Column(horizontalAlignment = Alignment.End) {
+
+            Row {
+                if (cat == ManualDI.categoryAll() && showCategory)
+                    CategoryName(
+                        manga.category,
+                        defaultColor,
+                        modifier = Modifier
+                            .padding(end = Dimensions.quarter)
+                            .align(Alignment.CenterVertically)
+                    )
+
                 Text(
                     text = "${manga.noRead}",
                     maxLines = 1,
                     modifier = Modifier
-                        .background(backgroundColor)
-                        .padding(4.dp),
-                    color = contentColorFor(backgroundColor)
+                        .background(backgroundColor, RoundedCornerShape(bottomStart = CornerRadius))
+                        .padding(Dimensions.quarter),
+                    color = textColor
                 )
-
-                if (cat == context.CATEGORY_ALL && showCategory)
-                    Text(
-                        text = manga.category,
-                        color = defaultColor,
-                        modifier = Modifier
-                            .padding(end = 3.dp)
-                            .background(MaterialTheme.colorScheme.contentColorFor(defaultColor))
-                            .padding(start = 3.dp, bottom = 1.dp, end = 3.dp)
-                    )
             }
         }
     }
@@ -129,7 +141,7 @@ fun LazyGridItemScope.LibraryLargeItem(
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-fun LazyItemScope.LibrarySmallItem(
+internal fun LazyItemScope.LibrarySmallItem(
     onClick: (Long, SharedParams) -> Unit,
     onLongClick: (SimplifiedManga) -> Unit,
     manga: SimplifiedManga,
@@ -144,67 +156,108 @@ fun LazyItemScope.LibrarySmallItem(
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(
-        shape = RoundedCornerShape(Dimensions.half),
+        shape = RoundedCornerShape(CornerRadius),
         border = BorderStroke(Dimensions.quarter, backgroundColor),
         modifier = Modifier
             .animateItemPlacement()
             .testTag(TestTags.Library.item)
-            .padding(Dimensions.smallest)
+            .padding(BetweenItemPadding)
             .fillMaxWidth()
-            .onGloballyPositioned {
-                buttonParams.bounds = it.boundsInWindow()
-            }
+            .saveParams(buttonParams)
             .combinedClickable(
                 onLongClick = { onLongClick(manga) },
                 onClick = { onClick(manga.id, buttonParams) })
     ) {
-        Row(
+        Box(
             modifier = Modifier
+                .endInsetsPadding()
+                .padding(Dimensions.smallest)
                 .fillMaxWidth()
-                .horizontalInsetsPadding()
-                .padding(Dimensions.quarter)
         ) {
-            Image(
-                rememberImage(manga.logo),
+            Row(
                 modifier = Modifier
-                    .padding(Dimensions.quarter)
-                    .size(Dimensions.Image.bigger),
-                contentDescription = null,
-            )
-            Text(
-                text = manga.name,
-                maxLines = 1,
-                modifier = Modifier
-                    .weight(1f, true)
-                    .padding(start = Dimensions.half)
-                    .align(Alignment.CenterVertically),
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = "${manga.noRead}",
-                maxLines = 1,
-                modifier = Modifier
-                    .padding(horizontal = Dimensions.half)
-                    .align(Alignment.CenterVertically),
-                fontWeight = FontWeight.Bold
-            )
-        }
-        if (cat == context.CATEGORY_ALL && showCategory)
-            Box(
-                contentAlignment = Alignment.BottomEnd,
-                modifier = Modifier
-                    .endInsetsPadding()
-                    .padding(Dimensions.smallest)
                     .fillMaxWidth()
+                    .horizontalInsetsPadding()
+                    .padding(Dimensions.quarter)
             ) {
-                Text(
-                    text = manga.category,
-                    color = MaterialTheme.colorScheme.contentColorFor(backgroundColor),
+                LogoImage(
+                    manga.logo,
                     modifier = Modifier
-                        .background(backgroundColor)
-                        .padding(Dimensions.smallest)
+                        .padding(Dimensions.quarter)
+                        .size(Dimensions.Image.bigger),
+                )
+
+                Text(
+                    text = manga.name,
+                    maxLines = 1,
+                    modifier = Modifier
+                        .weight(1f, true)
+                        .padding(start = Dimensions.half)
+                        .align(Alignment.CenterVertically),
+                    fontWeight = FontWeight.Bold
+                )
+
+                Text(
+                    text = "${manga.noRead}",
+                    maxLines = 1,
+                    modifier = Modifier
+                        .padding(horizontal = Dimensions.half)
+                        .align(Alignment.CenterVertically),
+                    fontWeight = FontWeight.Bold
                 )
             }
+
+            Row(
+                modifier = Modifier.align(Alignment.TopEnd),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                if (manga.hasError) {
+                    Icon(
+                        painterResource(com.san.kir.core.compose.R.drawable.unknown),
+                        contentDescription = null,
+                        tint = Color.Unspecified
+                    )
+                }
+
+                if (cat == ManualDI.categoryAll() && showCategory)
+                    CategoryName(
+                        manga.category,
+                        defaultColor,
+                        modifier = Modifier.padding(Dimensions.smallest),
+                    )
+            }
+        }
     }
 }
+
+@Composable
+internal fun LogoImage(logo: String, modifier: Modifier) {
+    Image(
+        painter = rememberImage(logo),
+        contentDescription = null,
+        modifier = modifier.clip(RoundedCornerShape(CornerRadius)),
+        contentScale = ContentScale.Crop
+    )
+}
+
+@Composable
+internal fun CategoryName(
+    category: String,
+    contentColor: Color,
+    modifier: Modifier = Modifier
+) {
+    Text(
+        text = category,
+        modifier = modifier
+            .background(color = contentColorFor(contentColor), shape = RoundedCornerShape(50))
+            .padding(horizontal = Dimensions.quarter, vertical = Dimensions.half),
+        color = contentColor,
+        style = MaterialTheme.typography.labelMedium
+    )
+}
+
+@Composable
+private fun contentColorFor(background: Color): State<Color> = remember {
+    derivedStateOf { if (background.luminance() > 0.5f) Color.Black else Color.White }
+}
+

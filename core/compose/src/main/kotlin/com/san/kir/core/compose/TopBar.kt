@@ -280,7 +280,7 @@ public class TopBarActions internal constructor(private val menuState: MenuDialo
 @Stable
 public sealed interface NavigationButton {
     @Stable
-    public data class Scaffold(val state: DrawerState, val hasNotify: Boolean) : NavigationButton
+    public data class Scaffold(val state: DrawerState, val hasNotify: Boolean = false) : NavigationButton
 
     @Stable
     public data class Back(val onClick: () -> Unit) : NavigationButton

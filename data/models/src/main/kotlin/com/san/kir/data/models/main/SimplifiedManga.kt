@@ -1,5 +1,9 @@
 package com.san.kir.data.models.main
 
+import android.os.Parcelable
+import kotlinx.parcelize.Parcelize
+
+@Parcelize
 public data class SimplifiedManga(
     val id: Long = 0,
     val name: String = "",
@@ -10,4 +14,4 @@ public data class SimplifiedManga(
     val category: String = "",
     val noRead: Int = 0,
     val hasError: Boolean = false
-)
+) : Parcelable

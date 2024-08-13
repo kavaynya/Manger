@@ -15,7 +15,7 @@ public fun settingsNavigationCreators() {
 
 @NavEntry
 @Serializable
-public object Settings : NavConfig() {
+public data object Settings : NavConfig() {
    internal val creator = navCreator<Settings> {
         SettingsScreen(backPressed())
     }

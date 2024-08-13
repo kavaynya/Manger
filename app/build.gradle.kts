@@ -30,14 +30,14 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Features.library))
+    implementation(projects.features.library)
 
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.internet))
-    implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.background))
+    implementation(projects.core.utils)
+    implementation(projects.core.internet)
+    implementation(projects.core.compose)
+    implementation(projects.core.background)
 
-    implementation(project(Modules.Data.db))
+    implementation(projects.data.db)
 
     implementation(libs.activity)
     implementation(libs.appcompat)
@@ -47,8 +47,6 @@ dependencies {
     implementation(libs.lifecycle.viewmodel)
 
     //    debugImplementation(libs.bundles.hyper)
-
-    implementation(libs.timber)
 
     testImplementation(libs.junit)
     androidTestImplementation(libs.bundles.tests)

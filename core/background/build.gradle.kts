@@ -7,11 +7,11 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Data.models))
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Core.internet))
-    implementation(project(Modules.Data.db))
-    implementation(project(Modules.Data.parsing))
+    implementation(projects.data.models)
+    implementation(projects.core.utils)
+    implementation(projects.core.internet)
+    implementation(projects.data.db)
+    implementation(projects.data.parsing)
 
     implementation(libs.core)
 

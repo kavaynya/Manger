@@ -1,77 +1,47 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name_version" translatable="false">Manger: %s</string>
-    <string name="name">Автор: Kir San</string>
+    <!-- Drawer -->
+    <string name="app_name_format" translatable="false">Manger: %s</string>
+    <string name="author_name">Автор: Kir San</string>
 
-    <string name="library_title">Библиотека</string>
-    <string name="by_date_added">По дате добавления</string>
-    <string name="in_alphabet_order">В алфавитном порядке</string>
-    <string name="by_frequency_of_use">По частоте использования</string>
-    <string name="library_popupmenu_about">Свойства</string>
-    <string name="library_popupmenu_delete">Удалить</string>
-    <string name="library_popupmenu_storage">Используемая память</string>
-    <string name="library_popupmenu_statistic">Статистика чтения</string>
-    <string name="library_popupmenu_delete_message">Вы действительно хотите удалить эту мангу</string>
-    <string name="library_popupmenu_delete_ok">Конечно</string>
-    <string name="library_popupmenu_delete_ok_with_files">Конечно, c файлами</string>
-    <string name="library_popupmenu_delete_no">Никогда</string>
-    <string name="library_popupmenu_title">Выбранная манга: %s</string>
-    <string name="library_popupmenu_set_category">Сменить категорию</string>
-    <string name="delete_read">Удалить прочитанное</string>
-    <string name="clear_folder">Очистить папку</string>
-    <string name="delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
-    <string name="library_popupmenu_delete_read_chapters_ok">Да</string>
-    <string name="deleting">Удаляю…</string>
-    <string name="no_no">Не, не</string>
+
+    <!-- Library -->
+    <string name="library">Библиотека</string>
     <string name="library_no_categories">У вас скрыты все категории, вернитесь в пункт "Категории" и измените видимость у нужных</string>
-    <string name="library_to_categories">Перейти в категории</string>
+    <string name="go_to_categories">Перейти в категории</string>
     <string name="library_help">Библиотека пуста.\n Перейдите в каталоги\n и добавьте новой манги</string>
     <string name="library_help2">Или добавьте мангу с помощью ссылки на нее,\n используйте для этого\n кнопку с крестиком сверху</string>
     <string name="library_help_go">В КАТАЛОГИ</string>
-    <string name="library_sort_dialog_reverse">Изменить порядок?</string>
-    <string name="library_sort_dialog_visible">Скрыть ?</string>
-    <string name="library_menu_reload">Обновить текущую категорию</string>
-    <string name="library_menu_reload_all">Обновить все</string>
-    <string name="library_menu_update">Поиск обновлений приложения</string>
-    <string name="library_page_item_size">%s Мб</string>
-    <string name="adding_new_manga">Добавление новой манги</string>
-    <string name="enter_manga_link">Введите ссылку на мангу</string>
-    <string name="add">Добавить</string>
+    <string name="update_current_category">Обновить текущую категорию</string>
+    <string name="update_all">Обновить все</string>
+    <string name="update_app">Поиск обновлений приложения</string>
+
+
+    <!-- Manga Dialog -->
+    <string name="delete">Удалить</string>
+    <string name="properties">Свойства</string>
+    <string name="used_memory">Используемая память</string>
+    <string name="read_statistic">Статистика чтения</string>
+    <string name="really_delete_manga">Вы действительно хотите удалить эту мангу</string>
+    <string name="really_ok">Конечно</string>
+    <string name="really_ok_with_files">Конечно, c файлами</string>
+    <string name="never">Никогда</string>
+    <string name="selected_manga">Выбранная манга</string>
+    <string name="change_category">Сменить категорию</string>
     <string name="cancel">Отменить</string>
-    <string name="library_add_manga_error">Ошибка в ссылке или нет интернета</string>
 
-    <!-- MainMenu -->
-    <string name="storage">Хранилище</string>
-    <string name="statistic">Статистика</string>
-    <string name="settings">Настройки</string>
-    <string name="schedule">Расписание</string>
-    <string name="categories">Категории</string>
-    <string name="catalogs">Каталоги</string>
-    <string name="size_mb_format">%s Мб</string>
-    <string name="downloader_format">Загрузчик: %d</string>
-    <string name="updates_format">Обновления: %d</string>
-    <string name="search">Поиск</string>
 
-    <string name="manga_info_dialog_title">Информация о манге</string>
-
-    <!--About Manga-->
-    <string name="about_manga_dialog_name">Название</string>
-    <string name="about_manga_dialog_category">Категория</string>
-    <string name="about_manga_dialog_authors">Авторы</string>
-    <string name="about_manga_dialog_status_edition">Статус выпуска</string>
-    <string name="about_manga_dialog_genres">Жанры</string>
-    <string name="about_manga_dialog_storage">Место хранения</string>
-    <string name="about_manga_dialog_volume">Текущий объем</string>
-    <string name="about_manga_dialog_link">Ссылка на источник</string>
-    <string name="about_manga_dialog_about">Описание</string>
-    <string name="about_manga_dialog_logo">Лого</string>
-    <string name="about_manga_dialog_save">Сохранить</string>
-
-    <!-- AddManga -->
-    <string name="add_manga_color">Цвет элемента</string>
-    <string name="add_manga_update">Обновление манги</string>
-    <string name="add_manga_update_available">Разрешить?</string>
-
-    <!-- Manga Status -->
+    <!-- About -->
+    <string name="size_format">%s Мб</string>
+    <string name="category">Категория</string>
+    <string name="authors">Авторы</string>
+    <string name="status_edition">Статус выпуска</string>
+    <string name="genres">Жанры</string>
+    <string name="storage_path">Место хранения</string>
+    <string name="current_volume">Текущий объем</string>
+    <string name="source_link">Ссылка на источник</string>
+    <string name="about">Описание</string>
+    <string name="logo">Лого</string>
+    <string name="update_available">Разрешить?</string>
 
 </resources>

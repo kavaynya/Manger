@@ -1,12 +1,10 @@
 package com.san.kir.data.db.main.dao
 
-import android.content.Context
 import androidx.room.Dao
 import androidx.room.Query
 import com.san.kir.data.db.base.BaseDao
-import com.san.kir.data.models.utils.CATEGORY_ALL
-import com.san.kir.data.db.main.entites.DbCategory
 import com.san.kir.data.db.main.custom.DbNameAndId
+import com.san.kir.data.db.main.entites.DbCategory
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -48,9 +46,6 @@ internal interface CategoryDao : BaseDao<DbCategory> {
 
     @Query("SELECT name FROM categories ORDER BY ordering")
     suspend fun names(): List<String>
-
-    // Получение категории по умолчанию
-    suspend fun defaultCategory(ctx: Context) = itemByName(ctx.CATEGORY_ALL)
 }
 
 

@@ -19,7 +19,7 @@ public fun accountsNavigationCreators() {
 
 @NavEntry
 @Serializable
-public object Accounts : NavConfig() {
+public data object Accounts : NavConfig() {
     internal val creator = navCreator<Accounts> {
         AccountsScreen(
             navigateUp = backPressed(),

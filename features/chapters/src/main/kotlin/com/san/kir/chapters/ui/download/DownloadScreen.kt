@@ -1,6 +1,5 @@
 package com.san.kir.chapters.ui.download
 
-import android.content.Context
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -42,7 +41,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
@@ -252,7 +250,6 @@ private fun LazyItemScope.ItemView(
     item: DownloadItem,
     sendAction: (DownloadsAction) -> Unit,
 ) {
-    val ctx: Context = LocalContext.current
     val totalPages by remember { derivedStateOf { item.pages.size } }
 
     Row(

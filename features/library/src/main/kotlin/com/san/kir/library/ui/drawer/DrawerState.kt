@@ -2,11 +2,10 @@ package com.san.kir.library.ui.drawer
 
 import androidx.compose.runtime.Stable
 import com.san.kir.core.utils.viewModel.ScreenState
-import com.san.kir.data.db.main.entites.DbMainMenuItem
+import com.san.kir.data.models.main.MainMenuItem
 
 
 internal data class DrawerState(
-    val hasEditMenu: Boolean = false,
     val menu: MainMenuItemsState = MainMenuItemsState.Load,
 ) : ScreenState
 

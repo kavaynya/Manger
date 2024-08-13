@@ -2,91 +2,116 @@ package com.san.kir.library.ui.library
 
 import com.san.kir.background.logic.UpdateMangaManager
 import com.san.kir.background.logic.di.updateMangaManager
-import com.san.kir.background.util.collectWorkInfoByTag
 import com.san.kir.background.works.AppUpdateWorker
 import com.san.kir.background.works.MangaDeleteWorker
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.coroutines.defaultLaunch
+import com.san.kir.core.utils.categoryAll
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.data.models.extend.CategoryWithMangas
-import com.san.kir.library.logic.di.mangaRepository
-import com.san.kir.library.logic.di.settingsRepository
-import com.san.kir.library.logic.repo.MangaRepository
-import com.san.kir.library.logic.repo.SettingsRepository
+import com.san.kir.data.categoryRepository
+import com.san.kir.data.db.main.repo.CategoryRepository
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.data.db.main.repo.SettingsRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.data.models.main.Category
+import com.san.kir.data.models.main.CategoryWithMangas
+import com.san.kir.data.models.main.SimplifiedManga
+import com.san.kir.data.models.utils.SortLibraryUtil
+import com.san.kir.data.settingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
-internal class LibraryViewModel internal constructor(
-    private val mangaRepository: MangaRepository = ManualDI.mangaRepository,
-    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager,
-    settingsRepository: SettingsRepository = ManualDI.settingsRepository,
+internal class LibraryViewModel(
+    private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
+    private val categoryRepository: CategoryRepository = ManualDI.categoryRepository(),
+    private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager(),
+    settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
 ) : ViewModel<LibraryState>(), LibraryStateHolder {
 
-    private val selectedMangaState =
-        MutableStateFlow<SelectedMangaState>(SelectedMangaState.NonVisible)
     private val currentCategory = MutableStateFlow(CategoryWithMangas())
-    private val backgroundState = MutableStateFlow<BackgroundState>(BackgroundState.None)
+    private val backgroundState = MutableStateFlow(BackgroundState.None)
+    private val itemsState =
+        combine(categoryRepository.items, mangaRepository.simplifiedItems) { cats, mangas ->
+            if (cats.isEmpty()) return@combine ItemsState.Empty
+            ItemsState.Ok(cats.filter { it.isVisible }.map { transform(it, mangas) })
+        }
+
 
     init {
-        checkWorks()
+        MangaDeleteWorker.workInfos()
+            .onEach { works ->
+                if (works.all { it.state.isFinished }) backgroundState.update { BackgroundState.None }
+                else backgroundState.update { BackgroundState.Work }
+            }
+            .launchIn(this)
     }
 
     override val tempState = combine(
-        selectedMangaState,
         currentCategory,
-        mangaRepository.itemsState,
-        settingsRepository.main().map { it.isShowCategory },
+        itemsState,
+        settingsRepository.isShowCategory,
         backgroundState,
         ::LibraryState
     )
 
     override val defaultState = LibraryState()
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
-            LibraryEvent.NonSelect -> deSelectManga()
-
-            is LibraryEvent.SelectManga ->
-                selectedMangaState.update { SelectedMangaState.Visible(event.item) }
-
-            is LibraryEvent.SetCurrentCategory -> currentCategory.update { event.item }
-
-            is LibraryEvent.ChangeCategory -> {
-                deSelectManga()
-                mangaRepository.changeCategory(event.mangaId, event.categoryId)
+    override suspend fun onAction(action: Action) {
+        when (action) {
+            is LibraryAction.SetCurrentCategory -> {
+                currentCategory.value = action.item
             }
 
-            is LibraryEvent.DeleteManga -> {
-                deSelectManga()
-                MangaDeleteWorker.addTask(event.mangaId, event.withFiles)
+            is LibraryAction.ChangeCategory -> {
+                mangaRepository.changeCategory(action.mangaId, action.categoryId)
+                sendEvent(LibraryEvent.DismissSelectedMangaDialog)
             }
 
-            LibraryEvent.UpdateApp -> AppUpdateWorker.addTask()
-            LibraryEvent.UpdateAll -> {
-                state.value.apply {
-                    if (items is ItemsState.Ok) updateManager.addTasks(
-                        items.items.flatMap { it.mangas.map { m -> m.id } }
-                    )
-                }
+            is LibraryAction.DeleteManga -> {
+                MangaDeleteWorker.addTask(action.mangaId, action.withFiles)
             }
 
-            LibraryEvent.UpdateCurrentCategory -> {
+            is LibraryAction.ChangeColor -> {
+                mangaRepository.changeColor(action.mangaId, action.color)
+            }
+
+            LibraryAction.UpdateApp -> {
+                AppUpdateWorker.addTask()
+            }
+
+            LibraryAction.UpdateAll -> {
+                val itemsState = state.value.items as? ItemsState.Ok ?: return
+                updateManager.addTasks(itemsState.items.flatMap { it.mangas }.map { it.id })
+            }
+
+            LibraryAction.UpdateCurrentCategory -> {
                 updateManager.addTasks(currentCategory.value.mangas.map { it.id })
             }
         }
     }
 
-    private fun deSelectManga() = selectedMangaState.update { SelectedMangaState.NonVisible }
-
-    private fun checkWorks() {
-        viewModelScope.defaultLaunch {
-            collectWorkInfoByTag(MangaDeleteWorker.TAG) { works ->
-                if (works.all { it.state.isFinished }) backgroundState.update { BackgroundState.None }
-                else backgroundState.update { BackgroundState.Work }
-            }
+    private fun transform(cat: Category, mangas: List<SimplifiedManga>): CategoryWithMangas {
+        val filteredMangas = mangas.filter {
+            cat.name == ManualDI.categoryAll() || it.categoryId == cat.id
         }
+        val sortedMangas = when (cat.typeSort) {
+            SortLibraryUtil.ABC -> filteredMangas.sortedBy { it.name }
+            SortLibraryUtil.ADD -> filteredMangas.sortedBy { it.id }
+            SortLibraryUtil.POP -> filteredMangas.sortedBy { it.populate }
+            else -> filteredMangas
+        }
+        return CategoryWithMangas(
+            id = cat.id,
+            name = cat.name,
+            typeSort = cat.typeSort,
+            isReverseSort = cat.isReverseSort,
+            spanPortrait = cat.spanPortrait,
+            spanLandscape = cat.spanLandscape,
+            mangas = if (cat.isReverseSort) sortedMangas.asReversed() else sortedMangas
+        )
     }
+
 }

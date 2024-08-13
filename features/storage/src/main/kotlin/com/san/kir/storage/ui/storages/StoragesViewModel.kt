@@ -1,6 +1,5 @@
 package com.san.kir.storage.ui.storages
 
-import android.content.Context
 import com.san.kir.background.works.StoragesUpdateWorker
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
@@ -20,7 +19,6 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 internal class StoragesViewModel(
-    context: Context = ManualDI.application,
     private val storageRepository: StorageRepository = ManualDI.storageRepository(),
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository()
 ) : ViewModel<StoragesState>(), StoragesStateHolder {

@@ -3,6 +3,7 @@ package com.san.kir.background.works
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.WorkInfo
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.san.kir.background.logic.di.workManager
@@ -10,6 +11,7 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.data.chapterRepository
 import com.san.kir.data.mangaRepository
+import kotlinx.coroutines.flow.Flow
 import timber.log.Timber
 
 public class MangaDeleteWorker(
@@ -63,5 +65,8 @@ public class MangaDeleteWorker(
                 .build()
             ManualDI.workManager().enqueue(deleteManga)
         }
+
+        public fun workInfos(): Flow<List<WorkInfo>> =
+            ManualDI.workManager().getWorkInfosByTagFlow(TAG)
     }
 }

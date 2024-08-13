@@ -1,8 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Category All -->
-    <string name="category_all">Все</string>
-
     <!--Planned-->
     <string name="manga">Манга</string>
     <string name="day">День</string>

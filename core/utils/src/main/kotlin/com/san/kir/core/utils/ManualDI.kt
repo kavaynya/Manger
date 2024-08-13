@@ -70,3 +70,6 @@ public object ManualDI {
         }.getOrNull()
     }
 }
+
+public fun ManualDI.categoryAll(): String =
+    application.getString(R.string.category_all)

@@ -1,16 +1,18 @@
 package com.san.kir.library.ui.library
 
-import com.san.kir.core.utils.viewModel.Action
-import com.san.kir.data.models.extend.CategoryWithMangas
-import com.san.kir.data.db.main.views.ViewManga
+import com.san.kir.core.compose.animation.SharedParams
+import com.san.kir.core.utils.viewModel.Event
+import com.san.kir.data.models.main.SimplifiedManga
+import com.san.kir.data.models.utils.MainMenuType
 
-internal sealed interface LibraryEvent : Action {
-    data class SelectManga(val item: SimplifiedManga) : LibraryEvent
-    data object NonSelect : LibraryEvent
-    data class SetCurrentCategory(val item: CategoryWithMangas) : LibraryEvent
-    data class ChangeCategory(val mangaId: Long, val categoryId: Long) : LibraryEvent
-    data class DeleteManga(val mangaId: Long, val withFiles: Boolean) : LibraryEvent
-    data object UpdateCurrentCategory : LibraryEvent
-    data object UpdateAll : LibraryEvent
-    data object UpdateApp : LibraryEvent
+internal sealed interface LibraryEvent : Event {
+
+    data class ToInfo(val id: Long, val params: SharedParams) : LibraryEvent
+    data class ToStorage(val id: Long, val params: SharedParams) : LibraryEvent
+    data class ToStats(val id: Long, val params: SharedParams) : LibraryEvent
+    data class ToChapters(val id: Long, val params: SharedParams) : LibraryEvent
+    data class ToOnline(val params: SharedParams) : LibraryEvent
+    data class ToScreen(val menu: MainMenuType) : LibraryEvent
+    data class ShowSelectedMangaDialog(val item: SimplifiedManga) : LibraryEvent
+    data object DismissSelectedMangaDialog : LibraryEvent
 }

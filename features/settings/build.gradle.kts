@@ -9,11 +9,11 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Data.db))
-    implementation(project(Modules.Data.models))
+    implementation(projects.core.compose)
+    implementation(projects.core.utils)
+    implementation(projects.data.db)
+    implementation(projects.data.models)
 
-    implementation(project(Modules.ksp))
-    ksp(project(Modules.ksp))
+    implementation(projects.ksp)
+    ksp(projects.ksp)
 }

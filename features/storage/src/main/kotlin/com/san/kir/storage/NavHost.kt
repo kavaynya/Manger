@@ -19,7 +19,7 @@ public fun storageNavigationCreators() {
 
 @NavEntry
 @Serializable
-public object Storages : NavConfig() {
+public data object Storages : NavConfig() {
     internal val creator = navCreator<Storages> {
         StoragesScreen(
             navigateUp = backPressed(),

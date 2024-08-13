@@ -7,7 +7,7 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.utils))
+    implementation(projects.core.utils)
 
     implementation(libs.coroutines.core)
     implementation(libs.stdlib)

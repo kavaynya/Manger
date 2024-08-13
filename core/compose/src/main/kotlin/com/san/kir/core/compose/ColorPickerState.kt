@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.lerp
 
 public class ColorPickerState internal constructor(private val initialColor: Color) {
-    private val currentColor by derivedStateOf {
+    public val currentColor: Color by derivedStateOf {
         val hValue = hValue
         val sValue = sValue
         val vValue = vValue

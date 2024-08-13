@@ -1,140 +1,231 @@
 package com.san.kir.library.utils
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.MenuDefaults
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.san.kir.core.compose.ColorPickerState
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
+import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
-import com.san.kir.core.compose.systemBarBottomPadding
-import com.san.kir.data.models.extend.SimplifiedManga
+import com.san.kir.core.compose.rememberColorPickerState
+import com.san.kir.core.utils.viewModel.Action
+import com.san.kir.core.utils.viewModel.returned
+import com.san.kir.data.models.main.SimplifiedManga
 import com.san.kir.library.R
 import com.san.kir.library.ui.library.ItemsState
+import com.san.kir.library.ui.library.LibraryAction
 import com.san.kir.library.ui.library.LibraryEvent
-import com.san.kir.library.ui.library.SelectedMangaState
-import kotlinx.collections.immutable.ImmutableMap
-import kotlinx.collections.immutable.toPersistentMap
+
+
+private val ItemCornerShape = RoundedCornerShape(Dimensions.default)
+private val ButtonPadding = Dimensions.quarter
+
+private val expandedItemModifier: Modifier
+    @Composable get() = Modifier
+        .background(MaterialTheme.colorScheme.surfaceVariant, ItemCornerShape)
+
+
+private val expandedItemContentColor: Color
+    @Composable get() = MaterialTheme.colorScheme.onSurfaceVariant
+
+
+internal enum class Expanded { COLOR, CATEGORY, DELETE, NONE; }
 
 @Composable
 internal fun LibraryDropUpMenu(
-    navigateToInfo: (Long) -> Unit,
-    navigateToStorage: (Long, SharedParams) -> Unit,
-    navigateToStats: (Long, SharedParams) -> Unit,
     itemsState: ItemsState,
-    selectedManga: SelectedMangaState.Visible,
-    sendEvent: (LibraryEvent) -> Unit,
+    selectedManga: SimplifiedManga,
+    sendAction: (Action) -> Unit,
 ) {
-    var deleteDialog by remember { mutableStateOf(false) }
-    var expandedCategory by remember { mutableStateOf(false) }
+    val expandedState = rememberSaveable { mutableStateOf(Expanded.NONE) }
+    val defaultColor = MaterialTheme.colorScheme.primary
+    val colorState =
+        rememberColorPickerState(if (selectedManga.color != 0) Color(selectedManga.color) else defaultColor)
 
     Column(
         modifier = Modifier
+            .verticalScroll(rememberScrollState())
             .fillMaxWidth()
-            .padding(systemBarBottomPadding())
+            .bottomInsetsPadding()
     ) {
 
-        Title(text = selectedManga.item.name, sendEvent = sendEvent)
+        Title { sendAction(LibraryEvent.DismissSelectedMangaDialog.returned()) }
 
-        Properties {
-            sendEvent(LibraryEvent.NonSelect)
-            navigateToInfo(selectedManga.item.id)
+        SubTitle(selectedManga.name, selectedManga.logo, colorState.currentColor) {
+            expandedState.value =
+                if (expandedState.value == Expanded.COLOR) Expanded.NONE else Expanded.COLOR
+        }
+
+        ColorPicker(
+            colorState = colorState,
+            visibility = expandedState.value != Expanded.COLOR,
+            onApply = {
+                expandedState.value = Expanded.NONE
+                sendAction(
+                    LibraryAction.ChangeColor(selectedManga.id, colorState.currentColor.toArgb())
+                )
+            },
+            onCancel = {
+                expandedState.value = Expanded.NONE
+                colorState.reset()
+            }
+        )
+
+        HorizontalDivider(modifier = Modifier.horizontalInsetsPadding(Dimensions.default))
+
+        Properties { params ->
+            sendAction(LibraryEvent.ToInfo(selectedManga.id, params).returned())
         }
 
         CategoryChanger(
-            changerVisibility = expandedCategory,
+            changerVisibility = expandedState.value != Expanded.CATEGORY,
             itemsState = itemsState,
-            selectedManga = selectedManga.item,
+            selectedManga = selectedManga,
             onClick = {
-                expandedCategory = !expandedCategory
-                deleteDialog = false
+                expandedState.value =
+                    if (expandedState.value == Expanded.CATEGORY) Expanded.NONE else Expanded.CATEGORY
             },
             onItemClick = { categoryId ->
-                expandedCategory = false
-                sendEvent(LibraryEvent.ChangeCategory(selectedManga.item.id, categoryId))
+                expandedState.value = Expanded.NONE
+                sendAction(LibraryAction.ChangeCategory(selectedManga.id, categoryId))
             }
         )
 
         Storage { params ->
-            navigateToStorage(selectedManga.item.id, params)
-            sendEvent(LibraryEvent.NonSelect)
+            sendAction(LibraryEvent.ToStorage(selectedManga.id, params).returned())
         }
 
         Statistics { params ->
-            sendEvent(LibraryEvent.NonSelect)
-            navigateToStats(selectedManga.item.id, params)
+            sendAction(LibraryEvent.ToStats(selectedManga.id, params).returned())
         }
 
         Delete(
-            changerVisibility = deleteDialog,
+            changerVisibility = expandedState.value != Expanded.DELETE,
             onClick = {
-                deleteDialog = !deleteDialog
-                expandedCategory = false
+                expandedState.value =
+                    if (expandedState.value == Expanded.DELETE) Expanded.NONE else Expanded.DELETE
             },
             onDismiss = {
-                deleteDialog = false
-                it?.let { sendEvent(LibraryEvent.DeleteManga(selectedManga.item.id, it)) }
+                expandedState.value = Expanded.NONE
+                it?.let { sendAction(LibraryAction.DeleteManga(selectedManga.id, it)) }
+                sendAction(LibraryEvent.DismissSelectedMangaDialog.returned())
             },
         )
     }
 }
 
 @Composable
-private inline fun Title(
-    text: String,
-    crossinline sendEvent: (LibraryEvent) -> Unit,
-) {
-    DropdownMenuItem(
-        onClick = { sendEvent(LibraryEvent.NonSelect) },
-        modifier = Modifier
-            .background(color = MaterialTheme.colorScheme.primary)
-            .horizontalInsetsPadding(),
-        text = {
-            Text(
-                stringResource(R.string.library_popupmenu_title, text),
-                maxLines = 1,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onPrimary,
-                overflow = TextOverflow.Ellipsis
-            )
+private fun Title(onClick: () -> Unit) {
+    Row(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.selected_manga),
+            modifier = Modifier
+                .padding(Dimensions.default)
+                .weight(1f),
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            textAlign = TextAlign.Center,
+            overflow = TextOverflow.Ellipsis,
+            maxLines = 1
+        )
+        IconButton(onClick = onClick, modifier = Modifier.padding(end = Dimensions.half)) {
+            Icon(imageVector = Icons.Default.Close, contentDescription = "Close")
         }
-    )
+    }
 }
 
 @Composable
-private fun Properties(onClick: () -> Unit) {
-    DropdownMenuItem(
-        onClick = onClick,
+private fun SubTitle(
+    text: String,
+    logo: String,
+    color: Color,
+    onClick: () -> Unit
+) {
+    Row(
         modifier = Modifier
+            .fillMaxWidth()
             .horizontalInsetsPadding()
     ) {
-        Text(stringResource(R.string.library_popupmenu_about))
+        LogoImage(
+            logo = logo,
+             Modifier
+                .padding(Dimensions.default)
+                .size(Dimensions.Image.bigger)
+        )
+
+        Text(
+            text = text,
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .weight(1f),
+            fontWeight = FontWeight.Bold,
+            maxLines = 3
+        )
+
+        Box(
+            modifier = Modifier
+                .align(Alignment.CenterVertically)
+                .padding(end = Dimensions.default)
+                .clip(RoundedCornerShape(50))
+                .background(color = color)
+                .size(Dimensions.Image.small)
+                .clickable(onClick = onClick)
+        )
     }
+}
+
+
+@Composable
+private fun Properties(onClick: (SharedParams) -> Unit) {
+    val params = rememberSharedParams()
+    DropdownMenuItem(
+        text = { Text(stringResource(R.string.properties)) },
+        onClick = { onClick(params) },
+        modifier = Modifier
+            .horizontalInsetsPadding()
+            .saveParams(params)
+    )
 }
 
 @Composable
@@ -146,25 +237,27 @@ private fun ColumnScope.CategoryChanger(
     onItemClick: (Long) -> Unit,
 ) {
     DropdownMenuItem(
+        text = { Text(text = stringResource(R.string.change_category)) },
         onClick = onClick,
         modifier = Modifier
-            .horizontalInsetsPadding()
-    ) {
-        Text(
-            stringResource(id = R.string.library_popupmenu_set_category),
-            modifier = Modifier.weight(1f)
-        )
-
-        Text(
-            text = selectedManga.category,
-            style = MaterialTheme.typography.subtitle2
-        )
-    }
+            .horizontalInsetsPadding(),
+        trailingIcon = {
+            Text(
+                text = selectedManga.category,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.primaryContainer, ItemCornerShape)
+                    .padding(Dimensions.half)
+            )
+        }
+    )
 
     if (itemsState is ItemsState.Ok)
         ExpandedCategories(
             visibility = changerVisibility,
-            categories = itemsState.categories.toPersistentMap().remove(selectedManga.categoryId),
+            categories = itemsState.categories.toMutableMap()
+                .apply { remove(selectedManga.categoryId) },
             onItemChanged = onItemClick
         )
 }
@@ -172,23 +265,21 @@ private fun ColumnScope.CategoryChanger(
 @Composable
 private fun ColumnScope.ExpandedCategories(
     visibility: Boolean,
-    categories: ImmutableMap<Long, String>,
+    categories: Map<Long, String>,
     onItemChanged: (Long) -> Unit,
 ) {
 
     BottomAnimatedVisibility(
         visible = visibility,
-        modifier = Modifier.background(Color(0xFF525252))
+        modifier = expandedItemModifier,
     ) {
         Column {
             categories.forEach { (key, value) ->
                 DropdownMenuItem(
+                    text = { Text(text = value, color = expandedItemContentColor) },
                     onClick = { onItemChanged(key) },
-                    modifier = Modifier
-                        .horizontalInsetsPadding()
-                ) {
-                    Text(text = value, color = Color.White)
-                }
+                    modifier = Modifier.horizontalInsetsPadding()
+                )
             }
         }
     }
@@ -198,94 +289,116 @@ private fun ColumnScope.ExpandedCategories(
 private fun Storage(onClick: (SharedParams) -> Unit) {
     val params = rememberSharedParams()
     DropdownMenuItem(
+        text = { Text(stringResource(R.string.used_memory)) },
         onClick = { onClick(params.copy()) },
         modifier = Modifier
             .horizontalInsetsPadding()
             .saveParams(params)
-    ) {
-        Text(stringResource(R.string.library_popupmenu_storage))
-    }
+    )
 }
 
 @Composable
 private fun Statistics(onClick: (SharedParams) -> Unit) {
     val params = rememberSharedParams()
     DropdownMenuItem(
+        text = { Text(stringResource(R.string.read_statistic)) },
         onClick = { onClick(params.copy()) },
         modifier = Modifier
             .horizontalInsetsPadding()
             .saveParams(params)
-    ) {
-        Text(stringResource(R.string.library_popupmenu_statistic))
-    }
+    )
 }
 
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun Delete(
+private fun Delete(
     changerVisibility: Boolean,
     onClick: () -> Unit,
     onDismiss: (Boolean?) -> Unit,
 ) {
     DropdownMenuItem(
+        text = { Text(stringResource(R.string.delete)) },
         onClick = onClick,
-        modifier = Modifier
-            .horizontalInsetsPadding()
-    ) {
-        Text(stringResource(R.string.library_popupmenu_delete))
-    }
+        modifier = Modifier.horizontalInsetsPadding()
+    )
 
     BottomAnimatedVisibility(
         visible = changerVisibility,
-        modifier = Modifier.background(Color(0xFF525252))
+        modifier = expandedItemModifier
     ) {
 
-        Column(
-            modifier = Modifier
-                .horizontalInsetsPadding()
-        ) {
+        Column(modifier = Modifier.horizontalInsetsPadding()) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .sizeIn(minHeight = Dimensions.Items.height)
-                    .padding(MenuDefaults.DropdownMenuItemContentPadding),
+                    .padding(Dimensions.default),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    stringResource(R.string.library_popupmenu_delete_message),
+                    stringResource(R.string.really_delete_manga),
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = expandedItemContentColor
                 )
             }
 
-            Row(
-                horizontalArrangement = Arrangement.SpaceAround,
+            FlowRow(
+                horizontalArrangement = Arrangement.End,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(4.dp)
             ) {
-                val pad = PaddingValues(4.dp, 4.dp)
-
                 OutlinedButton(
                     onClick = { onDismiss(true) },
-                    modifier = Modifier.padding(pad)
+                    modifier = Modifier.padding(ButtonPadding),
                 ) {
-                    Text(text = stringResource(id = R.string.library_popupmenu_delete_ok_with_files))
+                    Text(stringResource(R.string.really_ok_with_files))
                 }
 
                 OutlinedButton(
                     onClick = { onDismiss(false) },
-                    modifier = Modifier.padding(pad)
+                    modifier = Modifier.padding(ButtonPadding)
                 ) {
-                    Text(text = stringResource(id = R.string.library_popupmenu_delete_ok))
+                    Text(stringResource(R.string.really_ok))
                 }
 
                 OutlinedButton(
                     onClick = { onDismiss(null) },
-                    modifier = Modifier.padding(pad)
+                    modifier = Modifier.padding(ButtonPadding)
                 ) {
-                    Text(text = stringResource(id = R.string.library_popupmenu_delete_no))
+                    Text(stringResource(R.string.never))
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun ColorPicker(
+    colorState: ColorPickerState,
+    visibility: Boolean,
+    onApply: () -> Unit,
+    onCancel: () -> Unit
+) {
+    BottomAnimatedVisibility(visible = visibility, modifier = expandedItemModifier) {
+        Column {
+            com.san.kir.core.compose.ColorPicker(
+                state = colorState,
+                modifier = Modifier.horizontalInsetsPadding(horizontal = Dimensions.quarter)
+            )
+            Row(
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(bottom = Dimensions.half)
+                    .endInsetsPadding(Dimensions.half)
+            ) {
+                TextButton(onClick = onCancel) {
+                    Text(text = stringResource(R.string.cancel))
+                }
+                TextButton(onClick = onApply) {
+                    Text(text = stringResource(com.san.kir.catalog.R.string.apply))
                 }
             }
         }

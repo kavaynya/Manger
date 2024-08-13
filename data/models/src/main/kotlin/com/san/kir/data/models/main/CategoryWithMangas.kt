@@ -9,8 +9,6 @@ public data class CategoryWithMangas(
     val isReverseSort: Boolean = false,
     val spanPortrait: Int = 2,
     val spanLandscape: Int = 3,
-    val isLargePortrait: Boolean = true,
-    val isLargeLandscape: Boolean = true,
     val mangas: List<SimplifiedManga> = emptyList(),
 ) {
     override fun toString(): String = buildString {

@@ -1,6 +1,5 @@
 package com.san.kir.chapters.ui.latest
 
-import android.content.Context
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
@@ -57,7 +56,6 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -396,7 +394,6 @@ private fun LazyItemScope.ItemContent(
     screenWidth: MutableFloatState,
     sendAction: (Action) -> Unit,
 ) {
-    val context: Context = LocalContext.current
     val interactionSource = remember { MutableInteractionSource() }
     var itemSize by remember { mutableStateOf(Size.Zero) }
     var lastPressPosition by rememberSaveable(stateSaver = Offset.Saver) { mutableStateOf(Offset.Zero) }

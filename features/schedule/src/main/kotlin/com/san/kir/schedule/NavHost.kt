@@ -18,17 +18,15 @@ public fun scheduleNavigationCreators() {
 
 @NavEntry
 @Serializable
-public class Schedule : NavConfig() {
-    internal companion object {
-        val creator = navCreator<Schedule> {
-            ScheduleScreen(
-                navigateUp = backPressed(),
-                navigateToItem = add(::Task)
-            )
-        }
-
-        internal val animation = navAnimation<Schedule> { horizontalSlide() }
+public data object Schedule : NavConfig() {
+    internal val creator = navCreator<Schedule> {
+        ScheduleScreen(
+            navigateUp = backPressed(),
+            navigateToItem = add(::Task)
+        )
     }
+
+    internal val animation = navAnimation<Schedule> { horizontalSlide() }
 }
 
 @NavEntry
@@ -42,6 +40,6 @@ public class Task(internal val id: Long, internal val params: SharedParams) : Na
             )
         }
 
-        internal val animation = navAnimation<Task> {  shapeAnimator(it.params) }
+        internal val animation = navAnimation<Task> { shapeAnimator(it.params) }
     }
 }

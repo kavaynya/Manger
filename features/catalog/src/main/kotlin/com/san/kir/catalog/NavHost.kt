@@ -27,7 +27,7 @@ public fun catalogsNavigationCreators() {
 
 @NavEntry
 @Serializable
-public object Catalogs : NavConfig() {
+public data object Catalogs : NavConfig() {
 
     internal val creator = navCreator<Catalogs> { _ ->
         CatalogsScreen(

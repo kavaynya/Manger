@@ -8,13 +8,13 @@ android {
 }
 
 dependencies {
-    implementation(project(Modules.Core.utils))
-    implementation(project(Modules.Data.models))
-    implementation(project(Modules.Data.db))
-    implementation(project(Modules.Core.compose))
-    implementation(project(Modules.Core.internet))
+    implementation(projects.core.utils)
+    implementation(projects.data.models)
+    implementation(projects.data.db)
+    implementation(projects.core.compose)
+    implementation(projects.core.internet)
 
-    implementation(project(Modules.Features.catalog))
+    implementation(projects.features.catalog)
 
     implementation(libs.okhttp.loging)
 

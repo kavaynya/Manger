@@ -16,6 +16,6 @@ dependencies {
     implementation(projects.data.db)
     implementation(projects.data.models)
 
-    api(project(Modules.ksp))
-    ksp(project(Modules.ksp))
+    api(projects.ksp)
+    ksp(projects.ksp)
 }

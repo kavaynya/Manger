@@ -10,6 +10,8 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.san.kir.core.utils.DIR
+import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.categoryAll
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.data.db.main.dao.AccountDao
 import com.san.kir.data.db.main.dao.AccountMangaDao
@@ -46,7 +48,6 @@ import com.san.kir.data.db.main.views.ViewChapter
 import com.san.kir.data.db.main.views.ViewManga
 import com.san.kir.data.db.main.views.ViewMangaWithChapterCounts
 import com.san.kir.data.db.main.views.ViewStatistic
-import com.san.kir.data.models.utils.CATEGORY_ALL
 import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.data.models.utils.MainMenuType
 import com.san.kir.data.models.utils.Orientation
@@ -174,7 +175,7 @@ internal class Callback(private val context: Context) : RoomDatabase.Callback() 
 
     private fun SupportSQLiteDatabase.addCategoryAll() {
         val cat = ContentValues()
-        cat.put("name", context.CATEGORY_ALL)
+        cat.put("name", ManualDI.categoryAll())
         cat.put("ordering", 0)
         cat.put("isVisible", true)
         cat.put("typeSort", "")

@@ -4,13 +4,13 @@ import android.content.Context
 import com.san.kir.background.works.RemoveCategoryWorker
 import com.san.kir.categories.R
 import com.san.kir.core.utils.ManualDI
+import com.san.kir.core.utils.categoryAll
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.categoryRepository
 import com.san.kir.data.db.main.repo.CategoryRepository
 import com.san.kir.data.models.main.Category
-import com.san.kir.data.models.utils.CATEGORY_ALL
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
@@ -39,7 +39,7 @@ internal class CategoryViewModel(
             category = cat,
             isCreatedNew = isCreatedNew,
             oldCategoryName = categoryName,
-            hasAll = categoryName == context.CATEGORY_ALL,
+            hasAll = categoryName == ManualDI.categoryAll(),
             hasChanges = changes,
             error = error
         )
