@@ -61,82 +61,68 @@ internal class LoadImageViewModel(
 
         if (page == null) {
             _state.update { LoadState.Error(Throwable("None page")) }
-        } else {
-            // получаем файл страницы
-            val name = connectManager.nameFromUrl(page.pagelink)
-            val fullPath = getFullPath(page.chapter.path).absolutePath
-            var file = File(fullPath, name)
-            file = File(file.parentFile, "${file.nameWithoutExtension}.png")
+            return@launch
+        }
 
-            if (file.exists() && !force) {
+        // получаем файл страницы
+        val name = connectManager.nameFromUrl(page.pagelink)
+        val fullPath = getFullPath(page.chapter.path).absolutePath
+        var file = File(fullPath, name)
+        file = File(file.parentFile, "${file.nameWithoutExtension}.png")
 
-                // Если файл нужного формата в памяти
-                if (file.isOkPng()) {
-                    _state.update { LoadState.Ready(ImageSource.uri(Uri.fromFile(file))) }
-                    return@launch
-                }
+        if (file.exists() && !force) {
 
-                // Если файл есть, но формат неверный, то конвертировать
-                val png = convertImagesToPng(file)
-                if (png.isOkPng()) {
-                    _state.update { LoadState.Ready(ImageSource.uri(Uri.fromFile(png))) }
-                    return@launch
-                }
+            if (!file.isOkPng()) {
+                file = convertImagesToPng(file)
             }
 
-            val isOnline = settingsRepository.withoutSaveFiles()
+            if (file.isOkPng()) {
+                _state.update { LoadState.Ready(ImageSource.uri(Uri.fromFile(file))) }
+                return@launch
+            }
+        }
 
-            // Загрузка файла без сохранения в памяти смартфона
-            if (isOnline) {
-                if (page.chapter.link.isEmpty()) {
-                    _state.update { LoadState.Error(Throwable("No link")) }
-                } else {
-                    connectManager
-                        .downloadBitmap(
-                            connectManager.prepareUrl(page.pagelink),
-                            runCatching { siteCatalogsManager.catalog(page.pagelink) }
-                                .onFailure(Timber.Forest::e)
-                                .getOrNull()?.headers,
-                            onProgress = { progress ->
-                                _state.update { LoadState.Load(progress) }
-                            }
-                        ).onSuccess { (bm, size, time) ->
-                            _state.update {
-                                LoadState.Ready(ImageSource.cachedBitmap(bm), size, time)
-                            }
-                        }.onFailure { ex ->
-                            Timber.e(ex)
-                            _state.update { LoadState.Error(ex) }
-                        }
-                }
+        // Загрузка файла без сохранения в памяти смартфона
+        if (settingsRepository.withoutSaveFiles()) {
+            if (page.chapter.link.isEmpty()) {
+                _state.update { LoadState.Error(Throwable("No link")) }
                 return@launch
             }
 
-            // Загрузка файла с сохранением в памяти смартфона
-            file = File(fullPath, name)
-            connectManager.downloadFile(
-                file,
-                connectManager.prepareUrl(page.pagelink),
-                runCatching { siteCatalogsManager.catalog(page.pagelink) }
-                    .onFailure(Timber.Forest::e)
-                    .getOrNull()?.headers,
-                onProgress = { progress ->
-                    _state.update { LoadState.Load(progress) }
+            connectManager.downloadBitmap(
+                url = connectManager.prepareUrl(page.pagelink),
+                headers = siteCatalogsManager.headersByLink(page.pagelink),
+                onProgress = { progress -> _state.update { LoadState.Load(progress) } }
+            ).onSuccess { (bm, size, time) ->
+                _state.update {
+                    LoadState.Ready(ImageSource.cachedBitmap(bm), size, time)
                 }
-            ).onSuccess { (_, length, time) ->
-                val imageSource = ImageSource.uri(
-                    Uri.fromFile(
-                        if (file.extension in arrayOf("gif", "webp", "jpg", "jpeg"))
-                            convertImagesToPng(file)
-                        else file
-                    )
-                )
-                _state.update { LoadState.Ready(imageSource, length, time) }
             }.onFailure { ex ->
                 Timber.e(ex)
-                if (ex !is CancellationException)
-                    _state.update { LoadState.Error(ex) }
+                _state.update { LoadState.Error(ex) }
             }
+            return@launch
+        }
+
+        // Загрузка файла с сохранением в памяти смартфона
+        file = File(fullPath, name)
+        connectManager.downloadFile(
+            file = file,
+            url = connectManager.prepareUrl(page.pagelink),
+            headers = siteCatalogsManager.headersByLink(page.pagelink),
+            onProgress = { progress -> _state.update { LoadState.Load(progress) } }
+        ).onSuccess { (_, length, time) ->
+            val uri = Uri.fromFile(
+                if (file.extension in arrayOf("gif", "webp", "jpg", "jpeg"))
+                    convertImagesToPng(file)
+                else file
+            )
+            val imageSource = ImageSource.uri(uri)
+            _state.update { LoadState.Ready(imageSource, length, time) }
+        }.onFailure { ex ->
+            Timber.e(ex)
+            if (ex !is CancellationException)
+                _state.update { LoadState.Error(ex) }
         }
     }
 }

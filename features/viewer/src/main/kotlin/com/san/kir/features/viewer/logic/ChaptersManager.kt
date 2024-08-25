@@ -1,6 +1,9 @@
 package com.san.kir.features.viewer.logic
 
+import com.san.kir.core.internet.AuthorizationException
+import com.san.kir.core.internet.PageNotFoundException
 import com.san.kir.core.utils.coroutines.withDefaultContext
+import com.san.kir.core.utils.set
 import com.san.kir.data.db.main.repo.ChapterRepository
 import com.san.kir.data.db.main.repo.StatisticsRepository
 import com.san.kir.data.models.main.Chapter
@@ -38,8 +41,8 @@ internal class ChaptersManager(
 
     suspend fun updatePagePosition(position: Int) {
         if (currentState.pagePosition != position) {
-            saveProgress(position)
             _state.update { old -> old.copy(pagePosition = position) }
+            saveProgress(position)
         }
     }
 
@@ -143,11 +146,7 @@ internal class ChaptersManager(
 
     private fun updateCurrentChapter(chapter: Chapter) {
         _state.update { old ->
-            old.copy(
-                chapters = old.chapters
-                    .toMutableList()
-                    .apply { set(old.chapterPosition, chapter) }
-            ).preparePages()
+            old.copy(chapters = old.chapters.set(old.chapterPosition, chapter)).preparePages()
         }
     }
 
@@ -185,7 +184,20 @@ internal class ChaptersManager(
 
     // Если страницы пустые, то обновляем их
     private suspend fun Chapter.withUpdatedPages(): Chapter {
-        val chapter = copy(pages = siteCatalogManager.pages(this))
+        val pages = runCatching { siteCatalogManager.pages(this) }
+            .onFailure { ex ->
+                Timber.v(ex)
+                val errorState = when (ex) {
+                    is AuthorizationException -> ErrorState.AuthError(
+                        siteCatalogManager.catalog(link).name
+                    )
+                    is PageNotFoundException -> ErrorState.NotFoundError
+                    else -> ErrorState.BaseError(ex.localizedMessage ?: "Unknown error")
+                }
+                _state.update { it.copy(error = errorState) }
+            }
+            .getOrDefault(emptyList())
+        val chapter = copy(pages = pages)
         chapterRepository.save(chapter)
         return chapter
     }
@@ -193,7 +205,7 @@ internal class ChaptersManager(
     private suspend fun List<Chapter>.updatePages(chapterPosition: Int): List<Chapter> {
         val chapter = get(chapterPosition)
         return if (chapter.pages.all { it.isBlank() }.not()) this
-        else toMutableList().apply { set(chapterPosition, get(chapterPosition).withUpdatedPages()) }
+        else set(chapterPosition, get(chapterPosition).withUpdatedPages())
     }
 }
 
@@ -203,13 +215,15 @@ internal data class ManagerState(
 
     val chapters: List<Chapter> = emptyList(), // Список глав
     val chapterPosition: Int = -1, // Позиция текущей глава
+
+    val error: ErrorState = ErrorState.None
 ) {
     val uiChapterPosition: Int // Позиция текущей главы для ui
         get() = chapterPosition + 1
 
     val currentChapter: Chapter // Текущая глава
         get() =
-            if (chapterPosition > -1 && chapters.isNotEmpty()) {
+            if (chapterPosition in chapters.indices) {
                 chapters[chapterPosition]
             } else Chapter()
 
@@ -222,6 +236,13 @@ internal data class ManagerState(
             appendLine("\tchapter -> $chapterPosition")
         }
     }
+}
+
+internal sealed interface ErrorState {
+    data object None : ErrorState
+    data object NotFoundError : ErrorState
+    data class BaseError(val text: String) : ErrorState
+    data class AuthError(val catalogName: String) : ErrorState
 }
 
 // проверки наличия следующей и предыдущей главы

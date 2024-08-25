@@ -20,25 +20,27 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlin.concurrent.timer
 import kotlin.math.max
 import kotlin.math.roundToInt
 
 internal class ViewerViewModel(
+    val chaptersManager: ChaptersManager = ManualDI.chaptersManager(),
     val settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
-    val chaptersManager: ChaptersManager = ManualDI.chaptersManager,
     private val chapterRepository: ChapterRepository = ManualDI.chapterRepository(),
     private val statisticsRepository: StatisticsRepository = ManualDI.statisticsRepository(),
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
 ) : ViewModel() {
 
     // Переключение видимости интерфейса
-    private val _visibleUI = MutableStateFlow(false)
+    private val _visibleUI = MutableStateFlow(VisibleState())
     val visibleUI = _visibleUI.asStateFlow()
 
-    fun toggleVisibilityUI(state: Boolean = _visibleUI.value.not()) {
-        _visibleUI.update { state }
+    fun toggleVisibilityUI(
+        state: Boolean = _visibleUI.value.isShown.not(),
+        force: Boolean = false
+    ) {
+        _visibleUI.value = VisibleState(state, force)
     }
 
     // Хранение способов листания глав
@@ -89,7 +91,7 @@ internal class ViewerViewModel(
         val timerFlow = MutableStateFlow(-1)
 
         timer(name = "readTimeStopWatch", period = 60_000) {
-            timerFlow.update { old -> old + 1 }
+            timerFlow.value++
         }
 
         return timerFlow.asStateFlow()
@@ -103,10 +105,8 @@ internal class ViewerViewModel(
         // Включен ли режим управления нажатиями на экран
         if (control.value.taps) {
             when {
-                xPosition < leftPart -> // Нажатие на левую часть экрана
-                    chaptersManager.prevPage() // Предыдущая страница
-                xPosition > rightPart -> // Нажатие на правую часть
-                    chaptersManager.nextPage() // Следущая страница
+                xPosition < leftPart -> chaptersManager.prevPage()
+                xPosition > rightPart -> chaptersManager.nextPage()
             }
         }
 
@@ -133,3 +133,4 @@ internal class ViewerViewModel(
     }
 }
 
+internal data class VisibleState(val isShown: Boolean = true, val force: Boolean = true)

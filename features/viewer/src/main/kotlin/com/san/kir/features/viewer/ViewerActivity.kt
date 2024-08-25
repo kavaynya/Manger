@@ -31,6 +31,7 @@ import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.data.models.main.Settings
 import com.san.kir.data.models.utils.Orientation
 import com.san.kir.features.viewer.databinding.MainBinding
+import com.san.kir.features.viewer.logic.ErrorState
 import com.san.kir.features.viewer.utils.Page
 import com.san.kir.features.viewer.utils.VIEW_OFFSET
 import kotlinx.coroutines.Job
@@ -41,7 +42,9 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 public object MangaViewer {
-    public fun start(chapterID: Long) { ViewerActivity.start(chapterID) }
+    public fun start(chapterID: Long) {
+        ViewerActivity.start(chapterID)
+    }
 }
 
 internal class ViewerActivity : AppCompatActivity() {
@@ -103,31 +106,29 @@ internal class ViewerActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
         // Загрузка настроек
-        lifecycleScope.launchWhenResumed {
-            viewModel.settingsRepository.viewer.collect { data: Settings.Viewer ->
-                requestedOrientation = when (data.orientation) {
-                    Orientation.PORT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
-                    Orientation.LAND -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
-                    Orientation.AUTO -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
-                    Orientation.PORT_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
-                    Orientation.LAND_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
-                    Orientation.AUTO_PORT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
-                    Orientation.AUTO_LAND -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                    else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                }
-
-                if (Build.VERSION.SDK_INT >= 28) {
-                    val attrs = window.attributes
-                    attrs.layoutInDisplayCutoutMode =
-                        if (data.cutOut) WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
-                        else WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
-                    window.attributes = attrs
-                }
-
-                // переключение управления свайпами
-                binding.pager.setSwipable(data.control.swipes)
+        viewModel.settingsRepository.viewer.onEach { data: Settings.Viewer ->
+            requestedOrientation = when (data.orientation) {
+                Orientation.PORT -> ActivityInfo.SCREEN_ORIENTATION_PORTRAIT
+                Orientation.LAND -> ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+                Orientation.AUTO -> ActivityInfo.SCREEN_ORIENTATION_SENSOR
+                Orientation.PORT_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT
+                Orientation.LAND_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
+                Orientation.AUTO_PORT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
+                Orientation.AUTO_LAND -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
+                else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
-        }
+
+            if (Build.VERSION.SDK_INT >= 28) {
+                val attrs = window.attributes
+                attrs.layoutInDisplayCutoutMode =
+                    if (data.cutOut) WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
+                    else WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_NEVER
+                window.attributes = attrs
+            }
+
+            // переключение управления свайпами
+            binding.pager.setSwipable(data.control.swipes)
+        }.launchIn(lifecycleScope)
 
         viewModel.initReadTime()
         viewModel.setScreenWidth(getScreenWidth())
@@ -170,13 +171,39 @@ internal class ViewerActivity : AppCompatActivity() {
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
             .onEach { state ->
                 //                Timber.i("state -> $state")
+                if (state.error is ErrorState.None) {
+                    if (state.pages.isEmpty()) {
+                        viewModel.toggleVisibilityUI(true, true)
+                    } else {
+                        viewModel.toggleVisibilityUI(viewModel.visibleUI.value.isShown)
+                    }
 
-                binding.loader.isVisible = state.pages.isEmpty()
-                binding.pager.isInvisible = state.pages.isEmpty()
+                    binding.pager.isInvisible = state.pages.isEmpty()
+                    binding.loaderContainer.isVisible = state.pages.isEmpty()
+                    binding.loader.isVisible = state.pages.isEmpty()
+                    binding.loaderText.setText(R.string.data_loading)
+                } else {
+                    viewModel.toggleVisibilityUI(true, true)
+                    binding.loaderContainer.isVisible = true
+                    binding.loader.isVisible = false
+
+                    val str = when (val error = state.error) {
+                        is ErrorState.AuthError -> getString(
+                            R.string.auth_error_loading,
+                            error.catalogName
+                        )
+
+                        is ErrorState.BaseError -> getString(R.string.error_loading, error.text)
+                        is ErrorState.NotFoundError -> getString(R.string.not_found_error_loading)
+                        ErrorState.None -> ""
+                    }
+                    binding.loaderText.setText(str)
+                }
 
                 // обновление прогрессбара
                 binding.progressBar.max = state.pages.size - 1
                 binding.progressBar.progress = state.pagePosition
+                binding.pagesText.text = ""
 
                 if (state.pages.isNotEmpty()) {
                     // Обновление адаптера
@@ -218,13 +245,18 @@ internal class ViewerActivity : AppCompatActivity() {
         // Переключение видимости элементов
         viewModel.visibleUI
             .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
-            .onEach { state ->
+            .onEach { (state, force) ->
                 if (state) {
                     visibleJob?.cancel()
-                    visibleJob = lifecycleScope.launch {
+
+                    if (force) {
                         showUI()
-                        delay(4.seconds)
-                        viewModel.toggleVisibilityUI(false)
+                    } else {
+                        visibleJob = lifecycleScope.launch {
+                            showUI()
+                            delay(4.seconds)
+                            viewModel.toggleVisibilityUI(false, false)
+                        }
                     }
                 } else {
                     visibleJob?.cancel()
@@ -237,7 +269,7 @@ internal class ViewerActivity : AppCompatActivity() {
         // получение данных и инициализация менеджера
         val id = intent.getLongExtra(chapterKey, -1L)
         if (id != -1L) {
-            viewModel.init(chapterId = id)
+            viewModel.init(id)
         }
     }
 
@@ -251,7 +283,8 @@ internal class ViewerActivity : AppCompatActivity() {
     private fun autoHideSystemUI() {
         ViewCompat.setOnApplyWindowInsetsListener(window.decorView) { _, insets ->
             if (insets.isVisible(WindowInsetsCompat.Type.navigationBars())
-                || insets.isVisible(WindowInsetsCompat.Type.statusBars())) {
+                || insets.isVisible(WindowInsetsCompat.Type.statusBars())
+            ) {
                 hideSystemUI()
             }
 
@@ -278,13 +311,21 @@ internal class ViewerActivity : AppCompatActivity() {
     private fun showUI() {
         AnimatorSet().apply {
             playTogether(
-                ObjectAnimator.ofFloat(binding.appbar, View.TRANSLATION_Y, -VIEW_OFFSET, 0f).apply {
-                    doOnStart { binding.progressBar.isVisible = false }
-                },
-                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_Y, VIEW_OFFSET, 0f),
-                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_X, -VIEW_OFFSET, 0f),
-                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_Y, VIEW_OFFSET, 0f),
-                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_X, VIEW_OFFSET, 0f),
+                ObjectAnimator.ofFloat(
+                    binding.appbar, View.TRANSLATION_Y, binding.appbar.translationY, 0f
+                ).apply { doOnStart { binding.progressBar.isVisible = false } },
+                ObjectAnimator.ofFloat(
+                    binding.prev, View.TRANSLATION_Y, binding.prev.translationY, 0f
+                ),
+                ObjectAnimator.ofFloat(
+                    binding.prev, View.TRANSLATION_X, binding.prev.translationX, 0f
+                ),
+                ObjectAnimator.ofFloat(
+                    binding.next, View.TRANSLATION_Y, binding.next.translationY, 0f
+                ),
+                ObjectAnimator.ofFloat(
+                    binding.next, View.TRANSLATION_X, binding.next.translationX, 0f
+                ),
             )
             start()
         }
@@ -293,13 +334,21 @@ internal class ViewerActivity : AppCompatActivity() {
     private fun hideUI() {
         AnimatorSet().apply {
             playTogether(
-                ObjectAnimator.ofFloat(binding.appbar, View.TRANSLATION_Y, 0f, -VIEW_OFFSET).apply {
-                    doOnEnd { binding.progressBar.isVisible = true }
-                },
-                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_Y, 0f, VIEW_OFFSET),
-                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_X, 0f, -VIEW_OFFSET),
-                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_Y, 0f, VIEW_OFFSET),
-                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_X, 0f, VIEW_OFFSET),
+                ObjectAnimator.ofFloat(
+                    binding.appbar, View.TRANSLATION_Y, binding.appbar.translationY, -VIEW_OFFSET
+                ).apply { doOnEnd { binding.progressBar.isVisible = true } },
+                ObjectAnimator.ofFloat(
+                    binding.prev, View.TRANSLATION_Y, binding.prev.translationY, VIEW_OFFSET
+                ),
+                ObjectAnimator.ofFloat(
+                    binding.prev, View.TRANSLATION_X, binding.prev.translationX, -VIEW_OFFSET
+                ),
+                ObjectAnimator.ofFloat(
+                    binding.next, View.TRANSLATION_Y, binding.next.translationY, VIEW_OFFSET
+                ),
+                ObjectAnimator.ofFloat(
+                    binding.next, View.TRANSLATION_X, binding.next.translationX, VIEW_OFFSET
+                ),
             )
             start()
         }

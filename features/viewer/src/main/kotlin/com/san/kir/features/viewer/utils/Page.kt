@@ -10,6 +10,6 @@ internal sealed class Page {
 
     @Parcelize
     data class Current(val pagelink: String, val chapter: Chapter = Chapter()) : Page(), Parcelable
-    object Next : Page()
-    object NoneNext : Page()
+    data object Next : Page()
+    data object NoneNext : Page()
 }

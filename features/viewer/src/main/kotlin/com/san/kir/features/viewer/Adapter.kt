@@ -12,7 +12,7 @@ import com.san.kir.features.viewer.utils.Page
 internal class Adapter(fragmentActivity: FragmentActivity) :
     FragmentStatePagerAdapter(fragmentActivity.supportFragmentManager) {
 
-    var items: List<Page> = listOf()
+    private var items: List<Page> = listOf()
 
     fun setList(list: List<Page>) {
         if (items.containsAll(list).not()) {

@@ -6,5 +6,6 @@ import com.san.kir.data.parsing.siteCatalogsManager
 import com.san.kir.data.statisticsRepository
 import com.san.kir.features.viewer.logic.ChaptersManager
 
-internal val ManualDI.chaptersManager: ChaptersManager
-    get() = ChaptersManager(chapterRepository(), statisticsRepository(), siteCatalogsManager())
+internal fun ManualDI.chaptersManager(): ChaptersManager {
+    return ChaptersManager(chapterRepository(), statisticsRepository(), siteCatalogsManager())
+}

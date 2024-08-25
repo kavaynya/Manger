@@ -112,10 +112,27 @@
         android:layout_gravity="top"
         android:progressDrawable="@drawable/viewer_progressbar" />
 
-    <ProgressBar
-        android:id="@+id/loader"
+    <LinearLayout
+        android:layout_gravity="center"
+        android:orientation="vertical"
+        android:id="@+id/loaderContainer"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center" />
+        android:layout_height="wrap_content">
+        <ProgressBar
+            android:layout_gravity="center"
+            android:id="@+id/loader"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+        <TextView
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:id="@+id/loaderText"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="24dp"
+            android:layout_marginRight="24dp"
+            android:text="@string/data_loading"
+            android:textAlignment="center"/>
+    </LinearLayout>
 
 </FrameLayout>

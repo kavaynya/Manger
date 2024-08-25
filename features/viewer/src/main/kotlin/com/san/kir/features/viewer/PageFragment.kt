@@ -118,8 +118,7 @@ internal class PageFragment : Fragment() {
         binding.update.setOnClickListener {
             showUI(binding.update, false)
             images.setInitState()
-            viewModel.updatePagesForChapter()
-                .invokeOnCompletion { images.load(page, true) }
+            viewModel.updatePagesForChapter().invokeOnCompletion { images.load(page, true) }
         }
     }
 

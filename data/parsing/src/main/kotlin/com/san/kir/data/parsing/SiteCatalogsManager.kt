@@ -17,6 +17,8 @@ import com.san.kir.data.parsing.sites.Readmanga
 import com.san.kir.data.parsing.sites.Selfmanga
 import com.san.kir.data.parsing.sites.Unicomics
 import com.san.kir.data.parsing.sites.Yaoichan
+import io.ktor.util.StringValues
+import timber.log.Timber
 
 public class SiteCatalogsManager(
     context: Context,
@@ -85,5 +87,9 @@ public class SiteCatalogsManager(
             ?.also { catName = it }
 
         return catName
+    }
+
+    public fun headersByLink(link: String): StringValues? {
+       return runCatching { catalog(link) }.onFailure(Timber.Forest::e).getOrNull()?.headers
     }
 }
