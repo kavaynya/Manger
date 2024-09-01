@@ -41,6 +41,7 @@ public fun ManualDI.mainMenuRepository(): MainMenuRepository =
 public fun ManualDI.mangaRepository(): MangaRepository = MangaRepository(appDatabase.mangaDao())
 public fun ManualDI.plannedRepository(): PlannedRepository =
     PlannedRepository(appDatabase.plannedDao())
+public fun ManualDI.lazyPlannedRepository(): Lazy<PlannedRepository> = lazy { plannedRepository() }
 
 public fun ManualDI.settingsRepository(): SettingsRepository =
     SettingsRepository(appDatabase.settingsDao())

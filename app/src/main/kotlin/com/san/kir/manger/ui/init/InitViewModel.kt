@@ -2,6 +2,8 @@ package com.san.kir.manger.ui.init
 
 import android.content.Context
 import android.os.Build
+import androidx.core.content.edit
+import com.san.kir.background.works.ScheduleWorker
 import com.san.kir.core.utils.DIR
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withDefaultContext
@@ -9,24 +11,37 @@ import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.core.utils.getFullPath
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
-import com.san.kir.manger.logic.di.initRepository
-import com.san.kir.manger.logic.repo.InitRepository
+import com.san.kir.data.db.main.repo.PlannedRepository
+import com.san.kir.data.lazyPlannedRepository
+import com.san.kir.data.models.main.SimplifiedTask
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
-class InitViewModel(
-    private val ctx: Context = ManualDI.context,
-    private val repository: InitRepository = ManualDI.initRepository,
+internal class InitViewModel(
+    private val ctx: Context = ManualDI.application,
+    private val plannedRepository: Lazy<PlannedRepository> = ManualDI.lazyPlannedRepository(),
 ) : ViewModel<InitState>(), InitStateHolder {
 
-    override val defaultState = InitState.Memory
-    override val tempState = MutableStateFlow<InitState>(defaultState)
+    private val sharedPreferences by lazy {
+        ctx.getSharedPreferences("startup", Context.MODE_PRIVATE)
+    }
 
-    override suspend fun onEvent(event: Action) {
-        when (event) {
+    private val isFirstLaunch: Boolean
+        get() {
+            if (sharedPreferences.contains("firstLaunch")) return false
+            sharedPreferences.edit { putBoolean("firstLaunch", false) }
+            return true
+        }
+
+    override val defaultState = InitState.Memory
+    override val tempState = MutableStateFlow(defaultState)
+
+    override suspend fun onAction(action: Action) {
+        when (action) {
             is InitEvent.Next -> {
                 tempState.update { previous ->
                     when (previous) {
@@ -36,13 +51,14 @@ class InitViewModel(
                                 InitState.Notification
                             else {
                                 startApp()
-                                event.onSuccess.invoke()
+                                action.onSuccess.invoke()
                                 InitState.Init
                             }
                         }
+
                         InitState.Notification -> {
                             startApp()
-                            event.onSuccess.invoke()
+                            action.onSuccess.invoke()
                             InitState.Init
                         }
                     }
@@ -62,18 +78,27 @@ class InitViewModel(
 //            ctx, ctx.deepLinkIntent<MainActivity>(CatalogsNavTarget.Main)
 //        )
 //
+
 //        DownloadChaptersWorker.setDownloadDeepLink(
 //            ctx, ctx.deepLinkIntent<MainActivity>(MainNavTarget.Downloader)
 //        )
 
         delay(0.5.seconds)
 
-        if (repository.isFirstLaunch()) repository.restoreSchedule()
+        if (isFirstLaunch) {
+            restoreSchedule()
+        }
     }
 
     private suspend fun createNeedFolders() = withIoContext {
         DIR.ALL.forEach { dir ->
             Timber.i("dir $dir -> created (${getFullPath(dir).mkdirs()})")
         }
+    }
+
+    private suspend fun restoreSchedule() = withIoContext {
+        plannedRepository.value.simplifiedItems.first()
+            .filter(SimplifiedTask::isEnabled)
+            .forEach(ScheduleWorker.Companion::addTask)
     }
 }

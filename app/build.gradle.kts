@@ -38,6 +38,7 @@ dependencies {
     implementation(projects.core.background)
 
     implementation(projects.data.db)
+    implementation(projects.data.models)
 
     implementation(libs.activity)
     implementation(libs.appcompat)

@@ -4,9 +4,7 @@ import androidx.compose.runtime.Composable
 import com.san.kir.core.utils.viewModel.StateHolder
 import com.san.kir.core.utils.viewModel.rememberSendAction
 
-interface InitStateHolder : StateHolder<InitState>
+internal interface InitStateHolder : StateHolder<InitState>
 
 @Composable
-inline fun InitStateHolder.next(crossinline onSuccess: () -> Unit): () -> Unit {
-    return rememberSendAction(InitEvent.Next { onSuccess() })
-}
+internal fun InitStateHolder.next(onSuccess: () -> Unit) = rememberSendAction(InitEvent.Next(onSuccess))
