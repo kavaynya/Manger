@@ -74,8 +74,8 @@ private fun Main(main: Settings.Main, sendAction: (SettingsAction.SaveMain) -> U
         title = R.string.dark_theme_title,
         subtitle = R.string.dark_theme_summary,
         icon = Icons.Default.DarkMode,
-        initialValue = main.theme,
-        onCheckedChange = { sendAction(SettingsAction.SaveMain(main.copy(theme = it))) }
+        initialValue = main.isDarkTheme,
+        onCheckedChange = { sendAction(SettingsAction.SaveMain(main.copy(isDarkTheme = it))) }
     )
 
     HorizontalDivider()

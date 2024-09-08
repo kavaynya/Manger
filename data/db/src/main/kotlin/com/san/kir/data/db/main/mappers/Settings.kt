@@ -11,7 +11,7 @@ internal fun DbSettings.toModel() =
         isFirstLaunch,
         Settings.Chapters(isIndividual, isTitle, filterStatus),
         Settings.Download(concurrent, retry, wifi),
-        Settings.Main(theme, isShowCategory, editMenu),
+        Settings.Main(isDarkTheme, isShowCategory, editMenu),
         Settings.Viewer(
             orientation,
             cutOut,

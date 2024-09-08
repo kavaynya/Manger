@@ -23,10 +23,10 @@ private fun frontAnimation(config: NavConfig) = ManualDI.navAnimation(config) ?:
 public fun NavHost(
     componentContext: ComponentContext,
     startConfig: NavConfig,
-    stackAnimation: StackAnimation<NavConfig, NavContainer> = defaultAnimations,
+    animation: StackAnimation<NavConfig, NavContainer> = defaultAnimations,
 ) {
     val navHostComponent = remember {
-        NavHostComponent(componentContext, startConfig, stackAnimation)
+        NavHostComponent(componentContext, startConfig, animation)
     }
     navHostComponent.Show()
 }

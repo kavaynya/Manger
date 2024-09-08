@@ -16,7 +16,7 @@ internal data class DbSettings(
     @ColumnInfo("concurrent") val concurrent: Boolean = true,
     @ColumnInfo("retry") val retry: Boolean = false,
     @ColumnInfo("wifi") val wifi: Boolean = false,
-    @ColumnInfo("theme") val theme: Boolean = true,
+    @ColumnInfo("theme") val isDarkTheme: Boolean = true,
     @ColumnInfo("isShowCategory") val isShowCategory: Boolean = true,
     @ColumnInfo("editMenu") val editMenu: Boolean = false,
     @ColumnInfo("orientation") val orientation: Orientation = Orientation.AUTO_LAND,

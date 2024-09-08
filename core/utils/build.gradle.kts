@@ -16,8 +16,7 @@ dependencies {
 
     api(libs.serialization)
     api(libs.bundles.coroutines)
-    api(libs.decompose)
-    api(libs.decompose.extensions)
+    api(libs.bundles.decompose)
     api(libs.timber)
     api(libs.datetime)
 }

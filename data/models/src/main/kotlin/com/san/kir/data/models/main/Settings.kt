@@ -24,7 +24,7 @@ public data class Settings(
     )
 
     public data class Main(
-        val theme: Boolean = true,
+        val isDarkTheme: Boolean = true,
         val isShowCategory: Boolean = true,
         val editMenu: Boolean = false,
     )

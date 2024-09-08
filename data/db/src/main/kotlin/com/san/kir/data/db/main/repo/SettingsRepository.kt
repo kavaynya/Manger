@@ -14,7 +14,7 @@ import kotlinx.coroutines.flow.map
 public class SettingsRepository internal constructor(private val settingsDao: SettingsDao) {
     private val _settings = settingsDao.loadItem().filterNotNull()
     public val settings: Flow<Settings> = _settings.toModel()
-    public val theme: Flow<Boolean> = _settings.map { it.theme }
+    public val isDarkTheme: Flow<Boolean> = _settings.map { it.isDarkTheme }
     public val wifi: Flow<Boolean> = _settings.map { it.wifi }
     public val showTitle: Flow<Boolean> = _settings.map { it.isTitle }
     public val isIndividual: Flow<Boolean> = _settings.map { it.isIndividual }
@@ -57,7 +57,7 @@ public class SettingsRepository internal constructor(private val settingsDao: Se
     public suspend fun update(state: Settings.Main): Unit = withIoContext {
         settingsDao.update(
             currentSettings().copy(
-                theme = state.theme,
+                isDarkTheme = state.isDarkTheme,
                 isShowCategory = state.isShowCategory,
                 editMenu = state.editMenu
             )

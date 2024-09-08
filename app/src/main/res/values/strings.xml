@@ -1,14 +1,5 @@
 <resources>
 
-
-    <plurals name="chapters">
-        <item quantity="zero">глав</item>
-        <item quantity="one">главу</item>
-        <item quantity="few">главы</item>
-        <item quantity="many">глав</item>
-        <item quantity="other">глав.</item>
-    </plurals>
-
     <!-- Main Activity -->
     <string name="app_name" translatable="false">Manger</string>
     <string name="storage_permission_nonpermission">Вы запретили приложению доступ к памяти смартфона и оно превратилось в тыкву. Для исправления перейдите в настройки</string>

@@ -1,5 +1,8 @@
 plugins {
     id("compose.app")
+
+    alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -40,12 +43,12 @@ dependencies {
     implementation(projects.data.db)
     implementation(projects.data.models)
 
+    implementation(projects.ksp)
+    ksp(projects.ksp)
+
     implementation(libs.activity)
     implementation(libs.appcompat)
     implementation(libs.vectordrawable)
-
-    implementation(libs.bundles.decompose)
-    implementation(libs.lifecycle.viewmodel)
 
     //    debugImplementation(libs.bundles.hyper)
 

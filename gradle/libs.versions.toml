@@ -106,7 +106,6 @@ timber = { module = "com.jakewharton.timber:timber", version.ref = "timber" }
 
 # Accompanist
 permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
-systemuicontroller = { module = "com.google.accompanist:accompanist-systemuicontroller", version.ref = "accompanist" }
 webview = { module = "com.google.accompanist:accompanist-webview", version.ref = "accompanist" }
 
 datastore = { module = "androidx.datastore:datastore-preferences", version.ref = "datastore" }
@@ -157,7 +156,7 @@ espresso = { module = "androidx.test.espresso:espresso-core", version.ref = "esp
 coroutines = ["coroutines_core", "coroutines_android"]
 room = ["room_ktx", "room_paging", "room_runtime"]
 compose = ["compose_ui", "compose_ui_tooling", "compose_ui_tooling_preview", "compose_runtime", "compose_animation", "compose_foundation", "compose_foundation_layout", "compose_material_icons", "compose_material_icons_ext", "compose_material3"]
-accompanist = ["permissions", "systemuicontroller", "webview"]
+accompanist = ["permissions", "webview"]
 work = ["work_runtime", "work_gcm", "work_multiprocess"]
 hyper = ["hyperion-core", "hyperion-crash"]
 tests = ["test_core", "test_rules", "test_junit", "test_runner", "compose_junit", "kakaocup", "espresso"]

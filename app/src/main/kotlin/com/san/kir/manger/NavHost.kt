@@ -1,5 +1,6 @@
 package com.san.kir.manger
 
+import NavEntry
 import androidx.compose.animation.core.EaseInExpo
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.shape.GenericShape
@@ -14,8 +15,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.Color
 import com.arkivanov.decompose.ComponentContext
-import com.arkivanov.decompose.extensions.compose.jetpack.stack.animation.stackAnimation
-import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.NavHost
@@ -23,35 +23,38 @@ import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.library.LibraryNavHost
 import com.san.kir.manger.ui.init.InitScreen
-import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
+import kotlin.math.max
 
-@Parcelize
-private class Splash : NavConfig {
+@Serializable
+@NavEntry
+private class Splash : NavConfig() {
     companion object {
         val creator = navCreator<Splash> {
-            InitScreen(replace(Library()))
+            MaterialTheme(lightColorScheme()) {
+                InitScreen(replace(Library()))
+            }
         }
     }
 }
 
-@Parcelize
-class Library : NavConfig {
+@NavEntry
+@Serializable
+private class Library : NavConfig() {
     companion object {
         val creator = navCreator<Library> {
-            val mainViewModel: MainStateHolder = stateHolder { MainViewModel() }
-            val state by mainViewModel.state.collectAsState()
+            val stateHolder: MainStateHolder = stateHolder { MainViewModel() }
+            val state by stateHolder.state.collectAsState()
 
-            MaterialTheme(colorScheme = if (state.theme) darkColorScheme() else lightColorScheme()) {
+            MaterialTheme(colorScheme = if (state.isDarkTheme) darkColorScheme() else lightColorScheme()) {
                 // Remember a SystemUiController
                 val systemUiController = rememberSystemUiController()
-                val useDarkIcons = MaterialTheme.colorScheme.isLight
-
                 SideEffect {
                     // Update all of the system bar colors to be transparent, and use
                     // dark icons if we're in light theme
                     systemUiController.setSystemBarsColor(
                         color = Color.Transparent,
-                        darkIcons = useDarkIcons
+                        darkIcons = state.isDarkTheme.not()
                     )
                 }
 
@@ -67,20 +70,14 @@ fun MainNavHost(componentContext: ComponentContext) {
         componentContext = componentContext,
         startConfig = Splash(),
         animation = stackAnimation(animator),
-    ) { config ->
-        when (config) {
-            is Splash -> Splash.creator(config)
-            is Library -> Library.creator(config)
-            else -> null
-        }
-    }
+    )
 }
 
 private val animator = shapeAnimator(
     tween(durationMillis = 1200, easing = EaseInExpo)
 ) { factor ->
     GenericShape { size, _ ->
-        val radius = size.height * factor
+        val radius = max( size.height, size.width) * factor
         addOval(Rect(Offset.Zero, radius))
         addOval(Rect(Offset(size.width, size.height), radius))
     }
