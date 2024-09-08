@@ -116,7 +116,7 @@ internal class PageFragment : Fragment() {
 
         // Настройка кнопки обновления
         binding.update.setOnClickListener {
-            showUI(binding.update, false)
+            showUI(binding.update, VisibleState(false))
             images.setInitState()
             viewModel.updatePagesForChapter().invokeOnCompletion { images.load(page, true) }
         }
@@ -208,8 +208,8 @@ internal class PageFragment : Fragment() {
         _binding = null
     }
 
-    private fun showUI(view: View, state: Boolean) {
-        view.animate().translationY(if (state) 0f else VIEW_OFFSET).start()
+    private fun showUI(view: View, state: VisibleState) {
+        view.animate().translationY(if (state.isShown) 0f else VIEW_OFFSET).start()
     }
 
     private fun createGesture(onTapListener: (x: Float) -> Unit): GestureDetectorCompat {

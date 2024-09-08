@@ -28,7 +28,7 @@ import kotlin.math.max
 
 @Serializable
 @NavEntry
-private class Splash : NavConfig() {
+internal class Splash : NavConfig() {
     companion object {
         val creator = navCreator<Splash> {
             MaterialTheme(lightColorScheme()) {
@@ -40,7 +40,7 @@ private class Splash : NavConfig() {
 
 @NavEntry
 @Serializable
-private class Library : NavConfig() {
+internal class Library : NavConfig() {
     companion object {
         val creator = navCreator<Library> {
             val stateHolder: MainStateHolder = stateHolder { MainViewModel() }
@@ -66,6 +66,7 @@ private class Library : NavConfig() {
 
 @Composable
 fun MainNavHost(componentContext: ComponentContext) {
+    AddNavigationCreators
     NavHost(
         componentContext = componentContext,
         startConfig = Splash(),
