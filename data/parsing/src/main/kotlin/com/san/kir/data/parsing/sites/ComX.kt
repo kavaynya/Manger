@@ -1,6 +1,5 @@
 package com.san.kir.data.parsing.sites
 
-import com.google.gson.GsonBuilder
 import com.san.kir.core.internet.ConnectManager
 import com.san.kir.data.models.catalog.SiteCatalogElement
 import com.san.kir.data.models.main.Chapter

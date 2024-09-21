@@ -1,20 +1,18 @@
 package com.san.kir.features.shikimori.logic.useCases
 
-import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.models.base.ShikiDbManga
-import com.san.kir.data.models.base.ShikimoriMangaItem
-import com.san.kir.data.models.extend.SimplifiedMangaWithChapterCounts
 import com.san.kir.features.shikimori.logic.fuzzy
+import com.san.kir.features.shikimori.logic.models.AccountMangaItem
+import com.san.kir.features.shikimori.logic.models.LibraryMangaItem
+import com.san.kir.features.shikimori.logic.models.MangaItem
 import com.san.kir.features.shikimori.logic.repo.ItemsRepository
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 
 internal class BindingUseCase(private val itemsRepository: ItemsRepository) {
     // кеширование данных для ускорения проверки
-    private var repositoryItems: List<ShikimoriMangaItem> = emptyList()
+    private var repositoryItems: List<MangaItem> = emptyList()
 
-    fun <T : ShikimoriMangaItem> prepareData(): suspend (List<T>) -> List<BindStatus<T>> =
+    fun <T : MangaItem> prepareData(): suspend (List<T>) -> List<BindStatus<T>> =
         { list ->
             initRepositoryItems()
 
@@ -23,7 +21,7 @@ internal class BindingUseCase(private val itemsRepository: ItemsRepository) {
                 .map { item -> BindStatus(item, CanBind.Check) }
         }
 
-    fun <T : ShikimoriMangaItem> checkBinding(): suspend (List<BindStatus<T>>) -> Flow<CheckingStatus<T>> =
+    fun <T : MangaItem> checkBinding(): suspend (List<BindStatus<T>>) -> Flow<CheckingStatus<T>> =
         { list ->
             flow {
                 initRepositoryItems()
@@ -40,57 +38,54 @@ internal class BindingUseCase(private val itemsRepository: ItemsRepository) {
 
                     mutList[index] = item.copy(status = if (fuzzyCount) CanBind.Ok else CanBind.No)
 
-                    delay(40L)
-
-                    emit(
-                        CheckingStatus(
-                            items = mutList.sortedBy { (_, can) -> can.ordinal },
-                            progress = index.toFloat() / list.size
-                        )
-                    )
+                    emit(CheckingStatus(items = null, progress = index.toFloat() / list.size))
                 }
 
-                emit(CheckingStatus(items = null, progress = null))
+                emit(
+                    CheckingStatus(
+                        items = mutList.sortedBy { (_, can) -> can.ordinal },
+                        progress = null
+                    )
+                )
             }
         }
 
-    fun <T : ShikimoriMangaItem> filterData(): suspend (List<T>) -> List<T> =
+    fun <T : MangaItem> filterData(): suspend (List<T>) -> List<T> =
         { list ->
             if (list.isEmpty()) {
                 list
             } else {
                 initRepositoryItems()
 
-                list.filterNot { checkNoBind(it) }
+                list.filterNot(::checkNoBind)
                     .sortedBy { item -> item.name }
             }
         }
 
-    private suspend fun initRepositoryItems() = withIoContext {
+    private suspend fun initRepositoryItems() {
         if (repositoryItems.isEmpty())
             repositoryItems = itemsRepository.items()
     }
 
-    private fun checkNoBind(item: ShikimoriMangaItem): Boolean {
+    private fun checkNoBind(item: MangaItem): Boolean {
         return when (item) {
-            is ShikiDbManga -> item.libMangaId == -1L
-            is SimplifiedMangaWithChapterCounts ->
-                repositoryItems.firstOrNull { (it as ShikiDbManga).libMangaId == item.id } == null
+            is AccountMangaItem -> !item.inLibrary
+            is LibraryMangaItem ->
+                repositoryItems.firstOrNull { (it as AccountMangaItem).idInLibrary == item.id } == null
+
             else -> false
         }
     }
 }
 
-internal data class BindStatus<T : ShikimoriMangaItem>(
+internal data class BindStatus<T : MangaItem>(
     val item: T,
     val status: CanBind
 )
 
-internal data class CheckingStatus<T : ShikimoriMangaItem>(
+internal data class CheckingStatus<T : MangaItem>(
     val items: List<BindStatus<T>>?,
     val progress: Float?,
 )
 
-internal enum class CanBind {
-    Already, Ok, No, Check
-}
+internal enum class CanBind { Already, Ok, No, Check }

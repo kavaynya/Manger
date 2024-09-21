@@ -1,14 +1,16 @@
 package com.san.kir.features.shikimori.logic.repo
 
-import com.san.kir.data.models.base.ShikimoriMangaItem
+import com.san.kir.features.shikimori.logic.models.MangaItem
 import kotlinx.coroutines.flow.Flow
 
-interface ItemsRepository {
-    fun loadItems(): Flow<List<ShikimoriMangaItem>>
+internal interface ItemsRepository {
 
-    fun loadItemById(id: Long): Flow<ShikimoriMangaItem?>
+    suspend fun itemById(id: Long): MangaItem?
 
-    suspend fun items(): List<ShikimoriMangaItem>
+    suspend fun items(): List<MangaItem>
 
-    suspend fun itemById(id: Long): ShikimoriMangaItem?
+    fun loadItemById(id: Long): Flow<MangaItem?>
+
+    fun loadItems(): Flow<List<MangaItem>>
+
 }

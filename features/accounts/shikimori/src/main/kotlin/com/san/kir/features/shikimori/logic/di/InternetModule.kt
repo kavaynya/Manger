@@ -1,8 +1,7 @@
 package com.san.kir.features.shikimori.logic.di
 
-import com.san.kir.data.models.base.Settings.ShikimoriAuth.ShikimoriAccessToken
 import com.san.kir.features.shikimori.logic.api.ShikimoriData
-import com.san.kir.features.shikimori.logic.repo.SettingsRepository
+import com.san.kir.features.shikimori.logic.models.TokenContainer
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.engine.okhttp.OkHttp
@@ -11,30 +10,42 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.defaultRequest
 import io.ktor.client.plugins.plugin
 import io.ktor.client.plugins.resources.Resources
+import io.ktor.client.plugins.resources.delete
+import io.ktor.client.plugins.resources.get
+import io.ktor.client.plugins.resources.post
+import io.ktor.client.plugins.resources.put
 import io.ktor.client.request.HttpRequestBuilder
 import io.ktor.client.request.forms.FormDataContent
+import io.ktor.client.request.forms.submitForm
 import io.ktor.client.request.headers
 import io.ktor.client.request.setBody
 import io.ktor.client.request.url
+import io.ktor.client.statement.HttpResponse
+import io.ktor.http.ContentType
 import io.ktor.http.HttpHeaders
 import io.ktor.http.HttpMethod
 import io.ktor.http.HttpStatusCode
+import io.ktor.http.Parameters
 import io.ktor.http.URLProtocol
-import io.ktor.serialization.gson.gson
+import io.ktor.http.contentType
+import io.ktor.serialization.kotlinx.json.json
+import kotlinx.serialization.json.Json
 import okhttp3.Cache
 import okhttp3.logging.HttpLoggingInterceptor
 
-internal fun createKtorClient(
-    cache: Cache,
-    settingsRepository: SettingsRepository,
-): HttpClient {
-    val client = HttpClient(OkHttp) {
+
+internal class InternetClient(cache: Cache, json: Json) {
+
+
+    private var onTokenUpdateAction: suspend (TokenContainer) -> Unit = {}
+    private var tokenContainer: TokenContainer? = null
+    private val client = HttpClient(OkHttp) {
         engine {
             config {
                 retryOnConnectionFailure(true)
                 cache(cache)
                 addInterceptor(HttpLoggingInterceptor().apply {
-                    level = HttpLoggingInterceptor.Level.BASIC
+                    level = HttpLoggingInterceptor.Level.BODY
                 })
             }
         }
@@ -43,29 +54,49 @@ internal fun createKtorClient(
 
             url {
                 protocol = URLProtocol.HTTPS
-                host = ShikimoriData.siteName
+                host = ShikimoriData.SITE_NAME
             }
 
             headers {
                 append(HttpHeaders.UserAgent, "manger")
+                append(HttpHeaders.ContentType, "application/json")
+                append(HttpHeaders.Accept, "application/json")
+                append(HttpHeaders.Connection, "keep-alive")
+                append(HttpHeaders.Origin, ShikimoriData.BASE_URL)
             }
         }
 
-        install(ContentNegotiation) {
-            gson {
-                setPrettyPrinting()
-                setLenient()
-            }
-        }
-
+        install(ContentNegotiation) { json(json) }
         install(Resources)
     }
 
-    var dbToken: ShikimoriAccessToken? = null
-    suspend fun getToken(): ShikimoriAccessToken {
-        if (dbToken == null)
-            dbToken = settingsRepository.currentToken()
-        return requireNotNull(dbToken)
+    init {
+        initPlugins()
+    }
+
+    suspend fun submitForm(url: String, parameters: Parameters) =
+        client.submitForm(url, parameters)
+
+    suspend inline fun <reified T : Any> post(resource: T, data: Any?) = client.post(resource) {
+        contentType(ContentType.Application.Json)
+        setBody(data)
+    }
+
+    suspend inline fun <reified T : Any> get(resource: T): HttpResponse = client.get(resource)
+
+    suspend inline fun <reified T : Any> delete(resource: T): HttpResponse = client.delete(resource)
+
+    suspend inline fun <reified T : Any> put(resource: T, data: Any?) = client.put(resource) {
+        contentType(ContentType.Application.Json)
+        setBody(data)
+    }
+
+    fun updateTokens(newToken: TokenContainer) {
+        this.tokenContainer = newToken
+    }
+
+    fun onTokenUpdate(action: suspend (TokenContainer) -> Unit) {
+        this.onTokenUpdateAction = action
     }
 
     fun HttpRequestBuilder.addHeader(token: String) {
@@ -78,32 +109,29 @@ internal fun createKtorClient(
         }
     }
 
-    client.plugin(HttpSend).intercept { request ->
-        var token = getToken()
+    private fun initPlugins() {
+        client.plugin(HttpSend).intercept { request ->
+            val currentTokens = tokenContainer
+            currentTokens?.let { request.addHeader(it.accessToken) }
 
-        request.addHeader(token.accessToken)
-        val originalCall = execute(request)
+            val originalCall = execute(request)
+            if (originalCall.response.status != HttpStatusCode.Unauthorized || currentTokens == null)
+                return@intercept originalCall
 
-        if (originalCall.response.status != HttpStatusCode.Unauthorized)
-            return@intercept originalCall
+            val tokenCall = execute(HttpRequestBuilder().apply {
+                url(ShikimoriData.TOKEN_URL)
+                method = HttpMethod.Post
+                setBody(FormDataContent(ShikimoriData.refreshTokenParameters(currentTokens.refreshToken)))
+            })
 
-        val tokenCall = execute(HttpRequestBuilder().apply {
-            url(ShikimoriData.tokenUrl)
-            method = HttpMethod.Post
-            setBody(FormDataContent(ShikimoriData.refreshTokenParameters(token.refreshToken)))
-        })
+            if (tokenCall.response.status != HttpStatusCode.Unauthorized) {
+                val newToken: TokenContainer = tokenCall.body()
+                onTokenUpdateAction(newToken)
+                tokenContainer = newToken
+            }
 
-        if (tokenCall.response.status != HttpStatusCode.Unauthorized) {
-            val newToken: ShikimoriAccessToken = tokenCall.body()
-            settingsRepository.update(newToken)
-            dbToken = newToken
+            tokenContainer?.let { request.addHeader(it.accessToken) }
+            execute(request)
         }
-
-        token = getToken()
-
-        request.addHeader(token.accessToken)
-        execute(request)
     }
-
-    return client
 }

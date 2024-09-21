@@ -121,7 +121,7 @@ ktor_logging = { module = "io.ktor:ktor-client-logging", version.ref = "ktor" }
 ktor_res = { module = "io.ktor:ktor-client-resources", version.ref = "ktor" }
 ktor_auth = { module = "io.ktor:ktor-client-auth", version.ref = "ktor" }
 ktor_content = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
-ktor_json = { module = "io.ktor:ktor-serialization-gson", version.ref = "ktor" }
+ktor_json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
 # Compose
 compose_ui = { group = "androidx.compose.ui", name = "ui", version.ref = "compose" }

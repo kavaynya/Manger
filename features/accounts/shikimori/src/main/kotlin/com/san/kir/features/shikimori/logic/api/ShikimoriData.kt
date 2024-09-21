@@ -4,25 +4,25 @@ import android.net.Uri
 import io.ktor.http.Parameters
 import io.ktor.http.plus
 
-object ShikimoriData {
-    const val siteName = "shikimori.one"
-    const val baseUrl = "https://$siteName"
-    const val tokenUrl = "${baseUrl}/oauth/token"
-    const val iconUrl = "$baseUrl/favicons/apple-touch-icon-180x180.png"
+internal object ShikimoriData {
+    const val SITE_NAME = "shikimori.one"
+    const val BASE_URL = "https://$SITE_NAME"
+    const val TOKEN_URL = "${BASE_URL}/oauth/token"
+    const val ICON_URL = "$BASE_URL/favicons/apple-touch-icon-180x180.png"
 
-    private const val clientId = "HVh4u3DNW6qCmFHGCdKMt65SeFUuElar9tdxwtAzos4"
-    private const val clientSecret = "_htbF82BTgPwh775gTVvM4DW2Z3eHVjcqP8TMt_IkaA"
-    private const val redirectUri = "manger://shikimori-auth"
+    private const val CLIENT_ID = "HVh4u3DNW6qCmFHGCdKMt65SeFUuElar9tdxwtAzos4"
+    private const val CLIENT_SECRET = "_htbF82BTgPwh775gTVvM4DW2Z3eHVjcqP8TMt_IkaA"
+    private const val REDIRECT_URI = "manger://shikimori-auth"
 
     private val baseParameters = Parameters.build {
-        append("client_id", clientId)
-        append("client_secret", clientSecret)
+        append("client_id", CLIENT_ID)
+        append("client_secret", CLIENT_SECRET)
     }
 
-    fun getTokenParameters(code: String) =
+    fun tokenParameters(code: String) =
         baseParameters + Parameters.build {
             append("grant_type", "authorization_code")
-            append("redirect_uri", redirectUri)
+            append("redirect_uri", REDIRECT_URI)
             append("code", code)
         }
 
@@ -34,11 +34,12 @@ object ShikimoriData {
 
 
     val authorizeUrl: Uri =
-        Uri.parse("$baseUrl/oauth/authorize")
+        Uri.parse("$BASE_URL/oauth/authorize")
             .buildUpon()
-            .appendQueryParameter("client_id", clientId)
-            .appendQueryParameter("redirect_uri", redirectUri)
+            .appendQueryParameter("client_id", CLIENT_ID)
+            .appendQueryParameter("redirect_uri", REDIRECT_URI)
             .appendQueryParameter("response_type", "code")
+            .appendQueryParameter("scope", "user_rates")
             .build()
 
 }

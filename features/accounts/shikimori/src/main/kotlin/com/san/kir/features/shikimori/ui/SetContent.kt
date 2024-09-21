@@ -1,6 +1,7 @@
 package com.san.kir.features.shikimori.ui
 
 import androidx.compose.animation.Crossfade
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -14,6 +15,7 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.topBar
+import com.san.kir.features.accounts.shikimori.R
 import com.san.kir.features.shikimori.ui.accountItem.AccountItem
 import com.san.kir.features.shikimori.ui.accountRate.AccountRateScreen
 import com.san.kir.features.shikimori.ui.accountScreen.AccountScreen
@@ -22,7 +24,7 @@ import com.san.kir.features.shikimori.ui.localItems.LocalItemsScreen
 import com.san.kir.features.shikimori.ui.search.ShikiSearchScreen
 import timber.log.Timber
 
-fun ComponentActivity.setContent() {
+public fun ComponentActivity.setContent() {
     setContentView(
         ComposeView(this).apply {
             setContent {
@@ -35,6 +37,7 @@ fun ComponentActivity.setContent() {
 }
 
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 internal fun ShikimoriContent() {
     var nav: ShikiNavTarget by remember { mutableStateOf(ShikiNavTarget.LocalItems) }
@@ -111,7 +114,7 @@ internal fun ShikimoriContent() {
     }
 }
 
-sealed interface ShikiNavTarget {
+internal sealed interface ShikiNavTarget {
     data object Start : ShikiNavTarget
     data object Catalog : ShikiNavTarget
     data class AccountRate(val id: Long) : ShikiNavTarget

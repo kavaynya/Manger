@@ -1,56 +1,47 @@
 package com.san.kir.features.shikimori.logic.di
 
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.data.chapterDao
-import com.san.kir.data.settingsDao
-import com.san.kir.data.shikimoriDao
-import com.san.kir.features.shikimori.logic.SyncManager
-import com.san.kir.features.shikimori.logic.repo.ChapterRepository
+import com.san.kir.data.accountMangaRepository
+import com.san.kir.data.accountsRepository
+import com.san.kir.data.chapterRepository
+import com.san.kir.data.mangaRepository
+import com.san.kir.features.shikimori.logic.models.MangaItem
+import com.san.kir.features.shikimori.logic.repo.AccountItemRepository
+import com.san.kir.features.shikimori.logic.repo.AuthRepository
+import com.san.kir.features.shikimori.logic.repo.ItemsRepository
 import com.san.kir.features.shikimori.logic.repo.LibraryItemRepository
-import com.san.kir.features.shikimori.logic.repo.ProfileItemRepository
-import com.san.kir.features.shikimori.logic.repo.SettingsRepository
-import com.san.kir.features.shikimori.logic.repo.TokenRepository
-import com.san.kir.features.shikimori.logic.useCases.AuthUseCase
-import io.ktor.client.HttpClient
 import okhttp3.Cache
 import java.io.File
 
 private const val CACHE_SIZE = 5L * 1024 * 1024
-private var singletonCache: Cache? = null
-private var singletonClient: HttpClient? = null
 
-private val ManualDI.cache: Cache
-    get() = singletonCache ?: run {
-        val cacheDir = File(context.cacheDir, "shiki")
-        val instance = Cache(cacheDir, CACHE_SIZE)
-        singletonCache = instance
-        instance
-    }
+private fun ManualDI.cache(): Cache {
+    val cacheDir = File(application.cacheDir, "shiki")
+    return Cache(cacheDir, CACHE_SIZE)
+}
 
-private val ManualDI.client: HttpClient
-    get() = singletonClient ?: run {
-        val instance = createKtorClient(cache, settingsRepository)
-        singletonClient = instance
-        instance
-    }
+private fun ManualDI.client(): InternetClient = InternetClient(cache(), json)
 
-internal val ManualDI.settingsRepository: SettingsRepository
-    get() = SettingsRepository(settingsDao, shikimoriDao)
+internal fun ManualDI.authRepository(): AuthRepository {
+    return AuthRepository(client(), accountsRepository())
+}
 
-internal val ManualDI.tokenRepository: TokenRepository
-    get() = TokenRepository(client, settingsRepository)
+internal fun ManualDI.libraryItemRepository(): LibraryItemRepository {
+    return LibraryItemRepository(mangaRepository())
+}
 
-internal val ManualDI.authUseCase: AuthUseCase
-    get() = AuthUseCase(tokenRepository, settingsRepository)
+internal fun ManualDI.accountItemRepository(accountId: Long): AccountItemRepository {
+    return AccountItemRepository(
+        accountId,
+        accountsRepository(),
+        accountMangaRepository(),
+        client()
+    )
+}
 
-internal val ManualDI.libraryItemRepository: LibraryItemRepository
-    get() = LibraryItemRepository(shikimoriDao)
-
-internal val ManualDI.profileItemRepository: ProfileItemRepository
-    get() = ProfileItemRepository(shikimoriDao, client)
-
-internal val ManualDI.chapterRepository: ChapterRepository
-    get() = ChapterRepository(chapterDao)
-
-internal val ManualDI.syncManager: SyncManager
-    get() = SyncManager(profileItemRepository, chapterRepository)
+internal fun <T : MangaItem> ManualDI.syncManager(
+    accountId: Long,
+    opposite: ItemsRepository
+): ISyncManager<T> {
+    return SyncManager(accountItemRepository(accountId), chapterRepository(), opposite)
+}

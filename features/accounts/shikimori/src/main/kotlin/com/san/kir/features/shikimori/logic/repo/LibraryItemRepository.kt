@@ -1,19 +1,20 @@
 package com.san.kir.features.shikimori.logic.repo
 
-import com.san.kir.core.utils.coroutines.withIoContext
-import com.san.kir.data.db.main.dao.ShikimoriDao
+import com.san.kir.data.db.main.repo.MangaRepository
+import com.san.kir.features.shikimori.logic.models.toFlowLibraryMangaItem
+import com.san.kir.features.shikimori.logic.models.toFlowLibraryMangaItems
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 
-class LibraryItemRepository(
-    private val shikimoriDao: ShikimoriDao,
+internal class LibraryItemRepository(
+    private val mangaRepository: MangaRepository,
 ) : ItemsRepository {
-    override fun loadItems() = shikimoriDao.loadLibraryItems()
+    override fun loadItems() = mangaRepository.itemsWithChaptersCount.toFlowLibraryMangaItems()
 
-    override fun loadItemById(id: Long) = shikimoriDao.loadLibraryItemById(id)
+    override fun loadItemById(id: Long) =
+        mangaRepository.loadItemWithChaptersCount(id).toFlowLibraryMangaItem()
 
-    override suspend fun items() = withIoContext { loadItems().first() }
+    override suspend fun items() = loadItems().first()
 
-    override suspend fun itemById(id: Long) =
-        withIoContext { shikimoriDao.loadLibraryItemById(id).firstOrNull() }
+    override suspend fun itemById(id: Long) = loadItemById(id).firstOrNull()
 }

@@ -23,7 +23,7 @@ dependencies {
     implementation(projects.features.storage)
     implementation(projects.features.settings)
     implementation(projects.features.schedule)
-//    implementation(projects.features.accounts.main)
+    implementation(projects.features.accounts.main)
 
     api(projects.ksp)
     ksp(projects.ksp)

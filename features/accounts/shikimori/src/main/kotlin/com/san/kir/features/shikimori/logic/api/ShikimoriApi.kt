@@ -1,11 +1,13 @@
 package com.san.kir.features.shikimori.logic.api
 
-import io.ktor.resources.*
+import com.san.kir.features.shikimori.logic.models.ShikimoriStatus
+import io.ktor.resources.Resource
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
 @Resource("/api")
-class ShikimoriApi {
+internal class ShikimoriApi {
 
     @Serializable
     @Resource("users")
@@ -23,6 +25,7 @@ class ShikimoriApi {
         val search: String = "",
         val limit: Int = 50,
         val order: String = "name",
+        val ids: String = "",
     ) {
         @Serializable
         @Resource("{id}")
@@ -35,16 +38,56 @@ class ShikimoriApi {
 
         @Serializable
         @Resource("user_rates")
-        class UserRates(
-            val parent: V2 = V2(),
-            val user_id: Long? = null,
-            val target_id: Long? = null,
-            val target_type: String? = null
-        ) {
+        class UserRates(val parent: V2 = V2()) {
 
             @Serializable
             @Resource("{id}")
             class Id(val parent: UserRates = UserRates(), val id: Long)
+        }
+    }
+
+    @Serializable
+    @Resource("graphql")
+    class Graphql(val parent: ShikimoriApi = ShikimoriApi())
+
+    class Data {
+
+        @Serializable
+        class UpdateRate(@SerialName("user_rate") val userRate: Rate) {
+
+            @Serializable
+            class Rate(
+                @SerialName("status") val status: ShikimoriStatus,
+                @SerialName("chapters") val read: Int,
+                @SerialName("rewatches") val rewatches: Int,
+                @SerialName("score") val score: Int
+            )
+        }
+
+        @Serializable
+        class CreateRate(@SerialName("user_rate") val userRate: Rate) {
+
+            @Serializable
+            class Rate(
+                @SerialName("user_id") val userId: Long,
+                @SerialName("target_id") val targetId: Long,
+                @SerialName("target_type") val targetType: String,
+            )
+        }
+
+        companion object {
+            fun UpdateRate(
+                status: ShikimoriStatus,
+                read: Int,
+                rewatches: Int,
+                score: Int
+            ): UpdateRate {
+                return UpdateRate(UpdateRate.Rate(status, read, rewatches, score))
+            }
+
+            fun CreateRate(accountId: Long, idInSite: Long): CreateRate {
+                return CreateRate(CreateRate.Rate(accountId, idInSite, "Manga"))
+            }
         }
     }
 }

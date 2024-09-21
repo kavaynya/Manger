@@ -81,7 +81,7 @@ private fun LoginOrNot(
     ) {
 
         Image(
-            rememberImage(ShikimoriData.iconUrl),
+            rememberImage(ShikimoriData.ICON_URL),
             contentDescription = "Shikimori site icon",
             modifier = Modifier
                 .padding(vertical = Dimensions.half)

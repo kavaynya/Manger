@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
 internal fun DbAccount.toModel() = Account(id, type, data)
+
 @JvmName("toAccountModels")
 internal fun List<DbAccount>.toModels() = map(DbAccount::toModel)
 

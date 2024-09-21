@@ -10,6 +10,6 @@ public data class MangaWithChaptersCount(
     val logo: String = "",
     val description: String = "",
     val sort: Boolean = false,
-    val read: Long = 0,
-    val all: Long = 0,
+    val read: Int = 0,
+    val all: Int = 0,
 ) : Parcelable

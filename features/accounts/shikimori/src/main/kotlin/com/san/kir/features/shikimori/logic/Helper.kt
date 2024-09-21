@@ -1,14 +1,13 @@
 package com.san.kir.features.shikimori.logic
 
-import com.san.kir.data.models.base.ShikimoriMangaItem
+import com.san.kir.features.shikimori.logic.models.MangaItem
 import com.san.kir.features.shikimori.logic.useCases.BindStatus
 import com.san.kir.features.shikimori.logic.useCases.CheckingStatus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 
-internal interface Helper<T : ShikimoriMangaItem> {
+internal interface Helper<T : MangaItem> {
 
     val unbindedItems: StateFlow<List<BindStatus<T>>>
 
@@ -22,34 +21,32 @@ internal interface Helper<T : ShikimoriMangaItem> {
 
 }
 
-internal class HelperImpl<T : ShikimoriMangaItem> : Helper<T> {
+internal class HelperImpl<T : MangaItem> : Helper<T> {
 
     // Манга без привязки
-    private val _unbindedItems = MutableStateFlow(emptyList<BindStatus<T>>())
-    override val unbindedItems = _unbindedItems.asStateFlow()
+    override val unbindedItems = MutableStateFlow(emptyList<BindStatus<T>>())
 
     // Индикация о выполнении фоновых операций
-    private val _hasAction = MutableStateFlow(BackgroundTasks())
-    override val hasAction = _hasAction.asStateFlow()
+    override val hasAction = MutableStateFlow(BackgroundTasks())
 
     override fun send(checkingState: Boolean): (List<BindStatus<T>>) -> Unit = {
-        _unbindedItems.value = it
-        _hasAction.update { old -> old.copy(checkBind = checkingState) }
+        unbindedItems.value = it
+        hasAction.update { old -> old.copy(checkBind = checkingState) }
     }
 
     override fun send(): (CheckingStatus<T>) -> Unit = {
-        it.items?.let { items -> _unbindedItems.value = items }
-        _hasAction.update { old ->
+        it.items?.let { items -> unbindedItems.value = items }
+        hasAction.update { old ->
             old.copy(checkBind = it.progress != null, progress = it.progress)
         }
     }
 
     override fun updateLoading(loading: Boolean) {
-        _hasAction.update { old -> old.copy(loading = loading) }
+        hasAction.update { old -> old.copy(loading = loading) }
     }
 }
 
-data class BackgroundTasks(
+internal data class BackgroundTasks(
     val loading: Boolean = true,
     val checkBind: Boolean = true,
     val progress: Float? = null

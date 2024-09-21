@@ -1,6 +1,7 @@
 plugins {
     id("compose.library")
     alias(libs.plugins.serialization)
+    alias(libs.plugins.kotlin.ksp)
 }
 
 android {
@@ -25,6 +26,8 @@ dependencies {
     implementation(libs.lifecycle.runtime)
     implementation(libs.lifecycle.common)
 
-    implementation(libs.timber)
     implementation(libs.datastore)
+
+    implementation(projects.ksp)
+    ksp(projects.ksp)
 }
