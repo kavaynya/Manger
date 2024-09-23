@@ -7,7 +7,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.data.models)
     implementation(projects.core.utils)
     implementation(projects.core.internet)
     implementation(projects.data.db)

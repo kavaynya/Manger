@@ -8,7 +8,6 @@ android {
 
 dependencies {
     implementation(projects.core.utils)
-
     implementation(libs.coroutines.core)
     implementation(libs.stdlib)
 

@@ -23,6 +23,6 @@ internal data class ViewMangaWithChapterCounts(
     @ColumnInfo("logo") val logo: String = "",
     @ColumnInfo("about") val description: String = "",
     @ColumnInfo("isAlternativeSort") val sort: Boolean = false,
-    @ColumnInfo("read_chapters") val read: Long = 0,
-    @ColumnInfo("all_chapters") val all: Long = 0,
+    @ColumnInfo("read_chapters") val read: Int = 0,
+    @ColumnInfo("all_chapters") val all: Int = 0,
 )

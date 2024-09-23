@@ -1,6 +1,5 @@
 plugins {
     id("base.library")
-    alias(libs.plugins.kotlin.ksp)
     `kotlin-parcelize`
 }
 
@@ -17,8 +16,8 @@ android {
 }
 
 dependencies {
-    implementation(projects.data.models)
     implementation(projects.core.utils)
+    api(projects.data.models)
 
     ksp(libs.room.compiler)
     implementation(libs.bundles.room)

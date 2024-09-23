@@ -1,8 +1,5 @@
 plugins {
     id("compose.library")
-
-    alias(libs.plugins.serialization)
-    alias(libs.plugins.kotlin.ksp)
 }
 
 android {

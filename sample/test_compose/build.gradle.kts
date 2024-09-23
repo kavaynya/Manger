@@ -13,6 +13,4 @@ android {
 }
 
 dependencies {
-    api(libs.bundles.compose)
-    api(libs.bundles.accompanist)
 }

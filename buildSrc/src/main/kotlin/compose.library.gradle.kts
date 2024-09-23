@@ -1,13 +1,8 @@
 plugins {
     id("base.library")
+    id("compose")
 }
 
 android {
-    buildFeatures {
-        compose = true
-    }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.Compose.COMPOSE_COMPILER
-    }
 }

@@ -1,19 +1,11 @@
-import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
-
 plugins {
     id("com.android.application")
-    id("org.jetbrains.kotlin.plugin.parcelize")
-    kotlin("android")
+    id("basic")
 }
 
 android {
-    compileSdk = Versions.App.COMPILE_SDK
-
     defaultConfig {
-        minSdk = Versions.App.MIN_SDK
-        targetSdk = Versions.App.TARGET_SDK
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+        targetSdk = libs.versions.targetSdk.get().toInt()
 
         vectorDrawables {
             useSupportLibrary = true
@@ -32,7 +24,7 @@ android {
     }*/
 
     buildTypes {
-        getByName("release") {
+        release {
             isMinifyEnabled = true
             isShrinkResources = true
 //            signingConfig = signingConfigs.getByName("release")
@@ -43,7 +35,7 @@ android {
             )
             isDebuggable = false
         }
-        getByName("debug") {
+        debug {
             extra["enableCrashlytics"] = false
             isDebuggable = true
             applicationIdSuffix = ".debug"
@@ -51,26 +43,27 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = Versions.JAVA
-        targetCompatibility = Versions.JAVA
-    }
-
     kotlinOptions {
-        jvmTarget = "${Versions.JAVA}"
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
-        )
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
-        )
+        applyProjectConfigurations()
     }
 
     packaging {
-        resources.excludes.addAll(resourceExcludes)
+        resources.excludes.addAll(
+            listOf(
+                "META-INF/**/*",
+                "META-INF/DEPENDENCIES",
+                "META-INF/LICENSE",
+                "META-INF/LICENSE.txt",
+                "META-INF/license.txt",
+                "META-INF/NOTICE",
+                "META-INF/NOTICE.txt",
+                "META-INF/notice.txt",
+                "META-INF/ASL2.0",
+                "META-INF/AL2.0",
+                "META-INF/LGPL2.1",
+                "META-INF/*.kotlin_module"
+            )
+        )
     }
 
     kotlin {

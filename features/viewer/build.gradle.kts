@@ -12,7 +12,6 @@ android {
 }
 
 dependencies {
-    implementation(projects.data.models)
     implementation(projects.data.db)
     implementation(projects.data.parsing)
     implementation(projects.core.internet)

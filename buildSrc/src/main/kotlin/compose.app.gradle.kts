@@ -1,15 +1,8 @@
-import org.gradle.kotlin.dsl.extra
-
 plugins {
     id("base.app")
+    id("compose")
 }
 
 android {
-    buildFeatures {
-        compose = true
-    }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = Versions.Compose.COMPOSE_COMPILER
-    }
 }

@@ -2,7 +2,7 @@ import org.jetbrains.kotlin.gradle.dsl.ExplicitApiMode
 
 plugins {
     id("com.android.library")
-    kotlin("android")
+    id("basic")
 }
 
 kotlin {
@@ -11,12 +11,7 @@ kotlin {
 
 
 android {
-    compileSdk = Versions.App.COMPILE_SDK
-
     defaultConfig {
-        minSdk = Versions.App.MIN_SDK
-
-        testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
     }
 
@@ -30,22 +25,8 @@ android {
         }
     }
 
-    compileOptions {
-        sourceCompatibility = Versions.JAVA
-        targetCompatibility = Versions.JAVA
-    }
-
     kotlinOptions {
-        jvmTarget = "${Versions.JAVA}"
-        freeCompilerArgs += "-opt-in=kotlin.RequiresOptIn"
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
-        )
-        freeCompilerArgs += listOf(
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
-        )
+        applyProjectConfigurations()
     }
 
     kotlin {
