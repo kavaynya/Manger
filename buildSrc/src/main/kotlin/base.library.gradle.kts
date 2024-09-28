@@ -25,10 +25,6 @@ android {
         }
     }
 
-    kotlinOptions {
-        applyProjectConfigurations()
-    }
-
     kotlin {
         jvmToolchain(17)
 

@@ -43,10 +43,6 @@ android {
         }
     }
 
-    kotlinOptions {
-        applyProjectConfigurations()
-    }
-
     packaging {
         resources.excludes.addAll(
             listOf(

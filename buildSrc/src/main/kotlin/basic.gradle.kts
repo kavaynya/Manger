@@ -1,4 +1,6 @@
-import gradle.kotlin.dsl.accessors._9ba3a12095c0a769845b22313807cf44.implementation
+import org.jetbrains.kotlin.gradle.dsl.JvmTarget
+import org.jetbrains.kotlin.gradle.tasks.KotlinCompilationTask
+import org.jetbrains.kotlin.gradle.tasks.KotlinJvmCompile
 
 plugins {
     kotlin("android")
@@ -23,6 +25,21 @@ androidConfig {
         targetCompatibility = projectJavaVersion
     }
 
+    tasks.withType<KotlinJvmCompile>().configureEach {
+        compilerOptions {
+            jvmTarget.set(projectJvmTarget)
+
+            freeCompilerArgs.add("-opt-in=kotlin.RequiresOptIn")
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
+            )
+            freeCompilerArgs.addAll(
+                "-P",
+                "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=" + project.buildDir.absolutePath + "/compose_metrics"
+            )
+        }
+    }
 }
 
 dependencies {
