@@ -3,12 +3,14 @@ package com.san.kir.core.utils.viewModel
 import com.san.kir.core.utils.coroutines.defaultDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
@@ -53,4 +55,6 @@ public abstract class ViewModel<S : ScreenState>(eventBus: EventBus = EventBusIm
     public fun <T> Flow<T>.stateInEagerly(defaultValue: T): StateFlow<T> {
         return stateIn(this@ViewModel, SharingStarted.Eagerly, defaultValue)
     }
+
+    public fun Flow<*>.launch(): Job = launchIn(this@ViewModel)
 }

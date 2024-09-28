@@ -1,4 +1,4 @@
-package com.san.kir.features.shikimori.ui.accountItem
+package com.san.kir.features.accounts.shikimori.ui.accountItem
 
 import com.san.kir.core.utils.viewModel.StateHolder
 
