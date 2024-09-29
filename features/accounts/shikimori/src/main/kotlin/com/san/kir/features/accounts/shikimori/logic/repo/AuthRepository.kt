@@ -4,14 +4,14 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.withIoContext
 import com.san.kir.data.db.main.repo.AccountRepository
 import com.san.kir.data.models.main.data
-import com.san.kir.features.shikimori.logic.GraphQLQueries
-import com.san.kir.features.shikimori.logic.api.ShikimoriApi
-import com.san.kir.features.shikimori.logic.api.ShikimoriData
-import com.san.kir.features.shikimori.logic.di.InternetClient
-import com.san.kir.features.shikimori.logic.models.Auth
-import com.san.kir.features.shikimori.logic.models.GraphQLResult
-import com.san.kir.features.shikimori.logic.models.TokenContainer
-import com.san.kir.features.shikimori.logic.models.User
+import com.san.kir.features.accounts.shikimori.logic.GraphQLQueries
+import com.san.kir.features.accounts.shikimori.logic.api.ShikimoriApi
+import com.san.kir.features.accounts.shikimori.logic.api.ShikimoriData
+import com.san.kir.features.accounts.shikimori.logic.di.InternetClient
+import com.san.kir.features.accounts.shikimori.logic.models.Auth
+import com.san.kir.features.accounts.shikimori.logic.models.GraphQLResult
+import com.san.kir.features.accounts.shikimori.logic.models.TokenContainer
+import com.san.kir.features.accounts.shikimori.logic.models.User
 import io.ktor.client.call.body
 import timber.log.Timber
 

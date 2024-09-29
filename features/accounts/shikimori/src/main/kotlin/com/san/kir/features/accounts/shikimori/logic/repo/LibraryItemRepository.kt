@@ -1,8 +1,8 @@
 package com.san.kir.features.accounts.shikimori.logic.repo
 
 import com.san.kir.data.db.main.repo.MangaRepository
-import com.san.kir.features.shikimori.logic.models.toFlowLibraryMangaItem
-import com.san.kir.features.shikimori.logic.models.toFlowLibraryMangaItems
+import com.san.kir.features.accounts.shikimori.logic.models.toFlowLibraryMangaItem
+import com.san.kir.features.accounts.shikimori.logic.models.toFlowLibraryMangaItems
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.firstOrNull
 

@@ -1,6 +1,6 @@
 package com.san.kir.features.accounts.shikimori.logic.repo
 
-import com.san.kir.features.shikimori.logic.models.MangaItem
+import com.san.kir.features.accounts.shikimori.logic.models.MangaItem
 import kotlinx.coroutines.flow.Flow
 
 internal interface ItemsRepository {

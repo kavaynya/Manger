@@ -1,4 +1,4 @@
-package com.san.kir.features.shikimori.ui
+package com.san.kir.features.accounts.shikimori.ui
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.material3.ExperimentalMaterial3Api

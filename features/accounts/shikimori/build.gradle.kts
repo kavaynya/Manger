@@ -1,5 +1,6 @@
 plugins {
     id("compose.library")
+    `kotlin-parcelize`
 }
 
 android {

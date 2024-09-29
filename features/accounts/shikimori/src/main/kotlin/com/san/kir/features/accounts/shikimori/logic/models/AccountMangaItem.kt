@@ -1,10 +1,14 @@
 package com.san.kir.features.accounts.shikimori.logic.models
 
+import android.os.Parcelable
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.models.main.AccountManga
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.parcelize.IgnoredOnParcel
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 internal data class AccountMangaItem(
     override val id: Long = -1L,
     val accountId: Long = -1L,
@@ -24,9 +28,9 @@ internal data class AccountMangaItem(
     val rewatches: Int = 0,
     override val status: ShikimoriStatus = ShikimoriStatus.Watching,
     val genres: List<String> = emptyList()
-) : MangaItem {
-    val inLibrary = idInLibrary != -1L
-    val inAccount = idInAccount != -1L
+) : MangaItem, Parcelable {
+    @IgnoredOnParcel val inLibrary = idInLibrary != -1L
+    @IgnoredOnParcel val inAccount = idInAccount != -1L
 }
 
 internal fun AccountManga.toMangaItem(): AccountMangaItem {

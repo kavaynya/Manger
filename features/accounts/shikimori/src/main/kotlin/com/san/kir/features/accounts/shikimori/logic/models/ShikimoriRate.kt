@@ -4,7 +4,7 @@ import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-internal data class ShikimoriRate(
+public data class ShikimoriRate(
     @SerialName("id") override val id: Long? = -1,
     @SerialName("score") val score: Int? = -1,
     @SerialName("status") val status: ShikimoriStatus = ShikimoriStatus.Planned,

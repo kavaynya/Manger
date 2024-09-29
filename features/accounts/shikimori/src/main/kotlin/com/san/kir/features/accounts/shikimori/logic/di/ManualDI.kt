@@ -5,11 +5,13 @@ import com.san.kir.data.accountMangaRepository
 import com.san.kir.data.accountsRepository
 import com.san.kir.data.chapterRepository
 import com.san.kir.data.mangaRepository
-import com.san.kir.features.shikimori.logic.models.MangaItem
-import com.san.kir.features.shikimori.logic.repo.AccountItemRepository
-import com.san.kir.features.shikimori.logic.repo.AuthRepository
-import com.san.kir.features.shikimori.logic.repo.ItemsRepository
-import com.san.kir.features.shikimori.logic.repo.LibraryItemRepository
+import com.san.kir.features.accounts.shikimori.logic.models.MangaItem
+import com.san.kir.features.accounts.shikimori.logic.repo.AccountItemRepository
+import com.san.kir.features.accounts.shikimori.logic.repo.AuthRepository
+import com.san.kir.features.accounts.shikimori.logic.repo.ItemsRepository
+import com.san.kir.features.accounts.shikimori.logic.repo.LibraryItemRepository
+import com.san.kir.features.accounts.shikimori.ui.syncManager.ISyncManager
+import com.san.kir.features.accounts.shikimori.ui.syncManager.SyncManager
 import okhttp3.Cache
 import java.io.File
 
