@@ -40,7 +40,7 @@ internal class AccountItemRepository(
         private const val TAG = "AccountItemRepository"
     }
 
-    private val authData = accountRepository
+    val authData = accountRepository
         .loadItem(accountId)
         .map { ManualDI.stringToJson<Auth>(it?.data ?: "") }
         .filterNotNull()

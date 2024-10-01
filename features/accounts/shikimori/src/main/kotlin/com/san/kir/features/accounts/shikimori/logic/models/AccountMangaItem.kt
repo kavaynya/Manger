@@ -7,9 +7,11 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
+import kotlinx.serialization.Serializable
 
+@Serializable
 @Parcelize
-internal data class AccountMangaItem(
+public data class AccountMangaItem(
     override val id: Long = -1L,
     val accountId: Long = -1L,
     override val name: String = "",
@@ -29,8 +31,8 @@ internal data class AccountMangaItem(
     override val status: ShikimoriStatus = ShikimoriStatus.Watching,
     val genres: List<String> = emptyList()
 ) : MangaItem, Parcelable {
-    @IgnoredOnParcel val inLibrary = idInLibrary != -1L
-    @IgnoredOnParcel val inAccount = idInAccount != -1L
+    @IgnoredOnParcel val inLibrary: Boolean = idInLibrary != -1L
+    @IgnoredOnParcel val inAccount: Boolean = idInAccount != -1L
 }
 
 internal fun AccountManga.toMangaItem(): AccountMangaItem {

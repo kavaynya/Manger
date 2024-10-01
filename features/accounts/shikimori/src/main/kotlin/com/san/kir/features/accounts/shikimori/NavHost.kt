@@ -10,6 +10,7 @@ import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
+import com.san.kir.features.accounts.shikimori.logic.models.AccountMangaItem
 import com.san.kir.features.accounts.shikimori.ui.accountRate.AccountRateScreen
 import com.san.kir.features.accounts.shikimori.ui.accountScreen.AccountScreen
 import com.san.kir.features.accounts.shikimori.ui.localItem.LocalItemScreen
@@ -106,7 +107,7 @@ public class Search(
 @NavEntry
 public class ProfileItem(
     internal val accountId: Long,
-    internal val mangaId: Long,
+    internal val mangaItem: AccountMangaItem,
     internal val params: SharedParams,
 ) : NavConfig() {
     internal companion object {
@@ -115,7 +116,7 @@ public class ProfileItem(
                 navigateUp = backPressed(),
                 navigateToSearch = add(::CatalogSearch),
                 accountId = config.accountId,
-                mangaId = config.mangaId,
+                mangaItem = config.mangaItem,
             )
         }
 

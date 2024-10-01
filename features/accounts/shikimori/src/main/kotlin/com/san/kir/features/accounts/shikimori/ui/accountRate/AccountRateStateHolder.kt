@@ -1,4 +1,4 @@
-package com.san.kir.features.shikimori.ui.accountRate
+package com.san.kir.features.accounts.shikimori.ui.accountRate
 
 import com.san.kir.core.utils.viewModel.StateHolder
 

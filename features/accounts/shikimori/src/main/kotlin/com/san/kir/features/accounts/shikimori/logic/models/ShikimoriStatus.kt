@@ -1,7 +1,7 @@
 package com.san.kir.features.accounts.shikimori.logic.models
 
 
-internal enum class ShikimoriStatus {
+public enum class ShikimoriStatus {
     Planned,
     Watching,
     Rewatching,
