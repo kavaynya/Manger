@@ -117,7 +117,7 @@ private fun Chapters(inAccount: Boolean, all: Int, read: Int) {
 }
 
 @Composable
-internal fun Chapters(all: Long, read: Long) {
+internal fun Chapters(all: Int, read: Int) {
     TextWithFirstWordBold(
         stringResource(R.string.reading, read, all),
         modifier = Modifier.fillMaxWidth(),
