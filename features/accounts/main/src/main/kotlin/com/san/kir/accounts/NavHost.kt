@@ -10,6 +10,8 @@ import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
+import com.san.kir.features.accounts.shikimori.Shikimori
+import com.san.kir.features.accounts.shikimori.shikimoriNavigationCreators
 import kotlinx.serialization.Serializable
 
 public fun accountsNavigationCreators() {

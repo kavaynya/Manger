@@ -41,7 +41,6 @@ import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.features.accounts.shikimori.R
 import com.san.kir.features.accounts.shikimori.logic.api.ShikimoriData
 import com.san.kir.features.accounts.shikimori.ui.util.LogOutDialog
-import com.san.kir.features.accounts.shikimori.ui.util.TextLoginOrNot
 
 @Composable
 public fun ShikimoriListItem(navigateToManager: (Long, SharedParams) -> Unit) {
@@ -111,7 +110,6 @@ private fun LoginOrNot(
 
         Column(modifier = Modifier.weight(1f, true)) {
             Text(stringResource(R.string.site_name))
-            TextLoginOrNot(state)
             FromBottomToTopAnimContent(state) {
                 when (it) {
                     is LoginState.Ok, is LoginState.LogInCheck -> Row {

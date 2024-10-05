@@ -35,6 +35,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.util.lerp
+import kotlin.math.abs
 import kotlin.math.roundToInt
 
 internal enum class TopBarLayoutId {
@@ -218,15 +219,15 @@ internal fun TopBarLayout(
                 val navigationIconOffset = navigationIconPlaceable?.width ?: 0
                 val actionsOffset = actionsPlaceable?.width ?: 0
                 val freeMaxWidthPx = (constraints.maxWidth - navigationIconOffset) - actionsOffset
-                val collapsedTitleMaxWidthPx = freeMaxWidthPx / fullyCollapsedTitleScale
-                val collapsedSubtitleMaxWidthPx = freeMaxWidthPx / fullyCollapsedSubtitleScale
+                val collapsedTitleMaxWidthPx = abs(freeMaxWidthPx / fullyCollapsedTitleScale)
+                val collapsedSubtitleMaxWidthPx = abs(freeMaxWidthPx / fullyCollapsedSubtitleScale)
 
                 val collapsedTitlePlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.CollapsedTitle }
                     ?.measure(constraints.copy(maxWidth = collapsedTitleMaxWidthPx.roundToInt()))
 
                 val collapsedSubtitlePlaceable = measurables
-                    .firstOrNull { it.layoutId == TopBarLayoutId.CollapsedTitle }
+                    .firstOrNull { it.layoutId == TopBarLayoutId.CollapsedSubtitle }
                     ?.measure(constraints.copy(maxWidth = collapsedSubtitleMaxWidthPx.roundToInt()))
 
                 val collapsedHeightPx = MinCollapsedHeight.toPx()

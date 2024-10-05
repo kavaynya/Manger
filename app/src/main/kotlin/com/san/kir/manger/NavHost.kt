@@ -32,7 +32,7 @@ internal class Splash : NavConfig() {
     companion object {
         val creator = navCreator<Splash> {
             MaterialTheme(lightColorScheme()) {
-                InitScreen(replace(Library()))
+                InitScreen(replace(Library))
             }
         }
     }
@@ -40,26 +40,24 @@ internal class Splash : NavConfig() {
 
 @NavEntry
 @Serializable
-internal class Library : NavConfig() {
-    companion object {
-        val creator = navCreator<Library> {
-            val stateHolder: MainStateHolder = stateHolder { MainViewModel() }
-            val state by stateHolder.state.collectAsState()
+internal data object Library : NavConfig() {
+    val creator = navCreator<Library> {
+        val stateHolder: MainStateHolder = stateHolder { MainViewModel() }
+        val state by stateHolder.state.collectAsState()
 
-            MaterialTheme(colorScheme = if (state.isDarkTheme) darkColorScheme() else lightColorScheme()) {
-                // Remember a SystemUiController
-                val systemUiController = rememberSystemUiController()
-                SideEffect {
-                    // Update all of the system bar colors to be transparent, and use
-                    // dark icons if we're in light theme
-                    systemUiController.setSystemBarsColor(
-                        color = Color.Transparent,
-                        darkIcons = state.isDarkTheme.not()
-                    )
-                }
-
-                LibraryNavHost()
+        MaterialTheme(colorScheme = if (state.isDarkTheme) darkColorScheme() else lightColorScheme()) {
+            // Remember a SystemUiController
+            val systemUiController = rememberSystemUiController()
+            SideEffect {
+                // Update all of the system bar colors to be transparent, and use
+                // dark icons if we're in light theme
+                systemUiController.setSystemBarsColor(
+                    color = Color.Transparent,
+                    darkIcons = state.isDarkTheme.not()
+                )
             }
+
+            LibraryNavHost()
         }
     }
 }
@@ -78,7 +76,7 @@ private val animator = shapeAnimator(
     tween(durationMillis = 1200, easing = EaseInExpo)
 ) { factor ->
     GenericShape { size, _ ->
-        val radius = max( size.height, size.width) * factor
+        val radius = max(size.height, size.width) * factor
         addOval(Rect(Offset.Zero, radius))
         addOval(Rect(Offset(size.width, size.height), radius))
     }

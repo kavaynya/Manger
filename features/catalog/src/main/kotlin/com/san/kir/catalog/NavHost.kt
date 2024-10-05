@@ -21,8 +21,6 @@ import kotlinx.serialization.Serializable
 
 public fun catalogsNavigationCreators() {
     AddNavigationCreators
-
-
 }
 
 @NavEntry

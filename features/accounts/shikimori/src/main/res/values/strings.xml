@@ -11,6 +11,7 @@
     <string name="logout">Выйти</string>
     <string name="logout_dialog_title">Внимание!</string>
     <string name="logout_dialog_text">Вы собираетесь выйти из профиля.</string>
+    <string name="logout_dialog_ok_full">Да, с очисткой моих данных</string>
     <string name="logout_dialog_ok">Так и есть</string>
     <string name="logout_dialog_cancel">Нет</string>
     <string name="update_data">Обновить данные</string>
@@ -26,6 +27,13 @@
 
     <string name="local_items_title">Библиотека</string>
     <string name="local_items_subtitle">Непривязанной манги: %d</string>
+    <string name="manga_sync">Синхронизация манги</string>
+    <string name="where_apply_it">Откуда\nприменить?</string>
+    <string name="from_account">Из аккаунта</string>
+    <string name="from_library">Из библиотеки</string>
+    <string name="mutable_properties">Изменяемые свойства:</string>
+    <string name="status">Статус</string>
+
 
     <string name="profile_item_title">Описание</string>
     <string name="profile_item_volumes">Томов: %d шт.</string>

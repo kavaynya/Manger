@@ -5,13 +5,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import com.san.kir.accounts.R
 import com.san.kir.accounts.ui.catalogItem.CatalogItemScreen
+import com.san.kir.core.compose.BarContainerColor
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.animation.SharedParams
-import com.san.kir.core.compose.BarContainerColor
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.viewModel.rememberSendAction
@@ -19,6 +18,8 @@ import com.san.kir.core.utils.viewModel.rememberSendEvent
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.parsing.sites.AllhentaiConstants
 import com.san.kir.data.parsing.sites.MintmangaConstants
+import com.san.kir.features.accounts.main.R
+import com.san.kir.features.accounts.shikimori.ui.accountItem.ShikimoriListItem
 
 private val selectedBarColor: Color
     @Composable

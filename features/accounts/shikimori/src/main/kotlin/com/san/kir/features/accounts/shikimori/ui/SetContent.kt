@@ -15,13 +15,13 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.topBar
-import com.san.kir.features.accounts.shikimori.R
-import com.san.kir.features.shikimori.ui.accountItem.AccountItem
-import com.san.kir.features.shikimori.ui.accountRate.AccountRateScreen
-import com.san.kir.features.shikimori.ui.accountScreen.AccountScreen
-import com.san.kir.features.shikimori.ui.localItem.LocalItemScreen
-import com.san.kir.features.shikimori.ui.localItems.LocalItemsScreen
-import com.san.kir.features.shikimori.ui.search.ShikiSearchScreen
+import com.san.kir.features.accounts.shikimori.logic.models.AccountMangaItem
+import com.san.kir.features.accounts.shikimori.ui.accountItem.ShikimoriListItem
+import com.san.kir.features.accounts.shikimori.ui.accountRate.AccountRateScreen
+import com.san.kir.features.accounts.shikimori.ui.accountScreen.AccountScreen
+import com.san.kir.features.accounts.shikimori.ui.localItem.LocalItemScreen
+import com.san.kir.features.accounts.shikimori.ui.localItems.LocalItemsScreen
+import com.san.kir.features.accounts.shikimori.ui.search.ShikiSearchScreen
 import timber.log.Timber
 
 public fun ComponentActivity.setContent() {
@@ -49,24 +49,25 @@ internal fun ShikimoriContent() {
                 ScreenList(
                     topBar = topBar(
                         navigationButton = NavigationButton.Back { },
-                        title = stringResource(R.string.accounts),
+                        title = stringResource(com.san.kir.data.models.R.string.accounts),
                     ),
                     additionalPadding = Dimensions.zero
                 ) {
                     item(key = "Shiki") {
-                        AccountItem { nav = ShikiNavTarget.Catalog }
+                        ShikimoriListItem { _, _ -> nav = ShikiNavTarget.Catalog }
                     }
 
                 }
 
             ShikiNavTarget.Catalog ->
                 AccountScreen(
+                    accountId = 1,
                     navigateUp = {
                         nav = ShikiNavTarget.Start
                     },
-                    navigateToShikiItem = { id, _ ->
-                        Timber.v(id.toString())
-                        nav = ShikiNavTarget.AccountRate(id)
+                    navigateToShikiItem = { item, _ ->
+                        Timber.v(item.toString())
+                        nav = ShikiNavTarget.AccountRate(item)
                     },
                     navigateToLocalItems = { nav = ShikiNavTarget.LocalItems },
                     navigateToSearch = { /*nav = ShikiNavTarget.Search*/ }
@@ -78,16 +79,15 @@ internal fun ShikimoriContent() {
                         nav = ShikiNavTarget.Search
                     },
                     navigateToSearch = {},
-                    mangaId = target.id,
-                    //                    rateId = -1L,
+                    accountId = 1,
+                    mangaItem = target.item,
                 )
             }
 
             ShikiNavTarget.Search -> {
                 ShikiSearchScreen(
-                    navigateUp = {
-                        nav = ShikiNavTarget.Start
-                    },
+                    accountId = 1,
+                    navigateUp = { nav = ShikiNavTarget.Start },
                     navigateToItem = { id, _ -> nav = ShikiNavTarget.AccountRate(id) },
                     searchText = "Fetish na Yuu",
                 )
@@ -95,19 +95,17 @@ internal fun ShikimoriContent() {
 
             ShikiNavTarget.LocalItems -> {
                 LocalItemsScreen(
-                    navigateUp = {
-                        nav = ShikiNavTarget.Catalog
-                    },
-                    navigateToItem = { id, _ ->  nav = ShikiNavTarget.LocalItem(id) }
+                    accountId = 1,
+                    navigateUp = { nav = ShikiNavTarget.Catalog },
+                    navigateToItem = { id, _ -> nav = ShikiNavTarget.LocalItem(id) }
                 )
             }
 
             is ShikiNavTarget.LocalItem -> {
                 LocalItemScreen(
+                    accountId = 1,
                     mangaId = target.id,
-                    navigateUp = {
-                        nav = ShikiNavTarget.LocalItems
-                    },
+                    navigateUp = { nav = ShikiNavTarget.LocalItems },
                     navigateToSearch = {})
             }
         }
@@ -117,7 +115,7 @@ internal fun ShikimoriContent() {
 internal sealed interface ShikiNavTarget {
     data object Start : ShikiNavTarget
     data object Catalog : ShikiNavTarget
-    data class AccountRate(val id: Long) : ShikiNavTarget
+    data class AccountRate(val item: AccountMangaItem) : ShikiNavTarget
     data object Search : ShikiNavTarget
     data object LocalItems : ShikiNavTarget
     data class LocalItem(val id: Long) : ShikiNavTarget

@@ -1,6 +1,7 @@
 package com.san.kir.data.parsing.sites
 
 import com.san.kir.core.internet.ConnectManager
+import com.san.kir.core.utils.ManualDI
 import com.san.kir.data.models.catalog.SiteCatalogElement
 import com.san.kir.data.models.main.Chapter
 import com.san.kir.data.models.main.Manga
@@ -143,7 +144,8 @@ internal class ComX(private val connectManager: ConnectManager) : SiteCatalogCla
                 .getDocument("$catalog/page/${page++}")
                 .select("#dle-content div.readed")
                 .onEach { emit(simpleParseElement(it)) }
-                .size == 10) {
+                .size == 10
+        ) {
         }
     }
 
@@ -155,22 +157,27 @@ internal class ComX(private val connectManager: ConnectManager) : SiteCatalogCla
                 ?.attr("href")
 
         val jsonData = jsonData(host + lastChapterLink)
-        return jsonData.chapters.map { chapter ->
-            Chapter(
-                mangaId = manga.id,
-                name = chapter.title,
-                link = "$host/readcomix/${jsonData.news_id}/${chapter.id}.html",
-                _path = "${manga.path}/${chapter.title}",
-            )
-        }
+        return jsonData
+            ?.chapters
+            ?.map { chapter ->
+                Chapter(
+                    mangaId = manga.id,
+                    name = chapter.title,
+                    link = "$host/readcomix/${jsonData.news_id}/${chapter.id}.html",
+                    _path = "${manga.path}/${chapter.title}",
+                )
+            }
+            ?: emptyList()
     }
 
     override suspend fun pages(item: Chapter): List<String> {
-        return jsonData(item.link).images.map { "http://img.$catalogName/comix/$it" }
+        return jsonData(item.link)
+            ?.images
+            ?.map { "http://img.$catalogName/comix/$it" }
+            ?: emptyList()
     }
 
-    private val gson = GsonBuilder().setLenient().create()
-    private suspend fun jsonData(url: String): ChaptersData {
+    private suspend fun jsonData(url: String): ChaptersData? {
         val temp = getDocument(url)
             .select("script")
             .filterNot { it.toString().contains("window.__DATA__").not() }
@@ -178,7 +185,7 @@ internal class ComX(private val connectManager: ConnectManager) : SiteCatalogCla
             .removePrefix("[<script>window.__DATA__ = ")
             .removeSuffix(";</script>]")
 
-        return gson.fromJson(temp, ChaptersData::class.java)
+        return ManualDI.stringToJson<ChaptersData>(temp)
     }
 
     // Обертка над обычным вызовом, чтобы обходить проверку на работа

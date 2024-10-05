@@ -33,8 +33,10 @@ public data class Shikimori(
             AccountScreen(
                 accountId = config.accountId,
                 navigateUp = backPressed(),
-                navigateToShikiItem = add(::ProfileItem),
-                navigateToLocalItems = add(::LocalItems),
+                navigateToShikiItem = add { mangaItem, params ->
+                    ProfileItem(config.accountId, mangaItem, params)
+                },
+                navigateToLocalItems = add { params -> LocalItems(config.accountId, params) },
                 navigateToSearch = add(Search(config.accountId))
             )
         }
@@ -54,7 +56,7 @@ public class LocalItems(
             LocalItemsScreen(
                 accountId = config.accountId,
                 navigateUp = backPressed(),
-                navigateToItem = add(::LocalItem)
+                navigateToItem = add { id, params -> LocalItem(config.accountId, id, params) }
             )
         }
 
@@ -75,7 +77,7 @@ public class LocalItem(
                 accountId = config.accountId,
                 mangaId = config.id,
                 navigateUp = backPressed(),
-                navigateToSearch = add(::Search)
+                navigateToSearch = add { query -> Search(config.accountId, query) }
             )
         }
 
@@ -94,7 +96,9 @@ public class Search(
             ShikiSearchScreen(
                 accountId = config.accountId,
                 navigateUp = backPressed(),
-                navigateToItem = add(::ProfileItem),
+                navigateToItem = add { mangaItem, params ->
+                    ProfileItem(config.accountId, mangaItem, params)
+                },
                 searchText = config.query
             )
         }
@@ -114,7 +118,7 @@ public class ProfileItem(
         val creator = navCreator<ProfileItem> { config ->
             AccountRateScreen(
                 navigateUp = backPressed(),
-                navigateToSearch = add(::CatalogSearch),
+                navigateToSearch = add { query -> Search(config.accountId, query) },
                 accountId = config.accountId,
                 mangaItem = config.mangaItem,
             )

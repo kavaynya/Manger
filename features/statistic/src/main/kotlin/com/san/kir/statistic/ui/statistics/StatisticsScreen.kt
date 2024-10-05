@@ -124,7 +124,7 @@ private fun LazyItemScope.ItemView(
         modifier = Modifier
             .fillMaxWidth()
             .padding(HorizontalItemPadding, VerticalItemPadding)
-            .animateItemPlacement()
+            .animateItem()
             .saveParams(params)
     ) {
         Row(

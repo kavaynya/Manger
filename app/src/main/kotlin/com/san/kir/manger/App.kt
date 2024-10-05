@@ -2,6 +2,7 @@ package com.san.kir.manger
 
 import android.app.Application
 import androidx.appcompat.app.AppCompatDelegate
+import com.san.kir.core.compose.BuildConfig
 import com.san.kir.core.utils.ManualDI
 import timber.log.Timber
 

@@ -15,7 +15,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import com.san.kir.accounts.R
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.EndAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
@@ -28,6 +27,7 @@ import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.parsing.SiteConstants
+import com.san.kir.features.accounts.main.R
 
 @Composable
 internal fun CatalogItemScreen(

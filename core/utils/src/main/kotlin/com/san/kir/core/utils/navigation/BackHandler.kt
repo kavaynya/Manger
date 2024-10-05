@@ -15,9 +15,7 @@ import com.san.kir.core.utils.viewModel.LocalComponentContext
 public fun BackHandler(enabled: Boolean, onBack: suspend NavBackHandler.() -> Unit) {
     val currentOnBack by rememberUpdatedState(onBack)
     val backHandler = LocalComponentContext.current
-    require(backHandler is NavBackHandler) {
-        "No ComponentContext was provided via LocalComponentContext or ComponentContext is not NavBackHandler"
-    }
+    require(backHandler is NavBackHandler) { "ComponentContext is not NavBackHandler" }
     val scope = rememberCoroutineScope()
     val backCallback = remember {
         BackCallback(enabled) {

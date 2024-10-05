@@ -34,7 +34,10 @@ internal class NavHostComponent(
 
     private fun createChild(config: NavConfig, componentContext: ComponentContext): NavContainer {
         Timber.d("config -> $config")
-        return NavContainer(componentContext, ManualDI.navComponent(config))
+        return NavContainer(
+            NavBackComponent(componentContext, navigation),
+            ManualDI.navComponent(config)
+        )
     }
 
     @Composable

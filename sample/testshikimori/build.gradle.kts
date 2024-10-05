@@ -15,7 +15,7 @@ android {
 }
 
 dependencies {
-    implementation(projects.features.shikimori)
+    implementation(projects.features.accounts.shikimori)
     implementation(projects.data.db)
     implementation(projects.core.utils)
 

@@ -3,7 +3,7 @@ package com.san.kir.features.accounts.shikimori.ui.syncManager
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.features.accounts.shikimori.logic.models.MangaItem
 
-public sealed interface SyncState : ScreenState {
+internal sealed interface SyncState : ScreenState {
     data object Finding : SyncState
     data object Error : SyncState
     data object Empty : SyncState

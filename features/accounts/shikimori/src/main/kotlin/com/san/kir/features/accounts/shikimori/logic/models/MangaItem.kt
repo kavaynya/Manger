@@ -1,6 +1,6 @@
 package com.san.kir.features.accounts.shikimori.logic.models
 
-public interface MangaItem {
+internal interface MangaItem {
     val all: Int
     val description: String
     val id: Long
