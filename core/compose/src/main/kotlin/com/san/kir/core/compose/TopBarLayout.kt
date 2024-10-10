@@ -2,10 +2,12 @@ package com.san.kir.core.compose
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.windowInsetsPadding
@@ -81,8 +83,8 @@ internal fun TopBarLayout(
     val fullyCollapsedSubtitleScale = if (subtitle != null) {
         CollapsedSubtitleLineHeight.value / expandedSubTitleStyle.lineHeight.value
     } else 1.0f
-    val collapsingTitleScale = lerp(1.0f, fullyCollapsedTitleScale, collapsedFraction)
-    val collapsingSubtitleScale = lerp(1.0f, fullyCollapsedSubtitleScale, collapsedFraction)
+    val collapsingTitleScale = abs(lerp(1.0f, fullyCollapsedTitleScale, collapsedFraction))
+    val collapsingSubtitleScale = abs(lerp(1.0f, fullyCollapsedSubtitleScale, collapsedFraction))
 
     val showElevation = title != null
             && scrollBehavior != null
@@ -127,7 +129,8 @@ internal fun TopBarLayout(
                             }
                             .padding(horizontal = HorizontalPadding),
                         style = expandedTitleStyle,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        maxLines = 1,
                     )
 
                     subtitle?.let { subtitle ->
@@ -161,6 +164,7 @@ internal fun TopBarLayout(
                             color = contentColor.copy(alpha = 0.7f),
                             overflow = TextOverflow.Ellipsis,
                             style = expandedSubTitleStyle,
+                            maxLines = 1,
                         )
                     }
                 }
@@ -168,7 +172,8 @@ internal fun TopBarLayout(
                     Box(
                         Modifier
                             .layoutId(TopBarLayoutId.Navigation)
-                            .padding(start = HorizontalPadding)
+                            .padding(start = HorizontalPadding),
+                        contentAlignment = Alignment.Center
                     ) {
                         icon.invoke()
                     }
@@ -185,7 +190,12 @@ internal fun TopBarLayout(
                     }
                 }
                 additional?.let { additional ->
-                    Box(modifier = Modifier.layoutId(TopBarLayoutId.Additional)) {
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .background(Color.DarkGray)
+                            .layoutId(TopBarLayoutId.Additional)
+                    ) {
                         additional()
                     }
                 }
@@ -198,37 +208,49 @@ internal fun TopBarLayout(
 
                 val navigationIconPlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.Navigation }
-                    ?.measure(constraints.copy())
+                    ?.measure(constraints.copy(minWidth = 0, minHeight = 0))
 
                 val actionsPlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.Actions }
-                    ?.measure(constraints.copy())
+                    ?.measure(constraints.copy(minWidth = 0, minHeight = 0))
 
                 val additionalPlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.Additional }
-                    ?.measure(constraints.copy())
+                    ?.measure(constraints.copy(minHeight = 0))
 
                 val expandedTitlePlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.ExpandedTitle }
-                    ?.measure(constraints.copy())
+                    ?.measure(constraints.copy(minHeight = 0))
 
                 val expandedSubtitlePlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.ExpandedSubtitle }
-                    ?.measure(constraints.copy())
+                    ?.measure(constraints.copy(minHeight = 0))
 
                 val navigationIconOffset = navigationIconPlaceable?.width ?: 0
                 val actionsOffset = actionsPlaceable?.width ?: 0
-                val freeMaxWidthPx = (constraints.maxWidth - navigationIconOffset) - actionsOffset
-                val collapsedTitleMaxWidthPx = abs(freeMaxWidthPx / fullyCollapsedTitleScale)
-                val collapsedSubtitleMaxWidthPx = abs(freeMaxWidthPx / fullyCollapsedSubtitleScale)
+                val freeMaxWidthPx = constraints.maxWidth - navigationIconOffset - actionsOffset
+                val collapsedTitleMaxWidthPx = freeMaxWidthPx / fullyCollapsedTitleScale
+                val collapsedSubtitleMaxWidthPx = freeMaxWidthPx / fullyCollapsedSubtitleScale
 
                 val collapsedTitlePlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.CollapsedTitle }
-                    ?.measure(constraints.copy(maxWidth = collapsedTitleMaxWidthPx.roundToInt()))
+                    ?.measure(
+                        constraints.copy(
+                            maxWidth = collapsedTitleMaxWidthPx.roundToInt(),
+                            minHeight = 0,
+                            minWidth = 0
+                        )
+                    )
 
                 val collapsedSubtitlePlaceable = measurables
                     .firstOrNull { it.layoutId == TopBarLayoutId.CollapsedSubtitle }
-                    ?.measure(constraints.copy(maxWidth = collapsedSubtitleMaxWidthPx.roundToInt()))
+                    ?.measure(
+                        constraints.copy(
+                            maxWidth = collapsedSubtitleMaxWidthPx.roundToInt(),
+                            minHeight = 0,
+                            minWidth = 0
+                        )
+                    )
 
                 val collapsedHeightPx = MinCollapsedHeight.toPx()
                 val layoutHeightPx = collapsedHeightPx + (additionalPlaceable?.height ?: 0)
@@ -242,7 +264,7 @@ internal fun TopBarLayout(
                 var collapsingTitleY = 0
                 var collapsingSubtitleX = 0
                 var collapsingSubtitleY = 0
-                var additionalY: Int = MinCollapsedHeight.toPx().roundToInt()
+                var additionalY = collapsedHeightPx.roundToInt()
                 val fullyExpandedTitleX: Float
 
                 if (expandedTitlePlaceable == null || collapsedTitlePlaceable == null) {
@@ -254,7 +276,6 @@ internal fun TopBarLayout(
                             expandedTitleBottomPaddingPx +
                             additionalHeight +
                             (expandedSubtitlePlaceable?.height ?: 0)
-
                     scrollBehavior?.state?.heightOffsetLimit = -heightOffsetLimitPx
 
                     if (previousAdditionalHeight != additionalHeight) {
@@ -304,7 +325,9 @@ internal fun TopBarLayout(
                     ).roundToInt()
 
                     additionalY = lerp(
-                        (expandedSubtitlePlaceable?.height ?: 0) + fullyExpandedSubtitleY,
+                        (expandedSubtitlePlaceable?.height ?: 0)
+                                + fullyExpandedSubtitleY
+                                + expandedTitleBottomPaddingPx,
                         MinCollapsedHeight.toPx(),
                         collapsedFraction
                     ).roundToInt()
@@ -330,7 +353,10 @@ internal fun TopBarLayout(
 
 
                     if (expandedSubtitlePlaceable?.width == collapsedSubtitlePlaceable?.width) {
-                        expandedSubtitlePlaceable?.placeRelative(collapsingSubtitleX, collapsingSubtitleY)
+                        expandedSubtitlePlaceable?.placeRelative(
+                            collapsingSubtitleX,
+                            collapsingSubtitleY
+                        )
                     } else {
                         expandedSubtitlePlaceable?.placeRelativeWithLayer(
                             collapsingSubtitleX, collapsingSubtitleY

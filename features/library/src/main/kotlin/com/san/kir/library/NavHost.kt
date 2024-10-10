@@ -3,8 +3,8 @@ package com.san.kir.library
 import NavEntry
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-//import com.san.kir.accounts.Accounts
-//import com.san.kir.accounts.accountsNavigationCreators
+import com.san.kir.accounts.Accounts
+import com.san.kir.accounts.accountsNavigationCreators
 import com.san.kir.catalog.AddOnline
 import com.san.kir.catalog.Catalogs
 import com.san.kir.catalog.catalogsNavigationCreators
@@ -46,29 +46,29 @@ private fun libraryNavigationCreators() {
     catalogsNavigationCreators()
     scheduleNavigationCreators()
     statisticsNavigationCreators()
-//    accountsNavigationCreators()
+    accountsNavigationCreators()
     chaptersNavigationCreators()
     settingsNavigationCreators()
 }
 
-private val mainMenuItems = buildMap<MainMenuType, NavConfig> {
-    MainMenuType.Library to Library
-    MainMenuType.Storage to Storages
-    MainMenuType.Category to Categories
-    MainMenuType.Catalogs to Catalogs
-    MainMenuType.Downloader to Downloads
-    MainMenuType.Latest to Latest
-    MainMenuType.Settings to Settings
-    MainMenuType.Schedule to Schedule
-    MainMenuType.Statistic to Statistics
-//    MainMenuType.Accounts to Accounts
-}
+private val mainMenuItems = mapOf(
+    MainMenuType.Library to Library,
+    MainMenuType.Storage to Storages,
+    MainMenuType.Category to Categories,
+    MainMenuType.Catalogs to Catalogs,
+    MainMenuType.Downloader to Downloads,
+    MainMenuType.Latest to Latest,
+    MainMenuType.Settings to Settings,
+    MainMenuType.Schedule to Schedule,
+    MainMenuType.Statistic to Statistics,
+    MainMenuType.Accounts to Accounts,
+)
 
 
 @NavEntry
 @Serializable
 internal data object Library : NavConfig() {
-    val creator = navCreator<Library> { config ->
+    val creator = navCreator<Library> {
         val navigation = remember {
             LibraryNavigation(
                 toScreen = { type ->

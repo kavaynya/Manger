@@ -13,4 +13,7 @@ android {
 }
 
 dependencies {
+    implementation(libs.activity)
+    implementation(projects.core.compose)
+    implementation(projects.core.utils)
 }

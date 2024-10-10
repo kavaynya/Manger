@@ -108,7 +108,9 @@ internal fun StoragesScreen(
     }
     val subtitle by remember {
         derivedStateOf {
-            ctx.resources.getQuantityString(R.plurals.storage_subtitle_format, count.value, count)
+            ctx.resources.getQuantityString(
+                R.plurals.storage_subtitle_format, count.value, count.value,
+            )
         }
     }
 

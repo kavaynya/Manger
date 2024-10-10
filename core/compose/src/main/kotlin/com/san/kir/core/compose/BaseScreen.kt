@@ -45,6 +45,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
@@ -140,6 +141,10 @@ private fun ContentWrapper(
         Box(
             modifier = Modifier
                 .background(containerColor)
+                .then(
+                    if (scrollBehavior == null) Modifier
+                    else Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)
+                )
                 .pointerInput(Unit) { detectTapGestures { focusManager.clearFocus() } }
         ) {
             Column(modifier = Modifier.fillMaxSize()) {
