@@ -36,6 +36,7 @@ public object ManualDI {
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     public fun <T : NavConfig> addNavigationCreator(
         key: KClass<T>,
         creator: (T) -> NavComponent<T>
@@ -47,6 +48,7 @@ public object ManualDI {
         return navigationCreators[config::class]?.invoke(config)
     }
 
+    @Suppress("UNCHECKED_CAST")
     public fun <T : NavConfig> addNavigationAnimation(
         key: KClass<T>,
         creator: (T) -> StackAnimator
