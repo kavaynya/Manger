@@ -3,7 +3,7 @@
 minSdk = "21"
 targetSdk = "34"
 complileSdk = "34"
-java = "17"
+java = "21"
 
 # Kotlin
 kotlin = "2.0.20"
