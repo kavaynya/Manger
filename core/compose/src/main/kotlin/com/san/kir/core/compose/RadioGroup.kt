@@ -120,7 +120,7 @@ public fun <ValueT> VerticalRadioGroup(
                     .clip(RoundedCornerShape(50))
                     .selectable(
                         selected = initialValue == value,
-                        enabled = false,
+                        enabled = initialValue != value,
                         role = Role.RadioButton,
                         onClick = { onChange(value) }
                     )
