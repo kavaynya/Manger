@@ -31,15 +31,15 @@ internal class Acomics(private val connectManager: ConnectManager) : SiteCatalog
 
     override suspend fun init(): Acomics {
         var docLocal = Elements()
-        var i = 595
-        volume = 5950
+        var i = 280
+        volume = 2800
 
         suspend fun isGetNext(): Boolean {
             docLocal = connectManager
                 .getDocument(catalog + "&skip=${10 * i}")
-                .select(contentTemplate)
+                .select(CONTENT_TEMPLATE)
 
-            return docLocal.none { it.text().isBlank() }
+            return docLocal.isNotEmpty()
         }
 
         while (isGetNext()) {
@@ -120,13 +120,13 @@ internal class Acomics(private val connectManager: ConnectManager) : SiteCatalog
     }
 
     override fun catalog() = flow {
-        var docLocal = connectManager.getDocument(catalog).select(contentTemplate)
+        var docLocal = connectManager.getDocument(catalog).select(CONTENT_TEMPLATE)
         var index = 0
 
         suspend fun isGetNext(): Boolean {
             docLocal = connectManager
                 .getDocument(catalog + "&skip=${10 * index}")
-                .select(contentTemplate)
+                .select(CONTENT_TEMPLATE)
 
             return docLocal.none { it.text().isBlank() }
         }
@@ -193,7 +193,7 @@ internal class Acomics(private val connectManager: ConnectManager) : SiteCatalog
     }
 
     companion object {
-        private const val contentTemplate = "#content .list-loadable"
+        private const val CONTENT_TEMPLATE = ".infinite-scroll-content .serial-card"
         private const val AUTHOR = "Авторы:"
         private const val VOLUME = "Количество выпусков:"
         private const val POPULATE = "Количество подписчиков:"
