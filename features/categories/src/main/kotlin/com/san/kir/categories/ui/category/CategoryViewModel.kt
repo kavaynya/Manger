@@ -25,7 +25,7 @@ internal class CategoryViewModel(
     private val nameIsBusyString = context.getString(R.string.name_taken)
     private var categoryNames: List<String>? = null
 
-    private val isCreatedNew = categoryName.isNotEmpty()
+    private var isCreatedNew = categoryName.isEmpty()
     private val currentCategory = MutableStateFlow(Category())
     private val hasChanges = MutableStateFlow(false)
     private val error = MutableStateFlow<ErrorState>(ErrorState.None)
@@ -49,7 +49,7 @@ internal class CategoryViewModel(
 
     init {
         defaultLaunch {
-            currentCategory.value = categoryRepository.item(categoryName)
+            currentCategory.value = categoryRepository.item(categoryName) ?: Category()
             checkCategoryName(categoryName)
         }
     }
@@ -64,7 +64,11 @@ internal class CategoryViewModel(
 
     private suspend fun save() {
         hasChanges.value = false
-        categoryRepository.insert(currentCategory.value)
+        val id = categoryRepository.insert(currentCategory.value).first()
+        if (isCreatedNew) {
+            isCreatedNew = false
+            currentCategory.value = categoryRepository.item(id)
+        }
     }
 
     private fun change(event: CategoryAction.Update) {
