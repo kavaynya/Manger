@@ -42,7 +42,7 @@ internal interface CategoryDao : BaseDao<DbCategory> {
 
     // Получение элемента по его названию
     @Query("SELECT * FROM categories WHERE name IS :name")
-    suspend fun itemByName(name: String): DbCategory
+    suspend fun itemByName(name: String): DbCategory?
 
     @Query("SELECT name FROM categories ORDER BY ordering")
     suspend fun names(): List<String>

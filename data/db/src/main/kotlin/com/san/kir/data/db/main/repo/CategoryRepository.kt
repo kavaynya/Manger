@@ -40,19 +40,19 @@ public class CategoryRepository internal constructor(
     public suspend fun insert(name: String): List<Long> =
         withIoContext { categoryDao.insert(DbCategory(name = name)) }
 
-    public suspend fun item(categoryName: String): Category =
-        withIoContext { categoryDao.itemByName(categoryName).toModel() }
+    public suspend fun item(categoryName: String): Category? =
+        withIoContext { categoryDao.itemByName(categoryName)?.toModel() }
 
     public suspend fun item(id: Long): Category =
         withIoContext { categoryDao.itemById(id).toModel() }
 
-    public suspend fun defaultCategory(): Category = item(ManualDI.categoryAll())
+    public suspend fun defaultCategory(): Category = item(ManualDI.categoryAll()) ?: Category()
 
     public suspend fun delete(item: Category): Int =
         withIoContext { categoryDao.delete(item.toEntity()) }
 
-    public suspend fun idByName(name: String): Long =
-        withIoContext { categoryDao.itemByName(name).id }
+    public suspend fun idByName(name: String): Long? =
+        withIoContext { categoryDao.itemByName(name)?.id }
 
     public suspend fun createNewCategory(): Category = Category(order = count.first() + 1)
 }
