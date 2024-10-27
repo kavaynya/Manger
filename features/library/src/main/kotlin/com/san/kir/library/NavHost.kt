@@ -37,7 +37,6 @@ import com.san.kir.storage.Storage
 import com.san.kir.storage.Storages
 import com.san.kir.storage.storageNavigationCreators
 import kotlinx.serialization.Serializable
-import timber.log.Timber
 
 private fun libraryNavigationCreators() {
     AddNavigationCreators
@@ -73,11 +72,7 @@ internal data object Library : NavConfig() {
             LibraryNavigation(
                 toScreen = { type ->
                     if (MainMenuType.Library != type) {
-                        Timber.i("navigate to $type")
-                        mainMenuItems[type]?.let {
-                            Timber.i("mainMenuItem $it")
-                            simpleAdd(it).invoke()
-                        }
+                        mainMenuItems[type]?.let { simpleAdd(it).invoke() }
                     }
                 },
                 toInfo = simpleAdd(::About),
