@@ -6,7 +6,6 @@ import com.san.kir.categories.ui.category.CategoryScreen
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.shapeAnimator
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
@@ -32,7 +31,7 @@ public data object Categories : NavConfig() {
 
 @NavEntry
 @Serializable
-public class Category(internal val name: String, internal val params: SharedParams) : NavConfig() {
+public data class Category(internal val name: String, internal val params: SharedParams) : NavConfig() {
     internal companion object {
         val creator = navCreator<Category> { config ->
             CategoryScreen(
