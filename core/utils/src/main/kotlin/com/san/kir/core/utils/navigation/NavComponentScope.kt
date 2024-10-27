@@ -20,7 +20,6 @@ public interface NavComponentScope : NavBackHandler {
     public fun replace(navConfig: NavConfig): () -> Unit
 
     public fun simpleAdd(navConfig: NavConfig): () -> Unit
-
     public fun <P1> simpleAdd(function1: (P1) -> NavConfig): (P1) -> Unit
     public fun <P1, P2> simpleAdd(function2: (P1, P2) -> NavConfig): (P1, P2) -> Unit
     public fun <P1, P2, P3> simpleAdd(function3: (P1, P2, P3) -> NavConfig): (P1, P2, P3) -> Unit

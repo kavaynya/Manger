@@ -15,7 +15,9 @@ import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.EventBusImpl
 import com.san.kir.core.utils.viewModel.LocalComponentContext
 import com.san.kir.core.utils.viewModel.LocalEventBus
+import kotlinx.datetime.Clock.System
 import timber.log.Timber
+import kotlin.time.Duration.Companion.seconds
 
 internal class NavHostComponent(
     componentContext: ComponentContext,
@@ -23,6 +25,7 @@ internal class NavHostComponent(
     private val stackAnimation: StackAnimation<NavConfig, NavContainer>
 ) : ComponentContext by componentContext, NavComponentScope {
 
+    private var lastPushing = System.now()
     private val navigation = StackNavigation<NavConfig>()
     private val childStack = childStack(
         source = navigation,
@@ -40,35 +43,41 @@ internal class NavHostComponent(
         )
     }
 
+    private fun push(navConfig: NavConfig) {
+        if ((System.now() - lastPushing) < 1.seconds) return
+        navigation.push(navConfig)
+        lastPushing = System.now()
+    }
+
     @Composable
     override fun replace(navConfig: NavConfig) =
         rememberLambda { navigation.replaceCurrent(navConfig) }
 
-    override fun simpleAdd(navConfig: NavConfig) = { navigation.push(navConfig) }
+    override fun simpleAdd(navConfig: NavConfig) = { push(navConfig) }
 
     override fun <P1> simpleAdd(function1: (P1) -> NavConfig): (P1) -> Unit =
-        { p1 -> navigation.push(function1(p1)) }
+        { p1 -> push(function1(p1)) }
 
     override fun <P1, P2> simpleAdd(function2: (P1, P2) -> NavConfig): (P1, P2) -> Unit =
-        { p1, p2 -> navigation.push(function2(p1, p2)) }
+        { p1, p2 -> push(function2(p1, p2)) }
 
     override fun <P1, P2, P3> simpleAdd(function3: (P1, P2, P3) -> NavConfig): (P1, P2, P3) -> Unit =
-        { p1, p2, p3 -> navigation.push(function3(p1, p2, p3)) }
+        { p1, p2, p3 -> push(function3(p1, p2, p3)) }
 
     @Composable
-    override fun add(navConfig: NavConfig) = rememberLambda { navigation.push(navConfig) }
+    override fun add(navConfig: NavConfig) = rememberLambda { push(navConfig) }
 
     @Composable
     override fun <P1> add(function1: (P1) -> NavConfig): (P1) -> Unit =
-        rememberLambda { p1 -> navigation.push(function1(p1)) }
+        rememberLambda { p1 -> push(function1(p1)) }
 
     @Composable
     override fun <P1, P2> add(function2: (P1, P2) -> NavConfig): (P1, P2) -> Unit =
-        rememberLambda { p1, p2 -> navigation.push(function2(p1, p2)) }
+        rememberLambda { p1, p2 -> push(function2(p1, p2)) }
 
     @Composable
     override fun <P1, P2, P3> add(function3: (P1, P2, P3) -> NavConfig): (P1, P2, P3) -> Unit {
-        return rememberLambda { p1, p2, p3 -> navigation.push(function3(p1, p2, p3)) }
+        return rememberLambda { p1, p2, p3 -> push(function3(p1, p2, p3)) }
     }
 
     override fun isRegistered(callback: BackCallback) = backHandler.isRegistered(callback)
@@ -83,9 +92,7 @@ internal class NavHostComponent(
                 LocalComponentContext provides child.instance.context,
                 LocalEventBus provides EventBusImpl()
             ) {
-                child.instance.component?.apply {
-                    Render()
-                }
+                child.instance.component?.apply { Render() }
             }
         }
     }
