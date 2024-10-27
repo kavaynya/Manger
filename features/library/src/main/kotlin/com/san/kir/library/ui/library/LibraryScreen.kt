@@ -61,6 +61,7 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
             is LibraryEvent.ToStats -> navigation.toStats(event.id, event.params)
             is LibraryEvent.ToChapters -> navigation.toChapters(event.id, event.params)
             is LibraryEvent.ToOnline -> navigation.toOnline(event.params)
+            is LibraryEvent.ToScreen -> navigation.toScreen(event.menu)
             is LibraryEvent.ShowSelectedMangaDialog -> selectMangaState.show(event.item)
             is LibraryEvent.DismissSelectedMangaDialog -> selectMangaState.dismiss()
         }
