@@ -17,6 +17,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.foundation.shape.CornerSize
@@ -24,6 +25,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -156,7 +161,7 @@ public fun <T : Parcelable> CenterDialog(
         scrimColor,
         containerColor,
         elevation,
-        shape.copy(topEnd = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)),
+        shape,
         sheetContent
     )
 }
@@ -228,7 +233,7 @@ public fun <T : Parcelable> SheetContent(
         }
         AnimatedVisibility(
             visible = state != null,
-            modifier = modifier.align(alignment),
+            modifier = modifier.align(alignment).fillMaxWidth(),
             enter = enter,
             exit = exit,
             label = "",
@@ -239,8 +244,12 @@ public fun <T : Parcelable> SheetContent(
                 color = containerColor,
                 tonalElevation = elevation,
             ) {
+                var prevState: T? by remember { mutableStateOf(null) }
                 if (state != null) {
+                    prevState = state
                     sheetContent.invoke(this, state)
+                } else if (prevState != null) {
+                    prevState?.let {sheetContent.invoke(this, it) }
                 }
             }
         }
