@@ -17,6 +17,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreateNewFolder
@@ -37,10 +38,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.role
@@ -51,6 +54,7 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.center
 import androidx.compose.ui.unit.dp
 import com.san.kir.categories.R
@@ -160,7 +164,7 @@ private fun TextWithValidate(
     error: ErrorState,
     sendAction: (CategoryAction) -> Unit,
 ) {
-    var valueField by remember { mutableStateOf(categoryName) }
+    var valueField by remember(categoryName) { mutableStateOf(categoryName) }
 
     OutlinedTextField(
         value = valueField,
@@ -232,6 +236,8 @@ private fun ChangeTabVisibility(isVisible: Boolean, sendAction: (CategoryAction)
         label = ""
     )
 
+    val textStyle = MaterialTheme.typography.bodyLarge
+
     Surface(
         checked = isVisible,
         onCheckedChange = { sendAction(CategoryAction.Update(newVisible = isVisible.not())) },
@@ -243,10 +249,21 @@ private fun ChangeTabVisibility(isVisible: Boolean, sendAction: (CategoryAction)
         contentColor = colorContent
     ) {
         Box(modifier = Modifier.padding(Dimensions.default)) {
-            FromStartToEndAnimContent(isVisible, animationSpec = defaultAnimationSpec()) {
+            FromStartToEndAnimContent(
+                isVisible,
+                animationSpec = defaultAnimationSpec(),
+                modifier = Modifier.width(
+                    findMaxWidth(
+                        textStyle,
+                        stringResource(R.string.category_is_visible),
+                        stringResource(R.string.category_is_hide)
+                    )
+                ),
+                contentAlignment = Alignment.Center,
+            ) {
                 when (it) {
-                    true -> Text(stringResource(R.string.category_is_visible))
-                    false -> Text(stringResource(R.string.category_is_hide))
+                    true -> Text(stringResource(R.string.category_is_visible), style = textStyle, maxLines = 1)
+                    false -> Text(stringResource(R.string.category_is_hide), style = textStyle, maxLines = 1)
                 }
             }
         }
@@ -311,14 +328,26 @@ private fun SliderWithText(
             value = innerState.value,
             onValueChange = {
                 scope.defaultLaunch {
-                    if (dragged) innerState.snapTo(it) else onChange(it.roundToInt())
+                    if (dragged) {
+                        innerState.snapTo(it)
+                    } else {
+                        onChange(it.roundToInt())
+                        innerState.animateTo(it.roundToInt().toFloat(), defaultAnimationSpec())
+                    }
                 }
             },
             valueRange = 1f..maxPosition.toFloat(),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(top = Dimensions.default),
-            onValueChangeFinished = { if (dragged) onChange(innerState.value.roundToInt()) },
+            onValueChangeFinished = {
+                if (innerState.value != innerState.value.roundToInt().toFloat()) {
+                    scope.defaultLaunch {
+                        onChange(innerState.value.roundToInt())
+                        innerState.animateTo(innerState.value.roundToInt().toFloat(), defaultAnimationSpec())
+                    }
+                }
+            },
             interactionSource = interactionSource,
             thumb = { Thumb(interactionSource, activeTrackColor) },
             track = { sliderState ->
@@ -387,4 +416,13 @@ private fun Track(
             )
         }
     }
+}
+
+@Composable
+private fun findMaxWidth(textStyle: TextStyle, vararg texts: String): Dp {
+    val textMeasure = rememberTextMeasurer()
+    val width = texts
+        .map { text -> textMeasure.measure(text, style = textStyle, softWrap = false, maxLines = 1).size.width }
+        .max()
+    return with(LocalDensity.current) { width.toDp() }
 }
