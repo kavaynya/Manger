@@ -9,10 +9,10 @@ import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.FlowRowScope
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CornerBasedShape
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -20,13 +20,11 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.san.kir.core.utils.navigation.DialogState
-
 
 
 private val DialogPadding = PaddingValues(24.dp)
@@ -82,7 +80,7 @@ public fun <T : Parcelable> AlertDialog(
     titleContent: (@Composable () -> Unit)? = null,
     textContent: (@Composable () -> Unit)? = null,
     buttonContent: (@Composable () -> Unit)? = null,
-    shape: Shape = DialogTokens.shape,
+    shape: CornerBasedShape = DialogTokens.shape,
     containerColor: Color = DialogTokens.containerColor,
     tonalElevation: Dp = DialogTokens.TonalElevation,
     buttonContentColor: Color = DialogTokens.buttonContentColor,
@@ -90,11 +88,10 @@ public fun <T : Parcelable> AlertDialog(
     titleContentColor: Color = DialogTokens.titleContentColor,
     textContentColor: Color = DialogTokens.textContentColor,
 ) {
-    CenterDialog(dialogState = state) {
+    CenterDialog(dialogState = state, shape = shape, containerColor = containerColor, elevation = tonalElevation) {
         AlertDialogContent(
-            iconContent, titleContent, textContent, buttonContent, shape, containerColor,
-            tonalElevation, buttonContentColor, iconContentColor, titleContentColor,
-            textContentColor,
+            iconContent, titleContent, textContent, buttonContent, buttonContentColor, iconContentColor,
+            titleContentColor, textContentColor,
         )
     }
 }
@@ -106,63 +103,52 @@ private fun AlertDialogContent(
     titleContent: (@Composable () -> Unit)?,
     textContent: (@Composable () -> Unit)?,
     buttonContent: (@Composable () -> Unit)?,
-    shape: Shape,
-    containerColor: Color,
-    tonalElevation: Dp,
     buttonContentColor: Color,
     iconContentColor: Color,
     titleContentColor: Color,
     textContentColor: Color,
 ) {
-    Surface(
-        modifier = Modifier.horizontalInsetsPadding(Dimensions.default),
-        shape = shape,
-        color = containerColor,
-        tonalElevation = tonalElevation
-    ) {
-        Column(modifier = Modifier.padding(DialogPadding)) {
-            if (iconContent != null) {
-                Box(
-                    modifier = Modifier
-                        .padding(IconPadding)
-                        .align(Alignment.CenterHorizontally),
-                ) {
-                    CompositionLocalProvider(
-                        LocalContentColor provides iconContentColor,
-                        iconContent
-                    )
+    Column(modifier = Modifier.horizontalInsetsPadding().padding(DialogPadding)) {
+        if (iconContent != null) {
+            Box(
+                modifier = Modifier
+                    .padding(IconPadding)
+                    .align(Alignment.CenterHorizontally),
+            ) {
+                CompositionLocalProvider(
+                    LocalContentColor provides iconContentColor,
+                    iconContent
+                )
+            }
+        }
+        if (titleContent != null) {
+            Box(
+                modifier = Modifier
+                    .padding(TitlePadding)
+                    .align(if (iconContent == null) Alignment.Start else Alignment.CenterHorizontally),
+            ) {
+                CompositionLocalProvider(LocalContentColor provides titleContentColor) {
+                    ProvideTextStyle(DialogTokens.headlineFont, titleContent)
                 }
             }
-            if (titleContent != null) {
-                Box(
-                    modifier = Modifier
-                        .padding(TitlePadding)
-                        .align(if (iconContent == null) Alignment.Start else Alignment.CenterHorizontally),
-                ) {
-                    CompositionLocalProvider(LocalContentColor provides titleContentColor) {
-                        ProvideTextStyle(DialogTokens.headlineFont, titleContent)
-                    }
-                }
-            }
+        }
 
-            if (textContent != null) {
-                Box(
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(TextPadding)
-                        .align(Alignment.Start),
-                ) {
-                    CompositionLocalProvider(LocalContentColor provides textContentColor) {
-                        ProvideTextStyle(DialogTokens.supportingTextFont, textContent)
-                    }
+        if (textContent != null) {
+            Box(
+                modifier = Modifier
+                    .padding(TextPadding)
+                    .align(Alignment.Start),
+            ) {
+                CompositionLocalProvider(LocalContentColor provides textContentColor) {
+                    ProvideTextStyle(DialogTokens.supportingTextFont, textContent)
                 }
             }
+        }
 
-            if (buttonContent != null) {
-                Box(modifier = Modifier.align(Alignment.End)) {
-                    CompositionLocalProvider(LocalContentColor provides buttonContentColor) {
-                        ProvideTextStyle(DialogTokens.actionLabelTextFont, buttonContent)
-                    }
+        if (buttonContent != null) {
+            Box(modifier = Modifier.align(Alignment.End)) {
+                CompositionLocalProvider(LocalContentColor provides buttonContentColor) {
+                    ProvideTextStyle(DialogTokens.actionLabelTextFont, buttonContent)
                 }
             }
         }
@@ -193,7 +179,7 @@ public object DialogTokens {
     public val supportingTextFont: TextStyle
         @Composable get() = MaterialTheme.typography.bodyMedium
 
-    public val shape: Shape
+    public val shape: CornerBasedShape
         @Composable get() = MaterialTheme.shapes.extraLarge
 
     public val containerColor: Color
