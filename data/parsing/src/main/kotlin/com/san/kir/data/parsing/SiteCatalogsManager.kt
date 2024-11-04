@@ -83,7 +83,7 @@ public class SiteCatalogsManager(
         val first = catalogByName(siteName)
         var catName = first.catalogName
         first.allCatalogName
-            .firstOrNull { getFullPath(DIR.catalogName(catName)).exists() }
+            .firstOrNull { getFullPath(DIR.catalogName(it)).exists() }
             ?.also { catName = it }
 
         return catName
