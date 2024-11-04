@@ -2,7 +2,6 @@ package com.san.kir.core.compose
 
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -193,7 +192,6 @@ internal fun TopBarLayout(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .background(Color.DarkGray)
                             .layoutId(TopBarLayoutId.Additional)
                     ) {
                         additional()

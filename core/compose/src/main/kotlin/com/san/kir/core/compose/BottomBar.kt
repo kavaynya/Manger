@@ -25,10 +25,9 @@ public fun DefaultBottomBar(
     content: @Composable RowScope.() -> Unit
 ) {
     Row(
-        modifier = Modifier
-            .bottomInsetsPadding(BarPadding)
-            .background(BarContainerColor, DefaultRoundedShape)
-            .then(modifier),
+        modifier = modifier
+            .bottomInsetsPadding(bottom = BarPadding)
+            .background(BarContainerColor, DefaultRoundedShape),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         content()

@@ -23,8 +23,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -44,6 +44,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.san.kir.core.compose.animation.StartAnimatedVisibility
 
 @Composable
 public fun LabelText(idRes: Int) {
@@ -173,7 +174,7 @@ public fun SearchTextField(
 
     val canClearText by remember { derivedStateOf { searchText.isNotEmpty() } }
 
-    TextField(
+    OutlinedTextField(
         value = searchText,
         onValueChange = {
             if (searchText != it) {
@@ -183,19 +184,33 @@ public fun SearchTextField(
         },
         leadingIcon = { Icon(Icons.Default.Search, "search") },
         trailingIcon = {
-            IconButton(
-                onClick = {
-                    searchText = ""
-                    onChangeValue("")
-                },
-            ) {
-                Icon(Icons.Default.Close, "")
+            StartAnimatedVisibility(canClearText) {
+                IconButton(
+                    onClick = {
+                        searchText = ""
+                        onChangeValue("")
+                    },
+                ) { Icon(Icons.Default.Close, "") }
             }
         },
         modifier = Modifier
             .fillMaxWidth()
             .horizontalInsetsPadding(horizontal = Dimensions.half),
         shape = RoundedCornerShape(50),
+        colors = OutlinedTextFieldDefaults.colors(
+            unfocusedContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.6f),
+            focusedContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            errorContainerColor = MaterialTheme.colorScheme.secondaryContainer,
+            disabledContainerColor = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.4f),
+            unfocusedBorderColor = Color.Transparent,
+            focusedBorderColor = Color.Transparent,
+            errorBorderColor = Color.Transparent,
+            disabledBorderColor = Color.Transparent,
+            unfocusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.6f),
+            focusedTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+            disabledTextColor = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.4f),
+            errorTextColor = MaterialTheme.colorScheme.onSecondaryContainer,
+        ),
     )
 }
 

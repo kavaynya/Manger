@@ -45,7 +45,7 @@ import com.san.kir.core.utils.sumOf
 private val SortItemHeight = 48.dp
 private val ItemHorizontalPadding = Dimensions.default
 private fun <T> animationSpec() = spring<T>(DampingRatioLowBouncy, 800f)
-private val sortSelectedContainerColor: Color
+private val SortSelectedContainerColor: Color
     @Composable get() = MaterialTheme.colorScheme.primary
 
 internal interface IDataHelper<ValueT> {
@@ -82,7 +82,7 @@ public fun <ValueT> VerticalRadioGroup(
     initialValue: ValueT,
     onChange: (ValueT) -> Unit
 ) {
-    val selectedContainerColor = sortSelectedContainerColor
+    val selectedContainerColor = SortSelectedContainerColor
     val currentButtonIndex = dataHelpers.indexOfFirst { it.value == initialValue }
     val buttonOffset = rememberFloatAnimatable(currentButtonIndex.toFloat())
 
@@ -148,7 +148,7 @@ public fun <ValueT, DataHelper : IDataHelper<out ValueT>, HandledDataHelper : IH
     modifier: Modifier = Modifier,
     content: @Composable RowScope.(HandledDataHelper) -> Unit,
 ) {
-    val selectedContainerColor = sortSelectedContainerColor
+    val selectedContainerColor = SortSelectedContainerColor
     val itemHorizontalPadding = with(LocalDensity.current) { ItemHorizontalPadding.toPx() }
     val handledData = remember { mutableStateListOf<HandledDataHelper>() }
     val buttonOffset = rememberFloatAnimatable(0f)
@@ -167,7 +167,10 @@ public fun <ValueT, DataHelper : IDataHelper<out ValueT>, HandledDataHelper : IH
             buttonWidth.animateTo(handledData.getOrNull(currentButtonIndex)?.width ?: 1f)
         }
         defaultLaunch {
-            scrollState.animateScrollTo(scrollState.maxValue / (handledData.size - 1) * currentButtonIndex)
+            val diff = handledData.size - 1
+            if (diff != 0) {
+                scrollState.animateScrollTo(scrollState.maxValue / (diff) * currentButtonIndex)
+            }
         }
     }
 
@@ -231,7 +234,7 @@ public fun <ValueT> HorizontalTextRadioGroup(
         modifier = modifier
     ) { helper ->
         val textColor by animateColorAsState(
-            if (initialValue == helper.value) MaterialTheme.colorScheme.onSurface
+            if (initialValue != helper.value) MaterialTheme.colorScheme.onSurface
             else MaterialTheme.colorScheme.onPrimary, label = ""
         )
         Text(text = helper.title, color = textColor)
@@ -260,7 +263,7 @@ public fun <ValueT> HorizontalIconRadioGroup(
         modifier = modifier
     ) { helper ->
         val tint by animateColorAsState(
-            if (initialValue == helper.value) MaterialTheme.colorScheme.onSurfaceVariant
+            if (initialValue != helper.value) MaterialTheme.colorScheme.onSurfaceVariant
             else MaterialTheme.colorScheme.onPrimary, label = ""
         )
         Icon(helper.content, "", tint = tint)

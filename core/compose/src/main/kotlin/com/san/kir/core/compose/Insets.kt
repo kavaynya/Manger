@@ -82,6 +82,11 @@ public fun Modifier.bottomInsetsPadding(
     bottom: Dp = Dimensions.zero
 ): Modifier = windowInsetsPadding(bottomInsets(left, top, right, bottom))
 
+@Composable
+public fun Modifier.bottomInsetsPadding(
+    all: Dp = Dimensions.zero,
+): Modifier = windowInsetsPadding(bottomInsets(all, all, all, all))
+
 
 ///////////////////////////////////////
 
