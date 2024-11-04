@@ -53,7 +53,7 @@ internal class CatalogItemViewModel(
                 itemFlow.update { item }
                 background.update { BackgroundState.None }
 
-                catalogRepository.insert(catalogName, item.copy(id = item.id))
+                catalogRepository.insert(catalogName, item.copy(id = this@CatalogItemViewModel.item.id))
             }.onFailure { ex ->
                 background.update {
                     if (ex is AuthorizationException) {

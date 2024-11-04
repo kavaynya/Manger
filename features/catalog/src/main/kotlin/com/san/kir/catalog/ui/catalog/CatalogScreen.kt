@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
@@ -25,6 +26,7 @@ import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
@@ -39,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
@@ -61,6 +62,7 @@ import com.san.kir.core.compose.animation.StartAnimatedVisibility
 import com.san.kir.core.compose.animation.animateToDelayed
 import com.san.kir.core.compose.animation.rememberIntAnimatable
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.compose.topInsetsPadding
@@ -161,12 +163,11 @@ internal fun CatalogScreen(
         },
         bottomContent = { BottomBar(sortState, sendAction) },
     ) {
-        items(items.size, key = { index -> items[index].id }) { index ->
+        items(items, key = { it.id }) { item ->
             ListItem(
-                items[index],
-                items[index].statusEdition,
-                toAdd = navigateToAdd,
-                toInfo = { item, params -> navigateToInfo(item.toFullItem(), params) },
+                item, item.statusEdition,
+                toAdd = {params -> navigateToAdd(item.link, params)} ,
+                toInfo = { params -> navigateToInfo(item.toFullItem(), params) },
                 updateItem = { sendAction(CatalogAction.UpdateManga(it)) }
             )
         }
@@ -181,7 +182,6 @@ internal fun CatalogScreen(
 private fun BottomBar(
     sort: SortState,
     sendAction: (CatalogAction) -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     val dataHelpers by remember {
         derivedStateOf {
@@ -198,7 +198,7 @@ private fun BottomBar(
         }
     }
 
-    DefaultBottomBar(modifier = modifier) {
+    DefaultBottomBar(modifier = Modifier.endInsetsPadding(right = Dimensions.default)) {
 
         RotateToggleButton(icon = Icons.AutoMirrored.Filled.Sort, state = sort.reverse) {
             sendAction(CatalogAction.Reverse)
@@ -207,7 +207,7 @@ private fun BottomBar(
         HorizontalIconRadioGroup(
             dataHelpers = dataHelpers,
             initialValue = sort.type,
-            modifier = Modifier.padding(Dimensions.half)
+            modifier = Modifier.padding(Dimensions.middle)
         ) {
             sendAction(CatalogAction.ChangeSort(it))
         }
@@ -228,7 +228,7 @@ private fun DrawerContent(
     Column {
         Crossfade(
             targetState = currentIndex,
-            modifier = Modifier.weight(1f, true),
+            modifier = Modifier.weight(1f),
             label = "",
         ) { pageIndex ->
             val currentFilter = filters[pageIndex]
@@ -239,15 +239,13 @@ private fun DrawerContent(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable {
-                                sendAction(CatalogAction.ChangeFilter(currentFilter.type, index))
-                            }
+                            .clickable { sendAction(CatalogAction.ChangeFilter(currentFilter.type, index)) }
                             .startInsetsPadding(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Checkbox(
                             checked = item.state,
-                            onCheckedChange = { },
+                            onCheckedChange = { sendAction(CatalogAction.ChangeFilter(currentFilter.type, index)) },
                         )
                         Text(URLDecoder.decode(item.name, "UTF-8"))
                     }
@@ -261,7 +259,7 @@ private fun DrawerContent(
                 .fillMaxWidth()
                 .height(Dimensions.smallest)
                 .clip(RectangleShape)
-                .background(Color.Blue.copy(alpha = 0.3f))
+                .background(MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f))
         )
 
         // Переключатели вкладок доступных фильтров

@@ -91,8 +91,8 @@ internal fun SearchScreen(
         items(items, key = { it.id }) { item ->
             ListItem(
                 item, item.catalogName,
-                toAdd = navigateToAdd,
-                toInfo = { _, params -> navigateToInfo(item.toFullItem(), params) },
+                toAdd = { params -> navigateToAdd(item.link, params)},
+                toInfo = { params -> navigateToInfo(item.toFullItem(), params) },
                 updateItem = rememberLambda { manga -> sendAction(SearchAction.UpdateManga(manga)) }
             )
         }

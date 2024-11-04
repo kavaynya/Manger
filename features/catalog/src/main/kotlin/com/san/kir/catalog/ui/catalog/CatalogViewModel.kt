@@ -22,27 +22,22 @@ import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 internal class CatalogViewModel(
-    catalogName: String,
+    private val name: String,
     private val context: Context = ManualDI.application,
     private val catalogsRepository: CatalogsRepository = ManualDI.catalogsRepository(),
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
     private val siteCatalogManager: SiteCatalogsManager = ManualDI.siteCatalogsManager(),
     private val manager: UpdateCatalogManager = ManualDI.updateCatalogManager(),
 ) : ViewModel<CatalogState>(), CatalogStateHolder {
-    private var job: Job? = null
-
-    private var catalogItems = emptyList<MiniCatalogItem>()
-    private val catalogName = siteCatalogManager.catalogName(catalogName)
-    private val siteCatalog = siteCatalogManager.catalogByName(catalogName)
+    private val catalogName = siteCatalogManager.catalogName(name)
+    private val siteCatalog = siteCatalogManager.catalogByName(name)
 
     override val filterState = MutableStateFlow(FilterState())
     override val sortState =
@@ -54,27 +49,19 @@ internal class CatalogViewModel(
     override val items = combine(
         filterState,
         sortState,
-        mangaRepository.items
-            .mapLatest { mangas ->
-                if (catalogItems.isEmpty()) {
-                    catalogItems = catalogsRepository.items(this.catalogName)
-                }
-
-                val mangaLinks = mangas.linksForCatalog(siteCatalog)
-
-                catalogItems.map { item ->
-                    if (mangaLinks.any { it.contains(item.shortLink) }) {
-                        item.copy(state = MiniCatalogItem.State.Update)
-                    } else {
-                        item.copy(state = MiniCatalogItem.State.Added)
-                    }
-                }
-            },
-    ) { filterState, sortState, list ->
+        mangaRepository.items,
+        catalogsRepository.loadItems(catalogName).onEach { list -> filters.update { list.initFilters() } },
+    ) { filterState, sortState, mangas, catalogItems ->
         backgroundWork.update { it.copy(updateItems = true) }
 
-        if (filters.value.isEmpty()) {
-            filters.update { list.initFilters() }
+        val mangaLinks = mangas.linksForCatalog(siteCatalog)
+
+        val list = catalogItems.map { item ->
+            if (mangaLinks.any { it.contains(item.shortLink) }) {
+                item.copy(state = MiniCatalogItem.State.Update)
+            } else {
+                item.copy(state = MiniCatalogItem.State.Added)
+            }
         }
         list.applyFilters(filterState).applySort(sortState)
     }.onEach {
@@ -85,20 +72,17 @@ internal class CatalogViewModel(
     override val tempState = MutableStateFlow(defaultState)
 
     init {
-        manager.loadTask(this.catalogName)
+        manager.loadTask(this.name)
             .onEach { task ->
                 backgroundWork.update { old ->
                     if (task == null) {
                         old.copy(updateCatalogs = false, progress = null)
                     } else {
                         when (task.state) {
-                            DownloadState.LOADING -> old.copy(
-                                updateCatalogs = true, progress = task.progress,
-                            )
+                            DownloadState.LOADING -> old.copy(updateCatalogs = true, progress = task.progress)
 
-                            DownloadState.QUEUED, DownloadState.PAUSED -> old.copy(
-                                updateCatalogs = true, progress = null
-                            )
+                            DownloadState.QUEUED, DownloadState.PAUSED, DownloadState.COMPLETED ->
+                                old.copy(updateCatalogs = true, progress = null)
 
                             else -> old
                         }
@@ -116,8 +100,8 @@ internal class CatalogViewModel(
             is CatalogAction.ChangeSort -> sortState.update { it.copy(type = action.sort) }
             CatalogAction.Reverse -> sortState.update { it.copy(reverse = it.reverse.not()) }
             CatalogAction.ClearFilters -> clearFilters()
-            CatalogAction.UpdateContent -> manager.addTask(catalogName)
-            CatalogAction.CancelUpdateContent -> manager.removeTask(catalogName)
+            CatalogAction.UpdateContent -> manager.addTask(this.name)
+            CatalogAction.CancelUpdateContent -> manager.removeTask(this.name)
         }
     }
 

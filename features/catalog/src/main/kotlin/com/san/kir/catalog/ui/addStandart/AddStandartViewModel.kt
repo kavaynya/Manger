@@ -87,7 +87,7 @@ internal class AddStandartViewModel(
             val path = "${DIR.MANGA}/${element.catalogName}/$shortPath"
             val mangaId = mangaRepository.save(
                 element.toManga(
-                    categoryId = categoryRepository.idByName(categoryName.value),
+                    categoryId = categoryRepository.idByName(categoryName.value)!!,
                     path = path
                 ).copy(
                     isAlternativeSite = manager.catalog(element.link) is SiteCatalogAlternative

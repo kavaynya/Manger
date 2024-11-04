@@ -12,7 +12,7 @@ internal data class AddStandartState(
 ) : ScreenState {
     val hasAllow = categoryName.length >= 3
     val createNewCategory =
-        hasAllow && availableCategories.size != 1 || availableCategories.first() != categoryName
+        hasAllow && availableCategories.size != 1 || availableCategories.firstOrNull() != categoryName
 }
 
 internal sealed interface ProcessState {

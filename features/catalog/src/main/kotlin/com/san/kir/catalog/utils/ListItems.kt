@@ -21,7 +21,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.san.kir.core.compose.CircleLogo
 import com.san.kir.core.compose.Dimensions
+import com.san.kir.core.compose.HalfSpacer
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
@@ -32,8 +34,8 @@ import com.san.kir.data.models.catalog.MiniCatalogItem
 internal fun ListItem(
     item: MiniCatalogItem,
     secondName: String,
-    toAdd: (link: String, params: SharedParams) -> Unit,
-    toInfo: (item: MiniCatalogItem, params: SharedParams) -> Unit,
+    toAdd: (params: SharedParams) -> Unit,
+    toInfo: (params: SharedParams) -> Unit,
     updateItem: (MiniCatalogItem) -> Unit,
 ) {
     val params = rememberSharedParams()
@@ -42,18 +44,19 @@ internal fun ListItem(
             .fillMaxWidth()
             .height(60.dp)
             .saveParams(params)
-            .clickable { toInfo(item, params) }
-            .padding(vertical = Dimensions.quarter, horizontal = Dimensions.default)
-            .horizontalInsetsPadding(
-                horizontal = Dimensions.default,
-                vertical = Dimensions.quarter
-            ),
+            .clickable { toInfo(params) }
+            .horizontalInsetsPadding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
         verticalAlignment = Alignment.CenterVertically
     ) {
+        if (item.logo.isNotEmpty()) {
+            CircleLogo(item.logo, size = Dimensions.Image.mini)
+        }
+        HalfSpacer()
+
         Column(
             Modifier
                 .padding(end = Dimensions.default)
-                .weight(1f, true),
+                .weight(1f),
             verticalArrangement = Arrangement.Center
         ) {
             Text(
@@ -62,10 +65,12 @@ internal fun ListItem(
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
             )
-            Text(
-                text = secondName,
-                style = MaterialTheme.typography.bodyMedium
-            )
+            if (secondName.isNotEmpty()) {
+                Text(
+                    text = secondName,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
 
         when (item.state) {
@@ -77,7 +82,7 @@ internal fun ListItem(
                     modifier = Modifier
                         .size(Dimensions.Image.small)
                         .saveParams(params)
-                        .clickable { toAdd(item.link, params) }
+                        .clickable { toAdd(params) }
                 )
             }
 
