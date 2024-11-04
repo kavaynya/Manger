@@ -9,6 +9,7 @@ internal data class DbSimplifiedCatalogItem(
     @ColumnInfo("statusEdition") val statusEdition: String,
     @ColumnInfo("shotLink") val shortLink: String,
     @ColumnInfo("link") val link: String,
+    @ColumnInfo("logo") val logo: String,
     @ColumnInfo("genres") val genres: List<String>,
     @ColumnInfo("type") val type: String,
     @ColumnInfo("authors") val authors: List<String>,

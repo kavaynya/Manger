@@ -11,10 +11,7 @@ internal interface SiteCatalogDao : BaseDao<DbSiteCatalogElement> {
     @Query("SELECT * FROM items")
     suspend fun items(): List<DbSiteCatalogElement>
 
-    @Query(
-        "SELECT id, catalogName, name, statusEdition, shotLink, " +
-                "link, genres, type, authors, dateId, populate FROM items"
-    )
+    @Query("SELECT id, catalogName, name, statusEdition, shotLink, link, logo, genres, type, authors, dateId, populate FROM items")
     suspend fun miniItems(): List<DbSimplifiedCatalogItem>
 
     @Query("SELECT * FROM items WHERE id=:id")
