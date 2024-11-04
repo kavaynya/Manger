@@ -137,7 +137,7 @@ private fun Viewer(viewer: Settings.Viewer, sendAction: (SettingsAction.SaveView
         }
     )
 
-    if (Build.VERSION.SDK_INT >= 28)
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P)
         TogglePreferenceItem(
             title = R.string.viewer_cutout_title,
             subtitle = R.string.viewer_cutout_summary,

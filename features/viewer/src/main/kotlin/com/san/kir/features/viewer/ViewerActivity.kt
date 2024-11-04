@@ -118,7 +118,7 @@ internal class ViewerActivity : AppCompatActivity() {
                 else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
 
-            if (Build.VERSION.SDK_INT >= 28) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
                 val attrs = window.attributes
                 attrs.layoutInDisplayCutoutMode =
                     if (data.cutOut) WindowManager.LayoutParams.LAYOUT_IN_DISPLAY_CUTOUT_MODE_SHORT_EDGES
