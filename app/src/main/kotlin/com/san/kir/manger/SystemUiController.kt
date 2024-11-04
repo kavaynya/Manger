@@ -212,6 +212,7 @@ internal class AndroidSystemUiController(
                 // contrast
                 transformColorForLightContent(color)
             }
+
             else -> color
         }.toArgb()
     }
@@ -232,6 +233,7 @@ internal class AndroidSystemUiController(
                 // contrast
                 transformColorForLightContent(color)
             }
+
             else -> color
         }.toArgb()
     }
@@ -281,9 +283,9 @@ internal class AndroidSystemUiController(
         }
 
     override var isNavigationBarContrastEnforced: Boolean
-        get() = Build.VERSION.SDK_INT >= 29 && window?.isNavigationBarContrastEnforced == true
+        get() = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q && window?.isNavigationBarContrastEnforced == true
         set(value) {
-            if (Build.VERSION.SDK_INT >= 29) {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 window?.isNavigationBarContrastEnforced = value
             }
         }

@@ -23,17 +23,17 @@ import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.library.LibraryNavHost
 import com.san.kir.manger.ui.init.InitScreen
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 import kotlin.math.max
 
+
 @Serializable
 @NavEntry
-internal class Splash : NavConfig() {
-    companion object {
-        val creator = navCreator<Splash> {
-            MaterialTheme(lightColorScheme()) {
-                InitScreen(replace(Library))
-            }
+internal data object Splash : NavConfig() {
+    val creator = navCreator<Splash> {
+        MaterialTheme(lightColorScheme()) {
+            InitScreen(replace(Library))
         }
     }
 }
@@ -62,12 +62,13 @@ internal data object Library : NavConfig() {
     }
 }
 
+@OptIn(ExperimentalSerializationApi::class)
 @Composable
 fun MainNavHost(componentContext: ComponentContext) {
-    AddNavigationCreators
     NavHost(
         componentContext = componentContext,
-        startConfig = Splash(),
+        startConfig = Splash,
+        serializerModule = AddNavigationCreators.serializerModule(),
         animation = stackAnimation(animator),
     )
 }
