@@ -22,6 +22,7 @@ internal class Unicomics(private val connectManager: ConnectManager) : SiteCatal
     override val catalogName: String = "unicomics.ru"
     override val catalog: String = "$host/map"
     override var volume = 0
+    override val hasPopulateSort = false
 
     override suspend fun init(): Unicomics {
         val doc = connectManager.getDocument(catalog)
