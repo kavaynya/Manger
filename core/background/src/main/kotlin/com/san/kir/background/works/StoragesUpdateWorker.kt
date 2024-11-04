@@ -81,9 +81,7 @@ public class StoragesUpdateWorker(
             ManualDI.workManager().enqueue(task)
         }
 
-        public fun workInfos(): Flow<MutableList<WorkInfo>> =
-            WorkManager
-                .getInstance(ManualDI.application)
-                .getWorkInfosByTagFlow(TAG)
+        public fun workInfos(): Flow<List<WorkInfo>> =
+            WorkManager.getInstance(ManualDI.application).getWorkInfosByTagFlow(TAG)
     }
 }

@@ -3,6 +3,8 @@ package com.san.kir.background.works
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
 import androidx.work.ForegroundInfo
@@ -38,7 +40,7 @@ internal class UpdateCatalogWorker(
 
         val tempList = mutableListOf<SiteCatalogElement>()
         kotlin.runCatching {
-            val site = manager.catalog.first { it.name == task.name }
+            val site = manager.catalogByName(task.name)
             site.init()
 
             var retry = 3
@@ -73,8 +75,7 @@ internal class UpdateCatalogWorker(
                 updateCurrentTask { copy(state = DownloadState.COMPLETED) }
                 notify()
             }
-
-            catalogsRepository.save(task.name, tempList)
+            catalogsRepository.save(manager.catalogName(site.name), tempList)
 
             Timber.v("save items in db")
         }.onFailure {
@@ -87,9 +88,7 @@ internal class UpdateCatalogWorker(
         with(NotificationCompat.Builder(applicationContext, channelId)) {
             setSmallIcon(R.drawable.ic_notification_update)
 
-            setContentTitle(
-                applicationContext.getString(R.string.catalogs_updating_format, queue.size)
-            )
+            setContentTitle(applicationContext.getString(R.string.catalogs_updating_format, queue.size))
 
             task?.let { task ->
                 when (task.state) {
@@ -101,28 +100,20 @@ internal class UpdateCatalogWorker(
 
                     DownloadState.QUEUED -> {
                         setContentText(
-                            applicationContext.getString(
-                                R.string.prepare_catalog_for_loading_format, task.name
-                            )
+                            applicationContext.getString(R.string.prepare_catalog_for_loading_format, task.name)
                         )
                         setProgress(0, 0, true)
                     }
 
                     DownloadState.PAUSED -> {
                         setContentText(
-                            applicationContext.getString(
-                                R.string.cancel_loading_catalog_format, task.name
-                            )
+                            applicationContext.getString(R.string.cancel_loading_catalog_format, task.name)
                         )
                         setProgress(0, 0, true)
                     }
 
                     DownloadState.COMPLETED -> {
-                        setContentText(
-                            applicationContext.getString(
-                                R.string.saving_catalog_format, task.name
-                            )
-                        )
+                        setContentText(applicationContext.getString(R.string.saving_catalog_format, task.name))
                         setProgress(0, 0, true)
                     }
 
@@ -145,7 +136,11 @@ internal class UpdateCatalogWorker(
             addAction(applicationContext.cancelAction(id))
 
             kotlin.runCatching {
-                setForeground(ForegroundInfo(notifyId, build()))
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                    setForeground(ForegroundInfo(notifyId, build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC))
+                } else {
+                    setForeground(ForegroundInfo(notifyId, build()))
+                }
             }
         }
     }
@@ -159,9 +154,7 @@ internal class UpdateCatalogWorker(
                     setContentTitle(applicationContext.getString(R.string.complete_catalog_update))
                 } else {
                     setContentTitle(applicationContext.getString(R.string.updating_catalogs_completed_with_error))
-                    setStyle(
-                        NotificationCompat.BigTextStyle().bigText(errored.joinToString { it.name })
-                    )
+                    setStyle(NotificationCompat.BigTextStyle().bigText(errored.joinToString { it.name }))
                 }
             } else {
                 setContentTitle(applicationContext.getString(R.string.updating_catalogs_canceled))
@@ -188,10 +181,7 @@ internal class UpdateCatalogWorker(
         fun setLatestDeepLink(deepLinkIntent: Intent) {
             actionGoToCatalogs = TaskStackBuilder.create(ManualDI.application).run {
                 addNextIntentWithParentStack(deepLinkIntent)
-                getPendingIntent(
-                    0,
-                    PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT
-                )
+                getPendingIntent(0, PendingIntent.FLAG_IMMUTABLE or PendingIntent.FLAG_UPDATE_CURRENT)
             }
         }
     }
