@@ -14,11 +14,8 @@ public object ManualDI {
     public const val TAG: String = "MANUAL DI"
 
     private var app: Application? = null
-    private val navigationCreators: MutableMap<KClass<out NavConfig>, (NavConfig) -> NavComponent<*>> =
-        hashMapOf()
-
-    private val navigationAnimations: MutableMap<KClass<out NavConfig>, (NavConfig) -> StackAnimator> =
-        hashMapOf()
+    private val navigationCreators: MutableMap<KClass<out NavConfig>, (NavConfig) -> NavComponent<*>> = hashMapOf()
+    private val navigationAnimations: MutableMap<KClass<out NavConfig>, (NavConfig) -> StackAnimator> = hashMapOf()
 
     public fun init(application: Application) {
         app = application

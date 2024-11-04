@@ -12,16 +12,14 @@ import com.san.kir.core.compose.animation.circleShapeAnimator
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.animation.verticalSlide
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.data.models.catalog.SiteCatalogElement
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 
-public fun catalogsNavigationCreators() {
-    AddNavigationCreators
-}
+public val catalogsSerializersModule: SerializersModule = AddNavigationCreators.serializerModule()
 
 @NavEntry
 @Serializable
@@ -40,7 +38,7 @@ public data object Catalogs : NavConfig() {
 
 @NavEntry
 @Serializable
-public class Catalog(
+public data class Catalog(
     internal val catalogName: String,
     internal val params: SharedParams,
 ) : NavConfig() {

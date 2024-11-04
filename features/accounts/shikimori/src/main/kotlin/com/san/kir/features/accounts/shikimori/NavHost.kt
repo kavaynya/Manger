@@ -6,7 +6,6 @@ import com.san.kir.core.compose.animation.circleShapeAnimator
 import com.san.kir.core.compose.animation.itemShapeAnimator
 import com.san.kir.core.compose.animation.shapeAnimator
 import com.san.kir.core.compose.animation.verticalSlide
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
@@ -17,10 +16,9 @@ import com.san.kir.features.accounts.shikimori.ui.localItem.LocalItemScreen
 import com.san.kir.features.accounts.shikimori.ui.localItems.LocalItemsScreen
 import com.san.kir.features.accounts.shikimori.ui.search.ShikiSearchScreen
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 
-public fun shikimoriNavigationCreators() {
-    AddNavigationCreators
-}
+public val shikimoriSerializersModule: SerializersModule = AddNavigationCreators.serializerModule()
 
 @Serializable
 @NavEntry

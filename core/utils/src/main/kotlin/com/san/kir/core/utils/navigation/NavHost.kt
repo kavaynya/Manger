@@ -9,6 +9,7 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.isFront
 import com.arkivanov.decompose.extensions.compose.stack.animation.stackAnimation
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.LocalComponentContext
+import kotlinx.serialization.modules.SerializersModule
 
 @OptIn(FaultyDecomposeApi::class)
 private val defaultAnimations: StackAnimation<NavConfig, NavContainer> =
@@ -23,10 +24,11 @@ private fun frontAnimation(config: NavConfig) = ManualDI.navAnimation(config) ?:
 public fun NavHost(
     componentContext: ComponentContext,
     startConfig: NavConfig,
+    serializerModule: SerializersModule = SerializersModule {},
     animation: StackAnimation<NavConfig, NavContainer> = defaultAnimations,
 ) {
     val navHostComponent = remember {
-        NavHostComponent(componentContext, startConfig, animation)
+        NavHostComponent(componentContext, startConfig, serializerModule, animation)
     }
     navHostComponent.Show()
 }
@@ -34,5 +36,6 @@ public fun NavHost(
 @Composable
 public fun NavHost(
     startConfig: NavConfig,
+    serializerModule: SerializersModule = SerializersModule {},
     stackAnimation: StackAnimation<NavConfig, NavContainer> = defaultAnimations,
-): Unit = NavHost(LocalComponentContext.current, startConfig, stackAnimation)
+): Unit = NavHost(LocalComponentContext.current, startConfig, serializerModule, stackAnimation)

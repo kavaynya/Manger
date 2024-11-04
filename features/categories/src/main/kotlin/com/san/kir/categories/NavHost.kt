@@ -10,11 +10,9 @@ import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 
-
-public fun categoryNavigationCreators() {
-    AddNavigationCreators
-}
+public val categorySerializersModule: SerializersModule = AddNavigationCreators.serializerModule()
 
 @NavEntry
 @Serializable

@@ -136,10 +136,13 @@ class NavConfigProcessor(
             appendLine()
             appendLine()
             appendLine("import com.san.kir.core.utils.ManualDI");
-            appendLine("import com.san.kir.core.utils.navigation.NavComponent");
-            appendLine("import com.san.kir.core.utils.navigation.NavConfig");
-            appendLine("import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator");
-            appendLine("import android.util.Log");
+            appendLine("import com.san.kir.core.utils.navigation.NavComponent")
+            appendLine("import com.san.kir.core.utils.navigation.NavConfig")
+            appendLine("import kotlinx.serialization.modules.SerializersModule")
+            appendLine("import kotlinx.serialization.modules.polymorphic")
+            appendLine("import kotlinx.serialization.modules.subclass")
+            appendLine("import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimator")
+            appendLine("import android.util.Log")
             appendLine()
             appendLine("internal object AddNavigationCreators {")
             appendLine("\tinit {")
@@ -150,6 +153,15 @@ class NavConfigProcessor(
                     appendLine("\t\tManualDI.addNavigationAnimation($configName::class, $configName.$animation)")
                 }
             }
+            appendLine("\t}")
+            appendLine()
+            appendLine("\tfun serializerModule(vararg modules: SerializersModule) = SerializersModule {")
+            appendLine("\t\tpolymorphic(NavConfig::class) {")
+            params.forEach { (configName, _, _, _) ->
+                appendLine("\t\t\tsubclass($configName::class)")
+            }
+            appendLine("\t\t}")
+            appendLine("\t\tmodules.forEach(::include)")
             appendLine("\t}")
             appendLine("}")
         }

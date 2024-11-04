@@ -4,17 +4,15 @@ import NavEntry
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.shapeAnimator
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.schedule.ui.schedule.ScheduleScreen
 import com.san.kir.schedule.ui.task.TaskScreen
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 
-public fun scheduleNavigationCreators() {
-    AddNavigationCreators
-}
+public val scheduleSerializersModule: SerializersModule = AddNavigationCreators.serializerModule()
 
 @NavEntry
 @Serializable

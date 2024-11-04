@@ -4,19 +4,19 @@ import NavEntry
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import com.san.kir.accounts.Accounts
-import com.san.kir.accounts.accountsNavigationCreators
+import com.san.kir.accounts.accountsSerializersModule
 import com.san.kir.catalog.AddOnline
+import com.san.kir.catalog.Catalog
 import com.san.kir.catalog.Catalogs
-import com.san.kir.catalog.catalogsNavigationCreators
+import com.san.kir.catalog.catalogsSerializersModule
 import com.san.kir.categories.Categories
-import com.san.kir.categories.categoryNavigationCreators
+import com.san.kir.categories.categorySerializersModule
 import com.san.kir.chapters.Chapters
 import com.san.kir.chapters.Downloads
 import com.san.kir.chapters.Latest
-import com.san.kir.chapters.chaptersNavigationCreators
+import com.san.kir.chapters.chaptersSerializersModule
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.itemShapeAnimator
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.EmptyStackAnimator
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.NavHost
@@ -27,28 +27,16 @@ import com.san.kir.library.ui.library.LibraryNavigation
 import com.san.kir.library.ui.library.LibraryScreen
 import com.san.kir.library.ui.mangaAbout.MangaAboutScreen
 import com.san.kir.schedule.Schedule
-import com.san.kir.schedule.scheduleNavigationCreators
+import com.san.kir.schedule.scheduleSerializersModule
 import com.san.kir.settings.Settings
-import com.san.kir.settings.settingsNavigationCreators
+import com.san.kir.settings.settingsSerializersModule
 import com.san.kir.statistic.Statistic
 import com.san.kir.statistic.Statistics
-import com.san.kir.statistic.statisticsNavigationCreators
+import com.san.kir.statistic.statisticsSerializersModule
 import com.san.kir.storage.Storage
 import com.san.kir.storage.Storages
-import com.san.kir.storage.storageNavigationCreators
+import com.san.kir.storage.storageSerializersModule
 import kotlinx.serialization.Serializable
-
-private fun libraryNavigationCreators() {
-    AddNavigationCreators
-    storageNavigationCreators()
-    categoryNavigationCreators()
-    catalogsNavigationCreators()
-    scheduleNavigationCreators()
-    statisticsNavigationCreators()
-    accountsNavigationCreators()
-    chaptersNavigationCreators()
-    settingsNavigationCreators()
-}
 
 private val mainMenuItems = mapOf(
     MainMenuType.Library to Library,
@@ -62,7 +50,6 @@ private val mainMenuItems = mapOf(
     MainMenuType.Statistic to Statistics,
     MainMenuType.Accounts to Accounts,
 )
-
 
 @NavEntry
 @Serializable
@@ -106,7 +93,18 @@ internal class About(val mangaId: Long, val sharedParams: SharedParams) : NavCon
 
 @Composable
 public fun LibraryNavHost() {
-    libraryNavigationCreators()
-    NavHost(startConfig = Library)
+    NavHost(
+        startConfig = Catalog("UniComics", SharedParams()),
+        serializerModule = AddNavigationCreators.serializerModule(
+            storageSerializersModule,
+            categorySerializersModule,
+            catalogsSerializersModule,
+            scheduleSerializersModule,
+            statisticsSerializersModule,
+            accountsSerializersModule,
+            chaptersSerializersModule,
+            settingsSerializersModule,
+        )
+    )
 }
 

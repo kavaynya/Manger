@@ -5,18 +5,16 @@ import androidx.compose.runtime.remember
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.itemShapeAnimator
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.statistic.ui.statistic.StatisticScreen
 import com.san.kir.statistic.ui.statistics.StatisticsScreen
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 
 
-public fun statisticsNavigationCreators() {
-    AddNavigationCreators
-}
+public val statisticsSerializersModule: SerializersModule = AddNavigationCreators.serializerModule()
 
 @NavEntry
 @Serializable

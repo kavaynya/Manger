@@ -8,28 +8,34 @@ import com.arkivanov.decompose.extensions.compose.stack.animation.StackAnimation
 import com.arkivanov.decompose.router.stack.StackNavigation
 import com.arkivanov.decompose.router.stack.childStack
 import com.arkivanov.decompose.router.stack.pop
-import com.arkivanov.decompose.router.stack.push
+import com.arkivanov.decompose.router.stack.pushNew
 import com.arkivanov.decompose.router.stack.replaceCurrent
 import com.arkivanov.essenty.backhandler.BackCallback
+import com.arkivanov.essenty.statekeeper.ExperimentalStateKeeperApi
 import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.viewModel.EventBusImpl
 import com.san.kir.core.utils.viewModel.LocalComponentContext
 import com.san.kir.core.utils.viewModel.LocalEventBus
 import kotlinx.datetime.Clock.System
+import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.modules.SerializersModule
 import timber.log.Timber
 import kotlin.time.Duration.Companion.seconds
 
 internal class NavHostComponent(
     componentContext: ComponentContext,
     startConfig: NavConfig,
+    serializerModule: SerializersModule,
     private val stackAnimation: StackAnimation<NavConfig, NavContainer>
 ) : ComponentContext by componentContext, NavComponentScope {
 
     private var lastPushing = System.now()
     private val navigation = StackNavigation<NavConfig>()
+
+    @OptIn(ExperimentalStateKeeperApi::class, ExperimentalSerializationApi::class)
     private val childStack = childStack(
         source = navigation,
-        serializer = NavConfig.serializer(),
+        serializer = NavConfig.serializer(serializerModule),
         initialConfiguration = startConfig,
         handleBackButton = true,
         childFactory = ::createChild
@@ -45,7 +51,7 @@ internal class NavHostComponent(
 
     private fun push(navConfig: NavConfig) {
         if ((System.now() - lastPushing) < 1.seconds) return
-        navigation.push(navConfig)
+        navigation.pushNew(navConfig)
         lastPushing = System.now()
     }
 

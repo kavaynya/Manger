@@ -8,17 +8,15 @@ import com.san.kir.chapters.ui.latest.LatestScreen
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.horizontalSlide
 import com.san.kir.core.compose.animation.itemShapeAnimator
-import com.san.kir.core.compose.backPressed
 import com.san.kir.core.utils.navigation.NavConfig
 import com.san.kir.core.utils.navigation.navAnimation
 import com.san.kir.core.utils.navigation.navCreator
 import com.san.kir.core.utils.navigation.rememberLambda
 import com.san.kir.features.viewer.MangaViewer
 import kotlinx.serialization.Serializable
+import kotlinx.serialization.modules.SerializersModule
 
-public fun chaptersNavigationCreators() {
-    AddNavigationCreators
-}
+public val chaptersSerializersModule: SerializersModule = AddNavigationCreators.serializerModule()
 
 @NavEntry
 @Serializable
