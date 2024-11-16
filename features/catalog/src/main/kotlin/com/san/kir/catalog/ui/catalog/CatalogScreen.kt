@@ -264,7 +264,7 @@ private fun DrawerContent(
 
         // Переключатели вкладок доступных фильтров
         Row(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().startInsetsPadding(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 

@@ -142,10 +142,7 @@ internal fun TopBarLayout(
                                     scaleY = collapsingSubtitleScale
                                     transformOrigin = TransformOrigin(0f, 0f)
                                 }
-                                .padding(
-                                    start = HorizontalPadding,
-                                    end = ExpandedHorizontalPadding
-                                ),
+                                .padding(start = HorizontalPadding, end = ExpandedHorizontalPadding),
                             color = contentColor.copy(alpha = 0.8f),
                             style = expandedSubTitleStyle,
                         )
@@ -351,10 +348,7 @@ internal fun TopBarLayout(
 
 
                     if (expandedSubtitlePlaceable?.width == collapsedSubtitlePlaceable?.width) {
-                        expandedSubtitlePlaceable?.placeRelative(
-                            collapsingSubtitleX,
-                            collapsingSubtitleY
-                        )
+                        expandedSubtitlePlaceable?.placeRelative(collapsingSubtitleX, collapsingSubtitleY)
                     } else {
                         expandedSubtitlePlaceable?.placeRelativeWithLayer(
                             collapsingSubtitleX, collapsingSubtitleY

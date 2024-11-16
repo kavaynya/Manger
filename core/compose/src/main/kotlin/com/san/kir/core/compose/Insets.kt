@@ -151,6 +151,12 @@ public fun Modifier.startInsetsPadding(
     bottom: Dp = Dimensions.zero
 ): Modifier = windowInsetsPadding(startInsets(left, top, right, bottom))
 
+@Composable
+public fun Modifier.startInsetsPadding(
+    horizontal: Dp = Dimensions.zero,
+    vertical: Dp = Dimensions.zero,
+): Modifier = windowInsetsPadding(startInsets(horizontal, vertical, horizontal, vertical))
+
 
 ////////////////////////////////////
 

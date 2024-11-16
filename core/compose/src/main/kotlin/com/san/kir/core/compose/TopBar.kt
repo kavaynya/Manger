@@ -68,7 +68,8 @@ public fun topBar(
     TopBarLayout(
         modifier = Modifier
             .statusBarsPadding()
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .startInsetsPadding(),
         title = title?.let(::AnnotatedString),
         subtitle = subtitle?.let(::AnnotatedString),
         expandedTitleStyle = titleTextStyle,
@@ -136,7 +137,8 @@ public fun topBar(
     TopBarLayout(
         modifier = Modifier
             .statusBarsPadding()
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .startInsetsPadding(),
         title = title,
         subtitle = subtitle,
         expandedTitleStyle = titleTextStyle,
@@ -186,10 +188,7 @@ public fun topBar(
 private fun NavigationIcon(state: NavigationButton) {
     val coroutineScope = rememberCoroutineScope()
 
-    FromStartToStartAnimContent(
-        targetState = state,
-        modifier = Modifier.startInsetsPadding()
-    ) {
+    FromStartToStartAnimContent(targetState = state) {
         when (it) {
             is NavigationButton.Back ->
                 IconButton(
