@@ -3,11 +3,8 @@ package com.san.kir.background.works
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
-import android.os.Build
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
 import com.san.kir.background.logic.WorkComplete
@@ -135,13 +132,7 @@ internal class UpdateCatalogWorker(
 
             addAction(applicationContext.cancelAction(id))
 
-            kotlin.runCatching {
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-                    setForeground(ForegroundInfo(notifyId, build(), FOREGROUND_SERVICE_TYPE_DATA_SYNC))
-                } else {
-                    setForeground(ForegroundInfo(notifyId, build()))
-                }
-            }
+            kotlin.runCatching { setForeground(notifyId, build()) }
         }
     }
 

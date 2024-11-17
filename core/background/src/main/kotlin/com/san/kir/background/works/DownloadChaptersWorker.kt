@@ -5,7 +5,6 @@ import android.content.Context
 import android.content.Intent
 import androidx.core.app.NotificationCompat
 import androidx.core.app.TaskStackBuilder
-import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.R
 import com.san.kir.background.logic.ChapterDownloader
@@ -122,7 +121,7 @@ internal class DownloadChaptersWorker(context: Context, params: WorkerParameters
 
             addAction(applicationContext.cancelAction(id))
 
-            kotlin.runCatching { setForeground(ForegroundInfo(notifyId, build())) }
+            kotlin.runCatching { setForeground(notifyId, build()) }
         }
     }
 

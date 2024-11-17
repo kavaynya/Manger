@@ -1,8 +1,12 @@
 package com.san.kir.background.works
 
+import android.app.Notification
 import android.content.Context
+import android.content.pm.ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC
+import android.os.Build
 import androidx.core.app.NotificationManagerCompat
 import androidx.work.CoroutineWorker
+import androidx.work.ForegroundInfo
 import androidx.work.WorkerParameters
 import com.san.kir.background.logic.Command
 import com.san.kir.background.logic.WorkComplete
@@ -111,7 +115,7 @@ internal open class BaseUpdateWorker<T : BaseTask<T>>(
         }.apply { queue = new }
     }
 
-    private suspend fun start() {
+    private fun start() {
         Timber.i("start")
 
         if (currentJob != null
@@ -121,9 +125,10 @@ internal open class BaseUpdateWorker<T : BaseTask<T>>(
         ) return
 
         currentJob = scope.launch {
-            currentTask = queue.first()
-            Timber.i("createJob -> ${queue.first()}")
-            work(queue.first())
+            val item = queue.firstOrNull() ?: return@launch
+            currentTask = item
+            Timber.i("createJob -> $item")
+            work(item)
             removeTask()
             control()
         }
@@ -175,6 +180,14 @@ internal open class BaseUpdateWorker<T : BaseTask<T>>(
 
     protected suspend fun withCurrentTask(action: suspend (T) -> Unit) {
         currentTask?.let { action(it) }
+    }
+
+    protected suspend fun setForeground(notificationId: Int, notification: Notification) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+            setForeground(ForegroundInfo(notificationId, notification, FOREGROUND_SERVICE_TYPE_DATA_SYNC))
+        } else {
+            setForeground(ForegroundInfo(notificationId, notification))
+        }
     }
 
     protected suspend fun notify() {
