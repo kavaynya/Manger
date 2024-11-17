@@ -2,15 +2,21 @@ package com.san.kir.catalog.ui.addStandart
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -19,9 +25,11 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +47,9 @@ import com.san.kir.core.compose.FullWeightSpacer
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenContent
 import com.san.kir.core.compose.animation.FromEndToEndAnimContent
+import com.san.kir.core.compose.animation.StartAnimatedVisibility
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
+import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.viewModel.rememberSendAction
@@ -47,10 +57,8 @@ import com.san.kir.core.utils.viewModel.stateHolder
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun AddStandartScreen(
-    navigateUp: () -> Unit,
-    url: String,
-) {
+internal fun AddStandartScreen(navigateUp: () -> Unit, url: String) {
+
     val holder: AddStandartViewModel = stateHolder { AddStandartViewModel(url) }
     val state by holder.state.collectAsStateWithLifecycle()
     val sendAction = holder.rememberSendAction()
@@ -63,77 +71,84 @@ internal fun AddStandartScreen(
             navigationButton = NavigationButton.Back(navigateUp)
         ),
     ) {
-        TextWithValidate(
-            value = state.categoryName,
-            hasAllow = state.processState !is ProcessState.Load,
-            onValueChange = { sendAction(AddStandartAction.UpdateText(it)) }
-        )
-        MessageAboutCreatingNewCategory(state.createNewCategory)
+        Column(modifier = Modifier.fillMaxWidth().horizontalInsetsPadding()) {
+            TextWithValidate(state) { sendAction(AddStandartAction.UpdateText(it)) }
+            MessageAboutCreatingNewCategory(state.createNewCategory)
 
-        TopAnimatedVisibility(visible = state.processState !is ProcessState.Load) {
-            ListOfAvailableCategories(state.availableCategories) {
-                sendAction(AddStandartAction.UpdateText(it))
+            TopAnimatedVisibility(visible = state.processState !is ProcessState.Load) {
+                ListOfAvailableCategories(state.availableCategories) {
+                    sendAction(AddStandartAction.UpdateText(it))
+                }
             }
-        }
 
-        Process(state)
+            Process(state)
 
-        FullWeightSpacer()
+            FullWeightSpacer()
 
-        FromEndToEndAnimContent(
-            targetState = state.processState,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(Dimensions.default),
-            contentAlignment = Alignment.CenterEnd
-        ) {
-            when (it) {
-                ProcessState.Complete ->
-                    Button(onClick = navigateUp) {
+            FromEndToEndAnimContent(
+                targetState = state.processState,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(Dimensions.default),
+                contentAlignment = Alignment.CenterEnd
+            ) {
+                when (it) {
+                    ProcessState.Complete -> Button(onClick = navigateUp) {
                         Text(stringResource(R.string.close))
                     }
 
-                ProcessState.None ->
-                    Button(
+                    ProcessState.None -> Button(
                         onClick = { sendAction(AddStandartAction.StartProcess) },
                         enabled = state.hasAllow
                     ) {
                         Text(stringResource(R.string.proceed))
                     }
 
-                ProcessState.Error ->
-                    Button(
+                    ProcessState.Error -> Button(
                         onClick = { sendAction(AddStandartAction.StartProcess) },
                         enabled = state.hasAllow
                     ) {
                         Text(stringResource(R.string.try_again))
                     }
 
-                ProcessState.Load -> Unit
+                    ProcessState.Load -> Unit
+                }
             }
         }
     }
 }
 
 @Composable
-private fun TextWithValidate(
-    value: String,
-    hasAllow: Boolean,
-    onValueChange: (String) -> Unit,
-) {
-    var valueField by remember { mutableStateOf(value) }
+private fun TextWithValidate(state: AddStandartState, onValueChange: (String) -> Unit) {
+    var valueField by rememberSaveable(state.categoryName) { mutableStateOf(state.categoryName) }
+    val canClearText by remember(state.categoryName) { derivedStateOf { state.categoryName.isNotEmpty() } }
     OutlinedTextField(
         value = valueField,
         onValueChange = {
-            valueField = it
-            onValueChange(it)
+            if (valueField != it) {
+                valueField = it
+                onValueChange(it)
+            }
         },
         singleLine = true,
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = Dimensions.quarter),
-        enabled = hasAllow,
+        enabled = state.processState.canEdit(),
+        isError = state.hasAllow.not(),
         placeholder = { Text(stringResource(id = R.string.select_category)) },
+        leadingIcon = { Icon(Icons.Default.Category, "category") },
+        trailingIcon = {
+            StartAnimatedVisibility(canClearText) {
+                IconButton(
+                    onClick = {
+                        valueField = ""
+                        onValueChange("")
+                    },
+                    enabled = state.processState.canEdit(),
+                ) { Icon(Icons.Default.Close, "") }
+            }
+        },
     )
 }
 
@@ -237,7 +252,8 @@ private fun Title(text: Int, arg: String? = null, color: Color = Color.Unspecifi
 @Composable
 private fun PreviewListOfAvailableCategoriesLight() {
     MaterialTheme(colorScheme = lightColorScheme()) {
-        ListOfAvailableCategories(listOfCategories = listOf("Test 1", "Test 2", "Test 3"),
+        ListOfAvailableCategories(
+            listOfCategories = listOf("Test 1", "Test 2", "Test 3"),
             onItemSelect = {})
     }
 }
@@ -249,7 +265,8 @@ private fun PreviewListOfAvailableCategoriesLight() {
 @Composable
 private fun PreviewListOfAvailableCategoriesDark() {
     MaterialTheme(colorScheme = darkColorScheme()) {
-        ListOfAvailableCategories(listOfCategories = listOf("Test 1", "Test 2", "Test 3"),
+        ListOfAvailableCategories(
+            listOfCategories = listOf("Test 1", "Test 2", "Test 3"),
             onItemSelect = {})
     }
 }

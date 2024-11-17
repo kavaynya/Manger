@@ -11,8 +11,7 @@ internal data class AddStandartState(
     val processState: ProcessState = ProcessState.None,
 ) : ScreenState {
     val hasAllow = categoryName.length >= 3
-    val createNewCategory =
-        hasAllow && availableCategories.size != 1 || availableCategories.firstOrNull() != categoryName
+    val createNewCategory = hasAllow && (availableCategories.size != 1 || availableCategories.firstOrNull() != categoryName)
 }
 
 internal sealed interface ProcessState {
@@ -20,6 +19,8 @@ internal sealed interface ProcessState {
     data object Error : ProcessState
     data object Complete : ProcessState
     data object None : ProcessState
+
+    fun canEdit() : Boolean = this is None
 }
 
 internal object ProcessStatus {

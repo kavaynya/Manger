@@ -58,7 +58,7 @@ public data class Catalog(
 
 @NavEntry
 @Serializable
-public class Info(internal val item: SiteCatalogElement, internal val params: SharedParams) :
+public data class Info(internal val item: SiteCatalogElement, internal val params: SharedParams) :
     NavConfig() {
     internal companion object {
         val creator = navCreator<Info> { config ->
@@ -75,7 +75,7 @@ public class Info(internal val item: SiteCatalogElement, internal val params: Sh
 
 @NavEntry
 @Serializable
-public class AddLocal(internal val url: String, internal val params: SharedParams) : NavConfig() {
+public data class AddLocal(internal val url: String, internal val params: SharedParams) : NavConfig() {
     internal companion object {
         val creator = navCreator<AddLocal> { config ->
             AddStandartScreen(
@@ -90,7 +90,7 @@ public class AddLocal(internal val url: String, internal val params: SharedParam
 
 @NavEntry
 @Serializable
-public class GlobalSearch(internal val query: String = "") : NavConfig() {
+public data class GlobalSearch(internal val query: String = "") : NavConfig() {
     internal companion object {
         val creator = navCreator<GlobalSearch> { config ->
             SearchScreen(
@@ -107,7 +107,7 @@ public class GlobalSearch(internal val query: String = "") : NavConfig() {
 
 @NavEntry
 @Serializable
-public class AddOnline(internal val params: SharedParams) : NavConfig() {
+public data class AddOnline(internal val params: SharedParams) : NavConfig() {
     internal companion object {
         val creator = navCreator<AddOnline> { _ ->
             AddOnlineScreen(

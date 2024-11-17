@@ -21,9 +21,9 @@ import com.san.kir.data.statisticsRepository
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.update
 import timber.log.Timber
 import java.util.regex.Pattern
+import kotlin.time.Duration.Companion.milliseconds
 import kotlin.time.Duration.Companion.seconds
 
 
@@ -63,56 +63,56 @@ internal class AddStandartViewModel(
 
     private suspend fun startProcess() {
         kotlin.runCatching {
-            processState.update { ProcessState.Load }
+            processState.value = ProcessState.Load
 
             if (state.value.createNewCategory) {
                 categoryRepository.insert(categoryName.value)
                 delay(1.seconds)
             }
 
-            progress.update { ProcessStatus.CATEGORY_CHANGED }
+            progress.value = ProcessStatus.CATEGORY_CHANGED
 
-            progress.update { ProcessStatus.PREV_AND_UPDATE_MANGA }
+            progress.value = ProcessStatus.PREV_AND_UPDATE_MANGA
 
             val element = manager.elementByUrl(url) ?: throw NullPointerException()
             val matcher = Pattern.compile("[a-z/0-9]+-").matcher(element.shortLink)
             var shortPath = element.shortLink
-            if (matcher.find())
+            if (matcher.find()) {
                 shortPath = element.shortLink
                     .removePrefix("/")
                     .removePrefix("/")
                     .replace("/", "_")
                     .removeSuffix(".html")
+            }
 
             val path = "${DIR.MANGA}/${element.catalogName}/$shortPath"
-            val mangaId = mangaRepository.save(
-                element.toManga(
-                    categoryId = categoryRepository.idByName(categoryName.value)!!,
-                    path = path
-                ).copy(
-                    isAlternativeSite = manager.catalog(element.link) is SiteCatalogAlternative
-                )
-            ).ifEmpty { throw ArrayIndexOutOfBoundsException() }.first()
+            val manga = element
+                .toManga(categoryId = categoryRepository.idByName(categoryName.value)!!, path = path)
+                .copy(isAlternativeSite = manager.catalog(element.link) is SiteCatalogAlternative)
+            val mangaId = mangaRepository
+                .save(manga)
+                .ifEmpty { throw ArrayIndexOutOfBoundsException() }
+                .first()
 
             statisticRepository.save(mangaId)
 
-            progress.update { ProcessStatus.PREV_AND_CREATED_FOLDER }
+            progress.value = ProcessStatus.PREV_AND_CREATED_FOLDER
 
             catalogRepository.insert(manager.catalogName(element.catalogName), element)
-            delay(1.seconds)
+            delay(400.milliseconds)
 
-            progress.update { ProcessStatus.PREV_AND_SEARCH_CHAPTERS }
+            progress.value = ProcessStatus.PREV_AND_SEARCH_CHAPTERS
 
             updateManager.addTask(mangaId)
-            delay(1.seconds)
+            delay(400.milliseconds)
 
-            progress.update { ProcessStatus.ALL_COMPLETE }
+            progress.value = ProcessStatus.ALL_COMPLETE
 
         }.onFailure {
-            processState.update { ProcessState.Error }
+            processState.value = ProcessState.Error
             Timber.e(it)
         }.onSuccess {
-            processState.update { ProcessState.Complete }
+            processState.value = ProcessState.Complete
         }
     }
 
