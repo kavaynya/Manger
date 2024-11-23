@@ -71,7 +71,7 @@ internal fun AddStandartScreen(navigateUp: () -> Unit, url: String) {
             navigationButton = NavigationButton.Back(navigateUp)
         ),
     ) {
-        Column(modifier = Modifier.fillMaxWidth().horizontalInsetsPadding()) {
+        Column(modifier = Modifier.weight(1f).horizontalInsetsPadding()) {
             TextWithValidate(state) { sendAction(AddStandartAction.UpdateText(it)) }
             MessageAboutCreatingNewCategory(state.createNewCategory)
 
