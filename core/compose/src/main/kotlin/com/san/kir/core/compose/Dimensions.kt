@@ -16,7 +16,7 @@ public object Dimensions {
     public val big: Dp = 24.dp
 
     public object Image {
-        public val mini: Dp = 26.dp
+        public val mini: Dp = 24.dp
         public val small: Dp = 36.dp
         public val default: Dp = 56.dp
         public val bigger: Dp = 64.dp

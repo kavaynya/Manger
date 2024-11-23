@@ -7,14 +7,14 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -115,16 +115,15 @@ private fun ItemView(item: CheckableSite, onClick: (SharedParams) -> Unit) {
 
             QuarterSpacer()
 
-            Row {
+            Row(verticalAlignment = Alignment.CenterVertically) {
                 SiteState(item.state)
                 Text(
                     stringResource(R.string.volume),
                     fontWeight = FontWeight.Bold,
                     style = MaterialTheme.typography.bodySmall,
                 )
+                VolumeState(item.volume)
             }
-
-            VolumeState(item.volume)
         }
     }
 }
@@ -137,7 +136,7 @@ private fun SiteState(state: SiteState) {
                 Icon(
                     Icons.Default.Error, "",
                     tint = MaterialTheme.colorScheme.error,
-                    modifier = Modifier.padding(end = Dimensions.half)
+                    modifier = Modifier.padding(end = Dimensions.half).size(Dimensions.default),
                 )
 
             SiteState.Load ->
@@ -175,22 +174,14 @@ private fun VolumeState(state: VolumeState) {
             }
 
             is VolumeState.Ok -> {
-
-
                 Text(
                     text = buildAnnotatedString {
                         append(" ")
-                        append(
-                            "${it.volume}",
-                            SpanStyle(color = MaterialTheme.colorScheme.tertiary)
-                        )
+                        append("${it.volume}", SpanStyle(color = MaterialTheme.colorScheme.tertiary))
 
                         if (it.diff != 0) {
                             append(if (it.isPositive) " + " else " - ")
-                            append(
-                                "${it.diff}",
-                                SpanStyle(color = MaterialTheme.colorScheme.secondary)
-                            )
+                            append("${it.diff}", SpanStyle(color = MaterialTheme.colorScheme.secondary))
                         }
 
                         stringResource(R.string.volume_format, it.volume)
