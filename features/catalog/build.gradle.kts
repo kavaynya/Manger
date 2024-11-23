@@ -14,6 +14,7 @@ dependencies {
     implementation(projects.data.db)
     implementation(projects.data.parsing)
 
+    implementation(libs.datastore)
     implementation(projects.ksp)
     ksp(projects.ksp)
 }

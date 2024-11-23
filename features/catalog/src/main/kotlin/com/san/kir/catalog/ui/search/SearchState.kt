@@ -1,6 +1,7 @@
 package com.san.kir.catalog.ui.search
 
 import com.san.kir.core.utils.viewModel.ScreenState
+import kotlinx.serialization.Serializable
 
 internal data class SearchState(
     val background: Boolean = false,
@@ -17,6 +18,7 @@ internal data class SelectableCatalog(
     val selected: Boolean,
 )
 
+@Serializable
 internal data class FilterState(
     val selectedFilters: List<String> = emptyList(),
     val addedMangaVisible: Boolean = true,
@@ -30,5 +32,16 @@ internal data class FilterState(
                 .not()
         }
         return true
+    }
+
+    override fun equals(other: Any?): Boolean {
+        if (other !is FilterState) return false
+        return hasChanges(other).not()
+    }
+
+    override fun hashCode(): Int {
+        var result = addedMangaVisible.hashCode()
+        result = 31 * result + selectedFilters.hashCode()
+        return result
     }
 }

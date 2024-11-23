@@ -64,9 +64,7 @@ internal fun SearchScreen(
     val sendAction = holder.rememberSendAction()
 
     val size = rememberIntAnimatable()
-    LaunchedEffect(items) {
-        size.animateToDelayed(items.size)
-    }
+    LaunchedEffect(items) { size.animateToDelayed(items.size, duration = 500) }
 
     val catalogSelectorDialog = rememberDialogState<EmptyDialogData>()
 
@@ -91,7 +89,7 @@ internal fun SearchScreen(
         items(items, key = { it.id }) { item ->
             ListItem(
                 item, item.catalogName,
-                toAdd = { params -> navigateToAdd(item.link, params)},
+                toAdd = { params -> navigateToAdd(item.link, params) },
                 toInfo = { params -> navigateToInfo(item.toFullItem(), params) },
                 updateItem = rememberLambda { manga -> sendAction(SearchAction.UpdateManga(manga)) }
             )
@@ -138,11 +136,14 @@ private fun CatalogSelector(
             CheckBoxText(
                 state = showAddedManga,
                 onChange = { sendAction(SearchAction.ChangeAddMangaVisible(it)) },
-                firstText = if (!showAddedManga) "Показывать добавленную мангу" else "Непоказывать добавленную мангу"
+                firstText = if (showAddedManga) "Показывать добавленную мангу" else "Непоказывать добавленную мангу"
             )
 
             TextButton(
-                onClick = { sendAction(SearchAction.ApplyCatalogFilter) },
+                onClick = {
+                    sendAction(SearchAction.ApplyCatalogFilter)
+                    dialogState.dismiss()
+                },
                 enabled = hasFilterChanges,
                 modifier = Modifier.align(Alignment.End)
             ) {
