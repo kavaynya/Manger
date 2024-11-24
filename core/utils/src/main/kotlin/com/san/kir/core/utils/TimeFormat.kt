@@ -3,7 +3,7 @@ package com.san.kir.core.utils
 import android.content.Context
 
 public fun Long.formatTime(): String {
-    return TimeFormat(this).toString()
+    return TimeFormat(this).toString(ManualDI.application)
 }
 
 public class TimeFormat(seconds: Long) {
