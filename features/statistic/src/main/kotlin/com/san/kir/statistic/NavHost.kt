@@ -18,7 +18,7 @@ public val statisticsSerializersModule: SerializersModule = AddNavigationCreator
 
 @NavEntry
 @Serializable
-public object Statistics : NavConfig() {
+public data object Statistics : NavConfig() {
     internal val creator = navCreator<Statistics> {
         StatisticsScreen(
             navigateUp = backPressed(),
@@ -31,7 +31,7 @@ public object Statistics : NavConfig() {
 
 @NavEntry
 @Serializable
-public class Statistic(
+public data class Statistic(
     internal val itemId: Long = -1,
     internal val mangaId: Long = -1,
     internal val params: SharedParams

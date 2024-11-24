@@ -24,7 +24,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -76,8 +75,9 @@ internal fun StatisticsScreen(
     val sendAction = holder.rememberSendAction()
     val scope = rememberCoroutineScope()
     val density = LocalDensity.current
-    val ctx = LocalContext.current
-    val dismissStates = remember { createDismissStates(state.items.size, density, scope) }
+    val dismissStates = remember(state.items.size) {
+        createDismissStates(state.items.size, density, scope)
+    }
 
     holder.OnEvent { event ->
         when (event) {
@@ -96,8 +96,18 @@ internal fun StatisticsScreen(
         ),
         additionalPadding = Dimensions.quarter
     ) {
-        itemsIndexed(items = state.items, key = { _, stat -> stat.id }) { index, item ->
-            ItemView(item, state.allTime, dismissStates[index], sendAction)
+        if (state.items.isEmpty()) {
+            item {
+                Column(modifier = Modifier.fillMaxWidth(), horizontalAlignment = Alignment.CenterHorizontally) {
+                    Text(stringResource(R.string.empty_stats))
+                }
+            }
+        } else {
+            itemsIndexed(items = state.items, key = { _, stat -> stat.id }) { index, item ->
+                dismissStates.getOrNull(index)?.let { dismissState ->
+                    ItemView(item, state.allTime, dismissState, sendAction)
+                }
+            }
         }
     }
 }
@@ -120,7 +130,8 @@ private fun LazyItemScope.ItemView(
         agreeText = R.string.yes,
         durationDismissConfirmation = DurationDismissConfirmation,
         onSuccessDismiss = { sendAction(StatisticsAction.Delete(item.id)) },
-        endButtonPadding = DismissEndPadding,
+        dismissEndPadding = DismissEndPadding,
+        endButtonPadding = ImageSize,
         modifier = Modifier
             .fillMaxWidth()
             .padding(HorizontalItemPadding, VerticalItemPadding)
@@ -163,7 +174,7 @@ private fun ReadStatus(time: Long) {
             appendAndHighlightDigits(stringResource(R.string.time_reading) + " " + time.formatTime())
         },
         modifier = Modifier.padding(vertical = Dimensions.smallest),
-        color =  MaterialTheme.colorScheme.onSurfaceVariant,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
         style = MaterialTheme.typography.bodySmall,
     )
 }
@@ -175,7 +186,7 @@ private fun Progress(allTime: Long, itemTime: Animatable<Long, AnimationVector1D
             .padding(top = Dimensions.quarter, end = Dimensions.half)
             .height(Dimensions.half)
             .fillMaxWidth(),
-        progress = {if (allTime != 0L) itemTime.value / allTime.toFloat() else 0F},
+        progress = { if (allTime != 0L) itemTime.value / allTime.toFloat() else 0F },
     )
 }
 

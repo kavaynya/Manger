@@ -22,6 +22,7 @@
     <string name="session_time_pages">Каждая сессия чтения длится в среднем %1$s по %2$d %3$s</string>
     <string name="nothing">никакая</string>
     <string name="opening_times">Переходили в мангу %1$d %2$s</string>
+    <string name="empty_stats">Вы еще ничего не читали!</string>
 
     <plurals name="manga">
         <item quantity="one">манга</item>
