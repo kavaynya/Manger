@@ -159,6 +159,7 @@ public fun FabButton(
         contentDescription = "",
         modifier = Modifier
             .bottomInsetsPadding(right = Dimensions.default, bottom = Dimensions.default)
+            .horizontalInsetsPadding()
             .clip(DefaultRoundedShape)
             .saveParams(params)
             .clickable { onClick(params) }
