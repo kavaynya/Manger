@@ -13,7 +13,7 @@ import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBackIos
+import androidx.compose.material.icons.filled.ArrowBackIosNew
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -63,16 +63,19 @@ public fun createDismissStates(
     val states = mutableStateListOf<SwipeToDismissBoxState>()
 
     repeat(size) { mainIndex ->
-        SwipeToDismissBoxState(
+        states += SwipeToDismissBoxState(
             initialValue = SwipeToDismissBoxValue.Settled,
             density = density,
             confirmValueChange = { value ->
-                if (value == SwipeToDismissBoxValue.StartToEnd) {
-                    states.onEachIndexed { index, state ->
-                        if (index != mainIndex) scope.launch { state.reset() }
+                when (value) {
+                    SwipeToDismissBoxValue.StartToEnd -> {
+                        states.onEachIndexed { index, state -> if (index != mainIndex) scope.launch { state.reset() } }
+                        true
                     }
-                    true
-                } else false
+
+                    SwipeToDismissBoxValue.Settled -> true
+                    else -> false
+                }
             },
             positionalThreshold = { it / 2 }
         )
@@ -128,10 +131,7 @@ public fun SwipeToDelete(
                     Modifier
                         .fillMaxHeight()
                         .fillMaxWidth(access.value)
-                        .background(
-                            MaterialTheme.colorScheme.primary,
-                            SwipeToDeleteDefaults.MainItemShape
-                        )
+                        .background(MaterialTheme.colorScheme.primary, SwipeToDeleteDefaults.MainItemShape)
                 )
                 Row(
                     modifier = Modifier.fillMaxSize(),
@@ -141,7 +141,7 @@ public fun SwipeToDelete(
                         text = buildAnnotatedString {
                             append(
                                 stringResource(resetText),
-                                MaterialTheme.typography.headlineSmall.copy(
+                                MaterialTheme.typography.titleLarge.copy(
                                     color = SwipeToDeleteDefaults.backgroundItemContentColor,
                                     lineHeight = 25.sp
                                 ),
@@ -163,14 +163,14 @@ public fun SwipeToDelete(
 
                     OutlinedButton(
                         onClick = { },
-                        modifier = Modifier.padding(horizontal = Dimensions.default),
+                        modifier = Modifier.padding(horizontal = Dimensions.middle),
                         shape = MaterialTheme.shapes.extraLarge,
                         colors = ButtonDefaults.outlinedButtonColors(
                             contentColor = SwipeToDeleteDefaults.backgroundItemContentColor,
                         ),
                         interactionSource = interactionSource
                     ) {
-                        Text(stringResource(agreeText))
+                        Text(stringResource(agreeText), style = MaterialTheme.typography.bodyLarge)
                     }
 
                     OutlinedIconButton(
@@ -179,9 +179,9 @@ public fun SwipeToDelete(
                         colors = IconButtonDefaults.outlinedIconButtonColors(
                             contentColor = SwipeToDeleteDefaults.backgroundItemContentColor
                         ),
-                        border = ButtonDefaults.outlinedButtonBorder
+                        border = ButtonDefaults.outlinedButtonBorder(enabled = true)
                     ) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBackIos, contentDescription = "")
+                        Icon(Icons.Default.ArrowBackIosNew, contentDescription = "")
                     }
                 }
             }
