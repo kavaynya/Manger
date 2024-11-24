@@ -26,7 +26,7 @@ public fun HalfSpacer() {
 
 @Composable
 public fun DefaultSpacer() {
-    Spacer(modifier = Modifier.height(Dimensions.default))
+    Spacer(modifier = Modifier.size(Dimensions.default))
 }
 
 @Composable

@@ -6,6 +6,9 @@ import androidx.activity.ComponentActivity
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -14,6 +17,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.PlayArrow
+import androidx.compose.material.icons.filled.Restore
 import androidx.compose.material.icons.filled.Save
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
@@ -64,35 +68,30 @@ import com.san.kir.schedule.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-internal fun TaskScreen(
-    navigateUp: () -> Unit,
-    itemId: Long,
-) {
+internal fun TaskScreen(navigateUp: () -> Unit, itemId: Long) {
     val holder: TaskStateHolder = stateHolder { TaskViewModel(itemId) }
     val state by holder.state.collectAsStateWithLifecycle()
     val sendAction = holder.rememberSendAction()
     val changeAction = rememberLambda { type: ChangeType -> sendAction(TaskAction.Change(type)) }
 
-
     ScreenContent(
         topBar = topBar(
             navigationButton = NavigationButton.Back(navigateUp),
-            title = if (itemId == -1L)
+            title = if (state.item.isNew) {
                 stringResource(R.string.create_task)
-            else
-                stringResource(R.string.edit_task),
+            } else {
+                stringResource(R.string.edit_task)
+            },
             hasAction = state.backgroundWork.hasBackgrounds,
             actions = {
                 FromEndToEndAnimContent(targetState = state.availableAction) {
                     when (it) {
                         AvailableAction.None -> {}
-                        AvailableAction.Save ->
+                        AvailableAction.Start -> MenuIcon(Icons.Default.PlayArrow) { sendAction(TaskAction.Start) }
+                        AvailableAction.Save -> Row {
+                            MenuIcon(Icons.Default.Restore) { sendAction(TaskAction.Restore) }
                             MenuIcon(Icons.Default.Save) { sendAction(TaskAction.Save) }
-
-                        AvailableAction.Start ->
-                            MenuIcon(Icons.Default.PlayArrow) {
-                                sendAction(TaskAction.Start)
-                            }
+                        }
                     }
                 }
             }
@@ -100,37 +99,22 @@ internal fun TaskScreen(
     ) {
         Column(
             modifier = Modifier
-                .horizontalInsetsPadding()
-                .fillMaxWidth()
+                .horizontalInsetsPadding(horizontal = Dimensions.default)
+                .fillMaxWidth(),
         ) {
             TypeChanger(type = state.item.type, sendAction = changeAction)
 
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(vertical = Dimensions.half)
-                    .horizontalInsetsPadding()
-            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = Dimensions.half))
 
             TypeConfig(state, changeAction)
 
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(vertical = Dimensions.half)
-                    .horizontalInsetsPadding()
-            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = Dimensions.half))
 
             PeriodChanger(period = state.item.period, sendAction = changeAction)
 
-            HorizontalDivider(
-                modifier = Modifier
-                    .padding(vertical = Dimensions.half)
-                    .horizontalInsetsPadding()
-            )
+            HorizontalDivider(modifier = Modifier.padding(vertical = Dimensions.half))
 
-            TopAnimatedVisibility(
-                visible = state.item.period == PlannedPeriod.WEEK,
-                modifier = Modifier.horizontalInsetsPadding()
-            ) {
+            TopAnimatedVisibility(visible = state.item.period == PlannedPeriod.WEEK) {
                 PeriodConfig(dayOfWeek = state.item.dayOfWeek, sendAction = changeAction)
             }
 
@@ -144,7 +128,7 @@ internal fun TaskScreen(
 }
 
 @Composable
-private fun TypeChanger(type: PlannedType, sendAction: (ChangeType) -> Unit) {
+private fun ColumnScope.TypeChanger(type: PlannedType, sendAction: (ChangeType) -> Unit) {
     HalfSpacer()
     LabelText(idRes = R.string.update_type)
     DefaultSpacer()
@@ -316,7 +300,7 @@ private fun TypedItem(
     }
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalLayoutApi::class)
 @Composable
 private fun TypedItemList(
     label: Int,
@@ -332,10 +316,7 @@ private fun TypedItemList(
 
     Column {
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(bottom = Dimensions.default)
-        ) {
+        Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.padding(bottom = Dimensions.default)) {
             LabelText(label)
 
             BasicTextField(
@@ -381,23 +362,34 @@ private fun TypedItemList(
             )
         }
 
-        LabelText(label2)
+        Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            LabelText(label2)
+            FullWeightSpacer()
+            Text(
+                text = stringResource(R.string.change).uppercase(),
+                modifier = Modifier
+                    .clip(RoundedCornerShape(40))
+                    .clickable { dialog = true }
+                    .padding(Dimensions.quarter),
+                color = MaterialTheme.colorScheme.primary
+            )
+        }
 
         FromStartToStartAnimContent(
             targetState = items.isEmpty(),
             modifier = Modifier
                 .padding(Dimensions.half)
-                .weight(1f)
         ) {
             if (it) {
                 Text(stringResource(R.string.nothing_selected))
             } else
-                Column {
+                FlowRow {
                     items.forEach { item ->
                         Text(
                             text = item,
                             overflow = TextOverflow.Ellipsis,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
+                            modifier = Modifier.padding(vertical = Dimensions.quarter, horizontal = Dimensions.half)
                         )
                     }
                 }

@@ -1,6 +1,5 @@
 package com.san.kir.schedule.ui.task
 
-import android.content.Context
 import androidx.work.WorkInfo
 import com.san.kir.background.works.ScheduleWorker
 import com.san.kir.core.utils.ManualDI
@@ -19,39 +18,36 @@ import com.san.kir.data.parsing.siteCatalogsManager
 import com.san.kir.data.plannedRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 internal class TaskViewModel(
     private val itemId: Long,
-    private val context: Context = ManualDI.application,
     private val plannedRepository: PlannedRepository = ManualDI.plannedRepository(),
     private val categoryRepository: CategoryRepository = ManualDI.categoryRepository(),
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
     private val manager: SiteCatalogsManager = ManualDI.siteCatalogsManager(),
 ) : ViewModel<TaskState>(), TaskStateHolder {
     private val item = MutableStateFlow(PlannedTask())
-    private val hasChanges = MutableStateFlow(false)
+    private val editedItem = MutableStateFlow(PlannedTask())
+    private val hasChanges = combine(item, editedItem) { old, new -> old != new }
     private val hasWork = MutableStateFlow(BackgroundWork())
-    private var isNew = itemId == -1L
 
     override val tempState = combine(
-        item,
-        categoryRepository.namesAndIds,
-        mangaRepository.namesAndIds,
-        hasChanges,
-        hasWork
+        editedItem, categoryRepository.namesAndIds, mangaRepository.namesAndIds, hasChanges, hasWork
     ) { item, categories, mangas, changes, work ->
 
         val newItem = item.copy(
-            mangas = item.mangas.ifEmpty { item.groupContent.mapNotNull { name -> mangas.firstOrNull { it.name == name }?.id } }
+            mangas = item.mangas.ifEmpty {
+                item.groupContent.mapNotNull { name -> mangas.firstOrNull { it.name == name }?.id }
+            }
         )
 
-        val action =
-            if (changes) AvailableAction.Save
-            else if (work.hasBackgrounds.not()) AvailableAction.Start
-            else AvailableAction.None
+        val action = when {
+            changes -> AvailableAction.Save
+            work.hasBackgrounds.not() && this.item.value.isConfigured -> AvailableAction.Start
+            else -> AvailableAction.None
+        }
 
         TaskState(
             item = newItem,
@@ -71,12 +67,14 @@ internal class TaskViewModel(
 
     init {
         defaultLaunch {
-            val prev = item.value
-            val next = plannedRepository.item(itemId) ?: prev
+            hasWork.update { it.copy(hasAction = true) }
 
-            if (item.compareAndSet(prev, next).not()) {
-                hasWork.update { it.copy(hasWork = false) }
-            }
+            val dbItem = plannedRepository.item(itemId) ?: PlannedTask()
+
+            item.value = dbItem
+            editedItem.value = dbItem
+
+            hasWork.update { it.copy(hasAction = false) }
         }
 
         ScheduleWorker.workInfos(itemId)
@@ -86,13 +84,14 @@ internal class TaskViewModel(
                     old.copy(hasWork = hasWork)
                 }
             }
-            .launchIn(this)
+            .launch()
     }
 
     override suspend fun onAction(action: Action) {
         when (action) {
             is TaskAction.Change -> change(action.type)
             TaskAction.Save -> save()
+            TaskAction.Restore -> restore()
             TaskAction.Start -> ScheduleWorker.addTaskNow(
                 item.value.toBase(state.value.mangaName, state.value.categoryName)
             )
@@ -100,19 +99,25 @@ internal class TaskViewModel(
     }
 
     private suspend fun save() {
-        if (isNew) {
-            plannedRepository.save(item.value.copy(addedTime = System.currentTimeMillis()))
+        var saveItem = editedItem.value
+        if (saveItem.isNew) {
+            val ids = plannedRepository.save(saveItem.copy(addedTime = System.currentTimeMillis()))
+            saveItem = saveItem.copy(id = ids.first())
+            item.value = saveItem
+            editedItem.value = saveItem
         } else {
-            plannedRepository.save(item.value.copy(isEnabled = false))
-            ScheduleWorker.cancelTask(
-                item.value.toBase(state.value.mangaName, state.value.categoryName)
-            )
+            plannedRepository.save(saveItem.copy(isEnabled = false))
+            item.value = saveItem
+            ScheduleWorker.cancelTask(saveItem.toBase(state.value.mangaName, state.value.categoryName))
         }
-        hasChanges.value = false
+    }
+
+    private fun restore() {
+        editedItem.value = item.value
     }
 
     private fun change(type: ChangeType) {
-        item.update {
+        editedItem.update {
             when (type) {
                 is ChangeType.Catalog -> it.copy(catalog = type.name)
                 is ChangeType.Category -> it.copy(categoryId = type.categoryId)
@@ -125,6 +130,5 @@ internal class TaskViewModel(
                 is ChangeType.Type -> it.copy(type = type.type)
             }
         }
-        hasChanges.value = true
     }
 }

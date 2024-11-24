@@ -9,6 +9,7 @@ internal sealed interface TaskAction : Action {
     data class Change(val type: ChangeType) : TaskAction
     data object Save : TaskAction
     data object Start : TaskAction
+    data object Restore : TaskAction
 }
 
 internal sealed interface ChangeType {

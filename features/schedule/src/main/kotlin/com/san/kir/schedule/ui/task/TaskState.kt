@@ -34,6 +34,6 @@ internal sealed interface AvailableAction {
     data object None : AvailableAction
 }
 
-internal data class BackgroundWork(val hasWork: Boolean = false, val hasAction: Boolean = true) {
+internal data class BackgroundWork(val hasWork: Boolean = false, val hasAction: Boolean = false) {
     val hasBackgrounds = hasWork || hasAction
 }

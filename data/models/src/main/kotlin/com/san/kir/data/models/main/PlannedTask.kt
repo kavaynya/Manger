@@ -5,6 +5,7 @@ import com.san.kir.data.models.base.PlannedTaskBase
 import com.san.kir.data.models.utils.PlannedPeriod
 import com.san.kir.data.models.utils.PlannedType
 import com.san.kir.data.models.utils.PlannedWeek
+import kotlinx.parcelize.IgnoredOnParcel
 import kotlinx.parcelize.Parcelize
 
 @Parcelize
@@ -26,7 +27,20 @@ public data class PlannedTask(
     val errorMessage: String = "",
     override val manga: String = "",
     override val category: String = "",
-) : Parcelable, PlannedTaskBase
+) : Parcelable, PlannedTaskBase {
+
+    @IgnoredOnParcel
+    val isNew: Boolean = id < 1
+
+    @IgnoredOnParcel
+    val isConfigured: Boolean = when(type) {
+        PlannedType.MANGA -> mangaId != -1L
+        PlannedType.GROUP -> groupName.isNotBlank() && mangas.isNotEmpty()
+        PlannedType.CATEGORY -> categoryId != -1L
+        PlannedType.CATALOG -> catalog.isNotBlank()
+        PlannedType.APP -> true
+    }
+}
 
 public fun PlannedTask.toBase(mangaName: String, categoryName: String): PlannedTaskBase {
     return copy(manga = mangaName, category = categoryName)
