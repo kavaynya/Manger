@@ -4,8 +4,10 @@ import androidx.annotation.StringRes
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.SpringSpec
 import androidx.compose.animation.core.spring
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.hoverable
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -18,6 +20,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CreateNewFolder
@@ -216,7 +219,13 @@ private fun ChangeSortType(
             initialValue = typeSort
         ) { sendAction(CategoryAction.Update(newTypeSort = it)) }
 
-        RotateToggleButton(icon = Icons.Outlined.TextRotateUp, state = isReverseSort) {
+        RotateToggleButton(
+            icon = Icons.Outlined.TextRotateUp,
+            state = isReverseSort,
+            modifier = Modifier
+                .padding(Dimensions.half)
+                .border(BorderStroke(1.dp, Color.White), CircleShape)
+        ) {
             sendAction(CategoryAction.Update(newReverseSort = isReverseSort.not()))
         }
     }

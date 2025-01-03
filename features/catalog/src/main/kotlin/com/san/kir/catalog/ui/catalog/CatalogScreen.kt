@@ -131,11 +131,11 @@ internal fun CatalogScreen(
         topBar = topBar(
             title = "${catalogName}: ${itemCount.value}",
             navigationButton =
-            if (filters.isNotEmpty()) {
-                NavigationButton.Scaffold(drawerState, filterState.hasSelectedFilters)
-            } else {
-                NavigationButton.Back(navigateUp)
-            },
+                if (filters.isNotEmpty()) {
+                    NavigationButton.Scaffold(drawerState, filterState.hasSelectedFilters)
+                } else {
+                    NavigationButton.Back(navigateUp)
+                },
             actions = {
                 MenuIcon(
                     icon = Icons.Default.Search,
@@ -156,17 +156,17 @@ internal fun CatalogScreen(
             initSearchText = filterState.search
         ),
         drawerContent =
-        if (filters.isNotEmpty()) {
-            { DrawerContent(filters, filterState.hasSelectedFilters, sendAction) }
-        } else {
-            null
-        },
+            if (filters.isNotEmpty()) {
+                { DrawerContent(filters, filterState.hasSelectedFilters, sendAction) }
+            } else {
+                null
+            },
         bottomContent = { BottomBar(sortState, sendAction) },
     ) {
         items(items, key = { it.id }) { item ->
             ListItem(
                 item, item.statusEdition,
-                toAdd = {params -> navigateToAdd(item.link, params)} ,
+                toAdd = { params -> navigateToAdd(item.link, params) },
                 toInfo = { params -> navigateToInfo(item.toFullItem(), params) },
                 updateItem = { sendAction(CatalogAction.UpdateManga(it)) }
             )
@@ -200,7 +200,11 @@ private fun BottomBar(
 
     DefaultBottomBar(modifier = Modifier.endInsetsPadding(right = Dimensions.default)) {
 
-        RotateToggleButton(icon = Icons.AutoMirrored.Filled.Sort, state = sort.reverse) {
+        RotateToggleButton(
+            icon = Icons.AutoMirrored.Filled.Sort,
+            state = sort.reverse,
+            modifier = Modifier.padding(start = Dimensions.middle)
+        ) {
             sendAction(CatalogAction.Reverse)
         }
 
@@ -264,7 +268,9 @@ private fun DrawerContent(
 
         // Переключатели вкладок доступных фильтров
         Row(
-            modifier = Modifier.fillMaxWidth().startInsetsPadding(),
+            modifier = Modifier
+                .fillMaxWidth()
+                .startInsetsPadding(),
             verticalAlignment = Alignment.CenterVertically,
         ) {
 

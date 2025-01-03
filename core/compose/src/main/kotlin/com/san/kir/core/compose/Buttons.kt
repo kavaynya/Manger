@@ -15,8 +15,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -24,6 +26,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -38,8 +44,7 @@ import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
 
-private val DefaultRoundedShape = RoundedCornerShape(50)
-public val IconSize: DpSize = DpSize(24.dp + Dimensions.default * 2, 24.dp + Dimensions.half * 2)
+public val IconSize: DpSize = DpSize(24.dp + Dimensions.default * 2, 24.dp + Dimensions.default * 2)
 public val IconButtonPaddings: PaddingValues.Absolute =
     PaddingValues.Absolute(Dimensions.default, Dimensions.half, Dimensions.default, Dimensions.half)
 public val FabButtonHeight: Dp = 72.dp
@@ -80,7 +85,7 @@ public fun <T> RadioGroup(
         stateList.zip(textList).forEach { (s, text) ->
             Row(
                 modifier = Modifier
-                    .clip(DefaultRoundedShape)
+                    .clip(CircleShape)
                     .selectable(
                         selected = state == s,
                         role = Role.RadioButton,
@@ -129,15 +134,14 @@ public fun OutlinedButton(
 }
 
 @Composable
-public fun RotateToggleButton(icon: ImageVector, state: Boolean, onClick: () -> Unit) {
+public fun RotateToggleButton(icon: ImageVector, state: Boolean, modifier: Modifier = Modifier, onClick: () -> Unit) {
     val reverseRotate = animateFloatAsState(if (state) 0f else 540f, label = "")
 
     Icon(
         icon,
         contentDescription = "",
-        modifier = Modifier
-            .padding(Dimensions.default)
-            .clip(DefaultRoundedShape)
+        modifier = modifier
+            .clip(CircleShape)
             .clickable(onClick = onClick)
             .size(IconSize)
             .padding(IconButtonPaddings)
@@ -145,6 +149,17 @@ public fun RotateToggleButton(icon: ImageVector, state: Boolean, onClick: () -> 
                 rotationZ = reverseRotate.value
             }
     )
+}
+
+@ThemedPreview
+@Composable
+private fun PreviewRotateToggleButton() {
+    ThemedPreviewContainer {
+        Column {
+            var state by remember { mutableStateOf(false) }
+            RotateToggleButton(icon = Icons.AutoMirrored.Filled.Sort, state) { state = !state }
+        }
+    }
 }
 
 @Composable
@@ -160,7 +175,7 @@ public fun FabButton(
         modifier = Modifier
             .bottomInsetsPadding(right = Dimensions.default, bottom = Dimensions.default)
             .horizontalInsetsPadding()
-            .clip(DefaultRoundedShape)
+            .clip(CircleShape)
             .saveParams(params)
             .clickable { onClick(params) }
             .background(MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.95f))
