@@ -187,6 +187,7 @@ private fun Progress(allTime: Long, itemTime: Animatable<Long, AnimationVector1D
             .height(Dimensions.half)
             .fillMaxWidth(),
         progress = { if (allTime != 0L) itemTime.value / allTime.toFloat() else 0F },
+        drawStopIndicator = {},
     )
 }
 

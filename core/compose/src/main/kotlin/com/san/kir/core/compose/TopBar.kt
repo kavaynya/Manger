@@ -98,13 +98,14 @@ public fun topBar(
                     if (progressAction == null) {
                         LinearProgressIndicator(
                             modifier = Modifier.fillMaxWidth(),
-                            strokeCap = StrokeCap.Round
+                            strokeCap = StrokeCap.Round,
                         )
                     } else {
                         LinearProgressIndicator(
                             progress = { progressAction },
                             modifier = Modifier.fillMaxWidth(),
-                            strokeCap = StrokeCap.Round
+                            strokeCap = StrokeCap.Round,
+                            drawStopIndicator = {},
                         )
                     }
                 }
