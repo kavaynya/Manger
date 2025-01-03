@@ -2,6 +2,7 @@ package com.san.kir.features.viewer
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
 import android.os.Build
@@ -26,7 +27,6 @@ import androidx.lifecycle.lifecycleScope
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.viewpager.widget.ViewPager
-import com.san.kir.core.utils.ManualDI
 import com.san.kir.core.utils.coroutines.defaultLaunch
 import com.san.kir.data.models.main.Settings
 import com.san.kir.data.models.utils.Orientation
@@ -42,20 +42,20 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 public object MangaViewer {
-    public fun start(chapterID: Long) {
-        ViewerActivity.start(chapterID)
+    public fun start(chapterID: Long, context: Context) {
+        ViewerActivity.start(chapterID, context)
     }
 }
 
 internal class ViewerActivity : AppCompatActivity() {
 
     companion object {
-        private const val chapterKey = "chapter_key"
+        private const val CHAPTER_KEY = "chapter_key"
 
-        fun start(chapterID: Long) {
-            val intent = Intent(ManualDI.application, ViewerActivity::class.java)
-            intent.putExtra(chapterKey, chapterID)
-            ManualDI.application.startActivity(intent)
+        fun start(chapterID: Long, context: Context) {
+            val intent = Intent(context, ViewerActivity::class.java)
+            intent.putExtra(CHAPTER_KEY, chapterID)
+            context.startActivity(intent)
         }
     }
 
@@ -267,7 +267,7 @@ internal class ViewerActivity : AppCompatActivity() {
 
     private fun initData() {
         // получение данных и инициализация менеджера
-        val id = intent.getLongExtra(chapterKey, -1L)
+        val id = intent.getLongExtra(CHAPTER_KEY, -1L)
         if (id != -1L) {
             viewModel.init(id)
         }

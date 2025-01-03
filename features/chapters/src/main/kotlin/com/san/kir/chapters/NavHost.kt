@@ -1,6 +1,7 @@
 package com.san.kir.chapters
 
 import NavEntry
+import androidx.compose.ui.platform.LocalContext
 import com.san.kir.catalog.GlobalSearch
 import com.san.kir.chapters.ui.chapters.ChaptersScreen
 import com.san.kir.chapters.ui.download.DownloadsScreen
@@ -23,9 +24,10 @@ public val chaptersSerializersModule: SerializersModule = AddNavigationCreators.
 public class Chapters(internal val mangaId: Long, internal val params: SharedParams) : NavConfig() {
     internal companion object {
         val creator = navCreator<Chapters> { config ->
+            val context = LocalContext.current
             ChaptersScreen(
                 navigateUp = backPressed(),
-                navigateToViewer = rememberLambda(MangaViewer::start),
+                navigateToViewer = rememberLambda { chapterID -> MangaViewer.start(chapterID, context) },
                 navigateToGlobalSearch = add(::GlobalSearch),
                 mangaId = config.mangaId
             )
@@ -46,9 +48,10 @@ public data object Downloads : NavConfig() {
 @Serializable
 public data object Latest : NavConfig() {
     internal val creator = navCreator<Latest> {
+        val context = LocalContext.current
         LatestScreen(
             navigateUp = backPressed(),
-            navigateToViewer = rememberLambda(MangaViewer::start)
+            navigateToViewer = rememberLambda { chapterID -> MangaViewer.start(chapterID, context) }
         )
     }
     internal val animation = navAnimation<Latest> { horizontalSlide() }
