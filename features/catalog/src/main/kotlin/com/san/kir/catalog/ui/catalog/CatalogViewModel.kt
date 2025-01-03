@@ -22,9 +22,9 @@ import com.san.kir.data.models.utils.DownloadState
 import com.san.kir.data.parsing.SiteCatalogsManager
 import com.san.kir.data.parsing.siteCatalogsManager
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
@@ -38,10 +38,10 @@ internal class CatalogViewModel(
 ) : ViewModel<CatalogState>(), CatalogStateHolder {
     private val catalogName = siteCatalogManager.catalogName(name)
     private val siteCatalog = siteCatalogManager.catalogByName(name)
+    private val catalogItems = MutableStateFlow(emptyList<MiniCatalogItem>())
 
     override val filterState = MutableStateFlow(FilterState())
-    override val sortState =
-        MutableStateFlow(SortState(hasPopulateSort = siteCatalog.hasPopulateSort))
+    override val sortState = MutableStateFlow(SortState(hasPopulateSort = siteCatalog.hasPopulateSort))
     override val filters = MutableStateFlow(emptyList<Filter>())
     override val backgroundWork = MutableStateFlow(BackgroundState())
 
@@ -50,7 +50,7 @@ internal class CatalogViewModel(
         filterState,
         sortState,
         mangaRepository.items,
-        catalogsRepository.loadItems(catalogName).onEach { list -> filters.update { list.initFilters() } },
+        catalogItems.onEach { list -> filters.update { list.initFilters() } },
     ) { filterState, sortState, mangas, catalogItems ->
         backgroundWork.update { it.copy(updateItems = true) }
 
@@ -72,24 +72,35 @@ internal class CatalogViewModel(
     override val tempState = MutableStateFlow(defaultState)
 
     init {
+        var lastUpdatePercent = 0
         manager.loadTask(this.name)
             .onEach { task ->
-                backgroundWork.update { old ->
-                    if (task == null) {
-                        old.copy(updateCatalogs = false, progress = null)
-                    } else {
-                        when (task.state) {
-                            DownloadState.LOADING -> old.copy(updateCatalogs = true, progress = task.progress)
-
-                            DownloadState.QUEUED, DownloadState.PAUSED, DownloadState.COMPLETED ->
-                                old.copy(updateCatalogs = true, progress = null)
-
-                            else -> old
+                if (task == null) {
+                    backgroundWork.update { old -> old.copy(updateCatalogs = false, progress = null) }
+                } else {
+                    when (task.state) {
+                        DownloadState.LOADING -> {
+                            val percent = (task.progress * 100).toInt()
+                            if (percent % 5 == 0 && percent > lastUpdatePercent) {
+                                catalogItems.value = catalogsRepository.items(catalogName)
+                                lastUpdatePercent = percent
+                            }
+                            backgroundWork.update { old -> old.copy(updateCatalogs = true, progress = task.progress) }
                         }
+
+                        DownloadState.QUEUED, DownloadState.PAUSED, DownloadState.COMPLETED -> {
+                            loadCatalogItems()
+                            lastUpdatePercent = 0
+                            backgroundWork.update { old -> old.copy(updateCatalogs = true, progress = null) }
+                        }
+
+                        else -> Unit
                     }
                 }
             }
-            .launchIn(this)
+            .launch()
+
+        loadCatalogItems()
     }
 
     override suspend fun onAction(action: Action) {
@@ -205,5 +216,11 @@ internal class CatalogViewModel(
             .toHashSet()
             .sorted()
             .map { SelectableItem(it, false) }.toList()
+    }
+
+    private var catalogItemLoadingJob: Job? = null
+    private fun loadCatalogItems() {
+        catalogItemLoadingJob?.cancel()
+        catalogItemLoadingJob = catalogsRepository.loadItems(catalogName).onEach { catalogItems.value = it }.launch()
     }
 }

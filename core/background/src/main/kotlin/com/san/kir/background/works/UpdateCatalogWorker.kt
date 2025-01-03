@@ -35,16 +35,19 @@ internal class UpdateCatalogWorker(
         updateCurrentTask { copy(progress = 0f, state = DownloadState.QUEUED) }
         notify()
 
-        val tempList = mutableListOf<SiteCatalogElement>()
+        val buffer = mutableListOf<SiteCatalogElement>()
+        var fullCount = 0
+        var lastSavedPercent = 0
         kotlin.runCatching {
             val site = manager.catalogByName(task.name)
+            val catalogName = manager.catalogName(site.name)
             site.init()
 
             var retry = 3
             while (retry != 0) {
                 retry--
 
-                tempList.clear()
+                buffer.clear()
 
                 updateCurrentTask { copy(progress = 0f, state = DownloadState.LOADING) }
                 notify()
@@ -52,29 +55,37 @@ internal class UpdateCatalogWorker(
                 site.catalog()
                     .collectIndexed { index, value ->
                         val new = index / site.volume.toFloat()
+                        val percents = (new * 100).toInt()
 
+                        buffer.add(value)
+                        fullCount++
                         withCurrentTask { t ->
-                            if ((new * 100).toInt() > (t.progress * 100).toInt()) {
+                            if (percents > (t.progress * 100).toInt()) {
                                 updateCurrentTask { copy(progress = new) }
                                 notify()
                                 Timber.v("task -> ${task.name} / $index / ${site.volume}")
                             }
                         }
 
-                        tempList.add(value)
+                        if (percents % 5 == 0 && percents > lastSavedPercent) {
+                            catalogsRepository.save(catalogName, buffer)
+                            Timber.v("$percents save items(${buffer.size}) in db")
+                            buffer.clear()
+                            lastSavedPercent = percents
+                        }
                     }
-                if (tempList.size >= site.volume - 10) break
+                if (buffer.isNotEmpty()) {
+                    catalogsRepository.save(catalogName, buffer)
+                }
+                if (fullCount >= site.volume - 10) break
             }
 
-            Timber.v("update finish. elements getting ${tempList.size}")
+            Timber.v("update finish. elements getting $fullCount")
 
             withCurrentTask { t ->
                 updateCurrentTask { copy(state = DownloadState.COMPLETED) }
                 notify()
             }
-            catalogsRepository.save(manager.catalogName(site.name), tempList)
-
-            Timber.v("save items in db")
         }.onFailure {
             errored = errored + task
             Timber.e(it)
