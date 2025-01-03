@@ -160,7 +160,7 @@ private fun LazyItemScope.ItemView(
             .fillMaxWidth()
             .saveParams(params)
             .padding(HorizontalItemPadding, VerticalItemPadding)
-            .animateItemPlacement(),
+            .animateItem(),
         resetText = R.string.clear,
         agreeText = R.string.yes,
         resetDesc = R.string.hold_yes_for_clear,
