@@ -26,7 +26,7 @@ internal data class MangaContainer(
     val chapters: List<SimplifiedChapter>
 ) {
     val itemsCount: Int = chapters.size
-    val chapterIds: List<Long> = chapters.map { it.id }
+    val chaptersIds: List<Long> = chapters.map { it.id }
 }
 
 
@@ -35,6 +35,6 @@ internal data class DateContainer(
     val mangas: List<MangaContainer>
 ) {
     val chaptersCount: Int = mangas.sumOf { it.itemsCount }
-    val chaptersIds: List<Long> = mangas.flatMap { it.chapterIds }
+    val chaptersIds: List<Long> = mangas.flatMap { it.chaptersIds }
 }
 

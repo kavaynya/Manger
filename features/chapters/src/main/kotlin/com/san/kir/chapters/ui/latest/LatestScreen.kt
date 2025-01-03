@@ -38,7 +38,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.MutableFloatState
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -132,21 +131,21 @@ internal fun LatestScreen(
     ScreenClear(
         topBar = topBar(
             title =
-            if (selection.value.enabled) {
-                pluralStringResource(
-                    R.plurals.selected_format,
-                    selection.value.count,
-                    selection.value.count
-                )
-            } else {
-                stringResource(R.string.updates_format, state.itemsSize)
-            },
+                if (selection.value.enabled) {
+                    pluralStringResource(
+                        R.plurals.selected_format,
+                        selection.value.count,
+                        selection.value.count
+                    )
+                } else {
+                    stringResource(R.string.updates_format, state.itemsSize)
+                },
             hasAction = state.hasBackgroundWork,
             navigationButton =
-            if (selection.value.enabled)
-                NavigationButton.Close { sendAction(LatestAction.UnselectAll) }
-            else
-                NavigationButton.Back(navigateUp),
+                if (selection.value.enabled)
+                    NavigationButton.Close { sendAction(LatestAction.UnselectAll) }
+                else
+                    NavigationButton.Back(navigateUp),
             containerColor = selectionModeColor(selection.value.enabled)
         ),
     ) {
@@ -237,38 +236,30 @@ private fun Content(
 ) {
     val screenWidth = remember { mutableFloatStateOf(0f) }
 
-    SideEffect {
-
-    }
-
     LazyColumn(
         modifier = Modifier
             .fillMaxSize()
-            .onGloballyPositioned { screenWidth.value = it.boundsInWindow().width },
+            .onGloballyPositioned { screenWidth.floatValue = it.boundsInWindow().width },
         state = lazyListState,
         contentPadding = bottomInsetsPadding(bottom = 72.dp),
     ) {
         items.value.forEach { dateContainer ->
             date(
                 date = dateContainer.date,
-                onLongClick = {
-                    if (selection.value.enabled) {
-                        sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds))
-                    }
+                onClick = {
+                    if (selection.value.enabled) sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds))
                 },
-                onClick = { sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds)) }
+                onLongClick = { sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds)) }
             )
 
             dateContainer.mangas.forEach { mangaContainer ->
                 manga(
                     name = mangaContainer.manga,
                     date = mangaContainer.date,
-                    onLongClick = {
-                        if (selection.value.enabled) {
-                            sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds))
-                        }
+                    onClick = {
+                        if (selection.value.enabled) sendAction(LatestAction.ChangeSelect(mangaContainer.chaptersIds))
                     },
-                    onClick = { sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds)) }
+                    onLongClick = { sendAction(LatestAction.ChangeSelect(mangaContainer.chaptersIds)) }
                 )
 
                 items(mangaContainer.chapters, key = { it.id }) { chapter ->
@@ -395,21 +386,19 @@ private fun LazyItemScope.ItemContent(
     sendAction: (Action) -> Unit,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-    var itemSize by remember { mutableStateOf(Size.Zero) }
+    var itemSize by rememberSaveable(stateSaver = Size.Saver, key = "LatestItemSize") { mutableStateOf(Size.Zero) }
     var lastPressPosition by rememberSaveable(stateSaver = Offset.Saver) { mutableStateOf(Offset.Zero) }
 
     val backgroundSize = rememberFloatAnimatable(if (item.isRead) screenWidth.floatValue else 0f)
-    LaunchedEffect(item.isRead) {
-        backgroundSize.animateTo(if (item.isRead) screenWidth.floatValue else 0f)
-    }
+    LaunchedEffect(item.isRead) { backgroundSize.animateTo(if (item.isRead) screenWidth.floatValue else 0f) }
 
     val selectedRadius =
         rememberFloatAnimatable(if (itemSelected) lastPressPosition.maxDistanceIn(itemSize) else 0f)
 
-    LaunchedEffect(itemSelected) {
+    LaunchedEffect(itemSelected, itemSize) {
         selectedRadius.animateTo(if (itemSelected) lastPressPosition.maxDistanceIn(itemSize) else 0f)
     }
-    LaunchedEffect(interactionSource) {
+    LaunchedEffect(Unit) {
         interactionSource.interactions.collect { interaction ->
             if (interaction is PressInteraction.Press && itemSelected.not()) {
                 lastPressPosition = interaction.pressPosition
@@ -426,17 +415,11 @@ private fun LazyItemScope.ItemContent(
         modifier = Modifier
             .drawWithCache {
                 onDrawBehind {
-                    clipRect {}
-                    itemSize = size
-                    drawRect(
-                        color = readingColor,
-                        size = Size(width = backgroundSize.value, height = size.height)
-                    )
-                    drawCircle(
-                        color = selectedColor,
-                        radius = selectedRadius.value,
-                        center = lastPressPosition
-                    )
+                    clipRect {
+                        if (itemSize.isEmpty()) itemSize = size
+                        drawRect(color = readingColor, size = Size(width = backgroundSize.value, height = size.height))
+                        drawCircle(color = selectedColor, radius = selectedRadius.value, center = lastPressPosition)
+                    }
                 }
             }
             .fillMaxWidth()
@@ -454,7 +437,7 @@ private fun LazyItemScope.ItemContent(
             )
             .padding(vertical = Dimensions.half)
             .padding(start = Dimensions.default, end = Dimensions.half)
-            .animateItemPlacement(),
+            .animateItem(),
     ) {
         Column(
             modifier = Modifier
@@ -463,11 +446,7 @@ private fun LazyItemScope.ItemContent(
             verticalArrangement = Arrangement.Center,
         ) {
             ChapterName(item.name)
-
-            StatusText(
-                state = item.status,
-                progress = item.downloadProgress,
-            )
+            StatusText(state = item.status, progress = item.downloadProgress)
         }
 
         StartAnimatedVisibility(selectionMode.not()) {
@@ -497,11 +476,7 @@ private fun StatusText(state: DownloadState, progress: Int) {
                     QuarterSpacer()
                 }
 
-                DownloadState.PAUSED,
-                DownloadState.COMPLETED,
-                DownloadState.UNKNOWN,
-                DownloadState.ERROR -> {
-                }
+                else -> Unit
             }
         }
     }
