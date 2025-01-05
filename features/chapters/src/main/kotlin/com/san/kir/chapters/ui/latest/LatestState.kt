@@ -7,7 +7,11 @@ internal data class LatestState(
     val newChapters: Int = 0,
     val hasBackgroundWork: Boolean = true,
     val itemsSize: Int = 0,
-) : ScreenState
+    val readSize: Int = 0,
+    val downloadedSize: Int = 0,
+) : ScreenState {
+    val hasNewChapters = newChapters > 0
+}
 
 internal data class SelectionState(
     val selections: Set<Long> = emptySet()

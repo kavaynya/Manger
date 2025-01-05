@@ -78,6 +78,7 @@ import com.san.kir.chapters.utils.date
 import com.san.kir.chapters.utils.onClickItem
 import com.san.kir.chapters.utils.selectionModeColor
 import com.san.kir.core.compose.BottomEndSheets
+import com.san.kir.core.compose.DefaultSpacer
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.QuarterSpacer
@@ -165,7 +166,7 @@ internal fun LatestScreen(
             }
 
             TopAnimatedVisibility(
-                visible = selection.value.enabled.not(),
+                visible = selection.value.enabled.not() && state.itemsSize > 0,
                 modifier = Modifier.align(Alignment.BottomEnd)
             ) {
                 DefaultActions(dialogState)
@@ -181,21 +182,16 @@ internal fun LatestScreen(
     }
 
     BottomEndSheets(dialogState = dialogState, modifier = Modifier.bottomInsetsPadding()) {
-        val hasNewChapters by remember { derivedStateOf { state.newChapters > 0 } }
-
         Column(
             modifier = Modifier
-                .background(
-                    color = SelectedBarColor.copy(alpha = 0.94f),
-                    shape = RoundedCornerShape(Dimensions.default)
-                )
-                .endInsetsPadding(horizontal = Dimensions.half, vertical = Dimensions.default)
+                .endInsetsPadding(horizontal = Dimensions.half)
                 .width(IntrinsicSize.Max)
         ) {
-            if (hasNewChapters) {
+            DefaultSpacer()
+
+            BottomAnimatedVisibility(state.hasNewChapters) {
                 MenuItem(
-                    R.string.download_new_format,
-                    state.newChapters.toString(),
+                    R.string.download_new_format, state.newChapters.toString(),
                     onClick = {
                         sendAction(LatestAction.DownloadNew)
                         dialogState.dismiss()
@@ -204,28 +200,34 @@ internal fun LatestScreen(
             }
 
             MenuItem(
-                R.string.delete_all,
+                R.string.delete_all, state.itemsSize.toString(),
                 onClick = {
                     sendAction(LatestAction.CleanAll)
                     dialogState.dismiss()
                 }
             )
 
-            MenuItem(
-                R.string.delete_reads,
-                onClick = {
-                    sendAction(LatestAction.CleanRead)
-                    dialogState.dismiss()
-                }
-            )
+            BottomAnimatedVisibility(state.readSize > 0) {
+                MenuItem(
+                    R.string.delete_reads, state.readSize.toString(),
+                    onClick = {
+                        sendAction(LatestAction.CleanRead)
+                        dialogState.dismiss()
+                    }
+                )
+            }
 
-            MenuItem(
-                R.string.delete_downloads,
-                onClick = {
-                    sendAction(LatestAction.CleanDownloaded)
-                    dialogState.dismiss()
-                }
-            )
+            BottomAnimatedVisibility(state.downloadedSize > 0) {
+                MenuItem(
+                    R.string.delete_downloads, state.downloadedSize.toString(),
+                    onClick = {
+                        sendAction(LatestAction.CleanDownloaded)
+                        dialogState.dismiss()
+                    }
+                )
+            }
+
+            DefaultSpacer()
         }
     }
 }

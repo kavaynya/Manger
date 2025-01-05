@@ -6,26 +6,24 @@ import com.san.kir.background.logic.di.downloadChaptersManager
 import com.san.kir.background.works.LatestClearWorkers
 import com.san.kir.chapters.R
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ViewModel
 import com.san.kir.data.chapterRepository
 import com.san.kir.data.db.main.repo.ChapterRepository
 import com.san.kir.data.models.base.addedTime
+import com.san.kir.data.models.base.canDelete
 import com.san.kir.data.models.main.SimplifiedChapter
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.mapLatest
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
@@ -53,11 +51,9 @@ internal class LatestViewModel(
     }
 
     private val hasBackground = MutableStateFlow(true)
-    private val newItems = chaptersRepository
-        .simplifiedItems
-        .distinctUntilChanged()
-        .flowOn(defaultDispatcher)
-        .mapLatest { list -> list.filter { it.isRead.not() } }
+    private val newItems = chaptersRepository.simplifiedItems.mapLatest { list -> list.filter { it.isRead.not() } }
+    private val readItems = chaptersRepository.simplifiedItems.mapLatest { list -> list.count { it.isRead } }
+    private val downloadedItems = chaptersRepository.simplifiedItems.mapLatest { list -> list.count { it.canDelete } }
 
     override val items = MutableStateFlow<List<DateContainer>>(emptyList())
     override val selection = MutableStateFlow(SelectionState())
@@ -65,14 +61,18 @@ internal class LatestViewModel(
     private var job: Job? = null
 
     override val tempState = combine(
-        items,
+        chaptersRepository.latestCount,
         newItems.onEach { runWorkersObserver() },
         hasBackground,
-    ) { items, newItems, background ->
+        readItems,
+        downloadedItems,
+    ) { all, newItems, background, read, downloaded ->
         LatestState(
             newChapters = newItems.size,
             hasBackgroundWork = background,
-            itemsSize = items.sumOf(DateContainer::chaptersCount),
+            itemsSize = all,
+            readSize = read,
+            downloadedSize = downloaded
         )
     }
     override val defaultState = LatestState()
@@ -94,34 +94,32 @@ internal class LatestViewModel(
             LocalDate(year = currentDate.year + 1, monthNumber = 1, dayOfMonth = 1)
         )
 
-        launch {
-            chaptersRepository.simplifiedItems
-                .onEach {
-                    val groupedItems = it.groupBy { chapter ->
+        chaptersRepository.simplifiedItems
+            .onEach {
+                val groupedItems = it.groupBy { chapter ->
 
-                        val diff = chapter.addedTime.daysUntil(currentDate)
-                        when {
-                            chapter.addedTimestamp == 0L -> context.getString(R.string.long_ago)
-                            diff == 0 -> context.getString(R.string.today)
-                            diff == 1 -> context.getString(R.string.yesterday)
-                            diff <= nearestWeekDay -> context.getString(R.string.this_week)
-                            diff <= nearestMonthDay -> context.getString(R.string.this_month)
-                            diff <= nearestYearDay -> chapter.addedTime.format(monthFormat)
-                            else -> chapter.addedTime.format(monthYearFormat)
-                        }
-                    }.map { (date, chapters) ->
-                        DateContainer(
-                            date.replaceFirstChar { char -> char.titlecase(Locale.getDefault()) },
-                            chapters
-                                .groupBy(SimplifiedChapter::manga)
-                                .map { (manga, chapters) -> MangaContainer(manga, date, chapters) }
-                        )
+                    val diff = chapter.addedTime.daysUntil(currentDate)
+                    when {
+                        chapter.addedTimestamp == 0L -> context.getString(R.string.long_ago)
+                        diff == 0 -> context.getString(R.string.today)
+                        diff == 1 -> context.getString(R.string.yesterday)
+                        diff <= nearestWeekDay -> context.getString(R.string.this_week)
+                        diff <= nearestMonthDay -> context.getString(R.string.this_month)
+                        diff <= nearestYearDay -> chapter.addedTime.format(monthFormat)
+                        else -> chapter.addedTime.format(monthYearFormat)
                     }
-                    items.value = groupedItems
+                }.map { (date, chapters) ->
+                    DateContainer(
+                        date.replaceFirstChar { char -> char.titlecase(Locale.getDefault()) },
+                        chapters
+                            .groupBy(SimplifiedChapter::manga)
+                            .map { (manga, chapters) -> MangaContainer(manga, date, chapters) }
+                    )
                 }
-                .flowOn(Dispatchers.Default)
-                .launchIn(this)
-        }
+                items.value = groupedItems
+            }
+            .flowOn(Dispatchers.Default)
+            .launch()
     }
 
     override suspend fun onAction(action: Action) {

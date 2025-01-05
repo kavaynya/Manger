@@ -9,9 +9,9 @@
     <string name="this_week">На этой неделе</string>
     <string name="this_month">В этом месяце</string>
     <string name="download_new_format">Скачать новые (%s)</string>
-    <string name="delete_all">Удалить все</string>
-    <string name="delete_downloads">Удалить скачанное</string>
-    <string name="delete_reads">Удалить прочитанное</string>
+    <string name="delete_all">Удалить все (%s)</string>
+    <string name="delete_downloads">Удалить скачанное (%s)</string>
+    <string name="delete_reads">Удалить прочитанное (%s)</string>
 
 
     <!-- Downloader -->
