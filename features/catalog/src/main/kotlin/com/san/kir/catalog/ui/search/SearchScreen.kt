@@ -36,6 +36,8 @@ import com.san.kir.core.compose.TopSheets
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.animateToDelayed
 import com.san.kir.core.compose.animation.rememberIntAnimatable
+import com.san.kir.core.compose.endInsetsPadding
+import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.compose.topInsetsPadding
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
@@ -121,23 +123,27 @@ private fun CatalogSelector(
                 vertical = Dimensions.default
             )
         ) {
-            LazyColumn {
+            LazyColumn(modifier = Modifier.weight(1f)) {
                 items(list.size, key = { it }) { index ->
                     val catalog = list[index]
 
                     CheckBoxText(
                         state = catalog.selected,
                         onChange = { sendAction(SearchAction.ChangeCatalogSelect(catalog.name)) },
-                        firstText = catalog.title
+                        firstText = catalog.title,
+                        modifier = Modifier.horizontalInsetsPadding()
+                    )
+                }
+
+                item {
+                    CheckBoxText(
+                        state = showAddedManga,
+                        onChange = { sendAction(SearchAction.ChangeAddMangaVisible(it)) },
+                        firstText = if (showAddedManga) "Показывать добавленную мангу" else "Непоказывать добавленную мангу",
+                        modifier = Modifier.horizontalInsetsPadding(),
                     )
                 }
             }
-
-            CheckBoxText(
-                state = showAddedManga,
-                onChange = { sendAction(SearchAction.ChangeAddMangaVisible(it)) },
-                firstText = if (showAddedManga) "Показывать добавленную мангу" else "Непоказывать добавленную мангу"
-            )
 
             TextButton(
                 onClick = {
@@ -145,7 +151,7 @@ private fun CatalogSelector(
                     dialogState.dismiss()
                 },
                 enabled = hasFilterChanges,
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End).endInsetsPadding()
             ) {
                 Text(stringResource(R.string.apply))
             }

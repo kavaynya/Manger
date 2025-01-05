@@ -61,7 +61,7 @@ public fun <T : Parcelable> TopSheets(
         scrimColor,
         containerColor,
         elevation,
-        shape.copy(bottomStart = CornerSize(0.dp), bottomEnd = CornerSize(0.dp)),
+        shape.copy(topStart = CornerSize(0.dp), topEnd = CornerSize(0.dp)),
         sheetContent
     )
 }
