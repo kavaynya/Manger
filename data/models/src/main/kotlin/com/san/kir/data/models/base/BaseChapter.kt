@@ -1,6 +1,9 @@
 package com.san.kir.data.models.base
 
 import com.san.kir.core.utils.getCountPagesForChapterInMemory
+import com.san.kir.core.utils.getFullPath
+import com.san.kir.core.utils.isEmptyDirectory
+import com.san.kir.data.models.utils.ChapterStatus
 import com.san.kir.data.models.utils.preparePath
 import kotlinx.datetime.Instant
 import kotlinx.datetime.LocalDate
@@ -24,3 +27,17 @@ public val BaseChapter.addedTime: LocalDate
 
 public val BaseChapter.downloadProgress: Int
     get() = if (pages.isEmpty()) 0 else downloadPages * 100 / pages.size
+
+public val BaseChapter.action: Int
+    get() {
+        getFullPath(path).apply {
+            return when {
+                isEmptyDirectory || !exists() -> ChapterStatus.DOWNLOADABLE
+                else -> ChapterStatus.DELETE
+            }
+        }
+        return ChapterStatus.UNKNOWN // такого быть не должно, но если случится дайте знать
+    }
+
+public val BaseChapter.canDelete: Boolean
+    get() = action == ChapterStatus.DELETE
