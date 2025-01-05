@@ -46,6 +46,7 @@ import com.san.kir.core.compose.animation.rememberIntAnimatable
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
 import com.san.kir.core.compose.createDismissStates
+import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.format
@@ -159,7 +160,7 @@ private fun LazyItemScope.ItemView(
         modifier = Modifier
             .fillMaxWidth()
             .saveParams(params)
-            .padding(HorizontalItemPadding, VerticalItemPadding)
+            .horizontalInsetsPadding(HorizontalItemPadding, VerticalItemPadding)
             .animateItem(),
         resetText = R.string.clear,
         agreeText = R.string.yes,
