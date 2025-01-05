@@ -22,5 +22,5 @@ internal data class DbChapter(
     @ColumnInfo("totalTime") val downloadTime: Long = 0L,
     @ColumnInfo("status") val status: DownloadState = DownloadState.UNKNOWN,
     @ColumnInfo("ordering") val order: Long = 0,
-    @ColumnInfo("added_timestamp", defaultValue = "0") val addedTimestamp: Long = 0,
+    @ColumnInfo("added_timestamp", defaultValue = "0") val addedTimestamp: Long = System.currentTimeMillis(),
 )
