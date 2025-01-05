@@ -57,6 +57,7 @@ import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.san.kir.chapters.R
 import com.san.kir.chapters.utils.ChapterName
@@ -88,8 +89,10 @@ import com.san.kir.core.compose.animation.StartAnimatedVisibility
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
 import com.san.kir.core.compose.animation.rememberFloatAnimatable
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.maxDistanceIn
+import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
 import com.san.kir.core.utils.navigation.DialogState
@@ -183,10 +186,10 @@ internal fun LatestScreen(
         Column(
             modifier = Modifier
                 .background(
-                    SelectedBarColor.copy(alpha = 0.94f),
-                    RoundedCornerShape(Dimensions.default)
+                    color = SelectedBarColor.copy(alpha = 0.94f),
+                    shape = RoundedCornerShape(Dimensions.default)
                 )
-                .padding(horizontal = Dimensions.half, vertical = Dimensions.default)
+                .endInsetsPadding(horizontal = Dimensions.half, vertical = Dimensions.default)
                 .width(IntrinsicSize.Max)
         ) {
             if (hasNewChapters) {
@@ -243,13 +246,14 @@ private fun Content(
         state = lazyListState,
         contentPadding = bottomInsetsPadding(bottom = 72.dp),
     ) {
-        items.value.forEach { dateContainer ->
+        items.value.forEachIndexed { index, dateContainer ->
             date(
                 date = dateContainer.date,
                 onClick = {
                     if (selection.value.enabled) sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds))
                 },
-                onLongClick = { sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds)) }
+                onLongClick = { sendAction(LatestAction.ChangeSelect(dateContainer.chaptersIds)) },
+                modifier = if (index == 0) Modifier else Modifier.padding(top = Dimensions.half)
             )
 
             dateContainer.mangas.forEach { mangaContainer ->
@@ -298,9 +302,11 @@ private fun LazyListScope.manga(
                     color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.9f),
                     shape = RoundedCornerShape(topEndPercent = 30, bottomEndPercent = 30)
                 )
-                .padding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
+                .startInsetsPadding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
             color = MaterialTheme.colorScheme.onSecondaryContainer,
-            style = MaterialTheme.typography.titleSmall
+            style = MaterialTheme.typography.titleSmall,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
         )
     }
 }
@@ -317,7 +323,7 @@ private fun SelectionModeBar(
     Row(
         modifier = Modifier
             .bottomInsetsPadding()
-            .padding(bottom = Dimensions.default),
+            .endInsetsPadding(bottom = Dimensions.default),
         verticalAlignment = Alignment.CenterVertically
     ) {
 
@@ -361,7 +367,7 @@ private fun DefaultActions(dialogState: DialogState<EmptyDialogData>) {
     Box(
         modifier = Modifier
             .bottomInsetsPadding()
-            .padding(end = Dimensions.default, bottom = Dimensions.default)
+            .endInsetsPadding(right = Dimensions.default, bottom = Dimensions.default)
             .clip(DefaultRoundedShape)
             .clickable(onClick = dialogState::show)
             .background(color = SelectedBarColor, shape = DefaultRoundedShape)

@@ -5,9 +5,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.calculateEndPadding
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyListState
@@ -28,11 +29,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.rememberTextMeasurer
 import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.san.kir.chapters.ui.latest.DateContainer
 import com.san.kir.core.compose.BarContainerColor
-import kotlinx.coroutines.launch
+import com.san.kir.core.compose.endInsets
+import com.san.kir.core.compose.endInsetsPadding
 
 private const val DateType = "Date"
 internal const val MangaType = "Manga"
@@ -95,13 +99,14 @@ internal class DateState(private val height: Float) {
 internal fun LazyListScope.date(
     date: String,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     item(key = date, contentType = DateType) {
         Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterEnd) {
             val interactionSource = remember { MutableInteractionSource() }
             Box(
-                modifier = Modifier
+                modifier = modifier
                     .combinedClickable(
                         interactionSource = interactionSource,
                         indication = null,
@@ -110,13 +115,10 @@ internal fun LazyListScope.date(
                     )
                     .background(color = BarContainerColor, shape = DateShape)
                     .height(DateBarHeight)
-                    .padding(horizontal = DateBarHorizontalPadding),
+                    .endInsetsPadding(horizontal = DateBarHorizontalPadding),
                 contentAlignment = Alignment.Center
             ) {
-                Text(
-                    text = date,
-                    style = dateTextStyle,
-                )
+                Text(text = date, style = dateTextStyle)
             }
         }
     }
@@ -134,52 +136,42 @@ internal fun DateHeader(
     val density = LocalDensity.current
     val dateHeight = density.run { DateBarHeight.toPx() }
     val dateState = remember { DateState(dateHeight) }
+    val textMeasurer = rememberTextMeasurer()
     val textStyle = dateTextStyle
     val items by itemsState
 
     LaunchedEffect(items) {
         val datesWithIndex = mutableMapOf<Int, String>()
         var index = 0
+        if (items.isEmpty()) return@LaunchedEffect
+
         for (container in items) {
             datesWithIndex[index] = container.date
             index += container.chaptersCount + container.mangas.size + 1
         }
 
         val hidedDates = items.map { it.date }
-        val firstHiddenDate = hidedDates.firstOrNull() ?: ""
-
-        dateState.reset(firstHiddenDate)
-
-        fun findPreviousDate(list: List<String>, date: String): String {
-            return list.getOrNull(list.indexOf(date) - 1) ?: ""
+        val maxWidth = hidedDates.maxOf {
+            textMeasurer.measure(text = it, style = textStyle, density = density).size.width
         }
+        dateState.updateWidth(with(density) { maxWidth.toDp() });
+        dateState.reset(hidedDates.firstOrNull())
 
-        launch {
-            snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo }
-                .collect { infos ->
-                    val currentInfo =
-                        infos.firstOrNull { it.key.toString() == "Date" && it.offset >= 0 }
-                    if (currentInfo == null) {
-                        val firstInfo = infos.firstOrNull { it.key.toString() == "Manga" }
-                        if (firstInfo != null) {
-                            val key =
-                                datesWithIndex.keys.reversed().firstOrNull { it <= firstInfo.index }
-                            key?.let {
-                                dateState.reset(datesWithIndex[it] ?: "")
-                            }
-                        } else {
-                            dateState.reset(hidedDates.lastOrNull() ?: "")
-                        }
-                    } else {
-                        val date = currentInfo.key.toString()
-                        val offset = currentInfo.offset.toFloat()
-                        if (offset in 0.0f..dateHeight) {
-                            dateState.update(offset, date, findPreviousDate(hidedDates, date))
-                        } else {
-                            dateState.reset(findPreviousDate(hidedDates, date))
-                        }
-                    }
+        fun findPreviousDate(list: List<String>, date: String): String = list.getOrNull(list.indexOf(date) - 1) ?: ""
+
+        snapshotFlow { lazyListState.layoutInfo.visibleItemsInfo }.collect { infos ->
+            val currentInfo = infos.firstOrNull { it.contentType == DateType && it.offset >= 0 }
+            if (currentInfo == null) {
+                dateState.reset(hidedDates.lastOrNull())
+            } else {
+                val date = currentInfo.key.toString()
+                val offset = currentInfo.offset.toFloat()
+                if (offset in 0.0f..dateHeight) {
+                    dateState.update(offset, date, findPreviousDate(hidedDates, date))
+                } else {
+                    dateState.reset(findPreviousDate(hidedDates, date))
                 }
+            }
         }
     }
 
@@ -193,24 +185,26 @@ internal fun DateHeader(
                     interactionSource = interactionSource,
                     indication = null,
                     onClick = {
-                        val currentDate = items.firstOrNull { it.date == dateState.current }
-                        currentDate?.let { onClick(it.chaptersIds) }
+                        items.firstOrNull { it.date == dateState.current }?.let { onClick(it.chaptersIds) }
                     },
                     onLongClick = {
-                        val currentDate = items.firstOrNull { it.date == dateState.current }
-                        currentDate?.let { onLongClick(it.chaptersIds) }
+                        items.firstOrNull { it.date == dateState.current }?.let { onLongClick(it.chaptersIds) }
                     }
                 )
                 .background(BarContainerColor, DateBarShape)
                 .height(DateBarHeight)
-                .width(dateState.maxWidth + DateBarHorizontalPadding * 2)
+                .width(
+                    dateState.maxWidth
+                            + DateBarHorizontalPadding * 2
+                            + endInsets().asPaddingValues().calculateEndPadding(LayoutDirection.Ltr)
+                )
                 .clip(DateShape),
             contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = dateState.hidden,
                 modifier = Modifier
-                    .padding(horizontal = DateBarHorizontalPadding)
+                    .endInsetsPadding(horizontal = DateBarHorizontalPadding)
                     .graphicsLayer {
                         alpha = dateState.alpha
                         translationY = dateState.offset - dateHeight
@@ -220,7 +214,7 @@ internal fun DateHeader(
             Text(
                 text = dateState.current,
                 modifier = Modifier
-                    .padding(horizontal = DateBarHorizontalPadding)
+                    .endInsetsPadding(horizontal = DateBarHorizontalPadding)
                     .graphicsLayer {
                         alpha = 1.0f - dateState.alpha
                         translationY = dateState.offset
