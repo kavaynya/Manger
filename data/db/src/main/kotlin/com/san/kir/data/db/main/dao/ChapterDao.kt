@@ -3,10 +3,10 @@ package com.san.kir.data.db.main.dao
 import androidx.room.Dao
 import androidx.room.Query
 import com.san.kir.data.db.base.BaseDao
-import com.san.kir.data.models.utils.DownloadState
-import com.san.kir.data.db.main.entites.DbChapter
 import com.san.kir.data.db.main.custom.DbDownloadChapter
+import com.san.kir.data.db.main.entites.DbChapter
 import com.san.kir.data.db.main.views.ViewChapter
+import com.san.kir.data.models.utils.DownloadState
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -80,12 +80,11 @@ internal interface ChapterDao : BaseDao<DbChapter> {
     suspend fun deleteByIds(ids: List<Long>): Int
 
     @Query("UPDATE chapters SET status=:newStatus WHERE status=:oldStatus")
-    suspend fun updateChapters(
-        oldStatus: DownloadState,
-        newStatus: DownloadState = DownloadState.UNKNOWN
-    )
+    suspend fun updateChapters(oldStatus: DownloadState, newStatus: DownloadState = DownloadState.UNKNOWN)
+
     @Query("UPDATE chapters SET progress=0, isRead=0 WHERE id IN (:ids)")
     suspend fun readingReset(ids: List<Long>)
+
     @Query("UPDATE chapters SET progress=0, isRead=0 WHERE manga_id = :mangaId")
     suspend fun fullReadingReset(mangaId: Long)
 }
