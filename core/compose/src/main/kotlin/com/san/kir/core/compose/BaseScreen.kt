@@ -244,25 +244,34 @@ public fun ScreenList(
     drawerContent: @Composable (ColumnScope.() -> Unit)? = null,
     content: LazyListScope.() -> Unit,
 ) {
-    val canScroll by remember {
-        derivedStateOf {
-            val layoutInfo = state.layoutInfo
-            if (layoutInfo.totalItemsCount != 0) {
-                val visibleItemsInfo = layoutInfo.visibleItemsInfo
-                val firstVisibleItem = visibleItemsInfo.first()
-                val lastVisibleItem = visibleItemsInfo.last()
-                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
-                if (firstVisibleItem.index != 0
-                    || firstVisibleItem.offset != 0
-                    || lastVisibleItem.index + 1 != layoutInfo.totalItemsCount
-                    || lastVisibleItem.offset + lastVisibleItem.size > viewportHeight
-                ) {
-                    return@derivedStateOf true
-                }
-            }
-            false
-        }
-    }
+//    val canScroll by remember {
+//        derivedStateOf {
+//            val layoutInfo = state.layoutInfo
+//            if (layoutInfo.totalItemsCount != 0) {
+//                val visibleItemsInfo = layoutInfo.visibleItemsInfo
+//                val firstVisibleItem = visibleItemsInfo.first()
+//                val lastVisibleItem = visibleItemsInfo.last()
+//                val viewportHeight = layoutInfo.viewportEndOffset + layoutInfo.viewportStartOffset
+//                Timber.d("Items -> ${layoutInfo.totalItemsCount}  \n" +
+//                        "firstVisibleItem.index = ${firstVisibleItem.index}\n" +
+//                        "firstVisibleItem.offset = ${firstVisibleItem.offset}\n" +
+//                        "lastVisibleItem.index = ${lastVisibleItem.index}\n" +
+//                        "lastVisibleItem.offset = ${lastVisibleItem.offset}\n" +
+//                        "lastVisibleItem.size = ${lastVisibleItem.size}\n" +
+//                        "viewportHeight = ${viewportHeight}")
+//                if (firstVisibleItem.index != 0
+//                    || firstVisibleItem.offset != 0
+//                    || lastVisibleItem.index + 1 != layoutInfo.totalItemsCount
+//                    || lastVisibleItem.offset + lastVisibleItem.size > viewportHeight
+//                ) {
+//                    Timber.d("Items -> ${layoutInfo.totalItemsCount}  == true")
+//                    return@derivedStateOf true
+//                }
+//            }
+//            Timber.d("Items -> ${layoutInfo.totalItemsCount}  == false")
+//            false
+//        }
+//    }
 
     BaseScreen(
         drawerState = drawerState,
@@ -277,7 +286,7 @@ public fun ScreenList(
                 .imePadding(),
             state = state,
             contentPadding = contentPadding,
-            userScrollEnabled = canScroll,
+//            userScrollEnabled = canScroll,
             content = content
         )
 
