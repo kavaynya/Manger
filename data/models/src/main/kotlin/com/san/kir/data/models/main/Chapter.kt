@@ -27,7 +27,7 @@ public data class Chapter(
     val downloadTime: Long = 0L,
     val status: DownloadState = DownloadState.UNKNOWN,
     val order: Long = 0,
-    override val addedTimestamp: Long = 0
+    override val addedTimestamp: Long = System.currentTimeMillis()
 ) : Parcelable, BaseChapter {
     @IgnoredOnParcel
     override val path: String = _path.preparePath()
