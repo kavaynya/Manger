@@ -21,10 +21,10 @@
     <string name="download_final_format">%1$s Мб за %2$s</string>
     <string name="concat_format">%1$s  %2$s</string>
     <string name="subtitle_format">Останов.: %1$d  Заверш.: %2$d</string>
-    <string name="clean_all">Очистить все</string>
-    <string name="clean_completed">Очистить завершенные</string>
-    <string name="clean_paused">Очистить остановленные</string>
-    <string name="clean_with_error">Очистить с ошибкой</string>
+    <string name="clean_all">Очистить все (%s)</string>
+    <string name="clean_completed">Очистить завершенные (%s)</string>
+    <string name="clean_paused">Очистить остановленные (%s)</string>
+    <string name="clean_with_error">Очистить с ошибкой (%s)</string>
 
 
     <!-- Chapters -->

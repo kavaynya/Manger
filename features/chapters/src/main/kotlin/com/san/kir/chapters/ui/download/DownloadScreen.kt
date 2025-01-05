@@ -3,25 +3,23 @@ package com.san.kir.chapters.ui.download
 import androidx.annotation.StringRes
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.KeyboardDoubleArrowUp
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.filled.Stop
-import androidx.compose.material3.BottomAppBar
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -33,13 +31,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -47,29 +41,41 @@ import androidx.compose.ui.text.style.TextOverflow
 import com.san.kir.chapters.R
 import com.san.kir.chapters.utils.BarPadding
 import com.san.kir.chapters.utils.ChapterName
+import com.san.kir.chapters.utils.DefaultRoundedShape
 import com.san.kir.chapters.utils.Download
 import com.san.kir.chapters.utils.DownloadButton
 import com.san.kir.chapters.utils.MenuItem
+import com.san.kir.chapters.utils.SelectedBarColor
+import com.san.kir.chapters.utils.SelectedBarPadding
+import com.san.kir.core.compose.BottomEndSheets
 import com.san.kir.core.compose.CircleLogo
+import com.san.kir.core.compose.DefaultSpacer
 import com.san.kir.core.compose.Dimensions
-import com.san.kir.core.compose.FullWeightSpacer
 import com.san.kir.core.compose.IconSize
 import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
+import com.san.kir.core.compose.animation.BottomAnimatedVisibility
+import com.san.kir.core.compose.animation.EndAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.FromTopToTopAnimContent
 import com.san.kir.core.compose.animation.StartAnimatedVisibility
-import com.san.kir.core.compose.animation.TopAnimatedVisibility
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
+import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.compose.topBar
 import com.san.kir.core.internet.NetworkState
 import com.san.kir.core.utils.flow.collectAsStateWithLifecycle
+import com.san.kir.core.utils.navigation.EmptyDialogData
+import com.san.kir.core.utils.navigation.rememberDialogState
+import com.san.kir.core.utils.navigation.show
+import com.san.kir.core.utils.viewModel.Action
+import com.san.kir.core.utils.viewModel.OnEvent
+import com.san.kir.core.utils.viewModel.ReturnEvents
 import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
 import com.san.kir.data.models.main.DownloadItem
 import com.san.kir.data.models.utils.DownloadState
-import kotlinx.coroutines.launch
 
 
 private val InnerBarPadding = Dimensions.middle
@@ -81,56 +87,35 @@ internal fun DownloadsScreen(navigateUp: () -> Unit) {
     val holder: DownloadsStateHolder = stateHolder { DownloadsViewModel() }
     val state by holder.state.collectAsStateWithLifecycle()
     val sendAction = holder.rememberSendAction()
+    val dialogState = rememberDialogState<EmptyDialogData>()
 
-    val lazyListState = rememberLazyListState()
-    val scope = rememberCoroutineScope()
-    val canScrollUp = remember { derivedStateOf { lazyListState.firstVisibleItemIndex > 5 } }
-
+    holder.OnEvent { event ->
+        when (event) {
+            DownloadsEvent.ShowDeleteMenu -> dialogState.show()
+            DownloadsEvent.HideDeleteMenu -> dialogState.dismiss()
+        }
+    }
 
     ScreenList(
         additionalPadding = Dimensions.zero,
         contentPadding = bottomInsetsPadding(bottom = BarHeightWithPadding),
-        state = lazyListState,
         topBar = topBar(
             navigationButton = NavigationButton.Back(navigateUp),
             title = stringResource(R.string.downloader_format, state.loadingCount),
             subtitle = stringResource(
                 R.string.subtitle_format, state.stoppedCount, state.completedCount
             ),
-            actions = {
-                StartAnimatedVisibility(visible = canScrollUp.value) {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier
-                            .fillMaxHeight()
-                            .horizontalInsetsPadding(right = Dimensions.half)
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.KeyboardDoubleArrowUp,
-                            contentDescription = null,
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .clickable { scope.launch { lazyListState.animateScrollToItem(0) } }
-                                .padding(Dimensions.half)
-                        )
-                    }
-                }
-            }
         ),
-        bottomContent = { BottomManagerBar(state.network, sendAction) }
+        bottomContent = { BottomManagerBar(state, sendAction) }
     ) {
-
         state.items.forEach { group ->
             stickyHeader(key = group.groupName) {
                 Text(
                     text = stringResource(group.groupName),
                     modifier = Modifier
                         .padding(top = Dimensions.default, bottom = Dimensions.quarter)
-                        .background(
-                            MaterialTheme.colorScheme.secondaryContainer,
-                            RoundedCornerShape(0, 30, 30, 0)
-                        )
-                        .padding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
+                        .background(MaterialTheme.colorScheme.secondaryContainer, RoundedCornerShape(0, 30, 30, 0))
+                        .startInsetsPadding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
                     color = MaterialTheme.colorScheme.onSecondaryContainer,
                     style = MaterialTheme.typography.titleSmall
                 )
@@ -141,11 +126,15 @@ internal fun DownloadsScreen(navigateUp: () -> Unit) {
             }
         }
     }
+
+    BottomEndSheets(dialogState = dialogState, modifier = Modifier.bottomInsetsPadding()) {
+        ClearDownloadsMenu(state, sendAction)
+    }
 }
 
 @Composable
-private fun BottomManagerBar(state: NetworkState, sendEvent: (DownloadsAction) -> Unit) {
-    FromBottomToBottomAnimContent(targetState = state) {
+private fun BottomManagerBar(state: DownloadsState, sendAction: (Action) -> Unit) {
+    FromBottomToBottomAnimContent(targetState = state.network) {
         when (it) {
             NetworkState.NOT_WIFI -> {
                 Snackbar(
@@ -153,7 +142,10 @@ private fun BottomManagerBar(state: NetworkState, sendEvent: (DownloadsAction) -
                         .fillMaxWidth()
                         .bottomInsetsPadding()
                 ) {
-                    Text(stringResource(com.san.kir.background.R.string.wifi_off))
+                    Text(
+                        stringResource(com.san.kir.background.R.string.wifi_off),
+                        modifier = Modifier.horizontalInsetsPadding()
+                    )
                 }
             }
 
@@ -163,41 +155,52 @@ private fun BottomManagerBar(state: NetworkState, sendEvent: (DownloadsAction) -
                         .fillMaxWidth()
                         .bottomInsetsPadding()
                 ) {
-                    Text(stringResource(com.san.kir.background.R.string.internet_off))
+                    Text(
+                        stringResource(com.san.kir.background.R.string.internet_off),
+                        modifier = Modifier.horizontalInsetsPadding()
+                    )
                 }
             }
 
             NetworkState.OK -> {
-                var showMenu by remember { mutableStateOf(false) }
+                BottomAnimatedVisibility(state.allCount > 0) {
+                    Row(
+                        modifier = Modifier
+                            .bottomInsetsPadding(bottom = Dimensions.default)
+                            .endInsetsPadding(right = Dimensions.default)
+                            .background(SelectedBarColor, DefaultRoundedShape)
+                            .padding(SelectedBarPadding)
+                    ) {
 
-                // Массовое управление загрузками
-                BottomAppBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .bottomInsetsPadding()
-                ) {
-                    FullWeightSpacer()
+                        StartAnimatedVisibility(state.stoppedCount > 0) {
+                            Row {
+                                DefaultSpacer()
+                                IconButton(onClick = { sendAction(DownloadsAction.StartAll) }) {
+                                    Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                                }
+                            }
+                        }
 
-                    // Кнопка включения отображения всех глав
-                    IconButton(onClick = { sendEvent(DownloadsAction.StartAll) }) {
-                        Icon(Icons.Filled.PlayArrow, contentDescription = null)
+                        StartAnimatedVisibility(state.loadingCount > 0) {
+                            Row {
+                                DefaultSpacer()
+                                IconButton(onClick = { sendAction(DownloadsAction.StopAll) }) {
+                                    Icon(Icons.Filled.Stop, contentDescription = null)
+                                }
+                            }
+                        }
+
+                        EndAnimatedVisibility(state.canClearedCount > 0) {
+                            Row {
+                                DefaultSpacer()
+                                IconButton(onClick = { sendAction(ReturnEvents(DownloadsEvent.ShowDeleteMenu)) }) {
+                                    Icon(Icons.Filled.Delete, contentDescription = null)
+                                }
+                            }
+                        }
+
+                        DefaultSpacer()
                     }
-
-                    // Кнопка паузы
-                    IconButton(
-                        onClick = { sendEvent(DownloadsAction.StopAll) },
-                        modifier = Modifier.padding(start = Dimensions.default)
-                    ) { Icon(Icons.Filled.Stop, contentDescription = null) }
-
-                    FullWeightSpacer()
-
-                    // Кнопка очистки списка загрузок
-                    IconButton(onClick = { showMenu = true }) {
-                        Icon(Icons.Filled.Delete, contentDescription = null)
-                        ClearDownloadsMenu(showMenu, { showMenu = false }, sendEvent)
-                    }
-
-                    FullWeightSpacer()
                 }
             }
         }
@@ -205,57 +208,50 @@ private fun BottomManagerBar(state: NetworkState, sendEvent: (DownloadsAction) -
 }
 
 @Composable
-private fun ClearDownloadsMenu(
-    expanded: Boolean,
-    onClose: () -> Unit,
-    sendAction: (DownloadsAction) -> Unit,
-) {
-    TopAnimatedVisibility(
-        expanded,
-        modifier = Modifier.bottomInsetsPadding(bottom = BarHeightWithPadding + Dimensions.half)
+private fun ClearDownloadsMenu(state: DownloadsState, sendAction: (Action) -> Unit) {
+    Column(
+        modifier = Modifier
+            .endInsetsPadding(horizontal = Dimensions.half)
+            .width(IntrinsicSize.Max)
     ) {
-        Column(
-            modifier = Modifier
-                .padding(horizontal = Dimensions.default, vertical = Dimensions.half)
-                .background(
-                    MaterialTheme.colorScheme.secondaryContainer,
-                    RoundedCornerShape(Dimensions.default)
-                )
-                .padding(horizontal = Dimensions.half)
-                .padding(bottom = Dimensions.default)
-        ) {
-            MenuItem(R.string.clean_completed) {
+        DefaultSpacer()
+        BottomAnimatedVisibility(state.completedCount > 0) {
+            MenuItem(R.string.clean_completed, state.completedCount.toString()) {
                 sendAction(DownloadsAction.CompletedClear)
-                onClose()
-            }
-            MenuItem(R.string.clean_paused) {
-                sendAction(DownloadsAction.PausedClear)
-                onClose()
-            }
-            MenuItem(R.string.clean_with_error) {
-                sendAction(DownloadsAction.ErrorClear)
-                onClose()
-            }
-            MenuItem(R.string.clean_all) {
-                sendAction(DownloadsAction.ClearAll)
-                onClose()
+                sendAction(ReturnEvents(DownloadsEvent.HideDeleteMenu))
             }
         }
+        BottomAnimatedVisibility(state.stoppedCount > 0) {
+            MenuItem(R.string.clean_paused, state.stoppedCount.toString()) {
+                sendAction(DownloadsAction.PausedClear)
+                sendAction(ReturnEvents(DownloadsEvent.HideDeleteMenu))
+            }
+        }
+        BottomAnimatedVisibility(state.errorCount > 0) {
+            MenuItem(R.string.clean_with_error, state.errorCount.toString()) {
+                sendAction(DownloadsAction.ErrorClear)
+                sendAction(ReturnEvents(DownloadsEvent.HideDeleteMenu))
+            }
+        }
+        BottomAnimatedVisibility(state.allCount > 1) {
+            MenuItem(R.string.clean_all, state.canClearedCount.toString()) {
+                sendAction(DownloadsAction.ClearAll)
+                sendAction(ReturnEvents(DownloadsEvent.HideDeleteMenu))
+            }
+        }
+        DefaultSpacer()
     }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
-private fun LazyItemScope.ItemView(
-    item: DownloadItem,
-    sendAction: (DownloadsAction) -> Unit,
-) {
+private fun LazyItemScope.ItemView(item: DownloadItem, sendAction: (DownloadsAction) -> Unit) {
     val totalPages by remember { derivedStateOf { item.pages.size } }
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .animateItemPlacement()
+            .animateItem()
             .horizontalInsetsPadding(horizontal = Dimensions.default)
             .padding(top = Dimensions.half),
         verticalAlignment = Alignment.CenterVertically
@@ -333,6 +329,7 @@ private fun ProgressIndicator(state: DownloadState, progress: Float) {
                         .height(Dimensions.quarter)
                         .fillMaxWidth(),
                     strokeCap = StrokeCap.Round,
+                    drawStopIndicator = {},
                 )
             }
 
@@ -343,13 +340,7 @@ private fun ProgressIndicator(state: DownloadState, progress: Float) {
 }
 
 @Composable
-private fun StatusText(
-    state: DownloadState,
-    size: String,
-    time: String,
-    downloadPages: Int,
-    totalPages: Int,
-) {
+private fun StatusText(state: DownloadState, size: String, time: String, downloadPages: Int, totalPages: Int) {
     FromTopToTopAnimContent(targetState = state) {
         when (it) {
             DownloadState.COMPLETED ->
@@ -359,9 +350,7 @@ private fun StatusText(
                 Text(
                     stringResource(
                         R.string.concat_format,
-                        stringResource(
-                            R.string.download_progress_format, downloadPages, totalPages
-                        ),
+                        stringResource(R.string.download_progress_format, downloadPages, totalPages),
                         stringResource(R.string.size_format, size)
                     )
                 )
@@ -397,9 +386,5 @@ private fun BottomInfoBar(@StringRes textId: Int) {
 
 @Composable
 private fun MangaName(manga: String) {
-    Text(
-        manga,
-        maxLines = 1,
-        overflow = TextOverflow.Ellipsis,
-    )
+    Text(manga, maxLines = 1, overflow = TextOverflow.Ellipsis)
 }
