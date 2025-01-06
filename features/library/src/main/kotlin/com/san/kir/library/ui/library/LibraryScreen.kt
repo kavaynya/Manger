@@ -14,9 +14,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -52,7 +50,6 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
     val selectMangaState = rememberDialogState<SimplifiedManga>()
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val pagerState = rememberPagerState { (state.items as? ItemsState.Ok)?.names?.size ?: 0 }
-    val hasTabs by remember { derivedStateOf { state.items is ItemsState.Ok } }
 
     holder.OnEvent { event ->
         when (event) {
@@ -71,11 +68,12 @@ internal fun LibraryScreen(navigation: LibraryNavigation) {
         drawerState = drawerState,
         topBar = topBar(
             title = stringResource(R.string.library),
+            subtitle = state.singleTab,
             actions = libraryActions(navigation.toOnline),
             navigationButton = NavigationButton.Scaffold(drawerState),
             hasAction = state.background == BackgroundState.Work,
             additionalContent = {
-                TopAnimatedVisibility(visible = hasTabs) {
+                TopAnimatedVisibility(visible = state.hasTabs) {
                     val names = (state.items as ItemsState.Ok).names
                     ScrollableTabs(
                         pagerState = pagerState,

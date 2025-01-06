@@ -12,7 +12,10 @@ internal data class LibraryState(
     val items: ItemsState = ItemsState.Load,
     val showCategory: Boolean = false,
     val background: BackgroundState = BackgroundState.None,
-) : ScreenState
+) : ScreenState {
+    val hasTabs: Boolean = items is ItemsState.Ok && items.names.size > 1
+    val singleTab: String? = if (items is ItemsState.Ok && items.names.size == 1) items.names.first() else null
+}
 
 internal sealed interface ItemsState {
     data object Empty : ItemsState
@@ -28,6 +31,7 @@ internal sealed interface ItemsState {
             items.map { cat -> "${cat.name}: ${cat.mangas.count()}" }
     ) : ItemsState
 }
+
 internal enum class BackgroundState { Work, None }
 
 //@Immutable
