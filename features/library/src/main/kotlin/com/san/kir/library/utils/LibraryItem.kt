@@ -64,9 +64,7 @@ internal fun LazyGridItemScope.LibraryLargeItem(
     showCategory: Boolean,
 ) {
     val defaultColor = MaterialTheme.colorScheme.primary
-    val backgroundColor = remember {
-        runCatching { Color(manga.color) }.getOrDefault(defaultColor)
-    }
+    val backgroundColor by remember { mutableStateOf(manga.composeColor(defaultColor)) }
     val textColor = contentColorFor(backgroundColor)
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
@@ -81,7 +79,8 @@ internal fun LazyGridItemScope.LibraryLargeItem(
             .saveParams(buttonParams)
             .combinedClickable(
                 onLongClick = { onLongClick(manga) },
-                onClick = { onClick(manga.id, buttonParams) })
+                onClick = { onClick(manga.id, buttonParams) },
+            )
     ) {
         Box(modifier = Modifier.fillMaxWidth()) {
             Column(modifier = Modifier.fillMaxWidth()) {
@@ -114,7 +113,7 @@ internal fun LazyGridItemScope.LibraryLargeItem(
                 )
             }
 
-            Row {
+            Row(modifier = Modifier.align(Alignment.TopEnd)) {
                 if (cat == ManualDI.categoryAll() && showCategory)
                     CategoryName(
                         manga.category,
@@ -147,9 +146,7 @@ internal fun LazyItemScope.LibrarySmallItem(
     showCategory: Boolean,
 ) {
     val defaultColor = MaterialTheme.colorScheme.primary
-    val backgroundColor by remember {
-        mutableStateOf(runCatching { Color(manga.color) }.getOrDefault(defaultColor))
-    }
+    val backgroundColor by remember { mutableStateOf(manga.composeColor()) }
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(
@@ -163,7 +160,8 @@ internal fun LazyItemScope.LibrarySmallItem(
             .saveParams(buttonParams)
             .combinedClickable(
                 onLongClick = { onLongClick(manga) },
-                onClick = { onClick(manga.id, buttonParams) })
+                onClick = { onClick(manga.id, buttonParams) },
+            )
     ) {
         Box(
             modifier = Modifier
@@ -247,7 +245,7 @@ internal fun CategoryName(
         text = category,
         modifier = modifier
             .background(color = contentColorFor(contentColor), shape = RoundedCornerShape(50))
-            .padding(horizontal = Dimensions.quarter, vertical = Dimensions.half),
+            .padding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
         color = contentColor,
         style = MaterialTheme.typography.labelMedium
     )
