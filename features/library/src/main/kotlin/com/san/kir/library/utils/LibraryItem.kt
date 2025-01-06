@@ -64,7 +64,7 @@ internal fun LazyGridItemScope.LibraryLargeItem(
     showCategory: Boolean,
 ) {
     val defaultColor = MaterialTheme.colorScheme.primary
-    val backgroundColor by remember { mutableStateOf(manga.composeColor(defaultColor)) }
+    val backgroundColor by remember(manga.color) { mutableStateOf(manga.composeColor(defaultColor)) }
     val textColor = contentColorFor(backgroundColor)
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
@@ -146,7 +146,7 @@ internal fun LazyItemScope.LibrarySmallItem(
     showCategory: Boolean,
 ) {
     val defaultColor = MaterialTheme.colorScheme.primary
-    val backgroundColor by remember { mutableStateOf(manga.composeColor()) }
+    val backgroundColor by remember(manga.color) { mutableStateOf(manga.composeColor()) }
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(

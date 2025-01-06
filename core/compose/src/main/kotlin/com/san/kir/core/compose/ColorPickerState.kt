@@ -20,12 +20,7 @@ import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.util.lerp
 
 public class ColorPickerState internal constructor(private val initialColor: Color) {
-    public val currentColor: Color by derivedStateOf {
-        val hValue = hValue
-        val sValue = sValue
-        val vValue = vValue
-        Color.hsv(hValue, sValue, vValue, 0.0f)
-    }
+    public val currentColor: Color by derivedStateOf { Color.hsv(hValue, sValue, vValue) }
 
     internal val hBar by derivedStateOf {
         val bitmap = ImageBitmap(hSize.width, hSize.height)
@@ -39,7 +34,7 @@ public class ColorPickerState internal constructor(private val initialColor: Col
         if (0 <= hSize.width) {
             var index = 0
             while (true) {
-                val color = Color.hsv(hue.coerceIn(0.0f, 360.0f), 1.0f, 1.0f, 0.0f)
+                val color = Color.hsv(hue.coerceIn(0.0f, 360.0f), MAX_SATURATION, MAX_VALUE)
                 paint.color = color
                 val hue2 = hue + (360.0f / hSize.width)
                 hueCanvas.drawLine(
@@ -67,16 +62,16 @@ public class ColorPickerState internal constructor(private val initialColor: Col
                 from = Offset.Zero,
                 to = Offset(svSize.width, 0.0f),
                 colors = listOf(
-                    Color.hsv(hValue, MIN_SATURATION, MAX_VALUE, 0.0f),
-                    Color.hsv(hValue, MAX_SATURATION, MAX_VALUE, 0.0f)
+                    Color.hsv(hValue, MIN_SATURATION, MAX_VALUE),
+                    Color.hsv(hValue, MAX_SATURATION, MAX_VALUE)
                 ),
             )
             val valShader = LinearGradientShader(
                 from = Offset.Zero,
                 to = Offset(0.0f, svSize.height),
                 colors = listOf(
-                    Color.hsv(hValue, MIN_SATURATION, MIN_VALUE, 0.0f),
-                    Color.hsv(hValue, MIN_SATURATION, MAX_VALUE, 0.0f)
+                    Color.hsv(hValue, MIN_SATURATION, MIN_VALUE),
+                    Color.hsv(hValue, MIN_SATURATION, MAX_VALUE)
                 )
             )
             val paint = Paint()
@@ -84,8 +79,8 @@ public class ColorPickerState internal constructor(private val initialColor: Col
             canvas.drawRect(0.0f, 0.0f, svSize.width, svSize.height, paint)
             if (!hasGesture) {
                 svPosition = Offset(
-                    svSize.width * convertFromRangeToFraction(sValue, 0.15f, 1.0f),
-                    svSize.height * convertFromRangeToFraction(vValue, 0.27f, 1.0f)
+                    svSize.width * convertFromRangeToFraction(sValue, MIN_SATURATION, MAX_SATURATION),
+                    svSize.height * convertFromRangeToFraction(vValue, MIN_VALUE, MAX_VALUE)
                 )
             }
         }
@@ -127,7 +122,7 @@ public class ColorPickerState internal constructor(private val initialColor: Col
             position.x.coerceIn(0.0f, size.width.toFloat()),
             position.y.coerceIn(0.0f, size.height.toFloat())
         )
-        sValue = lerp(0.15f, 1.0f, (1.0f / size.width) * position.x)
+        sValue = lerp(MIN_SATURATION, MAX_SATURATION, (1.0f / size.width) * position.x)
             .coerceIn(MIN_SATURATION, MAX_SATURATION)
 
         vValue = lerp(MIN_VALUE, MAX_VALUE, (1.0f / size.height) * position.y)
@@ -160,7 +155,7 @@ public class ColorPickerState internal constructor(private val initialColor: Col
             }
             hValue = h.coerceIn(0.0f, 360.0f)
         } else {
-            sValue = 0.15f
+            sValue = MIN_SATURATION
             hValue = 0.0f
         }
     }

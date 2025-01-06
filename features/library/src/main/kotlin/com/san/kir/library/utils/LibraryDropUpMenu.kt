@@ -80,78 +80,76 @@ internal fun LibraryDropUpMenu(
 ) {
     val expandedState = rememberSaveable { mutableStateOf(Expanded.NONE) }
     val defaultColor = MaterialTheme.colorScheme.primary
-    val colorState =
-        rememberColorPickerState(if (selectedManga.color != 0) Color(selectedManga.color) else defaultColor)
+    val colorState = rememberColorPickerState(selectedManga.composeColor(defaultColor))
 
-    Column(
-        modifier = Modifier
-            .verticalScroll(rememberScrollState())
-            .fillMaxWidth()
-            .bottomInsetsPadding()
-    ) {
-
+    Column {
         Title { sendAction(LibraryEvent.DismissSelectedMangaDialog.returned()) }
 
-        SubTitle(selectedManga.name, selectedManga.logo, colorState.currentColor) {
-            expandedState.value =
-                if (expandedState.value == Expanded.COLOR) Expanded.NONE else Expanded.COLOR
-        }
-
-        ColorPicker(
-            colorState = colorState,
-            visibility = expandedState.value != Expanded.COLOR,
-            onApply = {
-                expandedState.value = Expanded.NONE
-                sendAction(
-                    LibraryAction.ChangeColor(selectedManga.id, colorState.currentColor.toArgb())
-                )
-            },
-            onCancel = {
-                expandedState.value = Expanded.NONE
-                colorState.reset()
-            }
-        )
-
-        HorizontalDivider(modifier = Modifier.horizontalInsetsPadding(Dimensions.default))
-
-        Properties { params ->
-            sendAction(LibraryEvent.ToInfo(selectedManga.id, params).returned())
-        }
-
-        CategoryChanger(
-            changerVisibility = expandedState.value != Expanded.CATEGORY,
-            itemsState = itemsState,
-            selectedManga = selectedManga,
-            onClick = {
+        Column(
+            modifier = Modifier
+                .verticalScroll(rememberScrollState())
+                .fillMaxWidth()
+                .bottomInsetsPadding()
+        ) {
+            SubTitle(selectedManga.name, selectedManga.logo, colorState.currentColor) {
                 expandedState.value =
-                    if (expandedState.value == Expanded.CATEGORY) Expanded.NONE else Expanded.CATEGORY
-            },
-            onItemClick = { categoryId ->
-                expandedState.value = Expanded.NONE
-                sendAction(LibraryAction.ChangeCategory(selectedManga.id, categoryId))
+                    if (expandedState.value == Expanded.COLOR) Expanded.NONE else Expanded.COLOR
             }
-        )
 
-        Storage { params ->
-            sendAction(LibraryEvent.ToStorage(selectedManga.id, params).returned())
+            ColorPicker(
+                colorState = colorState,
+                visibility = expandedState.value == Expanded.COLOR,
+                onApply = {
+                    expandedState.value = Expanded.NONE
+                    sendAction(LibraryAction.ChangeColor(selectedManga.id, colorState.currentColor.toArgb()))
+                },
+                onCancel = {
+                    expandedState.value = Expanded.NONE
+                    colorState.reset()
+                }
+            )
+
+            HorizontalDivider(modifier = Modifier.horizontalInsetsPadding(Dimensions.default))
+
+            Properties { params ->
+                sendAction(LibraryEvent.ToInfo(selectedManga.id, params).returned())
+            }
+
+            CategoryChanger(
+                changerVisibility = expandedState.value == Expanded.CATEGORY,
+                itemsState = itemsState,
+                selectedManga = selectedManga,
+                onClick = {
+                    expandedState.value =
+                        if (expandedState.value == Expanded.CATEGORY) Expanded.NONE else Expanded.CATEGORY
+                },
+                onItemClick = { categoryId ->
+                    expandedState.value = Expanded.NONE
+                    sendAction(LibraryAction.ChangeCategory(selectedManga.id, categoryId))
+                }
+            )
+
+            Storage { params ->
+                sendAction(LibraryEvent.ToStorage(selectedManga.id, params).returned())
+            }
+
+            Statistics { params ->
+                sendAction(LibraryEvent.ToStats(selectedManga.id, params).returned())
+            }
+
+            Delete(
+                changerVisibility = expandedState.value == Expanded.DELETE,
+                onClick = {
+                    expandedState.value =
+                        if (expandedState.value == Expanded.DELETE) Expanded.NONE else Expanded.DELETE
+                },
+                onDismiss = {
+                    expandedState.value = Expanded.NONE
+                    it?.let { sendAction(LibraryAction.DeleteManga(selectedManga.id, it)) }
+                    sendAction(LibraryEvent.DismissSelectedMangaDialog.returned())
+                },
+            )
         }
-
-        Statistics { params ->
-            sendAction(LibraryEvent.ToStats(selectedManga.id, params).returned())
-        }
-
-        Delete(
-            changerVisibility = expandedState.value != Expanded.DELETE,
-            onClick = {
-                expandedState.value =
-                    if (expandedState.value == Expanded.DELETE) Expanded.NONE else Expanded.DELETE
-            },
-            onDismiss = {
-                expandedState.value = Expanded.NONE
-                it?.let { sendAction(LibraryAction.DeleteManga(selectedManga.id, it)) }
-                sendAction(LibraryEvent.DismissSelectedMangaDialog.returned())
-            },
-        )
     }
 }
 

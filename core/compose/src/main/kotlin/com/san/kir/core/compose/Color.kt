@@ -1,5 +1,6 @@
 package com.san.kir.core.compose
 
+import android.annotation.SuppressLint
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.gestures.detectHorizontalDragGestures
 import androidx.compose.foundation.gestures.detectTapGestures
@@ -13,14 +14,12 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.compositionLocalOf
-import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
@@ -32,14 +31,12 @@ private val HBarHeight = 50.dp
 private val SVBarHeight = 90.dp
 private val SelectorThickness = 3.dp
 private val SelectorRadius = HBarHeight / 2 - SelectorThickness / 2
-private val saver =
-    Saver(save = { color: Color -> color.toArgb() }, restore = { color: Int -> Color(color) })
-
 
 @Composable
 public fun rememberColorPickerState(initialColor: Color): ColorPickerState =
     rememberSaveable(saver = ColorPickerState.Saver) { ColorPickerState(initialColor) }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 public fun ColorPicker(state: ColorPickerState, modifier: Modifier = Modifier) {
     Column(modifier) {
