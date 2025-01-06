@@ -81,12 +81,12 @@ internal interface MangaDao : BaseDao<DbManga> {
 
     // Обновление поля isUpdate
     @Query("UPDATE manga SET isUpdate = :isUpdate WHERE id = :id")
-    fun updateIsUpdate(id: Long, isUpdate: Boolean)
+    suspend fun updateIsUpdate(id: Long, isUpdate: Boolean)
 
     // Обновление поля categoryId
     @Query("UPDATE manga SET category_id = :categoryId WHERE id = :id")
-    fun updateCategory(id: Long, categoryId: Long)
+    suspend fun updateCategory(id: Long, categoryId: Long)
 
     @Query("UPDATE manga SET color=:color WHERE id=:id")
-    fun updateColor(id: Long, color: Int)
+    suspend fun updateColor(id: Long, color: Int)
 }

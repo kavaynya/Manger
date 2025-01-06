@@ -20,24 +20,22 @@ import com.san.kir.data.models.utils.SortLibraryUtil
 import com.san.kir.data.settingsRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 
 internal class LibraryViewModel(
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository(),
-    private val categoryRepository: CategoryRepository = ManualDI.categoryRepository(),
+    categoryRepository: CategoryRepository = ManualDI.categoryRepository(),
     private val updateManager: UpdateMangaManager = ManualDI.updateMangaManager(),
     settingsRepository: SettingsRepository = ManualDI.settingsRepository(),
 ) : ViewModel<LibraryState>(), LibraryStateHolder {
 
     private val currentCategory = MutableStateFlow(CategoryWithMangas())
     private val backgroundState = MutableStateFlow(BackgroundState.None)
-    private val itemsState =
-        combine(categoryRepository.items, mangaRepository.simplifiedItems) { cats, mangas ->
-            if (cats.isEmpty()) return@combine ItemsState.Empty
-            ItemsState.Ok(cats.filter { it.isVisible }.map { transform(it, mangas) })
-        }
+    private val itemsState = combine(categoryRepository.items, mangaRepository.simplifiedItems) { cats, mangas ->
+        if (cats.isEmpty()) return@combine ItemsState.Empty
+        ItemsState.Ok(cats.filter { it.isVisible }.map { transform(it, mangas) })
+    }
 
 
     init {
@@ -46,9 +44,10 @@ internal class LibraryViewModel(
                 if (works.all { it.state.isFinished }) backgroundState.update { BackgroundState.None }
                 else backgroundState.update { BackgroundState.Work }
             }
-            .launchIn(this)
+            .launch()
     }
 
+    override val defaultState = LibraryState()
     override val tempState = combine(
         currentCategory,
         itemsState,
@@ -57,38 +56,22 @@ internal class LibraryViewModel(
         ::LibraryState
     )
 
-    override val defaultState = LibraryState()
-
     override suspend fun onAction(action: Action) {
         when (action) {
-            is LibraryAction.SetCurrentCategory -> {
-                currentCategory.value = action.item
-            }
+            LibraryAction.UpdateApp -> AppUpdateWorker.addTask()
+            LibraryAction.UpdateCurrentCategory -> updateManager.addTasks(currentCategory.value.mangas.map { it.id })
+            is LibraryAction.SetCurrentCategory -> currentCategory.value = action.item
+            is LibraryAction.DeleteManga -> MangaDeleteWorker.addTask(action.mangaId, action.withFiles)
+            is LibraryAction.ChangeColor -> mangaRepository.changeColor(action.mangaId, action.color)
 
             is LibraryAction.ChangeCategory -> {
                 mangaRepository.changeCategory(action.mangaId, action.categoryId)
                 sendEvent(LibraryEvent.DismissSelectedMangaDialog)
             }
 
-            is LibraryAction.DeleteManga -> {
-                MangaDeleteWorker.addTask(action.mangaId, action.withFiles)
-            }
-
-            is LibraryAction.ChangeColor -> {
-                mangaRepository.changeColor(action.mangaId, action.color)
-            }
-
-            LibraryAction.UpdateApp -> {
-                AppUpdateWorker.addTask()
-            }
-
             LibraryAction.UpdateAll -> {
                 val itemsState = state.value.items as? ItemsState.Ok ?: return
                 updateManager.addTasks(itemsState.items.flatMap { it.mangas }.map { it.id })
-            }
-
-            LibraryAction.UpdateCurrentCategory -> {
-                updateManager.addTasks(currentCategory.value.mangas.map { it.id })
             }
         }
     }
