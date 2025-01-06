@@ -33,7 +33,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -64,7 +63,6 @@ internal fun LazyGridItemScope.LibraryLargeItem(
     cat: String,
     showCategory: Boolean,
 ) {
-    val context = LocalContext.current
     val defaultColor = MaterialTheme.colorScheme.primary
     val backgroundColor = remember {
         runCatching { Color(manga.color) }.getOrDefault(defaultColor)
@@ -76,7 +74,7 @@ internal fun LazyGridItemScope.LibraryLargeItem(
         shape = RoundedCornerShape(CornerRadius),
         colors = CardDefaults.cardColors(containerColor = backgroundColor),
         modifier = Modifier
-            .animateItemPlacement()
+            .animateItem()
             .testTag(TestTags.Library.item)
             .padding(BetweenItemPadding)
             .fillMaxWidth()
@@ -148,7 +146,6 @@ internal fun LazyItemScope.LibrarySmallItem(
     cat: String,
     showCategory: Boolean,
 ) {
-    val context = LocalContext.current
     val defaultColor = MaterialTheme.colorScheme.primary
     val backgroundColor by remember {
         mutableStateOf(runCatching { Color(manga.color) }.getOrDefault(defaultColor))
@@ -159,7 +156,7 @@ internal fun LazyItemScope.LibrarySmallItem(
         shape = RoundedCornerShape(CornerRadius),
         border = BorderStroke(Dimensions.quarter, backgroundColor),
         modifier = Modifier
-            .animateItemPlacement()
+            .animateItem()
             .testTag(TestTags.Library.item)
             .padding(BetweenItemPadding)
             .fillMaxWidth()

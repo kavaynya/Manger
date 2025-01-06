@@ -24,6 +24,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.utils.TestTags
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.returned
@@ -86,7 +87,7 @@ private fun PageView(
     if (span > 1) {
         LazyVerticalGrid(
             columns = GridCells.Fixed(span),
-            modifier = Modifier.fillMaxSize(),
+            modifier = Modifier.fillMaxSize().horizontalInsetsPadding(),
             contentPadding = bottomInsetsPadding(ContentPadding),
         ) {
             items(item.mangas, key = { it.id }) { manga ->

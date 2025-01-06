@@ -170,6 +170,7 @@ private fun ClipboardText(onPaste: (String) -> Unit) {
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable { onPaste(clipboardText) }
+                .horizontalInsetsPadding()
         ) {
             Column(
                 modifier = Modifier
