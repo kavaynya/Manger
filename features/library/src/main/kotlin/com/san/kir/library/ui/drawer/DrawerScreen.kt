@@ -64,13 +64,9 @@ internal fun DrawerScreen(navigateToScreen: (MainMenuType) -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
+            .startInsetsPadding()
     ) {
-        Row(
-            modifier = Modifier
-                .padding(Dimensions.half)
-                .startInsetsPadding(),
-            verticalAlignment = Alignment.CenterVertically,
-        ) {
+        Row(modifier = Modifier.padding(Dimensions.half), verticalAlignment = Alignment.CenterVertically) {
             Image(painterResource(R.mipmap.ic_launcher_foreground), "")
 
             Column(modifier = Modifier.weight(1f)) {
