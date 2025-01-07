@@ -21,7 +21,7 @@ public val chaptersSerializersModule: SerializersModule = AddNavigationCreators.
 
 @NavEntry
 @Serializable
-public class Chapters(internal val mangaId: Long, internal val params: SharedParams) : NavConfig() {
+public data class Chapters(internal val mangaId: Long, internal val params: SharedParams) : NavConfig() {
     internal companion object {
         val creator = navCreator<Chapters> { config ->
             val context = LocalContext.current

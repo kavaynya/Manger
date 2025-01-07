@@ -52,15 +52,12 @@ internal fun ChaptersScreen(
     val pages = chapterPages(state.manga.isAlternativeSite)
     val pagerState = rememberPagerState(pageCount = { pages.size })
 
-    val dialogFullReset = rememberDialogState<EmptyDialogData>(true) {
-        holder.sendAction(ChaptersAction.FullReset)
-    }
-    val dialogDeleteSelected = rememberDialogState<EmptyDialogData>(true) {
-        holder.sendAction(ChaptersAction.WithSelected(Selection.DeleteFiles))
-    }
-    val dialogFullDelete = rememberDialogState<EmptyDialogData>(true) {
-        holder.sendAction(ChaptersAction.WithSelected(Selection.DeleteFromDB))
-    }
+    val dialogFullReset =
+        rememberDialogState<EmptyDialogData> { sendAction(ChaptersAction.FullReset) }
+    val dialogDeleteSelected =
+        rememberDialogState<EmptyDialogData> { sendAction(ChaptersAction.WithSelected(Selection.DeleteFiles)) }
+    val dialogFullDelete =
+        rememberDialogState<EmptyDialogData> { sendAction(ChaptersAction.WithSelected(Selection.DeleteFromDB)) }
 
     holder.OnEvent { event ->
         when (event) {
