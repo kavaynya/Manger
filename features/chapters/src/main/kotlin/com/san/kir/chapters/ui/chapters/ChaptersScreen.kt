@@ -74,17 +74,20 @@ internal fun ChaptersScreen(
 
     ScreenClear(
         topBar = topBar(
-            title = if (selectionMode.enabled) state.manga.name
-            else pluralStringResource(
-                R.plurals.selected_format,
-                selectionMode.selectionCount,
-                selectionMode.selectionCount
-            ),
-            navigationButton = if (selectionMode.enabled) {
-                NavigationButton.Close { sendAction(ChaptersAction.WithSelected(Selection.Clear)) }
-            } else {
-                NavigationButton.Back(navigateUp)
-            },
+            title =
+                if (selectionMode.enabled)
+                    pluralStringResource(
+                        R.plurals.selected_format,
+                        selectionMode.count,
+                        selectionMode.count
+                    )
+                else state.manga.name,
+            navigationButton =
+                if (selectionMode.enabled) {
+                    NavigationButton.Close { sendAction(ChaptersAction.WithSelected(Selection.Clear)) }
+                } else {
+                    NavigationButton.Back(navigateUp)
+                },
             hasAction = state.backgroundAction,
             actions = {
                 StartAnimatedVisibility(selectionMode.enabled.not()) {

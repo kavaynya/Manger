@@ -4,7 +4,9 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,6 +24,9 @@ import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonColors
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -130,6 +135,32 @@ public fun OutlinedButton(
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(text = text, color = MaterialTheme.colorScheme.primary)
+    }
+}
+
+@Composable
+public fun IconCounterButton(
+    icon: ImageVector,
+    contentDescription: String?,
+    counter: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    enabled: Boolean = true,
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+    interactionSource: MutableInteractionSource? = null,
+) {
+    Box {
+        IconButton(onClick, modifier.align(Alignment.Center), enabled, colors, interactionSource) {
+            Icon(icon, contentDescription)
+        }
+        Text(
+            counter,
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .background(MaterialTheme.colorScheme.background.copy(alpha = 0.8f), CircleShape)
+                .padding(horizontal = Dimensions.quarter, vertical = Dimensions.smallest),
+            style = MaterialTheme.typography.labelSmall,
+        )
     }
 }
 

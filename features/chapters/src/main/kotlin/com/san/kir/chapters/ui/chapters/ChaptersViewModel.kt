@@ -30,6 +30,7 @@ import com.san.kir.data.settingsRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOn
@@ -60,7 +61,6 @@ internal class ChaptersViewModel(
 
     override val itemsContent = MutableStateFlow(Items())
 
-    private val items = MutableStateFlow(Items())
     override val nextChapter = chaptersRepository
         .items(mangaId)
         .map { checkNextChapter(it) }
@@ -68,17 +68,29 @@ internal class ChaptersViewModel(
 
     override val selectionMode = itemsContent
         .onEach {
-            backgroundAction.value =
-                BackgroundActions(updateManga = false, updateItems = false, updatePages = false)
+            backgroundAction.value = BackgroundActions(updateManga = false, updateItems = false, updatePages = false)
         }
         .map { current ->
             val selected = current.items.filter { it.selected }
+            val count = selected.size
+
+            var above = 0
+            var below = 0
+            if (count == 1) {
+                above = SelectionHelper.aboveCount(current.items)
+                below = if (above == 0) 0 else SelectionHelper.belowCount(current.items)
+                above = if (below == 0) 0 else above
+            }
+
             SelectionMode(
-                selectionCount = selected.size,
-                hasReading = selected.any { it.chapter.progress > 1 || it.chapter.isRead },
-                canSetRead = selected.any { !it.chapter.isRead },
-                canSetUnread = selected.any { it.chapter.isRead },
-                canRemovePages = selected.any { current.memoryPagesCounts[it.chapter.id] != null }
+                count = count,
+                hasReading = selected.count { it.chapter.progress > 1 || it.chapter.isRead },
+                canSetRead = selected.count { it.chapter.isRead.not() },
+                canSetUnread = selected.count { it.chapter.isRead },
+                canRemovePages = selected.count { current.memoryPagesCounts[it.chapter.id] != null },
+                remain = current.items.size - count,
+                aboveCount = above,
+                belowCount = below,
             )
         }
         .stateInSubscribed(SelectionMode())
@@ -189,11 +201,11 @@ internal class ChaptersViewModel(
 
         val selectedItems = itemsContent.value.items.filter { it.selected }
         when (mode) {
-            Selection.Above -> items.update { SelectionHelper.above(it) }
-            Selection.Below -> items.update { SelectionHelper.below(it) }
-            Selection.All -> items.update { SelectionHelper.all(it) }
-            Selection.Clear -> items.update { SelectionHelper.clear(it) }
-            is Selection.Change -> items.update { SelectionHelper.change(it, mode.index) }
+            Selection.Above -> itemsContent.update { SelectionHelper.above(it) }
+            Selection.Below -> itemsContent.update { SelectionHelper.below(it) }
+            Selection.All -> itemsContent.update { SelectionHelper.all(it) }
+            Selection.Clear -> itemsContent.update { SelectionHelper.clear(it) }
+            is Selection.Change -> itemsContent.update { SelectionHelper.change(it, mode.index) }
 
             Selection.DeleteFiles -> delChapters(
                 selectedItems.map { chaptersRepository.item(it.chapter.id).path }
@@ -205,7 +217,7 @@ internal class ChaptersViewModel(
                         context.toast(R.string.delete_successful)
                     }
                 }
-                items.update { SelectionHelper.clear(it) }
+                itemsContent.update { SelectionHelper.clear(it) }
                 updateMemoryCounts()
             }
 
@@ -213,17 +225,17 @@ internal class ChaptersViewModel(
 
             Selection.Download -> {
                 downloadManager.addTasks(selectedItems.map { it.chapter.id })
-                items.update { SelectionHelper.clear(it) }
+                itemsContent.update { SelectionHelper.clear(it) }
             }
 
             is Selection.SetRead -> {
                 chaptersRepository.updateIsRead(selectedItems.map { it.chapter.id }, mode.newState)
-                items.update { SelectionHelper.clear(it) }
+                itemsContent.update { SelectionHelper.clear(it) }
             }
 
             Selection.Reset -> {
                 chaptersRepository.reset(selectedItems.map { it.chapter.id })
-                items.update { SelectionHelper.clear(it) }
+                itemsContent.update { SelectionHelper.clear(it) }
             }
         }
     }

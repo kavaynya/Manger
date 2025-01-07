@@ -45,13 +45,16 @@ internal data class Items(
 }
 
 internal data class SelectionMode(
-    val selectionCount: Int = 0,
-    val hasReading: Boolean = false,
-    val canSetRead: Boolean = false,
-    val canSetUnread: Boolean = false,
-    val canRemovePages: Boolean = false
+    val count: Int = 0,
+    val hasReading: Int = 0,
+    val canSetRead: Int = 0,
+    val canSetUnread: Int = 0,
+    val canRemovePages: Int = 0,
+    val remain: Int = 0,
+    val aboveCount: Int = 0,
+    val belowCount: Int = 0,
 ) {
-    val enabled: Boolean = selectionCount > 0
+    val enabled: Boolean = count > 0
 }
 
 internal enum class ErrorState { None, NotFound, Other; }

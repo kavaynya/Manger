@@ -150,15 +150,8 @@ internal fun ListPageContent(
             BottomOrderBar(chapterFilter) { sendAction(ChaptersAction.ChangeFilter(it)) }
         }
 
-        StartAnimatedVisibility(
-            visible = selectionMode.enabled,
-            modifier = Modifier.align(Alignment.BottomEnd),
-        ) {
-            SelectionModeBar(
-                selectionMode = selectionMode,
-                itemsCount = itemsCount,
-                sendAction = sendAction
-            )
+        StartAnimatedVisibility(visible = selectionMode.enabled, modifier = Modifier.align(Alignment.BottomEnd)) {
+            SelectionModeBar(selectionMode = selectionMode, sendAction = sendAction)
         }
     }
 }
@@ -195,18 +188,7 @@ private fun BottomOrderBar(
 }
 
 @Composable
-internal fun SelectionModeBar(
-    selectionMode: SelectionMode,
-    itemsCount: Int,
-    sendAction: (Action) -> Unit
-) {
-    val allSelected by remember {
-        derivedStateOf { selectionMode.selectionCount == itemsCount }
-    }
-    val singleSelected by remember {
-        derivedStateOf { selectionMode.selectionCount == 1 }
-    }
-
+internal fun SelectionModeBar(selectionMode: SelectionMode, sendAction: (Action) -> Unit) {
     Row(
         modifier = Modifier
             .bottomInsetsPadding()
@@ -220,68 +202,91 @@ internal fun SelectionModeBar(
                 .padding(SelectedBarPadding)
         ) {
 
-            TopAnimatedVisibility(visible = singleSelected) {
-                IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Above)) }) {
-                    Icon(Icons.Default.ArrowUpward, contentDescription = "Select Above")
-                }
+            TopAnimatedVisibility(visible = selectionMode.aboveCount > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.ArrowUpward,
+                    contentDescription = "Select Above",
+                    counter = "+${selectionMode.aboveCount}",
+                    onClick = { sendAction(ChaptersAction.WithSelected(Selection.Above)) },
+                )
             }
 
-            BottomAnimatedVisibility(visible = allSelected.not()) {
-                IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.All)) }) {
-                    Icon(Icons.Default.SelectAll, contentDescription = "Select All")
-                }
+            BottomAnimatedVisibility(visible = selectionMode.remain > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.SelectAll,
+                    contentDescription = "Select All",
+                    counter = "+${selectionMode.remain}",
+                    onClick = { sendAction(ChaptersAction.WithSelected(Selection.All)) },
+                )
             }
 
-            BottomAnimatedVisibility(visible = singleSelected) {
-                IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Below)) }) {
-                    Icon(Icons.Default.ArrowDownward, contentDescription = "Select Below")
-                }
+            BottomAnimatedVisibility(visible = selectionMode.belowCount > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.ArrowDownward,
+                    contentDescription = "Select Below",
+                    counter = "+${selectionMode.belowCount}",
+                    onClick = { sendAction(ChaptersAction.WithSelected(Selection.Below)) },
+                )
             }
 
             IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Clear)) }) {
                 Icon(Icons.Default.Close, contentDescription = "Clear Selection")
             }
         }
+
+        Column(
+            modifier = Modifier
+                .padding(SelectedBarPadding)
+                .background(SelectedBarColor, DefaultRoundedShape)
+                .padding(SelectedBarPadding)
+                .verticalScroll(rememberScrollState()),
+        ) {
+            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Download)) }) {
+                Icon(Icons.Default.Download, contentDescription = "Download items")
+            }
+
+            BottomAnimatedVisibility(visible = selectionMode.canRemovePages > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.FolderDelete,
+                    contentDescription = "Delete Selection",
+                    counter = "${selectionMode.canRemovePages}",
+                    onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowDeleteDialog)) },
+                )
+            }
+
+            BottomAnimatedVisibility(visible = selectionMode.canSetRead > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.Visibility,
+                    contentDescription = null,
+                    counter = "${selectionMode.canSetRead}",
+                    onClick = { sendAction(ChaptersAction.WithSelected(Selection.SetRead(true))) },
+                )
+            }
+
+            BottomAnimatedVisibility(visible = selectionMode.canSetUnread > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.VisibilityOff,
+                    contentDescription = null,
+                    counter = "${selectionMode.canSetUnread}",
+                    onClick = { sendAction(ChaptersAction.WithSelected(Selection.SetRead(false))) },
+                )
+            }
+
+            BottomAnimatedVisibility(visible = selectionMode.hasReading > 0) {
+                IconCounterButton(
+                    icon = Icons.Default.LockReset,
+                    contentDescription = null,
+                    counter = "${selectionMode.hasReading}",
+                    onClick = { sendAction(ChaptersAction.WithSelected(Selection.Reset)) },
+                )
+            }
+
+            IconButton(onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowFullDeleteDialog)) }) {
+                Icon(Icons.Default.DeleteForever, contentDescription = "Delete items from DB")
+            }
+        }
     }
 
-    Column(
-        modifier = Modifier
-            .padding(SelectedBarPadding)
-            .background(SelectedBarColor, DefaultRoundedShape)
-            .padding(SelectedBarPadding)
-    ) {
-        IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Download)) }) {
-            Icon(Icons.Default.Download, contentDescription = "Download items")
-        }
-
-        BottomAnimatedVisibility(visible = selectionMode.canRemovePages) {
-            IconButton(onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowDeleteDialog)) }) {
-                Icon(Icons.Default.FolderDelete, contentDescription = "Delete Selection")
-            }
-        }
-
-        BottomAnimatedVisibility(visible = selectionMode.canSetRead) {
-            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.SetRead(true))) }) {
-                Icon(Icons.Default.Visibility, contentDescription = null)
-            }
-        }
-
-        BottomAnimatedVisibility(visible = selectionMode.canSetUnread) {
-            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.SetRead(false))) }) {
-                Icon(Icons.Default.VisibilityOff, contentDescription = null)
-            }
-        }
-
-        BottomAnimatedVisibility(visible = selectionMode.hasReading) {
-            IconButton(onClick = { sendAction(ChaptersAction.WithSelected(Selection.Reset)) }) {
-                Icon(Icons.Default.LockReset, contentDescription = null)
-            }
-        }
-
-        IconButton(onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowFullDeleteDialog)) }) {
-            Icon(Icons.Default.DeleteForever, contentDescription = "Download items")
-        }
-    }
 }
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -465,7 +470,7 @@ private fun StatusText(
     }
 }
 
-@Preview
+@ThemedPreview
 @Composable
 private fun PreviewSelectedModeOnListPageContent() {
     MaterialTheme {
@@ -473,11 +478,11 @@ private fun PreviewSelectedModeOnListPageContent() {
             chapterFilter = ChapterFilter.ALL_READ_DESC,
             selectionMode = remember {
                 SelectionMode(
-                    selectionCount = 1,
-                    hasReading = false,
-                    canSetRead = false,
-                    canSetUnread = false,
-                    canRemovePages = false
+                    count = 1,
+                    hasReading = 0,
+                    canSetRead = 0,
+                    canSetUnread = 0,
+                    canRemovePages = 0
                 )
             },
             itemsContent = remember {
@@ -496,18 +501,18 @@ private fun PreviewSelectedModeOnListPageContent() {
     }
 }
 
-@Preview
+@ThemedPreview
 @Composable
 private fun PreviewSelectedModeOffListPageContent() {
     MaterialTheme {
         ListPageContent(
             chapterFilter = ChapterFilter.ALL_READ_DESC,
             selectionMode = SelectionMode(
-                selectionCount = 0,
-                hasReading = false,
-                canSetRead = false,
-                canSetUnread = false,
-                canRemovePages = false
+                count = 0,
+                hasReading = 0,
+                canSetRead = 0,
+                canSetUnread = 0,
+                canRemovePages = 0
             ),
             itemsContent = Items(
                 listOf(

@@ -22,6 +22,8 @@ internal object SelectionHelper {
         return old.copy(items = newItems)
     }
 
+    fun aboveCount(items: List<SelectableItem>) = items.indexOfFirst { it.selected }
+
     fun below(old: Items): Items {
         val firstSelected = old.items.indexOfFirst { it.selected }
 
@@ -31,6 +33,8 @@ internal object SelectionHelper {
 
         return old.copy(items = newItems)
     }
+
+    fun belowCount(items: List<SelectableItem>) = items.size - items.indexOfFirst { it.selected } - 1
 
     fun all(old: Items): Items {
         val newItems = old
