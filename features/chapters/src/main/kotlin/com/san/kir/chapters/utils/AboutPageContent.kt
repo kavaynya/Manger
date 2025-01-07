@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -43,10 +44,13 @@ import com.san.kir.chapters.ui.chapters.NextChapter
 import com.san.kir.core.compose.DefaultSpacer
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.FromTopToTopAnimContent
-import com.san.kir.core.compose.animation.StartAnimatedVisibility
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
+import com.san.kir.core.compose.isLandscape
+import com.san.kir.core.compose.isPortrait
 import com.san.kir.core.compose.rememberImage
+import com.san.kir.core.compose.startInsetsPadding
 import com.san.kir.core.utils.viewModel.Action
 import com.san.kir.core.utils.viewModel.ReturnEvents
 
@@ -87,17 +91,14 @@ internal fun AboutPageContent(
             modifier = Modifier.fillMaxSize()
         ) {
 
-            StartAnimatedVisibility(hasReading, modifier = Modifier.align(Alignment.End)) {
-                FilledIconButton(
-                    onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowFullResetDialog)) },
-                    modifier = Modifier.padding(Dimensions.default),
-                    colors = IconButtonDefaults.filledIconButtonColors(
-                        containerColor = containerColor ?: defaultContainerColor,
-                        contentColor = contentColor ?: defaultContentColor,
-                    )
-                ) {
-                    Icon(Icons.Default.LockReset, "")
-                }
+            if (isPortrait()) {
+                ResetButton(
+                    hasReading,
+                    containerColor ?: defaultContainerColor,
+                    contentColor ?: defaultContentColor,
+                    sendAction,
+                    Modifier.align(Alignment.End)
+                )
             }
 
             FromTopToTopAnimContent(
@@ -113,9 +114,7 @@ internal fun AboutPageContent(
                     ),
             ) { state ->
                 when (state) {
-                    ErrorState.None -> {
-
-                    }
+                    ErrorState.None -> Unit
 
                     ErrorState.NotFound -> {
                         ErrorContainer(
@@ -151,39 +150,51 @@ internal fun AboutPageContent(
                 fontSize = 18.sp,
             )
 
-            // Продолжение чтения
-            Button(
-                onClick = {
-                    if (nextChapter is NextChapter.Ok) {
-                        sendAction(ReturnEvents(ChaptersEvent.ToViewer(nextChapter.id)))
-                    }
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(Dimensions.default)
-                    .horizontalInsetsPadding()
-                    .bottomInsetsPadding(),
-                enabled = nextChapter is NextChapter.Ok,
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = containerColor ?: defaultContainerColor,
-                    contentColor = contentColor ?: defaultContentColor,
-                    disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                    disabledContentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
-                )
-            ) {
-                when (nextChapter) {
-                    NextChapter.None -> ButtonText(stringResource(R.string.not_continue_reading))
-                    NextChapter.Loading -> CircularProgressIndicator()
-
-                    is NextChapter.Ok -> {
-                        val textId = when (nextChapter) {
-                            is NextChapter.Ok.Continue -> R.string.continue_reading_format
-                            is NextChapter.Ok.First -> R.string.start_reading_format
-                            is NextChapter.Ok.Single -> R.string.single_reading_format
+            Row {
+                // Продолжение чтения
+                Button(
+                    onClick = {
+                        if (nextChapter is NextChapter.Ok) {
+                            sendAction(ReturnEvents(ChaptersEvent.ToViewer(nextChapter.id)))
                         }
-                        ButtonText(stringResource(textId, nextChapter.name))
-                    }
+                    },
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(horizontal = Dimensions.default, vertical = Dimensions.half)
+                        .startInsetsPadding()
+                        .bottomInsetsPadding(),
+                    enabled = nextChapter is NextChapter.Ok,
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = containerColor ?: defaultContainerColor,
+                        contentColor = contentColor ?: defaultContentColor,
+                        disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        disabledContentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
+                    ),
+                    contentPadding = PaddingValues()
+                ) {
+                    when (nextChapter) {
+                        NextChapter.None -> ButtonText(stringResource(R.string.not_continue_reading))
+                        NextChapter.Loading -> CircularProgressIndicator()
 
+                        is NextChapter.Ok -> {
+                            val textId = when (nextChapter) {
+                                is NextChapter.Ok.Continue -> R.string.continue_reading_format
+                                is NextChapter.Ok.First -> R.string.start_reading_format
+                                is NextChapter.Ok.Single -> R.string.single_reading_format
+                            }
+                            ButtonText(stringResource(textId, nextChapter.name))
+                        }
+                    }
+                }
+
+                if (isLandscape()) {
+                    ResetButton(
+                        hasReading,
+                        containerColor ?: defaultContainerColor,
+                        contentColor ?: defaultContentColor,
+                        sendAction,
+                        modifier = Modifier.align(Alignment.CenterVertically)
+                    )
                 }
             }
         }
@@ -198,6 +209,26 @@ private fun ButtonText(content: String) {
         modifier = Modifier.padding(Dimensions.default),
         textAlign = TextAlign.Center
     )
+}
+
+@Composable
+private fun ResetButton(
+    hasReading: Boolean,
+    containerColor: Color,
+    contentColor: Color,
+    sendAction: (Action) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    FilledIconButton(
+        onClick = { sendAction(ReturnEvents(ChaptersEvent.ShowFullResetDialog)) },
+        modifier = modifier.endInsetsPadding(Dimensions.default),
+        colors = IconButtonDefaults.filledIconButtonColors(
+            containerColor = containerColor,
+            contentColor = contentColor,
+        )
+    ) {
+        Icon(Icons.Default.LockReset, "")
+    }
 }
 
 @Composable
