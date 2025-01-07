@@ -1,6 +1,7 @@
 package com.san.kir.chapters.ui.chapters
 
 import com.san.kir.core.utils.viewModel.Action
+import com.san.kir.data.models.utils.ChapterFilter
 
 internal sealed interface ChaptersAction : Action {
     data class WithSelected(val mode: Selection) : ChaptersAction
@@ -35,6 +36,14 @@ internal sealed interface Filter {
     data object All : Filter
     data object Read : Filter
     data object NotRead : Filter
+}
+
+internal fun ChapterFilter.convert(): Filter {
+    return when (this) {
+        ChapterFilter.ALL_READ_ASC, ChapterFilter.ALL_READ_DESC -> Filter.All
+        ChapterFilter.NOT_READ_ASC, ChapterFilter.NOT_READ_DESC -> Filter.NotRead
+        ChapterFilter.IS_READ_ASC, ChapterFilter.IS_READ_DESC -> Filter.Read
+    }
 }
 
 

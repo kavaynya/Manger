@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.selection.selectableGroup
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -48,31 +49,42 @@ private fun <T> animationSpec() = spring<T>(DampingRatioLowBouncy, 800f)
 private val SortSelectedContainerColor: Color
     @Composable get() = MaterialTheme.colorScheme.primary
 
-internal interface IDataHelper<ValueT> {
+internal interface IDataHelper<out ValueT> {
     val value: ValueT
+    val comparer: (@UnsafeVariance ValueT) -> Boolean
+        get() = { other -> value == other }
 }
 
-public data class DataIconHelper<ValueT>(val content: ImageVector, override val value: ValueT) :
-    IDataHelper<ValueT>
+public data class DataIconHelper<out ValueT>(
+    val content: ImageVector,
+    override val value: ValueT,
+    override val comparer: (@UnsafeVariance ValueT) -> Boolean = { value == it },
+) : IDataHelper<ValueT>
 
-public data class DataTextHelper<ValueT>(val title: Int, override val value: ValueT) :
-    IDataHelper<ValueT>
+public data class DataTextHelper<ValueT>(
+    val title: Int,
+    override val value: ValueT,
+    override val comparer: (ValueT) -> Boolean = { value == it },
+) : IDataHelper<ValueT>
 
 internal interface IHandledDataHelper<ValueT> {
     val value: ValueT
     val width: Float
+    val comparer: (ValueT) -> Boolean
 }
 
 internal class HandledDataTextHelper<ValueT>(
     val title: String,
     override val value: ValueT,
-    override val width: Float
+    override val width: Float,
+    override val comparer: (ValueT) -> Boolean,
 ) : IHandledDataHelper<ValueT>
 
 internal class HandledDataIconHelper<ValueT>(
     val content: ImageVector,
     override val value: ValueT,
-    override val width: Float
+    override val width: Float,
+    override val comparer: (ValueT) -> Boolean,
 ) : IHandledDataHelper<ValueT>
 
 
@@ -83,7 +95,7 @@ public fun <ValueT> VerticalRadioGroup(
     onChange: (ValueT) -> Unit
 ) {
     val selectedContainerColor = SortSelectedContainerColor
-    val currentButtonIndex = dataHelpers.indexOfFirst { it.value == initialValue }
+    val currentButtonIndex = dataHelpers.indexOfFirst { it.comparer(initialValue) }
     val buttonOffset = rememberFloatAnimatable(currentButtonIndex.toFloat())
 
     LaunchedEffect(currentButtonIndex) {
@@ -107,9 +119,9 @@ public fun <ValueT> VerticalRadioGroup(
                 }
             }
     ) {
-        dataHelpers.forEach { (title, value) ->
+        dataHelpers.forEach { (title, value, comparer) ->
             val textColor by animateColorAsState(
-                if (initialValue == value) {
+                if (comparer(initialValue)) {
                     MaterialTheme.colorScheme.onPrimary
                 } else {
                     MaterialTheme.colorScheme.onSurfaceVariant
@@ -117,10 +129,10 @@ public fun <ValueT> VerticalRadioGroup(
             )
             Row(
                 modifier = Modifier
-                    .clip(RoundedCornerShape(50))
+                    .clip(CircleShape)
                     .selectable(
-                        selected = initialValue == value,
-                        enabled = initialValue != value,
+                        selected = comparer(initialValue),
+                        enabled = comparer(initialValue).not(),
                         role = Role.RadioButton,
                         onClick = { onChange(value) }
                     )
@@ -140,7 +152,11 @@ public fun <ValueT> VerticalRadioGroup(
 }
 
 @Composable
-public fun <ValueT, DataHelper : IDataHelper<out ValueT>, HandledDataHelper : IHandledDataHelper<ValueT>> HorizontalRadioGroup(
+public fun <
+        ValueT,
+        DataHelper : IDataHelper<out ValueT>,
+        HandledDataHelper : IHandledDataHelper<ValueT>
+        > HorizontalRadioGroup(
     dataHelpers: List<DataHelper>,
     initialValue: ValueT,
     onChange: (ValueT) -> Unit,
@@ -159,7 +175,7 @@ public fun <ValueT, DataHelper : IDataHelper<out ValueT>, HandledDataHelper : IH
         if (handledData.isEmpty()) {
             dataHelpers.mapTo(handledData) { dataHandler(it, itemHorizontalPadding) }
         }
-        val currentButtonIndex = handledData.indexOfFirst { it.value == initialValue }
+        val currentButtonIndex = handledData.indexOfFirst { it.comparer(initialValue) }
         defaultLaunch {
             buttonOffset.animateTo(handledData.take(currentButtonIndex).sumOf { it.width })
         }
@@ -228,7 +244,8 @@ public fun <ValueT> HorizontalTextRadioGroup(
             HandledDataTextHelper(
                 title = title,
                 value = helper.value,
-                width = measure.size.width + 2 * padding
+                width = measure.size.width + 2 * padding,
+                comparer = helper.comparer,
             )
         },
         modifier = modifier
@@ -243,7 +260,7 @@ public fun <ValueT> HorizontalTextRadioGroup(
 
 @Composable
 public fun <ValueT> HorizontalIconRadioGroup(
-    dataHelpers: List<DataIconHelper<out ValueT>>,
+    dataHelpers: List<DataIconHelper<ValueT>>,
     initialValue: ValueT,
     modifier: Modifier = Modifier,
     onChange: (ValueT) -> Unit,
@@ -257,14 +274,15 @@ public fun <ValueT> HorizontalIconRadioGroup(
             HandledDataIconHelper(
                 content = helper.content,
                 value = helper.value,
-                width = iconWidth + 2 * padding
+                width = iconWidth + 2 * padding,
+                comparer = helper.comparer,
             )
         },
         modifier = modifier
     ) { helper ->
         val tint by animateColorAsState(
-            if (initialValue != helper.value) MaterialTheme.colorScheme.onSurfaceVariant
-            else MaterialTheme.colorScheme.onPrimary, label = ""
+            if (helper.comparer(initialValue)) MaterialTheme.colorScheme.onPrimary
+            else MaterialTheme.colorScheme.onSurfaceVariant, label = ""
         )
         Icon(helper.content, "", tint = tint)
     }

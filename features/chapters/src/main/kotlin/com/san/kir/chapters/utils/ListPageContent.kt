@@ -3,7 +3,6 @@ package com.san.kir.chapters.utils
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
@@ -11,12 +10,10 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -52,10 +49,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.drawWithCache
-import androidx.compose.ui.geometry.CornerRadius
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -65,7 +59,6 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.san.kir.chapters.R
-import com.san.kir.chapters.ui.chapters.BottomSortHelper
 import com.san.kir.chapters.ui.chapters.ChaptersAction
 import com.san.kir.chapters.ui.chapters.ChaptersEvent
 import com.san.kir.chapters.ui.chapters.Filter
@@ -73,10 +66,12 @@ import com.san.kir.chapters.ui.chapters.Items
 import com.san.kir.chapters.ui.chapters.SelectableItem
 import com.san.kir.chapters.ui.chapters.Selection
 import com.san.kir.chapters.ui.chapters.SelectionMode
+import com.san.kir.chapters.ui.chapters.convert
+import com.san.kir.core.compose.DataIconHelper
 import com.san.kir.core.compose.DefaultBottomBar
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.FullWeightSpacer
-import com.san.kir.core.compose.IconButtonPaddings
+import com.san.kir.core.compose.HorizontalIconRadioGroup
 import com.san.kir.core.compose.IconSize
 import com.san.kir.core.compose.RotateToggleButton
 import com.san.kir.core.compose.Saver
@@ -84,9 +79,9 @@ import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.StartAnimatedVisibility
 import com.san.kir.core.compose.animation.TopAnimatedVisibility
-import com.san.kir.core.compose.animation.rememberDpAnimatable
 import com.san.kir.core.compose.animation.rememberFloatAnimatable
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.maxDistanceIn
 import com.san.kir.core.utils.viewModel.Action
@@ -151,13 +146,8 @@ internal fun ListPageContent(
             }
         }
 
-        TopAnimatedVisibility(
-            visible = !selectionMode.enabled,
-            modifier = Modifier.align(Alignment.BottomEnd),
-        ) {
-            BottomOrderBar(chapterFilter) {
-                sendAction(ChaptersAction.ChangeFilter(it))
-            }
+        TopAnimatedVisibility(visible = selectionMode.enabled.not(), modifier = Modifier.align(Alignment.BottomEnd)) {
+            BottomOrderBar(chapterFilter) { sendAction(ChaptersAction.ChangeFilter(it)) }
         }
 
         StartAnimatedVisibility(
@@ -179,69 +169,28 @@ private fun BottomOrderBar(
     currentFilter: ChapterFilter,
     sendAction: (Filter) -> Unit,
 ) {
-    val selectedColor = MaterialTheme.colorScheme.inverseSurface
-
     val buttons = remember {
         listOf(
-            BottomSortHelper(
-                icon = Icons.Default.SelectAll,
-                action = { sendAction(Filter.All) },
-                checkEnable = { it.isAll }
-            ),
-            BottomSortHelper(
-                icon = Icons.Default.Visibility,
-                action = { sendAction(Filter.Read) },
-                checkEnable = { it.isRead }
-            ),
-            BottomSortHelper(
-                icon = Icons.Default.VisibilityOff,
-                action = { sendAction(Filter.NotRead) },
-                checkEnable = { it.isNot }
-            )
+            DataIconHelper(Icons.Default.SelectAll, ChapterFilter.ALL_READ_DESC) { it.isAll },
+            DataIconHelper(Icons.Default.Visibility, ChapterFilter.IS_READ_DESC) { it.isRead },
+            DataIconHelper(Icons.Default.VisibilityOff, ChapterFilter.NOT_READ_DESC) { it.isNot },
         )
     }
 
-    val currentButtonIndex = buttons.indexOfFirst { it.checkEnable(currentFilter) }
-    val buttonOffset = rememberDpAnimatable(IconSize.width * currentButtonIndex)
-
-    LaunchedEffect(currentButtonIndex) {
-        buttonOffset.animateTo(IconSize.width * currentButtonIndex)
-    }
-
-    DefaultBottomBar {
+    DefaultBottomBar(modifier = Modifier.endInsetsPadding(right = Dimensions.default)) {
         RotateToggleButton(
             icon = Icons.AutoMirrored.Filled.Sort,
             state = currentFilter.isAsc,
-            onClick = { sendAction(Filter.Reverse) }
+            onClick = { sendAction(Filter.Reverse) },
+            modifier = Modifier.padding(start = Dimensions.middle),
         )
-        Spacer(modifier = Modifier.width(SortBarPadding))
-        Row(
-            modifier = Modifier
-                .padding(SortBarPadding)
-                .drawBehind {
-                    drawRoundRect(
-                        color = selectedColor,
-                        topLeft = Offset(buttonOffset.value.toPx(), 0f),
-                        size = size.copy(size.width / buttons.size),
-                        cornerRadius = CornerRadius(size.height / 2)
-                    )
-                }
-        ) {
-            buttons.forEachIndexed { index, (icon, action) ->
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    modifier = Modifier
-                        .clip(DefaultRoundedShape)
-                        .clickable(onClick = action, enabled = index != currentButtonIndex)
-                        .size(IconSize)
-                        .padding(IconButtonPaddings),
-                    tint =
-                    if (index == currentButtonIndex) SortSelectedContentColor
-                    else LocalContentColor.current
-                )
-            }
-        }
+
+        HorizontalIconRadioGroup(
+            dataHelpers = buttons,
+            initialValue = currentFilter,
+            onChange = { sendAction(it.convert()) },
+            modifier = Modifier.padding(Dimensions.middle)
+        )
     }
 }
 
