@@ -80,11 +80,7 @@ internal object SelectionHelper {
                     .map { (chapter, item) -> item.copy(chapter = chapter) }
             }
 
-        return Items(
-            items = items,
-            count = list.size,
-            readCount = list.count { it.isRead },
-        )
+        return Items(items = items)
     }
 
     private fun List<SimplifiedChapter>.applyFilter(

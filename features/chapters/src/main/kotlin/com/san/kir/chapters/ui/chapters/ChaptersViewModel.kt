@@ -172,13 +172,13 @@ internal class ChaptersViewModel(
     }
 
     private suspend fun downloadAll() {
-        val chapterIds = chaptersRepository.allItems(manga.first().id).map { it.id }
+        val chapterIds = itemsContent.value.allIds()
         downloadManager.addTasks(chapterIds)
         showDownloadToast(chapterIds.size)
     }
 
     private suspend fun downloadNotReads() {
-        val chapterIds = chaptersRepository.notReadItems(manga.first().id).map { it.id }
+        val chapterIds = itemsContent.value.notReadIds()
         downloadManager.addTasks(chapterIds)
         showDownloadToast(chapterIds.size)
     }
@@ -295,19 +295,10 @@ internal class ChaptersViewModel(
 
         val firstUnreadChapter = newList.firstOrNull { item -> item.isRead.not() }
         val firstChapter = newList.firstOrNull()
-
         return when {
             firstUnreadChapter == null -> NextChapter.None
-            newList.size == 1 -> NextChapter.Ok.Single(
-                firstUnreadChapter.id,
-                firstUnreadChapter.name
-            )
-
-            firstUnreadChapter == firstChapter -> NextChapter.Ok.First(
-                firstUnreadChapter.id,
-                firstUnreadChapter.name
-            )
-
+            newList.size == 1 -> NextChapter.Ok.Single(firstUnreadChapter.id, firstUnreadChapter.name)
+            firstUnreadChapter == firstChapter -> NextChapter.Ok.First(firstUnreadChapter.id, firstUnreadChapter.name)
             else -> NextChapter.Ok.Continue(firstUnreadChapter.id, firstUnreadChapter.name)
         }
     }

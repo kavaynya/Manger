@@ -1,6 +1,5 @@
 package com.san.kir.chapters.ui.chapters
 
-import androidx.compose.ui.graphics.vector.ImageVector
 import com.san.kir.core.utils.viewModel.ScreenState
 import com.san.kir.data.models.main.Manga
 import com.san.kir.data.models.main.SimplifiedChapter
@@ -38,10 +37,14 @@ internal data class BackgroundActions(
 internal data class Items(
     val items: List<SelectableItem> = emptyList(),
     val memoryPagesCounts: Map<Long, Int> = emptyMap(),
-    val count: Int = items.count(),
-    val readCount: Int = items.count { it.chapter.isRead },
 ) {
+    val count: Int = items.count()
+    val readCount: Int = items.count { it.chapter.isRead }
     val hasReadingChapters: Boolean = items.any { it.chapter.progress > 1 || it.chapter.isRead }
+    val notReadCount: Int = count - readCount
+
+    fun notReadIds() = items.filter { it.chapter.isRead.not() }.map { it.chapter.id }
+    fun allIds() = items.map { it.chapter.id }
 }
 
 internal data class SelectionMode(
@@ -69,9 +72,3 @@ internal sealed interface NextChapter {
         class Single(id: Long, name: String) : Ok(id, name)
     }
 }
-
-internal data class BottomSortHelper(
-    val icon: ImageVector,
-    val action: () -> Unit,
-    val checkEnable: (ChapterFilter) -> Boolean
-)

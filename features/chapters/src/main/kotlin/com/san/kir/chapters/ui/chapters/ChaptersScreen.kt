@@ -104,6 +104,8 @@ internal fun ChaptersScreen(
         menuActions = defaultMenuActions(
             isUpdate = state.manga.isUpdate,
             isAlternativeSort = state.manga.isAlternativeSort,
+            notReadCount = itemsContent.notReadCount,
+            allCount = itemsContent.count,
             sendAction = sendAction
         )
     ) {

@@ -48,8 +48,8 @@
     <string name="start_reading_format">Начать чтение\n%s</string>
     <string name="single_reading_format">Прочитать\n%s</string>
     <string name="download_next">Скачать следующую</string>
-    <string name="download_not_reading">Скачать непрочитанное</string>
-    <string name="download_all">Скачать все</string>
+    <string name="download_not_reading">Скачать непрочитанное (%s)</string>
+    <string name="download_all">Скачать все (%s)</string>
     <string name="allow_updates">Разрешить обновления</string>
     <string name="change_sorting">Изменить сортировку</string>
 
@@ -61,7 +61,7 @@
 
 
     <!-- Dialogs -->
-    <string name="you_want_delete">Вы действительно хотите удалить</string>
+    <string name="you_want_delete">Вы действительно хотите удалить загруженные данные из памяти?</string>
     <string name="delete_read_chapters_message">Своими действиями вы хотите лишить себя такой кучи манги?</string>
     <string name="deleting">Удаляю…</string>
     <string name="full_delete_message">Данное действие приведет к удалению глав из базы данных. Все файлы и папки будут не тронуты, но приложение больше не будет видеть эти главы. Рекомендуется использовать это при появлении копий существующих глав.</string>
