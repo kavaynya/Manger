@@ -397,9 +397,6 @@ private fun LazyItemScope.ItemContent(
     var itemSize by rememberSaveable(stateSaver = Size.Saver, key = "LatestItemSize") { mutableStateOf(Size.Zero) }
     var lastPressPosition by rememberSaveable(stateSaver = Offset.Saver) { mutableStateOf(Offset.Zero) }
 
-    val backgroundSize = rememberFloatAnimatable(if (item.isRead) screenWidth.floatValue else 0f)
-    LaunchedEffect(item.isRead) { backgroundSize.animateTo(if (item.isRead) screenWidth.floatValue else 0f) }
-
     val selectedRadius =
         rememberFloatAnimatable(if (itemSelected) lastPressPosition.maxDistanceIn(itemSize) else 0f)
 
@@ -425,7 +422,10 @@ private fun LazyItemScope.ItemContent(
                 onDrawBehind {
                     clipRect {
                         if (itemSize.isEmpty()) itemSize = size
-                        drawRect(color = readingColor, size = Size(width = backgroundSize.value, height = size.height))
+                        drawRect(
+                            color = readingColor,
+                            size = size.copy(width = if (item.isRead) screenWidth.floatValue else 0f)
+                        )
                         drawCircle(color = selectedColor, radius = selectedRadius.value, center = lastPressPosition)
                     }
                 }
