@@ -54,8 +54,8 @@ private val IntSaver: Saver<Animatable<Int, AnimationVector1D>, *> = Saver(
 )
 
 private val DpSaver: Saver<Animatable<Dp, AnimationVector1D>, *> = Saver(
-    save = { it.value },
-    restore = { Animatable(it, Dp.VectorConverter) }
+    save = { it.value.value },
+    restore = { Animatable(it.dp, Dp.VectorConverter) }
 )
 
 private val ColorSaver: Saver<Animatable<Color, AnimationVector4D>, *> = Saver(

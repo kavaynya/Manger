@@ -28,7 +28,7 @@ vectordrawable = "1.2.0"
 workmanager = "2.10.0"
 
 # Compose
-compose = "1.7.5"
+compose = "1.7.6"
 material3 = "1.3.1"
 
 # Google
@@ -47,7 +47,7 @@ kakaocup = "0.0.2"
 espresso = "3.6.1"
 
 #
-agp = "8.7.2"
+agp = "8.7.3"
 
 hyperion = "0.9.31"
 subsampling = "3.10.0"
