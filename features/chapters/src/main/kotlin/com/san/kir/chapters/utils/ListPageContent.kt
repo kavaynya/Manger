@@ -8,7 +8,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -17,6 +16,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.ArrowDownward
@@ -36,10 +37,10 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableFloatState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableFloatStateOf
@@ -52,12 +53,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawWithCache
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.clipRect
 import androidx.compose.ui.layout.boundsInWindow
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.tooling.preview.Preview
 import com.san.kir.chapters.R
 import com.san.kir.chapters.ui.chapters.ChaptersAction
 import com.san.kir.chapters.ui.chapters.ChaptersEvent
@@ -72,9 +71,11 @@ import com.san.kir.core.compose.DefaultBottomBar
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.FullWeightSpacer
 import com.san.kir.core.compose.HorizontalIconRadioGroup
+import com.san.kir.core.compose.IconCounterButton
 import com.san.kir.core.compose.IconSize
 import com.san.kir.core.compose.RotateToggleButton
 import com.san.kir.core.compose.Saver
+import com.san.kir.core.compose.ThemedPreview
 import com.san.kir.core.compose.animation.BottomAnimatedVisibility
 import com.san.kir.core.compose.animation.FromBottomToBottomAnimContent
 import com.san.kir.core.compose.animation.StartAnimatedVisibility
@@ -92,15 +93,6 @@ import com.san.kir.data.models.utils.ChapterFilter
 import com.san.kir.data.models.utils.DownloadState
 
 private val SortBarPadding = Dimensions.default
-
-private val SortSelectedContainerColor: Color
-    @Composable
-    get() = MaterialTheme.colorScheme.inverseSurface
-
-private val SortSelectedContentColor: Color
-    @Composable
-    get() = contentColorFor(SortSelectedContainerColor)
-
 private val SortBarHeightWithPadding = IconSize.height + SortBarPadding * 4
 
 
@@ -113,26 +105,21 @@ internal fun ListPageContent(
     sendAction: (Action) -> Unit,
 ) {
     val itemsCount by remember { derivedStateOf { itemsContent.count } }
-    var screenWidth by remember { mutableFloatStateOf(0f) }
+    val screenWidth = remember { mutableFloatStateOf(0f) }
 
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .onGloballyPositioned {
-                screenWidth = it.boundsInWindow().width
-            }
+            .onGloballyPositioned { screenWidth.floatValue = it.boundsInWindow().width }
     ) {
-        if (itemsContent.items.isNotEmpty()) {
+        if (itemsCount > 0) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
                 contentPadding = bottomInsetsPadding(
                     bottom = if (selectionMode.enabled) Dimensions.zero else SortBarHeightWithPadding
                 )
             ) {
-                itemsIndexed(
-                    items = itemsContent.items,
-                    key = { _, ch -> ch.chapter.id }
-                ) { index, chapter ->
+                itemsIndexed(items = itemsContent.items, key = { _, ch -> ch.chapter.id }) { index, chapter ->
                     val memoryPagesCount = itemsContent.memoryPagesCounts[chapter.chapter.id] ?: 0
                     ItemContent(
                         item = chapter,
@@ -296,38 +283,22 @@ private fun LazyItemScope.ItemContent(
     index: Int,
     selectionEnabled: Boolean,
     memoryPagesCount: Int,
-    screenWidth: Float,
+    screenWidth: MutableFloatState,
     sendAction: (Action) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
-
-    var itemSize by remember { mutableStateOf(Size.Zero) }
+    var itemSize by rememberSaveable(stateSaver = Size.Saver, key = "LatestItemSize") { mutableStateOf(Size.Zero) }
     var lastPressPosition by rememberSaveable(stateSaver = Offset.Saver) { mutableStateOf(Offset.Zero) }
 
-    val backgroundSize = rememberFloatAnimatable(if (item.chapter.isRead) screenWidth else 0f)
+    val selectedRadius =
+        rememberFloatAnimatable(if (item.selected) lastPressPosition.maxDistanceIn(itemSize) else 0f)
 
-    LaunchedEffect(item.chapter.isRead) {
-        backgroundSize.animateTo(if (item.chapter.isRead) screenWidth else 0f)
-    }
-
-    val selectedRadius = rememberFloatAnimatable(
-        if (item.selected) lastPressPosition.maxDistanceIn(itemSize) else 0f
-    )
-
-    LaunchedEffect(item.selected) {
-        selectedRadius.animateTo(
-            if (item.selected) lastPressPosition.maxDistanceIn(itemSize) else 0f
-        )
+    LaunchedEffect(item.selected, itemSize) {
+        selectedRadius.animateTo(if (item.selected) lastPressPosition.maxDistanceIn(itemSize) else 0f)
     }
 
     LaunchedEffect(Unit) {
-        interactionSource.interactions.collect { interaction ->
-            if (interaction is PressInteraction.Press) {
-                lastPressPosition = interaction.pressPosition
-            }
-        }
-
         interactionSource.interactions.collect { interaction ->
             if (interaction is PressInteraction.Press && item.selected.not()) {
                 lastPressPosition = interaction.pressPosition
@@ -341,25 +312,19 @@ private fun LazyItemScope.ItemContent(
         modifier = modifier
             .drawWithCache {
                 onDrawBehind {
-                    clipRect { }
-                    itemSize = size
-
-                    drawRect(
-                        color = readingColor,
-                        size = size.copy(width = backgroundSize.value)
-                    )
-
-                    // Draw the selected circle
-                    drawCircle(
-                        color = selectedColor,
-                        radius = selectedRadius.value,
-                        center = lastPressPosition
-                    )
+                    clipRect {
+                        if (itemSize.isEmpty()) itemSize = size
+                        drawRect(
+                            color = readingColor,
+                            size = size.copy(width = if (item.chapter.isRead) screenWidth.floatValue else 0f)
+                        )
+                        drawCircle(color = selectedColor, radius = selectedRadius.value, center = lastPressPosition)
+                    }
                 }
             }
             .fillMaxWidth()
             .horizontalInsetsPadding()
-            .animateItemPlacement(),
+            .animateItem(),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val indication = LocalIndication.current
@@ -448,12 +413,8 @@ private fun StatusText(
                 DownloadState.PAUSED,
                 DownloadState.COMPLETED,
                 DownloadState.UNKNOWN,
-                -> {
-                    Text(
-                        stringResource(
-                            R.string.reading_progress_format, progress, size, localCountPages
-                        ),
-                    )
+                    -> {
+                    Text(stringResource(R.string.reading_progress_format, progress, size, localCountPages))
 
                     BottomAnimatedVisibility(visible = localCountPages > 0) {
                         Icon(
