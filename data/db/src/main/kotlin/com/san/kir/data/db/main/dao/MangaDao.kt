@@ -9,6 +9,7 @@ import com.san.kir.data.db.main.custom.DbNameAndId
 import com.san.kir.data.db.main.entites.DbManga
 import com.san.kir.data.db.main.views.ViewManga
 import com.san.kir.data.db.main.views.ViewMangaWithChapterCounts
+import com.san.kir.data.models.utils.ChapterFilter
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -89,4 +90,7 @@ internal interface MangaDao : BaseDao<DbManga> {
 
     @Query("UPDATE manga SET color=:color WHERE id=:id")
     suspend fun updateColor(id: Long, color: Int)
+
+    @Query("UPDATE manga set chapterFilter=:filter WHERE id=:id")
+    suspend fun updateFilter(id: Long, filter: ChapterFilter)
 }

@@ -8,7 +8,6 @@ import com.san.kir.background.logic.di.updateMangaManager
 import com.san.kir.chapters.R
 import com.san.kir.chapters.logic.utils.SelectionHelper
 import com.san.kir.core.utils.ManualDI
-import com.san.kir.core.utils.coroutines.defaultDispatcher
 import com.san.kir.core.utils.coroutines.withMainContext
 import com.san.kir.core.utils.delChapters
 import com.san.kir.core.utils.longToast
@@ -33,12 +32,11 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
-import timber.log.Timber
+import kotlinx.coroutines.flow.updateAndGet
 
 internal class ChaptersViewModel(
     private val mangaId: Long,
@@ -55,6 +53,7 @@ internal class ChaptersViewModel(
     private val backgroundAction = MutableStateFlow(BackgroundActions())
     private val manga = mangaRepository.loadItem(mangaId)
         .filterNotNull()
+        .distinctUntilChanged()
         .onEach { initFilterAndIncreasePopulate(it) }
 
     private val filter = MutableStateFlow(ChapterFilter.ALL_READ_ASC)
@@ -95,33 +94,18 @@ internal class ChaptersViewModel(
         }
         .stateInSubscribed(SelectionMode())
 
-    override val tempState = combine(
-        backgroundAction, manga, settingsRepository.showTitle, filter
-    ) { background, manga, title, filter ->
-        ChaptersState(
-            backgroundAction = background.result,
-            manga = manga,
-            showTitle = title,
-            chapterFilter = filter,
-        )
-    }
+    override val tempState =
+        combine(backgroundAction, manga, settingsRepository.showTitle, filter) { background, manga, title, filter ->
+            ChaptersState(manga, background.result, title, filter)
+        }
 
     override val defaultState = ChaptersState()
 
     init {
         combine(chaptersRepository.items(mangaId), filter, manga) { items, filter, manga ->
-            Timber.w("list -> " + items.size)
             itemsContent.value = SelectionHelper.update(itemsContent.value, items, filter, manga)
             updateMemoryCounts(items)
-        }.flowOn(defaultDispatcher).launchIn(this)
-
-        combine(settingsRepository.isIndividual, filter) { individual, filter ->
-            if (individual) {
-                settingsRepository.update(filter)
-            } else {
-                mangaRepository.save(manga.first().copy(chapterFilter = filter))
-            }
-        }.flowOn(defaultDispatcher).launchIn(this)
+        }.launch()
 
         registerReceiver(mangaId)
     }
@@ -163,9 +147,7 @@ internal class ChaptersViewModel(
         }.launchIn(this)
     }
 
-    private suspend fun changeIsUpdate() {
-        with(manga.first()) { mangaRepository.save(copy(isUpdate = isUpdate.not())) }
-    }
+    private suspend fun changeIsUpdate() = with(manga.first()) { mangaRepository.changeIsUpdate(id, isUpdate.not()) }
 
     private suspend fun changeMangaSort() {
         with(manga.first()) { mangaRepository.save(copy(isAlternativeSort = isAlternativeSort.not())) }
@@ -184,9 +166,7 @@ internal class ChaptersViewModel(
     }
 
     private suspend fun downloadNext() {
-        chaptersRepository.newItem(manga.first().id)?.let { chapter ->
-            downloadManager.addTask(chapter.id)
-        }
+        chaptersRepository.newItem(manga.first().id)?.let { chapter -> downloadManager.addTask(chapter.id) }
     }
 
     private fun showDownloadToast(count: Int) {
@@ -260,14 +240,19 @@ internal class ChaptersViewModel(
         }
     }
 
-    private fun changeFilter(mode: Filter) {
-        filter.update {
+    private suspend fun changeFilter(mode: Filter) {
+        val chapterFilter = filter.updateAndGet {
             when (mode) {
                 Filter.All -> it.toAll()
                 Filter.NotRead -> it.toNot()
                 Filter.Read -> it.toRead()
                 Filter.Reverse -> it.inverse()
             }
+        }
+        if (settingsRepository.isIndividual()) {
+            mangaRepository.changeFilter(manga.first().id, chapterFilter)
+        } else {
+            settingsRepository.update(chapterFilter)
         }
     }
 
@@ -277,13 +262,8 @@ internal class ChaptersViewModel(
 
             mangaRepository.save(manga.copy(populate = manga.populate + 1))
 
-            filter.update {
-                if (settingsRepository.isIndividual()) {
-                    manga.chapterFilter
-                } else {
-                    settingsRepository.filterStatus()
-                }
-            }
+            filter.value =
+                if (settingsRepository.isIndividual()) manga.chapterFilter else settingsRepository.filterStatus()
         }
     }
 

@@ -13,6 +13,7 @@ import com.san.kir.data.models.main.MangaWithChaptersCount
 import com.san.kir.data.models.main.MiniManga
 import com.san.kir.data.models.main.NameAndId
 import com.san.kir.data.models.main.SimplifiedManga
+import com.san.kir.data.models.utils.ChapterFilter
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import java.io.File
@@ -33,9 +34,9 @@ public class MangaRepository internal constructor(private val mangaDao: MangaDao
 
     public suspend fun idsByNames(names: List<String>): List<Long> = mangaDao.itemIdsByNames(names)
     public suspend fun idsByCategoryId(id: Long): List<Long> = mangaDao.itemIdsByCategoryId(id)
-    public suspend fun ids(): List<Long> =  mangaDao.itemIds(false)
+    public suspend fun ids(): List<Long> = mangaDao.itemIds(false)
     public suspend fun item(mangaId: Long): Manga? = mangaDao.itemById(mangaId)?.toModel()
-    public suspend fun items(): List<Manga> =  mangaDao.items().toModels()
+    public suspend fun items(): List<Manga> = mangaDao.items().toModels()
     public suspend fun itemByPath(path: String): MangaLogo? = itemByPath(getFullPath(path))
     public suspend fun itemByPath(file: File): MangaLogo? =
         mangaDao.specItems().firstOrNull { getFullPath(it.path) == file }?.toModel()
@@ -45,6 +46,7 @@ public class MangaRepository internal constructor(private val mangaDao: MangaDao
 
     public suspend fun changeColor(mangaId: Long, newColor: Int): Unit = mangaDao.updateColor(mangaId, newColor)
     public suspend fun changeIsUpdate(mangaId: Long, update: Boolean): Unit = mangaDao.updateIsUpdate(mangaId, update)
+    public suspend fun changeFilter(mangaId: Long, filter: ChapterFilter): Unit = mangaDao.updateFilter(mangaId, filter)
     public suspend fun name(mangaId: Long): String? = mangaDao.itemById(mangaId)?.name
     public suspend fun save(item: Manga): List<Long> = mangaDao.insert(item.toEntity())
     public suspend fun save(items: List<Manga>): List<Long> = mangaDao.insert(items.toEntities())
