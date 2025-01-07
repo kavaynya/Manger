@@ -207,7 +207,7 @@ private fun ErrorContainer(
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.padding(Dimensions.default),
+        modifier = Modifier.horizontalInsetsPadding(Dimensions.default),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

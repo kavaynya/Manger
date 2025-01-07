@@ -125,7 +125,7 @@ internal fun ListPageContent(
         if (itemsContent.items.isNotEmpty()) {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                contentPadding = PaddingValues(
+                contentPadding = bottomInsetsPadding(
                     bottom = if (selectionMode.enabled) Dimensions.zero else SortBarHeightWithPadding
                 )
             ) {
@@ -210,7 +210,7 @@ internal fun SelectionModeBar(
     Row(
         modifier = Modifier
             .bottomInsetsPadding()
-            .padding(bottom = Dimensions.default),
+            .endInsetsPadding(bottom = Dimensions.default),
         verticalAlignment = Alignment.CenterVertically
     ) {
 

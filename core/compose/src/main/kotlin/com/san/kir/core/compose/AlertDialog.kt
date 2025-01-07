@@ -88,7 +88,13 @@ public fun <T : Parcelable> AlertDialog(
     titleContentColor: Color = DialogTokens.titleContentColor,
     textContentColor: Color = DialogTokens.textContentColor,
 ) {
-    CenterDialog(dialogState = state, shape = shape, containerColor = containerColor, elevation = tonalElevation) {
+    CenterDialog(
+        dialogState = state,
+        shape = shape,
+        containerColor = containerColor,
+        elevation = tonalElevation,
+        modifier = Modifier.padding(Dimensions.default)
+    ) {
         AlertDialogContent(
             iconContent, titleContent, textContent, buttonContent, buttonContentColor, iconContentColor,
             titleContentColor, textContentColor,
@@ -108,7 +114,9 @@ private fun AlertDialogContent(
     titleContentColor: Color,
     textContentColor: Color,
 ) {
-    Column(modifier = Modifier.horizontalInsetsPadding().padding(DialogPadding)) {
+    Column(modifier = Modifier
+        .horizontalInsetsPadding()
+        .padding(DialogPadding)) {
         if (iconContent != null) {
             Box(
                 modifier = Modifier
