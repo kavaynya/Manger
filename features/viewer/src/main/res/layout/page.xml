@@ -33,7 +33,8 @@
         android:layout_gravity="center"
         android:background="@drawable/bgr_progress"
         android:indeterminate="true"
-        tools:visibility="gone" />
+        android:alpha="0.9"
+        tools:visibility="visible" />
 
     <TextView
         android:id="@+id/progressText"
@@ -60,6 +61,7 @@
         android:textColor="@color/text_for_transparent_dark"
         android:textSize="16sp"
         android:textStyle="bold"
-        tools:text="@string/error_argument" />
+        tools:text="@string/error_argument"
+        tools:visibility="gone"/>
 
 </FrameLayout>

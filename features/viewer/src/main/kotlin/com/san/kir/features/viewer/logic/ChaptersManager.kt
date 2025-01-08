@@ -48,18 +48,15 @@ internal class ChaptersManager(
 
     private val _state = MutableStateFlow(ManagerState())
     val state = _state.asStateFlow()
-    private val currentState: ManagerState
-        get() = state.value
+
+    private val currentState: ManagerState get() = state.value
 
     suspend fun init(manga: Manga, chapterId: Long) = withDefaultContext {
+        _state.update { old -> old.copy(color = manga.color) }
+
         val list = chapterRepository.allItems(manga.id)
 
-        val chapters =
-            if (manga.isAlternativeSort) {
-                list.sortedWith(ChapterComparator())
-            } else {
-                list
-            }
+        val chapters = if (manga.isAlternativeSort) list.sortedWith(ChapterComparator()) else list
 
         val currentChapterPosition = findChapterPosition(chapters, chapterId)
         val currentChapter = chapters[currentChapterPosition]
@@ -69,11 +66,11 @@ internal class ChaptersManager(
 
         val statisticId = statisticsRepository.idByMangaId(manga.id)
 
-        statisticItem = if (statisticId == null)
-            statisticsRepository.itemById(
-                statisticsRepository.save(Statistic(mangaId = manga.id)).first()
-            )!!
-        else statisticsRepository.itemById(statisticId)!!
+        statisticItem =
+            if (statisticId == null)
+                statisticsRepository.itemById(statisticsRepository.save(Statistic(mangaId = manga.id)).first())!!
+            else
+                statisticsRepository.itemById(statisticId)!!
 
         statisticItem = statisticItem.copy(
             lastChapters = 0,
@@ -87,7 +84,7 @@ internal class ChaptersManager(
             old.copy(
                 pagePosition = currentPagePosition,
                 chapterPosition = currentChapterPosition,
-                chapters = chapters.updatePages(currentChapterPosition)
+                chapters = chapters.updatePages(currentChapterPosition),
             ).preparePages()
         }
     }
@@ -96,27 +93,16 @@ internal class ChaptersManager(
         updateCurrentChapter(chapter.withUpdatedPages())
     }
 
-    suspend fun nextPage() {
-        updatePagePosition(currentState.pagePosition + 1)
-    }
-
-    suspend fun prevPage() {
-        updatePagePosition(currentState.pagePosition - 1)
-    }
+    suspend fun nextPage() = updatePagePosition(currentState.pagePosition + 1)
+    suspend fun prevPage() = updatePagePosition(currentState.pagePosition - 1)
 
     suspend fun nextChapter() { // переключение на следующую главу
         if (currentState.hasNextChapter().not()) return
         _state.update { old ->
-            old.copy(
-                pagePosition = 1,
-                chapterPosition = old.chapterPosition + 1,
-                pages = emptyList()
-            )
+            old.copy(pagePosition = 1, chapterPosition = old.chapterPosition + 1, pages = emptyList())
         }
 
-        _state.update { old ->
-            old.copy(chapters = old.chapters.updatePages(old.chapterPosition)).preparePages()
-        }
+        _state.update { old -> old.copy(chapters = old.chapters.updatePages(old.chapterPosition)).preparePages() }
         statisticItem = statisticItem.copy(
             lastChapters = statisticItem.lastChapters + 1,
             allChapters = statisticItem.allChapters + 1,
@@ -127,27 +113,17 @@ internal class ChaptersManager(
     fun prevChapter() { // переключение на предыдущию главу
         if (currentState.hasPrevChapter()) {
             _state.update { old ->
-                old.copy(
-                    pagePosition = 1,
-                    chapterPosition = old.chapterPosition - 1,
-                ).preparePages()
+                old.copy(pagePosition = 1, chapterPosition = old.chapterPosition - 1).preparePages()
             }
         }
     }
 
-    private fun findChapterPosition(
-        chapters: List<Chapter>,
-        chapterId: Long,
-    ): Int { // Позиции главы, по названию главы
-        val lastIndex = chapters.size - 1 // Последняя позиция
-        // Проверка всех названий глав на соответствие, если ничего нет, то позиция равна 0
-        return (0..lastIndex).firstOrNull { chapters[it].id == chapterId } ?: 0
+    private fun findChapterPosition(chapters: List<Chapter>, chapterId: Long): Int {
+        return (0..chapters.lastIndex).firstOrNull { chapters[it].id == chapterId } ?: 0
     }
 
     private fun updateCurrentChapter(chapter: Chapter) {
-        _state.update { old ->
-            old.copy(chapters = old.chapters.set(old.chapterPosition, chapter)).preparePages()
-        }
+        _state.update { old -> old.copy(chapters = old.chapters.set(old.chapterPosition, chapter)).preparePages() }
     }
 
     private suspend fun saveProgress(pos: Int) { // Сохранение позиции текущей главы
@@ -157,8 +133,7 @@ internal class ChaptersManager(
         when {
             pos < 1 -> p = 1 // если меньше единицы значение, то приравнять к еденице
             pos == currentState.pages.size - 2 -> { // если текущая позиция последняя
-                Timber.v("pos is $pos")
-                Timber.v("size is ${currentState.pages.size}")
+                Timber.v("pos is $pos \nsize is ${currentState.pages.size}")
                 p = currentState.pages.size - 2
                 // Сделать главу прочитанной
                 chapter = chapter.copy(isRead = true)
@@ -188,9 +163,7 @@ internal class ChaptersManager(
             .onFailure { ex ->
                 Timber.v(ex)
                 val errorState = when (ex) {
-                    is AuthorizationException -> ErrorState.AuthError(
-                        siteCatalogManager.catalog(link).name
-                    )
+                    is AuthorizationException -> ErrorState.AuthError(siteCatalogManager.catalog(link).name)
                     is PageNotFoundException -> ErrorState.NotFoundError
                     else -> ErrorState.BaseError(ex.localizedMessage ?: "Unknown error")
                 }
@@ -216,16 +189,15 @@ internal data class ManagerState(
     val chapters: List<Chapter> = emptyList(), // Список глав
     val chapterPosition: Int = -1, // Позиция текущей глава
 
-    val error: ErrorState = ErrorState.None
+    val error: ErrorState = ErrorState.None,
+
+    val color: Int = 0,
 ) {
     val uiChapterPosition: Int // Позиция текущей главы для ui
         get() = chapterPosition + 1
 
     val currentChapter: Chapter // Текущая глава
-        get() =
-            if (chapterPosition in chapters.indices) {
-                chapters[chapterPosition]
-            } else Chapter()
+        get() = if (chapterPosition in chapters.indices) chapters[chapterPosition] else Chapter()
 
     override fun toString(): String {
         return buildString {
@@ -253,19 +225,13 @@ internal fun ManagerState.hasPrevChapter() = chapterPosition > 0
 internal fun ManagerState.preparePages(): ManagerState {
     val pages = mutableListOf<Page>()
 
-    if (hasPrevChapter())  // Если есть главы до этой
-        pages.add(Page.Prev) // Добавить в конец указатель наличия предыдущей главы
-    else  // если нет
-        pages.add(Page.NonePrev) // Добавить в конец указатель отсутствия предыдущей главы
+    if (hasPrevChapter()) pages.add(Page.Prev) // Добавить в конец указатель наличия предыдущей главы
+    else pages.add(Page.NonePrev) // Добавить в конец указатель отсутствия предыдущей главы
 
-    pages.addAll(
-        currentChapter.pages
-            .map<String, Page> { Page.Current(it, currentChapter) })
+    pages.addAll(currentChapter.pages.map<String, Page> { Page.Current(it, currentChapter) })
 
-    if (hasNextChapter())  // Если есть главы после этой
-        pages.add(Page.Next) // Добавить в конец указатель наличия следующей главы
-    else // если нет
-        pages.add(Page.NoneNext) // Добавить в конец указатель отсутствия следующей главы
+    if (hasNextChapter()) pages.add(Page.Next) // Добавить в конец указатель наличия следующей главы
+    else pages.add(Page.NoneNext) // Добавить в конец указатель отсутствия следующей главы
 
     return copy(pages = pages)
 }

@@ -24,6 +24,7 @@
         android:contentDescription="@string/move_to_previous_chapter"
         android:focusable="true"
         android:padding="16dp"
+        android:alpha="0.9"
         app:srcCompat="@android:drawable/ic_media_previous" />
 
     <ImageButton
@@ -38,6 +39,7 @@
         android:contentDescription="@string/move_to_next_chapter"
         android:focusable="true"
         android:padding="16dp"
+        android:alpha="0.9"
         app:srcCompat="@android:drawable/ic_media_next" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
@@ -45,6 +47,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_gravity="top"
+        android:alpha="0.9"
         android:background="@color/primary">
 
         <ImageView

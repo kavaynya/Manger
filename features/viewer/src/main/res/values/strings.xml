@@ -3,14 +3,8 @@
     <string name="finish_reading">Закончить чтение</string>
     <string name="viewer_page_next_text">Для перехода на следующую главу нажмите на экран</string>
     <string name="viewer_page_prev_text">Для перехода на предыдущую главу нажмите на экран</string>
-    <string name="viewer_page_none_next_text">
-        Увы но еще одной главы нет, мне очень жаль.\n
-        Для выхода нажмите на экран
-    </string>
-    <string name="viewer_page_none_prev_text">
-        Эта самая первая глава, ничего первее быть не должно.\n
-        Для выхода нажмите на экран
-    </string>
+    <string name="viewer_page_none_next_text">Увы но еще одной главы нет, мне очень жаль.\n\nДля выхода нажмите на экран</string>
+    <string name="viewer_page_none_prev_text">Эта самая первая глава, ничего первее быть не должно.\n\nДля выхода нажмите на экран</string>
 
     <string name="error_argument">
         Во время загрузки произошла следующая ошибка: \n

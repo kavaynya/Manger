@@ -26,8 +26,11 @@ import com.san.kir.features.viewer.databinding.PageBinding
 import com.san.kir.features.viewer.utils.LoadState
 import com.san.kir.features.viewer.utils.Page
 import com.san.kir.features.viewer.utils.VIEW_OFFSET
+import com.san.kir.features.viewer.utils.setContainerColor
+import com.san.kir.features.viewer.utils.setContentColor
 import io.ktor.client.plugins.ClientRequestException
 import io.ktor.http.HttpStatusCode
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -40,20 +43,18 @@ import java.util.concurrent.Executors
 @SuppressLint("ClickableViewAccessibility")
 internal class PageFragment : Fragment() {
     companion object {
-        private const val page_name = "page_name"
+        private const val PAGE_NAME = "page_name"
 
         fun newInstance(page: Page.Current): PageFragment {
             return PageFragment().apply {
-                arguments = bundleOf(page_name to page)
+                arguments = bundleOf(PAGE_NAME to page)
             }
         }
     }
 
     private val viewModel: ViewerViewModel by activityViewModels()
     private val images: LoadImageViewModel by viewModels(factoryProducer = {
-        viewModelFactory {
-            initializer { LoadImageViewModel() }
-        }
+        viewModelFactory { initializer { LoadImageViewModel() } }
     })
 
     private var _binding: PageBinding? = null
@@ -65,10 +66,7 @@ internal class PageFragment : Fragment() {
             // Установка зума и расположения страницы
             binding.viewer.setMinimumScaleType(SCALE_TYPE_CUSTOM)
             binding.viewer.minScale = binding.viewer.width / binding.viewer.sWidth.toFloat()
-            binding.viewer.setScaleAndCenter(
-                binding.viewer.minScale,
-                PointF(binding.viewer.sWidth / 2f, 0f)
-            )
+            binding.viewer.setScaleAndCenter(binding.viewer.minScale, PointF(binding.viewer.sWidth / 2f, 0f))
         }
 
         override fun onImageLoaded() {
@@ -76,32 +74,16 @@ internal class PageFragment : Fragment() {
             binding.progress.isVisible = false
         }
 
-        override fun onPreviewLoadError(e: Exception?) {
-            Timber.v("onPreviewLoadError")
-        }
-
-        override fun onImageLoadError(e: Exception?) {
-            Timber.v("onImageLoadError")
-        }
-
-        override fun onTileLoadError(e: Exception?) {
-            Timber.v("onTileLoadError")
-        }
-
-        override fun onPreviewReleased() {
-            Timber.v("onPreviewReleased")
-        }
+        override fun onPreviewLoadError(e: Exception?) = Timber.v("onPreviewLoadError")
+        override fun onImageLoadError(e: Exception?) = Timber.v("onImageLoadError")
+        override fun onTileLoadError(e: Exception?) = Timber.v("onTileLoadError")
+        override fun onPreviewReleased() = Timber.v("onPreviewReleased")
     }
 
-    private val page: Page.Current? by lazy { arguments?.getParcelable(page_name) }
+    private val page: Page.Current? by lazy { arguments?.getParcelable(PAGE_NAME) }
 
-    override fun onCreateView(
-        inflater: LayoutInflater,
-        container: ViewGroup?,
-        savedInstanceState: Bundle?,
-    ) = PageBinding.inflate(inflater, container, false)
-        .apply { _binding = this }
-        .root
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?) =
+        PageBinding.inflate(inflater, container, false).apply { _binding = this }.root
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -196,6 +178,17 @@ internal class PageFragment : Fragment() {
                 .hasScrollbars
                 .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
                 .onEach(binding.viewer::setScrollbarsVisible)
+                .launchIn(this)
+
+            viewModel.chaptersManager.state
+                .flowWithLifecycle(lifecycle, Lifecycle.State.RESUMED)
+                .filter { it.color != 0 }
+                .onEach { state ->
+                    binding.apply {
+                        context?.setContainerColor(state.color, update, progress)
+                        setContentColor(state.color, update, progressText, progress)
+                    }
+                }
                 .launchIn(this)
         }
     }

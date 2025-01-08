@@ -36,19 +36,14 @@ internal class ViewerViewModel(
     private val _visibleUI = MutableStateFlow(VisibleState())
     val visibleUI = _visibleUI.asStateFlow()
 
-    fun toggleVisibilityUI(
-        state: Boolean = _visibleUI.value.isShown.not(),
-        force: Boolean = false
-    ) {
+    fun toggleVisibilityUI(state: Boolean = _visibleUI.value.isShown.not(), force: Boolean = false) {
         _visibleUI.value = VisibleState(state, force)
     }
 
     // Хранение способов листания глав
-    val control = settingsRepository.control
-        .stateIn(viewModelScope, SharingStarted.Lazily, Settings.Viewer.Control())
+    val control = settingsRepository.control.stateIn(viewModelScope, SharingStarted.Lazily, Settings.Viewer.Control())
 
-    val hasScrollbars = settingsRepository.useScrollbars
-        .stateIn(viewModelScope, SharingStarted.Lazily, false)
+    val hasScrollbars = settingsRepository.useScrollbars.stateIn(viewModelScope, SharingStarted.Lazily, false)
 
     // инициализация данных
     private var isInitManager = false
@@ -90,9 +85,7 @@ internal class ViewerViewModel(
     fun getStopWatch(): StateFlow<Int> {
         val timerFlow = MutableStateFlow(-1)
 
-        timer(name = "readTimeStopWatch", period = 60_000) {
-            timerFlow.value++
-        }
+        timer(name = "readTimeStopWatch", period = 60_000) { timerFlow.value++ }
 
         return timerFlow.asStateFlow()
     }
@@ -112,14 +105,12 @@ internal class ViewerViewModel(
 
         // Если нажатие по центральной части
         // Переключение видимости баров
-        if (xPosition.toInt() in (leftPart + 1) until rightPart) {
-            toggleVisibilityUI()
-        }
+        if (xPosition.toInt() in (leftPart + 1) until rightPart) toggleVisibilityUI()
     }
 
     fun setScreenWidth(width: Int) {
-        leftPart = (width * leftScreenPart).roundToInt()
-        rightPart = (width * rightScreenPart).roundToInt()
+        leftPart = (width * LEFT_SCREEN_PART).roundToInt()
+        rightPart = (width * RIGHT_SCREEN_PART).roundToInt()
     }
 
     // Обновление списка страниц для текущей главы
@@ -128,8 +119,8 @@ internal class ViewerViewModel(
     }
 
     companion object {
-        private const val leftScreenPart = 2 / 5f
-        private const val rightScreenPart = 3 / 5f
+        private const val LEFT_SCREEN_PART = 2 / 5f
+        private const val RIGHT_SCREEN_PART = 3 / 5f
     }
 }
 

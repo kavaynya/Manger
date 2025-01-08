@@ -34,6 +34,8 @@ import com.san.kir.features.viewer.databinding.MainBinding
 import com.san.kir.features.viewer.logic.ErrorState
 import com.san.kir.features.viewer.utils.Page
 import com.san.kir.features.viewer.utils.VIEW_OFFSET
+import com.san.kir.features.viewer.utils.setContainerColor
+import com.san.kir.features.viewer.utils.setContentColor
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.launchIn
@@ -42,9 +44,7 @@ import kotlinx.coroutines.launch
 import kotlin.time.Duration.Companion.seconds
 
 public object MangaViewer {
-    public fun start(chapterID: Long, context: Context) {
-        ViewerActivity.start(chapterID, context)
-    }
+    public fun start(chapterID: Long, context: Context): Unit = ViewerActivity.start(chapterID, context)
 }
 
 internal class ViewerActivity : AppCompatActivity() {
@@ -92,15 +92,9 @@ internal class ViewerActivity : AppCompatActivity() {
 
         binding.pager.offscreenPageLimit = 2
 
-        binding.next.setOnClickListener { // Следующая глава
-            lifecycleScope.defaultLaunch { viewModel.chaptersManager.nextChapter() }
-        }
-        binding.prev.setOnClickListener { // Предыдущая глава
-            lifecycleScope.defaultLaunch { viewModel.chaptersManager.prevChapter() }
-        }
-        binding.back.setOnClickListener {
-            onBackPressedDispatcher.onBackPressed()
-        }
+        binding.next.setOnClickListener { lifecycleScope.defaultLaunch { viewModel.chaptersManager.nextChapter() } }
+        binding.prev.setOnClickListener { lifecycleScope.defaultLaunch { viewModel.chaptersManager.prevChapter() } }
+        binding.back.setOnClickListener { onBackPressedDispatcher.onBackPressed() }
     }
 
     override fun onResume() {
@@ -115,7 +109,6 @@ internal class ViewerActivity : AppCompatActivity() {
                 Orientation.LAND_REV -> ActivityInfo.SCREEN_ORIENTATION_REVERSE_LANDSCAPE
                 Orientation.AUTO_PORT -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_PORTRAIT
                 Orientation.AUTO_LAND -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
-                else -> ActivityInfo.SCREEN_ORIENTATION_SENSOR_LANDSCAPE
             }
 
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
@@ -187,17 +180,12 @@ internal class ViewerActivity : AppCompatActivity() {
                     binding.loaderContainer.isVisible = true
                     binding.loader.isVisible = false
 
-                    val str = when (val error = state.error) {
-                        is ErrorState.AuthError -> getString(
-                            R.string.auth_error_loading,
-                            error.catalogName
-                        )
-
+                    binding.loaderText.text = when (val error = state.error) {
+                        is ErrorState.AuthError -> getString(R.string.auth_error_loading, error.catalogName)
                         is ErrorState.BaseError -> getString(R.string.error_loading, error.text)
                         is ErrorState.NotFoundError -> getString(R.string.not_found_error_loading)
                         ErrorState.None -> ""
                     }
-                    binding.loaderText.setText(str)
                 }
 
                 // обновление прогрессбара
@@ -236,6 +224,14 @@ internal class ViewerActivity : AppCompatActivity() {
 
                 // Обновление заголовка
                 binding.title.text = state.currentChapter.name
+
+                // Обновление цветов
+                if (state.color != 0) {
+                    binding.apply {
+                        setContainerColor(state.color, prev, next, appbar)
+                        setContentColor(state.color, prev, next, back, title, stopwatch, chaptersText, pagesText)
+                    }
+                }
             }
             .launchIn(lifecycleScope)
     }
@@ -268,9 +264,7 @@ internal class ViewerActivity : AppCompatActivity() {
     private fun initData() {
         // получение данных и инициализация менеджера
         val id = intent.getLongExtra(CHAPTER_KEY, -1L)
-        if (id != -1L) {
-            viewModel.init(id)
-        }
+        if (id != -1L) viewModel.init(id)
     }
 
     private fun runStopWatch() {
@@ -296,36 +290,24 @@ internal class ViewerActivity : AppCompatActivity() {
         WindowCompat.setDecorFitsSystemWindows(window, false)
         WindowInsetsControllerCompat(window, window.decorView).let { controller ->
             controller.hide(WindowInsetsCompat.Type.systemBars())
-            controller.systemBarsBehavior =
-                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+            controller.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
     }
 
     override fun onWindowFocusChanged(hasFocus: Boolean) {
         super.onWindowFocusChanged(hasFocus)
-        if (hasFocus) {
-            hideSystemUI()
-        }
+        if (hasFocus) hideSystemUI()
     }
 
     private fun showUI() {
         AnimatorSet().apply {
             playTogether(
-                ObjectAnimator.ofFloat(
-                    binding.appbar, View.TRANSLATION_Y, binding.appbar.translationY, 0f
-                ).apply { doOnStart { binding.progressBar.isVisible = false } },
-                ObjectAnimator.ofFloat(
-                    binding.prev, View.TRANSLATION_Y, binding.prev.translationY, 0f
-                ),
-                ObjectAnimator.ofFloat(
-                    binding.prev, View.TRANSLATION_X, binding.prev.translationX, 0f
-                ),
-                ObjectAnimator.ofFloat(
-                    binding.next, View.TRANSLATION_Y, binding.next.translationY, 0f
-                ),
-                ObjectAnimator.ofFloat(
-                    binding.next, View.TRANSLATION_X, binding.next.translationX, 0f
-                ),
+                ObjectAnimator.ofFloat(binding.appbar, View.TRANSLATION_Y, binding.appbar.translationY, 0f)
+                    .apply { doOnStart { binding.progressBar.isVisible = false } },
+                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_Y, binding.prev.translationY, 0f),
+                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_X, binding.prev.translationX, 0f),
+                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_Y, binding.next.translationY, 0f),
+                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_X, binding.next.translationX, 0f),
             )
             start()
         }
@@ -334,21 +316,12 @@ internal class ViewerActivity : AppCompatActivity() {
     private fun hideUI() {
         AnimatorSet().apply {
             playTogether(
-                ObjectAnimator.ofFloat(
-                    binding.appbar, View.TRANSLATION_Y, binding.appbar.translationY, -VIEW_OFFSET
-                ).apply { doOnEnd { binding.progressBar.isVisible = true } },
-                ObjectAnimator.ofFloat(
-                    binding.prev, View.TRANSLATION_Y, binding.prev.translationY, VIEW_OFFSET
-                ),
-                ObjectAnimator.ofFloat(
-                    binding.prev, View.TRANSLATION_X, binding.prev.translationX, -VIEW_OFFSET
-                ),
-                ObjectAnimator.ofFloat(
-                    binding.next, View.TRANSLATION_Y, binding.next.translationY, VIEW_OFFSET
-                ),
-                ObjectAnimator.ofFloat(
-                    binding.next, View.TRANSLATION_X, binding.next.translationX, VIEW_OFFSET
-                ),
+                ObjectAnimator.ofFloat(binding.appbar, View.TRANSLATION_Y, binding.appbar.translationY, -VIEW_OFFSET)
+                    .apply { doOnEnd { binding.progressBar.isVisible = true } },
+                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_Y, binding.prev.translationY, VIEW_OFFSET),
+                ObjectAnimator.ofFloat(binding.prev, View.TRANSLATION_X, binding.prev.translationX, -VIEW_OFFSET),
+                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_Y, binding.next.translationY, VIEW_OFFSET),
+                ObjectAnimator.ofFloat(binding.next, View.TRANSLATION_X, binding.next.translationX, VIEW_OFFSET),
             )
             start()
         }
