@@ -88,11 +88,7 @@ import timber.log.Timber
         AutoMigration(from = 58, to = 59, spec = From58to59::class), // remove Site table
         AutoMigration(from = 59, to = 60, spec = From59to60::class), // remove field from Manga
         AutoMigration(from = 60, to = 61), // update SimplifiedManga view
-        AutoMigration(
-            from = 62,
-            to = 63,
-            spec = From62to63::class
-        ), // remove unused fields from Chapters
+        AutoMigration(from = 62, to = 63, spec = From62to63::class), // remove unused fields from Chapters
         AutoMigration(from = 63, to = 64, spec = From63to64::class), //
     ]
 )

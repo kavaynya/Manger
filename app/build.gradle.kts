@@ -6,10 +6,10 @@ android {
     namespace = "com.san.kir.manger"
 
     defaultConfig {
-        applicationId = "com.san.kir.manger"
+        applicationId = "com.san.kir.manger.alpha"
 
-        versionCode = 283
-        versionName = "2.8.3"
+        versionCode = 300
+        versionName = "3.0.0-alpha"
 
         setProperty("archivesBaseName", "Manger $versionName")
     }

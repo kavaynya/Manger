@@ -6,7 +6,6 @@ import androidx.compose.runtime.remember
 import com.san.kir.accounts.Accounts
 import com.san.kir.accounts.accountsSerializersModule
 import com.san.kir.catalog.AddOnline
-import com.san.kir.catalog.Catalog
 import com.san.kir.catalog.Catalogs
 import com.san.kir.catalog.catalogsSerializersModule
 import com.san.kir.categories.Categories
@@ -94,7 +93,7 @@ internal class About(val mangaId: Long, val sharedParams: SharedParams) : NavCon
 @Composable
 public fun LibraryNavHost() {
     NavHost(
-        startConfig = Catalog("UniComics", SharedParams()),
+        startConfig = Library,
         serializerModule = AddNavigationCreators.serializerModule(
             storageSerializersModule,
             categorySerializersModule,
