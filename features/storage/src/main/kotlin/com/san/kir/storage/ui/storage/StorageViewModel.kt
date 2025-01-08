@@ -1,6 +1,5 @@
 package com.san.kir.storage.ui.storage
 
-import android.content.Context
 import com.san.kir.background.works.AllChapterDelete
 import com.san.kir.background.works.ChapterDeleteWorker
 import com.san.kir.background.works.ReadChapterDelete
@@ -26,7 +25,6 @@ import kotlinx.coroutines.flow.update
 internal class StorageViewModel(
     private val mangaId: Long,
     hasUpdate: Boolean,
-    private val context: Context = ManualDI.application,
     private val storageRepository: StorageRepository = ManualDI.storageRepository(),
     private val mangaRepository: MangaRepository = ManualDI.mangaRepository()
 ) : ViewModel<StorageState>(), StorageStateHolder {
@@ -50,11 +48,8 @@ internal class StorageViewModel(
 
     override suspend fun onAction(action: Action) {
         when (action) {
-            StorageAction.DeleteAll ->
-                ChapterDeleteWorker.addTask<AllChapterDelete>(mangaId)
-
-            StorageAction.DeleteRead ->
-                ChapterDeleteWorker.addTask<ReadChapterDelete>(mangaId)
+            StorageAction.DeleteAll -> ChapterDeleteWorker.addTask<AllChapterDelete>(mangaId)
+            StorageAction.DeleteRead -> ChapterDeleteWorker.addTask<ReadChapterDelete>(mangaId)
         }
     }
 

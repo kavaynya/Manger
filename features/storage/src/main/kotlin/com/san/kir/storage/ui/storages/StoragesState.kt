@@ -17,4 +17,7 @@ internal data class BackgroundState(val load: Boolean = true, val deleting: Int 
 internal data class StorageContainer(
     val storage: Storage,
     val mangaLogo: MangaLogo?,
-)
+    val deleting: Boolean = false,
+) {
+    val id = storage.id
+}

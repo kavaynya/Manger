@@ -33,9 +33,7 @@ public class AllChapterDelete(
                 Timber.tag("AllChapterDelete").e("Не найдена манга с id -> $mangaId")
             }
         }.fold(
-            onSuccess = {
-                Result.success()
-            },
+            onSuccess = { Result.success() },
             onFailure = {
                 Timber.tag("AllChapterDelete").e(it)
                 Result.failure()
@@ -43,17 +41,11 @@ public class AllChapterDelete(
         )
     }
 
-    private fun deleteAllChapters(manga: Manga) {
-        getFullPath(manga.path).deleteRecursively()
-    }
+    private fun deleteAllChapters(manga: Manga) = getFullPath(manga.path).deleteRecursively()
 
     private suspend fun updateStorageItem(manga: Manga) {
         val storageItem = storageRepository.items().first { it.path == getFullPath(manga.path).shortPath }
-
         val file = getFullPath(storageItem.path)
-
-        storageRepository.save(
-            storageItem.getSizes(file, chaptersRepository.allItems(manga.id))
-        )
+        storageRepository.save(storageItem.getSizes(file, chaptersRepository.allItems(manga.id)))
     }
 }

@@ -23,4 +23,10 @@ internal interface StorageDao : BaseDao<DbStorage> {
 
     @Query("SELECT * FROM StorageItem ORDER BY sizeFull DESC")
     suspend fun items(): List<DbStorage>
+
+    @Query("SELECT * FROM StorageItem WHERE id=:id")
+    suspend fun itemById(id: Long): DbStorage?
+
+    @Query("DELETE FROM StorageItem WHERE id=:id")
+    suspend fun delete(id: Long): Int
 }

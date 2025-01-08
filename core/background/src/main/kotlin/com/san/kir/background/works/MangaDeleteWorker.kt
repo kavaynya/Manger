@@ -30,11 +30,9 @@ public class MangaDeleteWorker(
         return runCatching {
             removeWithChapters(mangaId, withFiles)
         }.fold(
-            onSuccess = {
-                Result.success()
-            },
+            onSuccess = { Result.success() },
             onFailure = {
-                Timber.tag("MangaDeleteWorker").e(it)
+                Timber.tag(TAG).e(it)
                 Result.failure()
             }
         )
@@ -48,9 +46,7 @@ public class MangaDeleteWorker(
         val ids = chaptersRepository.allItems(manga.id).map { it.id }
         chaptersRepository.delete(ids)
 
-        if (withFiles) {
-            getFullPath(manga.path).deleteRecursively()
-        }
+        if (withFiles) getFullPath(manga.path).deleteRecursively()
     }
 
     public companion object {

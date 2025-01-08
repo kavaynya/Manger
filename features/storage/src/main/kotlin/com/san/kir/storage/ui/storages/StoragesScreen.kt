@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -33,6 +34,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.sp
 import com.san.kir.core.compose.CircleLogo
 import com.san.kir.core.compose.Dimensions
@@ -40,6 +42,7 @@ import com.san.kir.core.compose.NavigationButton
 import com.san.kir.core.compose.ScreenList
 import com.san.kir.core.compose.SwipeToDelete
 import com.san.kir.core.compose.SwipeToDeleteDefaults
+import com.san.kir.core.compose.animation.FadeAnimatedVisibility
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.animateToDelayed
 import com.san.kir.core.compose.animation.rememberDoubleAnimatable
@@ -56,8 +59,6 @@ import com.san.kir.core.utils.viewModel.OnEvent
 import com.san.kir.core.utils.viewModel.ReturnEvents
 import com.san.kir.core.utils.viewModel.rememberSendAction
 import com.san.kir.core.utils.viewModel.stateHolder
-import com.san.kir.data.models.main.MangaLogo
-import com.san.kir.data.models.main.Storage
 import com.san.kir.storage.R
 import com.san.kir.storage.utils.StorageProgressBar
 import kotlinx.coroutines.launch
@@ -128,8 +129,7 @@ internal fun StoragesScreen(
         items(items.size, key = { i -> items[i].storage.id }) { index ->
             val item = items[index]
             ItemView(
-                item = item.storage,
-                manga = item.mangaLogo,
+                item = item,
                 storageSize = state.size,
                 dismissState = dismissStates.getOrNull(index)
                     ?: SwipeToDismissBoxState(SwipeToDismissBoxValue.Settled, density) { it / 2 },
@@ -142,8 +142,7 @@ internal fun StoragesScreen(
 @OptIn(ExperimentalFoundationApi::class, ExperimentalMaterial3Api::class)
 @Composable
 private fun LazyItemScope.ItemView(
-    item: Storage,
-    manga: MangaLogo?,
+    item: StorageContainer,
     storageSize: Double,
     dismissState: SwipeToDismissBoxState,
     sendAction: (Action) -> Unit,
@@ -152,9 +151,9 @@ private fun LazyItemScope.ItemView(
     val sizeFullCounter = rememberDoubleAnimatable()
     val sizeReadCounter = rememberDoubleAnimatable()
 
-    LaunchedEffect(item.sizeFull) {
-        launch { sizeFullCounter.animateToDelayed(item.sizeFull) }
-        launch { sizeReadCounter.animateToDelayed(item.sizeRead) }
+    LaunchedEffect(item.storage.sizeFull) {
+        launch { sizeFullCounter.animateToDelayed(item.storage.sizeFull) }
+        launch { sizeReadCounter.animateToDelayed(item.storage.sizeRead) }
     }
 
     SwipeToDelete(
@@ -168,84 +167,105 @@ private fun LazyItemScope.ItemView(
         agreeText = R.string.yes,
         resetDesc = R.string.hold_yes_for_clear,
         durationDismissConfirmation = DurationDismissConfirmation,
-        onSuccessDismiss = {}
+        onSuccessDismiss = { sendAction(StoragesAction.Delete(item.storage.id)) },
+        enabled = item.deleting.not()
     ) {
         Row(
             modifier = Modifier
                 .clip(SwipeToDeleteDefaults.MainItemShape)
-                .clickable {
-                    manga?.let {
-                        sendAction(
-                            ReturnEvents(StoragesEvent.ToStorage(it.id, params, false))
-                        )
-                    }
+                .clickable(item.deleting.not()) {
+                    item.mangaLogo?.let { sendAction(ReturnEvents(StoragesEvent.ToStorage(it.id, params, false))) }
                 }
                 .padding(vertical = Dimensions.quarter)
         ) {
-            // Иконка манги, если для этой папки она еще есть
+            ImageContent(item)
+            TextContent(item, sizeFullCounter, storageSize)
+        }
+
+        FadeAnimatedVisibility(item.deleting, modifier = Modifier.matchParentSize()) {
             Box(
-                contentAlignment = Alignment.Center,
-                modifier = Modifier
-                    .padding(start = ImageStartPadding)
-                    .size(ImageSize)
-                    .align(Alignment.CenterVertically)
+                Modifier
+                    .matchParentSize()
                     .background(
-                        color = MaterialTheme.colorScheme.secondaryContainer,
-                        shape = SwipeToDeleteDefaults.MainItemShape
+                        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = .6f),
+                        SwipeToDeleteDefaults.MainItemShape
                     )
-            ) {
-                if (manga != null) {
-                    CircleLogo(logoUrl = manga.logo, size = ImageSize)
-                } else {
-                    Text(
-                        text = stringResource(R.string.not_in_bd),
-                        color = MaterialTheme.colorScheme.onSecondaryContainer,
-                        fontSize = NoMangaTextSize,
-                        fontWeight = FontWeight.W400,
-                        textAlign = TextAlign.Center,
-                        lineHeight = NoMangaTextSize
-                    )
-                }
-            }
-
-            Column(
-                modifier = Modifier
-                    .weight(1f, true)
-                    .align(Alignment.CenterVertically)
-                    .padding(horizontal = HorizontalItemContentPadding),
-                verticalArrangement = Arrangement.Center
-            ) {
-                // Название папки с мангой
-                if (manga == null) {
-                    Text(item.name, maxLines = 1, style = MaterialTheme.typography.titleMedium)
-                } else {
-                    Text(manga.name, maxLines = 1, style = MaterialTheme.typography.labelSmall)
-                    Text(
-                        stringResource(R.string.folder_format, item.name),
-                        maxLines = 1,
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-
-
-                // Текстовая Информация о занимаемом месте
-                UsedText(sizeFullCounter, storageSize)
-
-                // Прогрессбар занимаемого места
-                StorageProgressBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = Dimensions.quarter, end = Dimensions.default)
-                        .height(Dimensions.smaller),
-                    max = storageSize,
-                    full = item.sizeFull,
-                    read = item.sizeRead,
-                )
-            }
+            )
         }
     }
 }
 
+@Composable
+private fun RowScope.ImageContent(item: StorageContainer) {
+    // Иконка манги, если для этой папки она еще есть
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = Modifier
+            .padding(start = ImageStartPadding)
+            .size(ImageSize)
+            .align(Alignment.CenterVertically)
+            .background(
+                color = MaterialTheme.colorScheme.secondaryContainer,
+                shape = SwipeToDeleteDefaults.MainItemShape
+            )
+    ) {
+        if (item.mangaLogo != null) {
+            CircleLogo(logoUrl = item.mangaLogo.logo, size = ImageSize)
+        } else {
+            Text(
+                text = stringResource(R.string.not_in_bd),
+                color = MaterialTheme.colorScheme.onSecondaryContainer,
+                fontSize = NoMangaTextSize,
+                fontWeight = FontWeight.W400,
+                textAlign = TextAlign.Center,
+                lineHeight = NoMangaTextSize
+            )
+        }
+    }
+}
+
+@Composable
+private fun RowScope.TextContent(
+    item: StorageContainer,
+    sizeFullCounter: Animatable<Double, AnimationVector1D>,
+    storageSize: Double,
+) {
+    Column(
+        modifier = Modifier
+            .weight(1f, true)
+            .align(Alignment.CenterVertically)
+            .padding(horizontal = HorizontalItemContentPadding),
+        verticalArrangement = Arrangement.Center
+    ) {
+        // Название папки с мангой
+        if (item.mangaLogo == null) {
+            Text(item.storage.name, maxLines = 1, style = MaterialTheme.typography.titleMedium)
+        } else {
+            Text(item.mangaLogo.name, maxLines = 1, style = MaterialTheme.typography.labelSmall)
+            Text(
+                stringResource(R.string.folder_format, item.storage.name),
+                maxLines = 1,
+                style = MaterialTheme.typography.titleMedium,
+                overflow = TextOverflow.Ellipsis,
+            )
+        }
+
+
+        // Текстовая Информация о занимаемом месте
+        UsedText(sizeFullCounter, storageSize)
+
+        // Прогрессбар занимаемого места
+        StorageProgressBar(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = Dimensions.quarter, end = Dimensions.default)
+                .height(Dimensions.smaller),
+            max = storageSize,
+            full = item.storage.sizeFull,
+            read = item.storage.sizeRead,
+        )
+    }
+}
 
 @Composable
 private fun UsedText(sizeFull: Animatable<Double, AnimationVector1D>, storageSize: Double) {

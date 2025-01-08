@@ -93,6 +93,7 @@ public fun SwipeToDelete(
     durationDismissConfirmation: Int,
     onSuccessDismiss: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
     resetDesc: Int? = null,
     endButtonPadding: Dp = SwipeToDeleteDefaults.EndButtonEndPadding,
     dismissEndPadding: Dp = 0.dp,
@@ -115,7 +116,10 @@ public fun SwipeToDelete(
     }
 
     LaunchedEffect(isSuccessDismiss) {
-        if (isSuccessDismiss) onSuccessDismiss()
+        if (isSuccessDismiss) {
+            onSuccessDismiss()
+            state.reset()
+        }
     }
 
     SwipeToDismissBox(
@@ -186,6 +190,8 @@ public fun SwipeToDelete(
                 }
             }
         },
+        enableDismissFromEndToStart = enabled,
+        enableDismissFromStartToEnd = enabled,
         modifier = Modifier
             .saveParams(params)
             .then(modifier)
