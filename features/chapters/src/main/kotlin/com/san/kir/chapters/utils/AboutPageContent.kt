@@ -27,7 +27,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -45,8 +44,10 @@ import com.san.kir.core.compose.DefaultSpacer
 import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.FromTopToTopAnimContent
 import com.san.kir.core.compose.bottomInsetsPadding
+import com.san.kir.core.compose.contentColorBy
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
+import com.san.kir.core.compose.intToComposeColor
 import com.san.kir.core.compose.isLandscape
 import com.san.kir.core.compose.isPortrait
 import com.san.kir.core.compose.rememberImage
@@ -67,12 +68,8 @@ internal fun AboutPageContent(
     sendAction: (Action) -> Unit,
 ) {
     val defaultContainerColor = MaterialTheme.colorScheme.primary
-    val defaultContentColor = MaterialTheme.colorScheme.onPrimary
-
-    val containerColor = if (color != 0) Color(color) else null
-    val contentColor = containerColor?.let { color ->
-        if (color.luminance() > 0.5f) Color.Black else Color.White
-    }
+    val containerColor = intToComposeColor(color, defaultContainerColor)
+    val contentColor = contentColorBy(containerColor)
 
     Box(modifier = Modifier.fillMaxSize()) {
         // Большое лого манги
@@ -94,8 +91,8 @@ internal fun AboutPageContent(
             if (isPortrait()) {
                 ResetButton(
                     hasReading,
-                    containerColor ?: defaultContainerColor,
-                    contentColor ?: defaultContentColor,
+                    containerColor,
+                    contentColor,
                     sendAction,
                     Modifier.align(Alignment.End)
                 )
@@ -144,10 +141,11 @@ internal fun AboutPageContent(
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
-                    .background(containerColor ?: defaultContainerColor)
+                    .background(containerColor)
                     .horizontalInsetsPadding(Dimensions.default),
                 fontWeight = FontWeight.Bold,
                 fontSize = 18.sp,
+                color = contentColor,
             )
 
             Row {
@@ -165,8 +163,8 @@ internal fun AboutPageContent(
                         .bottomInsetsPadding(),
                     enabled = nextChapter is NextChapter.Ok,
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = containerColor ?: defaultContainerColor,
-                        contentColor = contentColor ?: defaultContentColor,
+                        containerColor = containerColor,
+                        contentColor = contentColor,
                         disabledContainerColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                         disabledContentColor = MaterialTheme.colorScheme.surface.copy(alpha = 0.8f),
                     ),
@@ -190,8 +188,8 @@ internal fun AboutPageContent(
                 if (isLandscape()) {
                     ResetButton(
                         hasReading,
-                        containerColor ?: defaultContainerColor,
-                        contentColor ?: defaultContentColor,
+                        containerColor,
+                        contentColor,
                         sendAction,
                         modifier = Modifier.align(Alignment.CenterVertically)
                     )

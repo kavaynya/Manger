@@ -20,10 +20,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -31,7 +28,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.painterResource
@@ -42,6 +38,7 @@ import com.san.kir.core.compose.Dimensions
 import com.san.kir.core.compose.animation.SharedParams
 import com.san.kir.core.compose.animation.rememberSharedParams
 import com.san.kir.core.compose.animation.saveParams
+import com.san.kir.core.compose.contentColorBy
 import com.san.kir.core.compose.endInsetsPadding
 import com.san.kir.core.compose.horizontalInsetsPadding
 import com.san.kir.core.compose.rememberImage
@@ -65,7 +62,7 @@ internal fun LazyGridItemScope.LibraryLargeItem(
 ) {
     val defaultColor = MaterialTheme.colorScheme.primary
     val backgroundColor by remember(manga.color) { mutableStateOf(manga.composeColor(defaultColor)) }
-    val textColor = contentColorFor(backgroundColor)
+    val textColor = contentColorBy(backgroundColor)
     val buttonParams = rememberSharedParams(cornerRadius = Dimensions.half)
 
     Card(
@@ -244,15 +241,9 @@ internal fun CategoryName(
     Text(
         text = category,
         modifier = modifier
-            .background(color = contentColorFor(contentColor), shape = RoundedCornerShape(50))
+            .background(color = contentColorBy(contentColor), shape = RoundedCornerShape(50))
             .padding(horizontal = Dimensions.half, vertical = Dimensions.quarter),
         color = contentColor,
         style = MaterialTheme.typography.labelMedium
     )
 }
-
-@Composable
-private fun contentColorFor(background: Color): State<Color> = remember {
-    derivedStateOf { if (background.luminance() > 0.5f) Color.Black else Color.White }
-}
-
