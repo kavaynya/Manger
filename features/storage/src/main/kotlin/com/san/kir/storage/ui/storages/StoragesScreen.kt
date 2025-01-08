@@ -17,6 +17,7 @@ import androidx.compose.foundation.lazy.LazyItemScope
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SwipeToDismissBoxState
+import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -130,7 +131,8 @@ internal fun StoragesScreen(
                 item = item.storage,
                 manga = item.mangaLogo,
                 storageSize = state.size,
-                dismissState = dismissStates[index],
+                dismissState = dismissStates.getOrNull(index)
+                    ?: SwipeToDismissBoxState(SwipeToDismissBoxValue.Settled, density) { it / 2 },
                 sendAction = sendAction
             )
         }
