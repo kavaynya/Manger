@@ -12,13 +12,14 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.defaultMinSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.selection.selectable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Add
@@ -86,19 +87,14 @@ public fun <T> RadioGroup(
     stateList: List<T>,
     textList: List<String>,
 ) {
-    Column {
+    Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
         stateList.zip(textList).forEach { (s, text) ->
             Row(
                 modifier = Modifier
                     .clip(CircleShape)
-                    .selectable(
-                        selected = state == s,
-                        role = Role.RadioButton,
-                        onClick = { onSelected(s) }
-                    )
+                    .selectable(selected = state == s, role = Role.RadioButton, onClick = { onSelected(s) })
                     .fillMaxWidth()
-                    .height(56.dp)
-                    .padding(Dimensions.default),
+                    .padding(vertical = Dimensions.quarter),
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 RadioButton(selected = state == s, onClick = { onSelected(s) })

@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -122,27 +124,17 @@ internal fun <T> ListPreferenceItem(
     onValueChange: (T) -> Unit,
 ) {
     var dialog by remember { mutableStateOf(false) }
-    TemplatePreferenceItem(title = title, subtitle = subtitle, icon = icon) {
-        dialog = true
-    }
+    TemplatePreferenceItem(title = title, subtitle = subtitle, icon = icon) { dialog = true }
 
     if (dialog) {
         AlertDialog(
             onDismissRequest = { dialog = false },
             confirmButton = {
-                TextButton(
-                    onClick = { dialog = false },
-                    modifier = Modifier.padding(
-                        end = Dimensions.default,
-                        bottom = Dimensions.default
-                    )
-                ) {
-                    Text(text = "CANCEL")
+                TextButton(onClick = { dialog = false }) {
+                    Text(stringResource(R.string.close).uppercase())
                 }
             },
-            title = {
-                Text(stringResource(title))
-            },
+            title = { Text(stringResource(title)) },
             text = {
                 RadioGroup(
                     state = initialValue,
@@ -166,18 +158,11 @@ internal fun TogglePreferenceItem(
     initialValue: Boolean,
     onCheckedChange: (Boolean) -> Unit,
 ) {
-
     TemplatePreferenceItem(
         title = title, subtitle = subtitle,
         icon = icon,
-        action = {
-            Switch(
-                checked = initialValue,
-                onCheckedChange = { onCheckedChange(it) })
-        },
-        onClick = {
-            onCheckedChange(initialValue.not())
-        }
+        action = { Switch(checked = initialValue, onCheckedChange = { onCheckedChange(it) }) },
+        onClick = { onCheckedChange(initialValue.not()) }
     )
 }
 
@@ -193,40 +178,32 @@ internal fun MultiSelectListPreferenceItem(
     val items = remember(initialValue) { mutableStateListOf(*initialValue.toTypedArray()) }
     var dialog by remember { mutableStateOf(false) }
 
-    TemplatePreferenceItem(title = title, subtitle = subtitle, icon = icon) {
-        dialog = true
-    }
+    TemplatePreferenceItem(title = title, subtitle = subtitle, icon = icon) { dialog = true }
 
     if (dialog) {
         AlertDialog(
             onDismissRequest = { dialog = false },
             confirmButton = {
                 TextButton(
-                    modifier = Modifier.padding(
-                        bottom = Dimensions.default,
-                        end = Dimensions.default
-                    ),
                     onClick = {
                         onValueChange(items)
                         dialog = false
                     }
                 ) {
-                    Text(stringResource(R.string.close))
+                    Text(stringResource(R.string.close).uppercase())
                 }
             },
-            title = {
-                Text(stringResource(title))
-            },
+            title = { Text(stringResource(title)) },
             text = {
                 val textList = stringArrayResource(entries).toList()
 
-                Column {
+                Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     textList.forEachIndexed { index, text ->
                         CheckBoxText(
                             state = items[index],
                             onChange = { items[index] = it },
                             firstText = text,
-                            modifier = Modifier.padding(vertical = Dimensions.half)
+                            modifier = Modifier.padding(vertical = Dimensions.quarter)
                         )
                     }
                 }
